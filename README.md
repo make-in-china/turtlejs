@@ -2,4 +2,6 @@
 
 make it for fun
 
-[blog（博客）](http://make-in-china.github.io/turtlejs)
+[turtle github blog（龟计算1.0github博客）](http://make-in-china.github.io/turtlejs)
+
+I'm a new web developer, you gentle to me（新手写库，轻喷）
