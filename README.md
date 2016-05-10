@@ -4,4 +4,4 @@ make it for fun
 
 [blog（博客）](http://make-in-china.github.io/turtlejs)
 
-I'm new web developer, you gentle to me（新手写库，轻喷）
+I'm new front-end development engineer, please tender with me（新手写库，轻喷）
