@@ -1,17 +1,19 @@
-<!DOCTYPE html>
-<html>
-
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
   <head>
-    <meta charset='utf-8'>
+    <title></title>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="description" content="Turtlejs : make it for fun">
-
+    <meta name="viewport" content="target-densitydpi=device-dpi,width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="css/turtle.min.css">
+    <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
     <title>Turtlejs</title>
+    <script src="js/turtle.js">
+        $t.extend(window,$t.fn);
+    </script>
   </head>
-
-  <body>
+  <body class='scrolly'>
 
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
@@ -29,14 +31,26 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>
-<a id="turtlejs-10" class="anchor" href="#turtlejs-10" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>turtlejs 1.0</h1>
-
-<p>make it for fun</p>
-<p><a href="turtle1.0example">example</a></p>
-      </section>
+    <div id="main_content_wrap" class="outer" style="height:400px;">
+        <xmp>
+            <ui:swiper slideClass="ct bgray15 ub">
+              <script type="option">
+                {
+                    pagination: '.h',
+                    paginationClickable: true,
+                    spaceBetween: 5,
+                    nextButton: '.next1',
+                    prevButton: '.prev2',
+                    onSlideChangeEnd: function(swiper){
+                        
+                    }
+                }
+              </script>
+              <div><a href="turtle1.0example">Example</a></div>
+              <div><a href="turtle1.0component">Component</a></div>
+              <div><a href="turtle1.0sandbox">Sandbox</a></div>
+              <div><a href="turtle1.0api">API</a></div>
+        </xmp>
     </div>
 
     <!-- FOOTER  -->
