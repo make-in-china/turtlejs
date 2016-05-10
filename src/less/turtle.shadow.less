@@ -1,0 +1,56 @@
+@import "turtle.base.less";
+//light<><><>
+.looptext-shadowc(@name,@w,@i:0,@n,@clr,@clr2) when (@i=<@n){
+	@s:0 0 (.1em*@w) mix(@clr,@clr2,@i * 100% / @n);
+	@c:replace(@g_ct,"\?",%(~"light%s%s%s",@w,@name,@i),"gi");
+	@{c}{
+		text-shadow:@s,@s,@s,@s,@s;
+	}
+  .looptext-shadowc(@name,@w,(@i + 1),@n,@clr,@clr2);
+}
+.looptext-shadoww(@cn,@i:0,@n,@clr,@clr2) when (@i=<@n){
+	.looptext-shadowc(@cn,@i,0,15,@clr,@clr2);
+	.looptext-shadoww(@cn,(@i + 1), @n,@clr,@clr2);
+}
+.looptext-shadow(@i:0,@n) when (@i=<@n){
+	@cn:extract(@g_clrs, @i);
+	@clr:extract(@g_clrs, @i+1);
+	@clr2:extract(@g_clrs, @i+2);
+	.looptext-shadoww(@cn,2,5,@clr,@clr2);
+	.looptext-shadow((@i + 3), @n);
+}
+.looptext-shadow(1,length(@g_clrs));
+//shadow<>
+.loopshadow(@i:0,@n) when (@i=<@n){
+	@w:(.0625em*@i);
+	@c1:replace(@g_ct,"\?",%(~"shadow%s",@i),"gi");
+	@{c1}{
+		-webkit-box-shadow:0 0 @w #000;
+		box-shadow:0 0 @w #000;
+	}
+	@c2:replace(@g_ct,"\?",%(~"shadowb%s",@i),"gi");
+	@{c2}{
+		-webkit-box-shadow:0 0 @w #fff;
+		box-shadow:0 0 @w #fff;
+	}
+	@c3:replace(@g_ct,"\?",%(~"shadow-%s",@i),"gi");
+	@{c3}{
+		-webkit-box-shadow:inset 0 0 @w #000;
+		box-shadow:inset 0 0 @w #000;
+	}
+	@c4:replace(@g_ct,"\?",%(~"shadowb-%s",@i),"gi");
+	@{c4}{
+		-webkit-box-shadow:inset 0 0 @w #fff;
+		box-shadow:inset 0 0 @w #fff;
+	}
+  .loopshadow((@i + 1),@n);
+}
+.loopshadow(1,32);
+.parse("shadowless{
+	-webkit-box-shadow: inset 0 0 1px #000,.125em .125em 1em rgba(0,0,0,.2);
+	box-shadow:inset 0 0 1px #000,.125em .125em 1em rgba(0,0,0,.2);
+}");
+.parse("shadowless2{
+	-webkit-box-shadow: .125em .125em 1em rgba(0,0,0,.2);
+	box-shadow:.125em .125em 1em rgba(0,0,0,.2);
+}");

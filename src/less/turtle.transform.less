@@ -1,0 +1,14 @@
+@import "turtle.base.less";
+.parse2("
+	rotate{
+		transform: rotate(?deg);
+		-webkit-transform: rotate(?deg);
+	}
+",0,36,5,5);
+
+.parse2("
+	rotate-{
+		transform: rotate(-?deg);
+		-webkit-transform: rotate(-?deg);
+	}
+",1,36,5,5);

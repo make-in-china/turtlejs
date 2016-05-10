@@ -1,0 +1,109 @@
+@g_clrs:
+	gray,#ffffff,#000000,
+	red,#ff0000,#100000,
+	green,#99ff99,#006600,
+	yellow,#ffff00,#111100,
+	purple,#ff00ff,#110011,
+	yellowgreen,#80ff00,#051100,
+	orange,#ff8000,#800000,
+	coffee,#ffeade,#210c00,
+	blue,#0099ff,#000066,
+    skyblue,#00E0FF,#0080FF,
+    blackAlpha,rgba(0,0,0,1),rgba(0,0,0,0),
+    whiteAlpha,rgba(255,255,255,1),rgba(255,255,255,0);
+@g_ct:~".?,.a?:active,.i?>*,.ia?>*:active,.bf?:before,.bfa?:active::before,.ibf?>*:before,.ibfa?>*:active::before,.af?:after,.afa?:active::after,.iaf?>*:after,.iafa?>*:active::after";
+.parse(@css){
+	@cnotspace:replace(replace(replace(@css,"\n|\t","","gi"),";{1,}",";","gi"),"\s{2,}"," ","gi");
+	@cselector:%(~"%s",replace(@cnotspace,"{.*",""));
+	@ccsss:%(~"%s",replace(replace(@cnotspace,".*{",""),"}.*",""));
+	@c:replace(@g_ct,"\?",@cselector,"gi");//选择器处理
+	@{c}{
+		.do(@ccsss);
+	}
+	.do(@c){
+		@lenc:replace(@c,".{1,}","1");
+		.do(@c,@lenc);	
+		.do(@csss,@len) when(@len=1){
+			@c1:replace(@csss,";.*","");
+			.do2(@c1);
+			.do2(@c){
+				@c1:replace(replace(@c,":.*",""),"\s","","gi");
+				@c2:replace(replace(replace(@c,".*:",""),"^\s*",""),"\s*$","");
+				@{c1}:@c2;//填充样式
+			}
+			@c2:replace(@csss,".*?;","");
+			@lenc2:replace(@c2,".{1,}","1");
+			.do(replace(replace(@c2,"^\s*",""),"\s*$",""),@lenc2);
+		}
+	}
+}
+.parse2(@css,@i:1,@n:1,@v:1,@multiple:1){
+	@cnotspace:replace(replace(replace(@css,"\n|\t","","gi"),";{1,}",";","gi"),"\s{2,}"," ","gi");
+	@cselector:replace(@cnotspace,"{.*","");
+	@ccsss:%(~"%s",replace(replace(@cnotspace,".*{",""),"}.*",""));
+	.do(@cselector,@ccsss,@i,@n,@v);
+	.do(@sl,@css,@i,@n,@v) when(@i=<@n){
+		@cselector:%(~"%s%s",@sl,@i * @multiple);//选择器+数字
+		@c:replace(@g_ct,"\?",@cselector,"gi");//选择器处理
+		@{c}{
+			.do(@ccsss);
+			.do(@c){
+				@lenc:replace(@c,".{1,}","1");
+				.do(@c,@lenc);	
+				.do(@csss,@len) when(@len=1){
+					@c1:replace(@csss,";.*","");
+					.do2(@c1);
+					.do2(@c){
+						@c1:replace(replace(@c,":.*",""),"\s","","gi");
+						@c2:replace(replace(replace(@c,".*:",""),"^\s*",""),"\s*$","");
+						@c3:replace(@c2,"\?",@v * @i,"gi");//选择器处理
+						@{c1}+:@c3;//填充样式
+					}
+					@c2:replace(@csss,".*?;","");
+					@lenc2:replace(@c2,".{1,}","1");
+					.do(replace(replace(@c2,"^\s*",""),"\s*$",""),@lenc2);
+				}
+			}
+		}
+		.do(@sl,@css,(@i + 1),@n,@v)
+	}
+}
+.parsecolor(@css,@i:1,@n:1){
+	@cnotspace:replace(replace(replace(@css,"\n","","gi"),";{1,}",";","gi"),"\s{2,}"," ","gi");
+	@cselector:replace(@cnotspace,"{.*","");
+	@ccsss:%(~"%s",replace(replace(@cnotspace,".*{",""),"}.*",""));
+	.do(1,length(@g_clrs));
+	.do(@ii,@nn) when(@ii=<@nn){
+		@cn:extract(@g_clrs, @ii);
+		@v:extract(@g_clrs, @ii+1);
+		@v2:extract(@g_clrs, @ii+2);
+		.do(@cselector,@ccsss,@i,@n,@v,@v2);
+		.do(@sl,@css,@i,@n,@v,@v2) when(@i=<@n){
+			@cselector:%(~"%s%s%s",@sl,@cn,@i);//选择器+数字
+			@c:replace(@g_ct,"\?",@cselector,"gi");//选择器处理
+			@{c}{
+				.do(@ccsss);
+				.do(@c){
+					@lenc:replace(@c,".{1,}","1");
+					
+					.do(@c,@lenc);	
+					.do(@csss,@len) when(@len=1){
+						@c1:replace(@csss,";.*","");
+						.do2(@c1);
+						.do2(@c){
+							@c1:replace(replace(@c,":.*",""),"\s","","gi");
+							@c2:replace(replace(replace(@c,".*:",""),"^\s*",""),"\s*$","");
+							@c3:replace(@c2,"\?",mix(@v,@v2,@i  * 100% / @n),"gi");//选择器处理
+							@{c1}+:@c3;//填充样式
+						}
+						@c2:replace(@csss,".*?;","");
+						@lenc2:replace(@c2,".{1,}","1");
+						.do(replace(replace(@c2,"^\s*",""),"\s*$",""),@lenc2);
+					}
+				}
+			}
+			.do(@sl,@css,(@i + 1),@n,@v,@v2)
+		}
+		.do(@ii + 3,@nn);
+	}
+}
