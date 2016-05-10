@@ -49,7 +49,7 @@
                       API
                   </a>
                 </set>
-                <ui:swiper slideClass="ct bgray15 ub">
+                <ui:swiper slideclass="ct bgray15 ub">
                   <script type="option">
                     {
                         pagination: '.h',
@@ -60,19 +60,58 @@
                             if(t.classList.contains('swiper-pagination-bullet')){
                                 return;
                             }
+                            if(t.nodeName==="A"&&t.href.length!==0){
+                                return;
+                            }
                             var item=swiper.slides[swiper.activeIndex];
                             window.location.href=item.href;
                         }
                     }
                   </script>
                   <div style="background-color:#2980B9;" href="#">
-                    <div>
-                        兼容性:
-                    </div>
-                                                                        
+                      <div>
+                        <div>
+                            Compatibility（兼容性）:　　IE9+
+                        </div>
+                        <div>
+                            Collaboration（协作能力）:　<a href="#">reactjs</a>　<a href="#">bootstrap</a>
+                        </div>
+                      </div>
                   </div>
-                  <div style="background-color:#1ABC9C;" href="turtle1.0example">
-                      Example
+                  <div style="background-color:#1ABC9C;" href="turtle1.0example" class="scrolly">
+                      <div>
+                        <div>
+                            control（逻辑控制）:
+                        </div>
+                        <div>
+                            if：
+                            <br/>
+                            <pre>&lt;! var v:1&gt;
+&lt;! if v===3&gt;
+    &lt;div&gt;v===3&lt;/div&gt;
+&lt;! else if v===2&gt;
+    &lt;div&gt;v===2&lt;/div&gt;
+&lt;! else&gt;
+    &lt;div&gt;v的值为&lt;!= v&gt;&lt;/div&gt;
+&lt;! end&gt;</pre>
+                            result（执行结果）：
+                            <! var v:1>                                
+                            <! if v===3>
+                                <div>v===3</div>
+                            <! else if v===2>
+                                <div>v===2</div>
+                            <! else>
+                                <div>v的值为<!= v></div>
+                            <! end>
+                        </div>
+                      </div>
+                  </div>
+                  <div style="background-color:#43cc72;" href="turtle1.0example">
+                      <div>
+                        <div>
+                            Example(例子):
+                        </div>
+                      </div>
                   </div>
                   <div style="background-color:#6CC749;" href="turtle1.0component">
                       Component
@@ -85,7 +124,7 @@
                   </div>
             </xmp>
             <style>
-                .swiper-slide{
+                .swiper-slide,.swiper-slide a{
                     color:#fff !important;
                     font-family:微软雅黑 黑体 !important;
                     cursor: pointer;
