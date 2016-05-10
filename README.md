@@ -1,3 +1,2 @@
-# turtlejs
-<script src="src/js/turtle.js"></script>
-<xmp><div>make it for fun</div></xmp>
+# turtlejs 1.0
+make it for fun
