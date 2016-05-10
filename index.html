@@ -22,10 +22,11 @@
 
           <h1 id="project_title">Turtlejs</h1>
           <h2 id="project_tagline">make it for fun</h2>
-
             <section id="downloads">
+                    
               <a class="zip_download_link" href="https://github.com/make-in-china/turtlejs/zipball/master">Download this project as a .zip file</a>
               <a class="tar_download_link" href="https://github.com/make-in-china/turtlejs/tarball/master">Download this project as a tar.gz file</a>
+
             </section>
         </header>
     </div>
@@ -33,21 +34,31 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer fz25" style="background-color:#fff;">
         <div style="max-width:980px;height:400px;margin:0 auto;">
+            
             <xmp>
+                <set style="display:inline-block;padding:10px;">
+                  <a href="turtle1.0example">
+                      Example
+                  </a>
+                  <a href="turtle1.0component">
+                      Component
+                  </a>
+                  <a href="turtle1.0sandbox">
+                      Sandbox
+                  </a>
+                  <a href="turtle1.0api">
+                      API
+                  </a>
+                </set>
                 <ui:swiper slideClass="ct bgray15 ub">
                   <script type="option">
                     {
                         pagination: '.h',
                         paginationClickable: true,
-                        nextButton: '.next1',
-                        prevButton: '.prev2',
                         loop:true,
                         onClick: function(swiper,e){
                             var t=e.target;
-                            if(t.classList.contains('swiper-button-next')
-                            ||t.classList.contains('swiper-button-prev')
-                            ||t.classList.contains('swiper-pagination-bullet')){
-                                
+                            if(t.classList.contains('swiper-pagination-bullet')){
                                 return;
                             }
                             var item=swiper.slides[swiper.activeIndex];
@@ -56,7 +67,10 @@
                     }
                   </script>
                   <div style="background-color:#2980B9;" href="#">
-                                                                    这里放点啥好呢
+                    <div>
+                        兼容性:
+                    </div>
+                                                                        
                   </div>
                   <div style="background-color:#1ABC9C;" href="turtle1.0example">
                       Example
@@ -82,7 +96,8 @@
     </div>
 
     <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
+    <div id="footer_wrap" class="outer" style="padding-top:40px;">
+        
       <footer class="inner">
         <p class="copyright">Turtlejs maintained by <a href="https://github.com/make-in-china">make-in-china</a></p>
         <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
