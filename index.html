@@ -31,7 +31,7 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer" style="background-color:#fff;">
+    <div id="main_content_wrap" class="outer fz25" style="background-color:#fff;">
         <div style="max-width:980px;height:400px;margin:0 auto;">
             <xmp>
                 <ui:swiper slideClass="ct bgray15 ub">
@@ -39,19 +39,44 @@
                     {
                         pagination: '.h',
                         paginationClickable: true,
-                        spaceBetween: 5,
                         nextButton: '.next1',
                         prevButton: '.prev2',
-                        onSlideChangeEnd: function(swiper){
-                            
+                        onClick: function(swiper,e){
+                            var t=e.target;
+                            if(t.classList.contains('swiper-button-next')
+                            ||t.classList.contains('swiper-button-prev')
+                            ||t.classList.contains('swiper-pagination-bullet')){
+                                
+                                return;
+                            }
+                            var item=swiper.slides[swiper.activeIndex];
+                            window.location.href=item.href;
                         }
                     }
                   </script>
-                  <div><a href="turtle1.0example">Example</a></div>
-                  <div><a href="turtle1.0component">Component</a></div>
-                  <div><a href="turtle1.0sandbox">Sandbox</a></div>
-                  <div><a href="turtle1.0api">API</a></div>
+                  <div style="background-color:#2980B9;" href="#">
+                                                                    这里放点啥好呢
+                  </div>
+                  <div style="background-color:#1ABC9C;" href="turtle1.0example">
+                      Example
+                  </div>
+                  <div style="background-color:#6CC749;" href="turtle1.0component">
+                      Component
+                  </div>
+                  <div style="background-color:#E98C00;" href="turtle1.0sandbox">
+                      Sandbox
+                  </div>
+                  <div style="background-color:#E74C3C;" href="turtle1.0api">
+                      API
+                  </div>
             </xmp>
+            <style>
+                .swiper-slide{
+                    color:#fff !important;
+                    font-family:微软雅黑 黑体 !important;
+                    cursor: pointer;
+                }
+            </style>
         </div>
     </div>
 
