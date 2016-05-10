@@ -44,286 +44,122 @@
         <header class="inner">
           <h1 id="project_title">Turtlejs</h1>
           <h2 id="project_tagline">make it for fun</h2>
+          本博客由turtlejs构建完成
 
         </header>
     </div>
 
     <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer" style="background-color:#fff;">
+    <div id="main_content_wrap" class="outer fz25" style="background-color:#fff;">
         <div style="max-width:980px;margin:0 auto;">
             <xmp>
-    	      <ui:growpanel title="逻辑控制测试" align=2 extend=0>
-    	          <! scope xx|variable:1+1>
-    	          <! var xxx:1+1,x:1,i:99>
-    	          <! switch x>
-    	          <! case 1>老大
-    	          <! case 1>老二<!! x++>
-    	          <! case 2>老三
-    	          <! case 2>老四
-    	          <! case break 2>老五
-    	          <div>
-    	            <! scope>
-    	            <! if false>
-    	            老六
-    	            <! else if variable!=2>
-    	            老七
-    	            <! else>
-    	            老八
-    	            <! var j:1>
-    	            <! while j<=10>
-    	            <div>
-    	              <! if j==4><! break><! else><!= j><! end>
-    	            </div>
-    	            <!! j++>
-    	            <! end>
-    	            <div>
-    	              <! var k:0>
-    	              <! for k=10;-1
-    	              <k;k-->
-    	                <! if k==3><! break><! else><!= k><! end>
-    	                <! end>
-    	            </div>
-    	            <div>
-    	              <! var n:'',m:["a","b","c","d","e","f"]>
-    	              <! for n in m>
-    	                <span><!= m[n]></span>
-    	                <! if n=='3'>
-    	                    <! break>
-    	                <! end>
-    	              <! end>
-    	            </div>
-    	            <div>
-    	              <! scope xt|i:0,j:0,d:[[1,2,3],[4,5,6],[7,8,9]]>
-    	              <! for ;i<3;i++>
-    	              <! for j=0;j<3;j++>
-    	              <div>
-    	                <!= d[i][j]>
-    	              </div>
-    	              <! end>
-    	              <! end>
-    	            </div>
-    	            <! end>
-    	          </div>
-    	          <! case 2>老九
-    	          <! default>老十
-    	          <! end>
-    	        </ui:growpanel>
-    	        <ui:growpanel title="绑定测试" align=2 extend=0>
-    	          <! scope x|v:"turtle绑定测试",vv:0,vvv:0>
-    	          <div>
-    	            <div class="ipdip5 imdip5 iub">
-    	              <ui:td name="checkbox属性 “checked” " way=1>
-    	                <input type="checkbox" bind="vvv"/>
-    	                全选/反选
-    	              </ui:td>
-    	              <ui:td name="checkbox属性 “checked” " way=1>
-    	                <set lazy bind="v">
-    	                  <input type="checkbox" bind="vv" ? ?checked="vvv"/>
-    	                  双向A+双向B
-    	                </set>
-    	              </ui:td>
-    	              <ui:td name="checkbox内置" way=2>
-    	                <input type="checkbox" bind="v" ? ?checked="vvv"/>
-    	                双向A
-    	              </ui:td>
-    	              <ui:td name="checkbox属性 “checked” " way=1>
-    	                <input type="checkbox" ? ?checked="v"/>
-    	                单向A
-    	              </ui:td>
-    	              <ui:td name="checkbox属性 “checked” " way=2>
-    	                <input type="checkbox" bind="vv" ? ?checked="vvv"/>
-    	                双向B
-    	              </ui:td>
-    	              <ui:td name="按钮属性 “disabled” " way=1>
-    	                <button ? ?disabled="v">
-    	                  disabled="<!- v>"
-    	                </button>
-    	              </ui:td>
-    	              <ui:td name="div内置" way=1>
-    	                <div bind="v"></div>
-    	              </ui:td>
-    	              <ui:td name="div属性 “style.display” " way=1>
-    	                <div show='v!=""'>
-    	                  className!="uhide"
-    	                </div>
-    	              </ui:td>
-    	              <ui:td name="input内置" way=2>
-    	                <input bind="v"/>
-    	                <!- v|v.length==0?'不能为空':v>（验证文本长度）
-    	              </ui:td>
-    	              <ui:td name="textArea内置" way=2>
-    	                <textArea bind="v"></textarea>
-    	              </ui:td>
-    	              <ui:td name="a属性 “href” " way=1>
-    	                <a ? ?href="v"><!- v></a>
-    	              </ui:td>
-    	              <ui:td name="下拉内置" way=2>
-    	                <select bind="v" class="wem5">
-    	                  <option ></option>
-    	                  <option >-1</option>
-    	                  <option >0</option>
-    	                  <option >1</option>
-    	                  <option >2</option>
-    	                  <option >3</option>
-    	                  <option value="true">真</option>
-    	                  <option value="false">假</option>
-    	                </select>
-    	              </ui:td>
-    	            </div>
-    	          </div>
-    	        </ui:growpanel>
-    	        <ui:growpanel title="动画测试" align=2 extend=1>
-    	          <div class="iwem1 ct">
-    	            <div animgroup='{repeatCount:-1,class:"animated rotateIn",runBeforeClass:"op0",autoReturnBeforeState:true}'
-    	            class="op0" anim='{autoRun:true,index:0}'>
-    	              1
-    	            </div>
-    	            <div class="op0" anim='[{index:1},{index:3},{index:5}]'>
-    	              2
-    	            </div>
-    	            <div class="op0" anim='[{index:2},{index:4}]'>
-    	              3
-    	            </div>
-    	            <div class="op0" anim='[{index:3},{index:5}]'>
-    	              4
-    	            </div>
-    	            <div class="op0" anim='{index:2}'>
-    	              5
-    	            </div>
-    	            <div class="op0" anim='{group:"__default__",index:3}'>
-    	              6
-    	            </div>
-    	            <div class="op0" anim='{index:4}'>
-    	              7
-    	            </div>
-    	          </div>
-    	        </ui:growpanel>
-    	        <ui:growpanel title="移动测试" align=2 extend=0>
-    	          <div class="hem18 w100 bgray14">
-    	            <ui:move direction=1>
-    	              <ui:panel title="横向移动测试">
-    	                <div class="wem5 hem2"></div>
-    	              </ui:panel>
-    	            </ui:move>
-    	            <set lazy style="top:50%;">
-    	              <ui:move direction=2>
-    	                <ui:panel title="竖向移动测试">
-    	                  <div class="wem5 hem2"></div>
-    	                </ui:panel>
-    	              </ui:move>
-    	            </set>
-    	            <set lazy style="left:50%;">
-    	              <ui:move direction=0>
-    	                <ui:panel title="自由移动测试">
-    	                  <div class="wem5 hem2"></div>
-    	                </ui:panel>
-    	              </ui:move>
-    	            </set>
-    	            <set lazy style="left:50%;top:50%;">
-    	              <ui:move noout=1>
-    	                <ui:panel title="不能超出容器">
-    	                  <div class="wem5 hem2"></div>
-    	                </ui:panel>
-    	              </ui:move>
-    	            </set>
-    	          </div>
-    	          <div>
-    	            <! scope xxx|scroll1:{v:0},scroll2:{v:0}> <ui:scrollbar bind="scroll1.v"></ui:scrollbar>
-    	            <!- scroll1.v|parseInt(v)> <ui:scrollbar bind="scroll2.v"></ui:scrollbar>
-    	            <!- scroll2.v|parseInt(v)>
-    	          </div>
-    	        </ui:growpanel>
-    	        <ui:growpanel title="swiper组件测试" align=2 extend=1>
-    	            <div class="hem18 w100 bgray14 pdip5" style="box-sizing:border-box;">
-    	                <! scope $swiper|index:0,innerIndex:[0,0,0,0]>
-    	                <ui:swiper slideclass="ct bgray15 ub fz17">
-    	                  <script type="option">
-    	                    {
-    	                        pagination: '.h',
-    	                        slidesPerView: 2,
-    	                        slidesPerColumn: 3,
-    	                        paginationClickable: true,
-    	                        spaceBetween: 5,
-    	                        nextButton: '.next1',
-    	                        prevButton: '.prev2',
-    	                        onSlideChangeEnd: function(swiper){
-    	                            index=swiper.activeIndex;
-    	                        }
-    	                    }
-    	                  </script>
-    	                  <div>
-    	                      <ui:swiper slideclass="ct bgray15 ub fz17">
-    	                          <script type="option">
-    	                            {
-    	                                pagination: '.v',
-    	                                paginationClickable: true,
-    	                                direction: 'vertical',
-    	                                spaceBetween: 5,
-    	                                onSlideChangeEnd: function(swiper){
-    	                                    innerIndex[0]=swiper.activeIndex;
-    	                                }
-    	                            }
-    	                          </script>
-    	                          <div>B1</div>
-    	                          <div>B2</div>
-    	                          <div>B3</div>
-    	                          <div>B4</div>
-    	                          <div>B5</div>
-    	                      </ui:swiper>
-    	                  </div>
-    	                  <div></div>
-    	                  <div><ui:swiper slideclass="ct bgray15 ub fz17">
-    	                          <script type="option">
-    	                            {
-    	                                scrollbar: '.swiper-scrollbar',
-    	                                width:100,
-    	                                spaceBetween: 5,
-    	                                onSlideChangeEnd: function(swiper){
-    	                                    innerIndex[1]=swiper.activeIndex;
-    	                                }
-    	                            }
-    	                          </script>
-    	                          <div>B1</div>
-    	                          <div>B2</div>
-    	                          <div>B3</div>
-    	                          <div>B4</div>
-    	                          <div>B5</div>
-    	                      </ui:swiper>
-    	                  </div>
-    	                  <div>
-    	                      <ui:swiper slideclass="ct bgray15 ub fz17">
-    	                          <script type="option">
-    	                            {
-    	                                pagination: '.v',
-    	                                paginationClickable: true,
-    	                                width:100,
-    	                                spaceBetween: 5,
-    	                                nextButton: '.next',
-    	                                prevButton: '.prev',
-    	                                onSlideChangeEnd: function(swiper){
-    	                                    innerIndex[2]=swiper.activeIndex;
-    	                                }
-    	                            }
-    	                          </script>
-    	                          <div>B1</div>
-    	                          <div>B2</div>
-    	                          <div>B3</div>
-    	                          <div>B4</div>
-    	                          <div>B5</div>
-    	                      </ui:swiper>
-    	                  </div>
-    	                  <div></div>
-    	                  <div></div>
-    	                  <div></div>
-    	                  <div></div>
-    	                  <div></div>
-    	                  <div></div>
-    	                  <div></div>
-    	                  <div></div>
-    	                </ui:swiper>
-    	            </div>
-    	            <div class="pdip5">$swiper.index=<!- $swiper.index>；$swiper.innerIndex=[<!- $swiper.innerIndex.0>,<!- $swiper.innerIndex.1>,<!- $swiper.innerIndex.2>,<!- $swiper.innerIndex.3>]</div>
-    	        </ui:growpanel>
+                <set class="ct2" style="display:inline-block;padding:5px 10px;line-height:100%;">
+                  <a href="turtle1.0control">
+                      Control<br>
+                      <span class="fz12">逻辑控制</span>
+                  </a>
+                  <a href="turtle1.0component">
+                      Component<br>
+                      <span class="fz12">组件</span>
+                  </a>
+                  <a href="turtle1.0sandbox">
+                      Sandbox<br>
+                      <span class="fz12">沙盒</span>
+                  </a>
+                  <a href="turtle1.0api">
+                      API<br>
+                      <span class="fz12">库接口</span>
+                  </a>
+                </set>
+    	        <div>
+    	            <div style="margin-left:40px;">
+                        if：
+                    </div>
+                    <div>
+                        <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! var v:1&gt;                                <br>&lt;! if v===3&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v===3<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! else if v===2&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v===2<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! else&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v的值为&lt;!= v&gt;<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! end&gt;</pre>
+                    </div>
+                    <div style="margin-left:40px;">
+                        result（执行结果）：
+                        <! scope if|v:1>
+                        <! if v===3>
+                            <div>v===3</div>
+                        <! else if v===2>
+                            <div>v===2</div>
+                        <! else>
+                            <div>v=<!= v></div>
+                        <! end>
+                    </div>
+                    <div style="margin-left:40px;">
+                        switch：
+                    </div>
+                    <div>
+                        <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope switch|v:1&gt;<br>&lt;! switch v&gt;<br>&lt;! case 1&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:red"</span><span style="color:#170">&gt;</span>赤<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case 1&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:orange"</span><span style="color:#170">&gt;</span>橙<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span>&lt;!! v++&gt;<br>&lt;! case 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:yellow"</span><span style="color:#170">&gt;</span>黄<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:green"</span><span style="color:#170">&gt;</span>绿<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case break 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:blue"</span><span style="color:#170">&gt;</span>蓝<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! default&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:purple"</span><span style="color:#170">&gt;</span>紫<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! end&gt;</pre>
+                    </div>
+                    <div style="margin-left:40px;">
+                        result（执行结果）：
+                        <br/>
+                        <! scope switch|v:1>
+                        <! switch v>
+                        <! case 1><span style="color:red">赤</span>
+                        <! case 1><span style="color:orange">橙</span><!! v++>
+                        <! case 2><span style="color:yellow">黄</span>
+                        <! case 2><span style="color:green">绿</span>
+                        <! case break 2><span style="color:blue">蓝</span>
+                        <! default><span style="color:purple">紫</span>
+                        <! end>
+                    </div>
+                    
+                    <div style="margin-left:40px;">
+                        while：
+                    </div>
+                    <div>
+                        <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope while|v:1&gt;<br>&lt;! while v<span style="color:#170">&lt;</span>=<span style="color:#a11">10</span><span style="color:#170">&gt;</span><br><span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span><br>  &lt;! if v==4&gt;&lt;! break&gt;&lt;! else&gt;&lt;!= v&gt;&lt;! end&gt;<br><span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;!! v++&gt;<br>&lt;! end&gt;</pre>
+                    </div>
+                    <div style="margin-left:40px;">
+                        result（执行结果）：
+                        <br/>
+                        <! scope while|v:1>
+                        <! while v<=10>
+                        <div>
+                          <! if v==4><! break><! else><!= v><! end>
+                        </div>
+                        <!! v++>
+                        <! end>
+                    </div>
+                    
+                    <div style="margin-left:40px;">
+                        for：
+                    </div>
+                    <div>
+                        <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope for1|v:1,k:10&gt;<br>&lt;! for v=10;-1<span style="color:#170">&lt;k;k--</span><span style="color:#170">&gt;</span><br>&lt;! if k==3&gt;&lt;! break&gt;&lt;! else&gt;&lt;!= k&gt;&lt;! end&gt;<br>&lt;! end&gt;</pre>
+                    </div>
+                    <div style="margin-left:40px;">
+                        result（执行结果）：
+                        <br/>
+                        <! scope for1|v:1,k:10>
+                        <! for v=10;-1<k;k-->
+                        <! if k==3><! break><! else><!= k><! end>
+                        <! end>
+                    </div>
+                    
+                    <div style="margin-left:40px;">
+                        for：
+                    </div>
+                    <div>
+                        <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope for2|n:'',m:["a","b","c","d","e","f"]&gt;<br>&lt;! for n in m&gt;<br>    <span style="color:#170">&lt;span</span><span style="color:#170">&gt;</span>&lt;!= m[n]&gt;<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>    &lt;! if n=='3'&gt;<br>        &lt;! break&gt;<br>    &lt;! end&gt;<br>&lt;! end&gt;</pre>
+                    </div>
+                    <div style="margin-left:40px;">
+                        result（执行结果）：
+                        <br/>
+                        <! scope for2|n:'',m:["a","b","c","d","e","f"]>
+                        <! for n in m>
+                            <span><!= m[n]></span>
+                            <! if n=='3'>
+                                <! break>
+                            <! end>
+                        <! end>
+                    </div>
+    	        </div>
     	    </xmp>
         </div>
     </div>
