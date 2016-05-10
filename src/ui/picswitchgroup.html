@@ -1,0 +1,33 @@
+<xmp>
+    <! scope group|data:{%$t.trimLine(outer[0].data)%}>
+  <ui:optionbuttongroup checkClass="{checkClass}" index="{index!''}" lazy>
+    <ui:loop each="group.data">
+      <div id="[?id]" key='x' text=" ">
+        <div class='ct3 ub-img5 wem2 hem2' style="background-image:url([?url1])">
+          <div class='ct3 ub-img5 wem2 hem2 uhide' style="background-image:url([?url2])"></div>
+        </div>
+        <div class="full fz10 ct noevent">
+          <div class="mdipl64 fb wdip20">
+            [?tip]
+          </div>
+        </div>
+      </div>
+    </ui:loop>
+    <script>
+        var x = $t.keyNode.x;
+        for (var i = 0; i < x.length; i++) {
+            x[i].onCheck = function() {
+                removeClass(this.children[0].children[0], 'uhide');
+                if (this.onCheck.more)
+                    this.onCheck.more();
+            }
+            x[i].onUnCheck = function() {
+                addClass(this.children[0].children[0], 'uhide');
+                if (this.onUnCheck.more)
+                    this.onUnCheck.more();
+            }
+        }
+        x.length =0;
+    </script>
+  </ui:optionbuttongroup>
+</xmp>
