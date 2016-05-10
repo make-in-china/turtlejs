@@ -50,12 +50,12 @@
                       API
                   </a>
                 </set>
-                <ui:swiper slideclass="ct bgray15 ub">
+                <ui:swiper>
                   <script type="option">
                     {
                         pagination: '.h',
                         paginationClickable: true,
-                        loop:true,
+                        loop:true/*,
                         onClick: function(swiper,e){
                             var t=e.target;
                             if(t.classList.contains('swiper-pagination-bullet')){
@@ -66,56 +66,95 @@
                             }
                             var item=swiper.slides[swiper.activeIndex];
                             window.location.href=item.href;
-                        }
+                        }*/
                     }
                   </script>
-                  <div style="background-color:#2980B9;" href="#">
-                      <div>
-                        <div>
-                            Compatibility（兼容性）:　　IE9+
+                  <div style="background-color:#2980B9;" href="#" class="ict3">
+                        <div style="width:550px;margin-top:90px;">
+                            <div>
+                                Feature（特性）：
+                                <div style="margin-left:140px;">Simple component（傻瓜式组件化）</div>
+                                <div style="margin-left:140px;">Data binding（数据绑定）</div>
+                                <div style="margin-left:140px;">Sandbox layout（沙盒布局）</div>
+                            </div>
+                            <div>
+                                Compatibility（兼容性）:　　IE9+
+                            </div>
+                            <div>
+                                Collaboration（协作能力）:　<a href="#">reactjs</a>　<a href="#">bootstrap</a>
+                            </div>
                         </div>
-                        <div>
-                            Collaboration（协作能力）:　<a href="#">reactjs</a>　<a href="#">bootstrap</a>
-                        </div>
-                      </div>
                   </div>
-                  <div style="background-color:#1ABC9C;" href="turtle1.0example" class="scrolly">
-                      <div>
-                        <div>
-                            control（逻辑控制）:
+                  <div style="background-color:#1ABC9C;" href="turtle1.0example">
+                        <div style="margin-left:40px;">
+                            if：
                         </div>
                         <div>
-                            if：
-                            <br/>
-                            <pre>&lt;! var v:1&gt;
-&lt;! if v===3&gt;
-    &lt;div&gt;v===3&lt;/div&gt;
-&lt;! else if v===2&gt;
-    &lt;div&gt;v===2&lt;/div&gt;
-&lt;! else&gt;
-    &lt;div&gt;v的值为&lt;!= v&gt;&lt;/div&gt;
-&lt;! end&gt;</pre>
+                            <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! var v:1&gt;                                <br>&lt;! if v===3&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v===3<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! else if v===2&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v===2<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! else&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v的值为&lt;!= v&gt;<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! end&gt;</pre>
+                        </div>
+                        <div style="margin-left:40px;">
                             result（执行结果）：
-                            <! var v:1>                                
+                            <! scope if|v:1>
                             <! if v===3>
                                 <div>v===3</div>
                             <! else if v===2>
                                 <div>v===2</div>
                             <! else>
-                                <div>v的值为<!= v></div>
+                                <div>v=<!= v></div>
                             <! end>
                         </div>
-                      </div>
                   </div>
                   <div style="background-color:#43cc72;" href="turtle1.0example">
-                      <div>
-                        <div>
-                            Example(例子):
+                      
+                        <div style="margin-left:40px;">
+                            switch：
                         </div>
-                      </div>
+                        <div>
+                            <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope switch|v:1&gt;<br>&lt;! switch v&gt;<br>&lt;! case 1&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:red"</span><span style="color:#170">&gt;</span>赤<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case 1&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:orange"</span><span style="color:#170">&gt;</span>橙<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span>&lt;!! v++&gt;<br>&lt;! case 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:yellow"</span><span style="color:#170">&gt;</span>黄<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:green"</span><span style="color:#170">&gt;</span>绿<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case break 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:blue"</span><span style="color:#170">&gt;</span>蓝<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! default&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:purple"</span><span style="color:#170">&gt;</span>紫<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! end&gt;</pre>
+                        </div>
+                        <div style="margin-left:40px;">
+                            result（执行结果）：
+                            <br/>
+                            <! scope switch|v:1>
+                            <! switch v>
+                            <! case 1><span style="color:red">赤</span>
+                            <! case 1><span style="color:orange">橙</span><!! v++>
+                            <! case 2><span style="color:yellow">黄</span>
+                            <! case 2><span style="color:green">绿</span>
+                            <! case break 2><span style="color:blue">蓝</span>
+                            <! default><span style="color:purple">紫</span>
+                            <! end>
+                        </div>
                   </div>
-                  <div style="background-color:#6CC749;" href="turtle1.0component">
-                      Component
+                  <div style="background-color:#49A4C7;" href="turtle1.0component">
+
+                        <div style="margin-left:40px;">
+                            component（组件）：
+                        </div>
+                        <div>
+                            <pre style="width: inherit;margin:0 20px;height:100px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444"><span style="color:#170">&lt;div</span> <span style="color:#00c">style</span>=<span style="color:#a11">"margin:0 20px;height:150px;"</span> <span style="color:#00c">class</span>=<span style="color:#a11">"ct3"</span><span style="color:#170">&gt;</span><br>  <span style="color:#170">&lt;ui:swiper</span> <span style="color:#00c">slideclass</span>=<span style="color:#a11">"bgreen5 ct2"</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;script</span> <span style="color:#00c">type</span>=<span style="color:#a11">"option"</span><span style="color:#170">&gt;</span><br>        {<br>            pagination: '.w',<br>            paginationClickable: true,<br>            direction: 'vertical',<br>            loop:true<br>        }<br>      <span style="color:#170">&lt;/script</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;set</span> <span style="color:#00c">style</span>=<span style="color:#a11">"line-height:150px;"</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>1<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>2<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>3<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>4<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;/set</span><span style="color:#170">&gt;</span><br>  <span style="color:#170">&lt;/ui:swiper</span><span style="color:#170">&gt;</span><br><span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span></pre>
+                        </div>
+                        <div style="margin-left:40px;">
+                            result（执行结果）：
+                        </div>
+                        <div style="margin:0 20px;height:150px;" class="ct3">
+                          <ui:swiper slideclass="bgray2 ct2">
+                              <script type="option">
+                                {
+                                    pagination: '.w',
+                                    paginationClickable: true,
+                                    direction: 'vertical',
+                                    loop:true
+                                }
+                              </script>
+                              <set style="line-height:150px;">
+                              <div>1</div>
+                              <div>2</div>
+                              <div>3</div>
+                              <div>4</div>
+                              </set>
+                          </ui:swiper>
+                        </div>
                   </div>
                   <div style="background-color:#E98C00;" href="turtle1.0sandbox">
                       Sandbox
