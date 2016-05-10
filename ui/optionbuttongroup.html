@@ -1,0 +1,52 @@
+<script type="xmp" service="_obgsetCheck">
+    function(group,team,noclick,index,checkClasses,noCheckClasses){
+      var checkClass;
+      var noCheckClass;
+      if(checkClasses)checkClass=checkClasses.split(" ");
+      if(noCheckClasses)noCheckClass=noCheckClasses.split(" ");
+      function unCheck(e){
+          for(var i=0;i<group.length;i++){
+              if(group[i].isCheck==1){
+                  group[i].isCheck=0;
+                  if(checkClasses)removeClasses(group[i],checkClass);
+                  if(noCheckClasses)addClasses(group[i],noCheckClass);
+                  if(isFunction(group[i].onUnCheck))group[i].onUnCheck();
+              }
+          }
+      }
+      function check(e){
+          if(this.isCheck==1)return;
+          unCheck();
+          this.isCheck=1;
+          if(checkClasses)addClasses(this,checkClass);
+          if(noCheckClasses)removeClasses(this,noCheckClass);
+          if(isFunction(this.onCheck))this.onCheck();
+          turtle.uiLink.on(this);
+      }
+      if(team){
+          check=$t.uiTeam.push(team,group,check,unCheck);
+      }
+      for(var i=0;i<group.length;i++){
+          var node=group[i];
+          node.check=check;
+          node.isCheck=0;
+          turtle.uiLink.appendByTree(node);
+           if(!noclick){
+               node.addEventListener('click',check,false);
+          }
+      }
+      if(group[index])group[index].check();
+    }
+  </script>
+<xmp><!content>
+<script>
+    var team="{team!}";
+    var noclick={noclick!false};
+    var checkClasses="{checkClass!}";
+    var index=parseInt("{index!-1}");
+    var noCheckClasses="{noCheckClass!}";
+    
+    if(outerElement.length!==0){
+        $t.service.require("_obgsetCheck")(outerElement,team,noclick,index,checkClasses,noCheckClasses);
+    }
+</script></xmp>
