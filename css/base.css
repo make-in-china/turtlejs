@@ -1,0 +1,36 @@
+* {
+  font-family: Arial,Microsoft YaHei;
+  padding: 0px;
+  margin: 0px;
+}
+body {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  overflow: hidden;
+  background-color: #000;
+}
+div {
+  outline: 0 !important;
+  -webkit-text-size-adjust: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  position: relative;
+}
+ul,
+li {
+  list-style: none;
+}
+.um,
+.um body {
+  height: 100%;
+}
+
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('./fonts/fontawesome-webfont.ttf?v=4.2.0') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
