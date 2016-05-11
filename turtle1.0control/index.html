@@ -25,14 +25,14 @@
                     
                     <set class="fz18" : :style.display="resize.value|v>649?'block':''" style="padding:5px 10px;cursor:pointer;">
                         
-                        <a href="#scope" >变量域和变量</a>
-                        <a href="#if" >If</a>
-                        <a href="#switch" >Switch</a>
-                        <a href="#while" >While</a>
-                        <a href="#for" >For</a>
-                        <a href="#forin" >For in</a>
-                        <a href="#run" >运算和返回</a>
-                        <a href="#bind" >绑定</a>
+                        <a href="#scope" >1.变量域和变量</a>
+                        <a href="#if" >2.If</a>
+                        <a href="#switch" >3.Switch</a>
+                        <a href="#while" >4.While</a>
+                        <a href="#for" >5.For</a>
+                        <a href="#forin" >6.For in</a>
+                        <a href="#run" >7.运算和返回</a>
+                        <a href="#bind" >8.绑定</a>
                     </set>
                 </div>
             </div>
@@ -45,14 +45,31 @@
                 <h4>1</h4>
                 <div style="margin-left:40px;">
                     &lt;! scope [name|]variable1:1,variable2:2>：
+                    <br/>
                     作用域和作用域变量
                 </div>
                 <div>
-                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444"></pre>
+                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444"><span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span><br>    &lt;! scope scopeTop|x:1,y:1&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span><br>        &lt;! scope scope2|x:2&gt;<br>        <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span><br>            &lt;! scope scope3&gt;<br>            &lt;! var y:3>&gt;<span style="color:#a50">&lt;!--定义一个变量在scope3上--&gt;</span><br>            scope3:x=&lt;!= x&gt;,y=&lt;!= y&gt;<br>            scopeTop.x=&lt;!= scopeTop.x&gt;<br>            scopeTop.y=&lt;!= scopeTop.y&gt;<br>        <span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>        scope2:x=&lt;!= x&gt;,y=&lt;!= y&gt;    <br>    <span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>    scopeTop:x=&lt;!= x&gt;,y=&lt;!= y&gt;<br><span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span></pre>
                 </div>
                 <div style="margin-left:40px;">
                     >:_
                     <br/>
+                    <div>
+                        <! scope scopeTop|x:1,y:1>
+                        
+                        <div>
+                            <! scope scope2|x:2>
+                            <div>
+                                <! scope scope3>
+                                <! var y:3><!--定义一个变量在scope3上-->
+                                scope3:x=<!= x>,y=<!= y>
+                                scopeTop.x=<!= scopeTop.x>
+                                scopeTop.y=<!= scopeTop.y>
+                            </div>
+                            scope2:x=<!= x>,y=<!= y>    
+                        </div>
+                        scopeTop:x=<!= x>,y=<!= y>
+                    </div>
                 </div>
                 
                 <a name="if"></a>
