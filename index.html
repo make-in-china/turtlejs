@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
     <title>Turtlejs</title>
-    <script src="js/turtle.js">
+    <script baseuipath="ui,uiapp" src="js/turtle.js">
         $t.extend(window,$t.fn);
     </script>
   </head>
@@ -32,149 +32,130 @@
         </header>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer fz25" style="background-color:#fff;">
-        <div style="max-width:800px;height:400px;margin:0 auto;">
-            
-            <xmp>
-                <set class="ct2" style="display:inline-block;padding:5px 10px;line-height:100%;">
-                  <a href="/turtlejs/turtle1.0control">
-                      Control<br>
-                      <span class="fz12">逻辑控制</span>
-                  </a>
-                  <a href="/turtlejs/turtle1.0component">
-                      Component<br>
-                      <span class="fz12">组件</span>
-                  </a>
-                  <a href="/turtlejs/turtle1.0sandbox">
-                      Sandbox<br>
-                      <span class="fz12">沙盒</span>
-                  </a>
-                  <a href="/turtlejs/turtle1.0api">
-                      API<br>
-                      <span class="fz12">库接口</span>
-                  </a>
-                </set>
-                <ui:swiper>
-                  <script type="option">
-                    {
-                        pagination: '.h',
-                        paginationClickable: true,
-                        loop:true/*,
-                        onClick: function(swiper,e){
-                            var t=e.target;
-                            if(t.classList.contains('swiper-pagination-bullet')){
-                                return;
-                            }
-                            if(t.nodeName==="A"&&t.href.length!==0){
-                                return;
-                            }
-                            var item=swiper.slides[swiper.activeIndex];
-                            window.location.href=item.href;
-                        }*/
-                    }
-                  </script>
-                  <div style="background-color:#2980B9;" href="#" class="ict3">
-                        <div style="width:600px;margin-top:60px;">
-                            <div>
-                                Feature（特性）：
-                                <div style="margin-left:140px;"><a href="#">Simple component（傻瓜式组件化）</a></div>
-                                <div style="margin-left:140px;"><a href="#">Data binding（数据绑定）</a></div>
-                                <div style="margin-left:140px;"><a href="#">Sandbox layout（沙盒布局）</a></div>
-                            </div>
-                            <div>
-                                Compatibility（兼容性）:　　IE9+
-                            </div>
-                            <div>
-                                Collaboration（协作能力）:　<a href="#">reactjs</a>　<a href="#">bootstrap</a>
-                            </div>
-                        </div>
-                  </div>
-                  <div style="background-color:#1ABC9C;">
-                        <div style="margin-left:40px;">
-                            if：
+    <xmp>
+        <ui:content>
+            <ui:swiper>
+              <script type="option">
+                {
+                    pagination: '.h',
+                    paginationClickable: true,
+                    loop:true/*,
+                    onClick: function(swiper,e){
+                        var t=e.target;
+                        if(t.classList.contains('swiper-pagination-bullet')){
+                            return;
+                        }
+                        if(t.nodeName==="A"&&t.href.length!==0){
+                            return;
+                        }
+                        var item=swiper.slides[swiper.activeIndex];
+                        window.location.href=item.href;
+                    }*/
+                }
+              </script>
+              
+              <set append style="height:400px;"></set>
+              <div style="background-color:#2980B9;" href="#" class="ict3">
+                    <div style="width:600px;margin-top:60px;">
+                        <div>
+                            Feature（特性）：
+                            <div style="margin-left:140px;"><a href="#">Simple component（傻瓜式组件化）</a></div>
+                            <div style="margin-left:140px;"><a href="#">Data binding（数据绑定）</a></div>
+                            <div style="margin-left:140px;"><a href="#">Sandbox layout（沙盒布局）</a></div>
                         </div>
                         <div>
-                            <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! var v:1&gt;                                <br>&lt;! if v===3&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v===3<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! else if v===2&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v===2<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! else&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v的值为&lt;!= v&gt;<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! end&gt;</pre>
-                        </div>
-                        <div style="margin-left:40px;">
-                            result（执行结果）：
-                            <! scope if|v:1>
-                            <! if v===3>
-                                <div>v===3</div>
-                            <! else if v===2>
-                                <div>v===2</div>
-                            <! else>
-                                <div>v=<!= v></div>
-                            <! end>
-                            <a href="/turtlejs/turtle1.0control">查看更多</a>
-                        </div>
-                  </div>
-                  <div style="background-color:#43cc72;">
-                      
-                        <div style="margin-left:40px;">
-                            switch：
+                            Compatibility（兼容性）:　　IE9+
                         </div>
                         <div>
-                            <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope switch|v:1&gt;<br>&lt;! switch v&gt;<br>&lt;! case 1&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:red"</span><span style="color:#170">&gt;</span>赤<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case 1&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:orange"</span><span style="color:#170">&gt;</span>橙<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span>&lt;!! v++&gt;<br>&lt;! case 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:yellow"</span><span style="color:#170">&gt;</span>黄<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:green"</span><span style="color:#170">&gt;</span>绿<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case break 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:blue"</span><span style="color:#170">&gt;</span>蓝<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! default&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:purple"</span><span style="color:#170">&gt;</span>紫<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! end&gt;</pre>
+                            Collaboration（协作能力）:　<a href="#">reactjs</a>　<a href="#">bootstrap</a>
                         </div>
-                        <div style="margin-left:40px;">
-                            result（执行结果）：
-                            <br/>
-                            <! scope switch|v:1>
-                            <! switch v>
-                            <! case 1><span style="color:red">赤</span>
-                            <! case 1><span style="color:orange">橙</span><!! v++>
-                            <! case 2><span style="color:yellow">黄</span>
-                            <! case 2><span style="color:green">绿</span>
-                            <! case break 2><span style="color:blue">蓝</span>
-                            <! default><span style="color:purple">紫</span>
-                            <! end>
-                        </div>
-                        <div style="margin-left:40px;">
-                            <a href="/turtlejs/turtle1.0control">查看更多</a>
-                        </div>
-                  </div>
-                  <div style="background-color:#49A4C7;">
+                    </div>
+              </div>
+              <div style="background-color:#1ABC9C;">
+                    <div style="margin-left:40px;">
+                        if：
+                    </div>
+                    <div>
+                        <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! var v:1&gt;                                <br>&lt;! if v===3&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v===3<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! else if v===2&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v===2<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! else&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v的值为&lt;!= v&gt;<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! end&gt;</pre>
+                    </div>
+                    <div style="margin-left:40px;">
+                        result（执行结果）：
+                        <! scope if|v:1>
+                        <! if v===3>
+                            <div>v===3</div>
+                        <! else if v===2>
+                            <div>v===2</div>
+                        <! else>
+                            <div>v=<!= v></div>
+                        <! end>
+                        <a href="/turtlejs/turtle1.0control/index.html#if">查看更多</a>
+                    </div>
+              </div>
+              <div style="background-color:#43cc72;">
+                  
+                    <div style="margin-left:40px;">
+                        switch：
+                    </div>
+                    <div>
+                        <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope switch|v:1&gt;<br>&lt;! switch v&gt;<br>&lt;! case 1&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:red"</span><span style="color:#170">&gt;</span>赤<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case 1&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:orange"</span><span style="color:#170">&gt;</span>橙<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span>&lt;!! v++&gt;<br>&lt;! case 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:yellow"</span><span style="color:#170">&gt;</span>黄<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:green"</span><span style="color:#170">&gt;</span>绿<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case break 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:blue"</span><span style="color:#170">&gt;</span>蓝<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! default&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:purple"</span><span style="color:#170">&gt;</span>紫<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! end&gt;</pre>
+                    </div>
+                    <div style="margin-left:40px;">
+                        result（执行结果）：
+                        <br/>
+                        <! scope switch|v:1>
+                        <! switch v>
+                        <! case 1><span style="color:red">赤</span>
+                        <! case 1><span style="color:orange">橙</span><!! v++>
+                        <! case 2><span style="color:yellow">黄</span>
+                        <! case 2><span style="color:green">绿</span>
+                        <! case break 2><span style="color:blue">蓝</span>
+                        <! default><span style="color:purple">紫</span>
+                        <! end>
+                    </div>
+                    <div style="margin-left:40px;">
+                        <a href="/turtlejs/turtle1.0control/index.html#switch">查看更多</a>
+                    </div>
+              </div>
+              <div style="background-color:#49A4C7;">
 
-                        <div style="margin-left:40px;">
-                            component（组件）：
-                        </div>
-                        <div>
-                            <pre style="width: inherit;margin:0 20px;height:100px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444"><span style="color:#170">&lt;div</span> <span style="color:#00c">style</span>=<span style="color:#a11">"margin:0 20px;height:150px;"</span> <span style="color:#00c">class</span>=<span style="color:#a11">"ct3"</span><span style="color:#170">&gt;</span><br>  <span style="color:#170">&lt;ui:swiper</span> <span style="color:#00c">slideclass</span>=<span style="color:#a11">"bgreen5 ct2"</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;script</span> <span style="color:#00c">type</span>=<span style="color:#a11">"option"</span><span style="color:#170">&gt;</span><br>        {<br>            pagination: '.w',<br>            paginationClickable: true,<br>            direction: 'vertical',<br>            loop:true<br>        }<br>      <span style="color:#170">&lt;/script</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;set</span> <span style="color:#00c">style</span>=<span style="color:#a11">"line-height:150px;"</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>1<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>2<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>3<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>4<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;/set</span><span style="color:#170">&gt;</span><br>  <span style="color:#170">&lt;/ui:swiper</span><span style="color:#170">&gt;</span><br><span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span></pre>
-                        </div>
-                        <div style="margin-left:40px;">
-                            result（执行结果）：
-                        </div>
-                        <div style="margin:0 20px;height:120px;" class="ct3">
-                          <ui:swiper slideclass="bgray2 ct2">
-                              <script type="option">
-                                {
-                                    pagination: '.w',
-                                    paginationClickable: true,
-                                    direction: 'vertical',
-                                    loop:true
-                                }
-                              </script>
-                              <set style="line-height:120px;">
-                              <div>1</div>
-                              <div>2</div>
-                              <div>3</div>
-                              <div>4</div>
-                              </set>
-                          </ui:swiper>
-                        </div>
-                        <div style="margin-left:40px;">
-                            <a href="/turtlejs/turtle1.0component">查看更多</a>
-                        </div>
-                  </div>
-                  <div style="background-color:#E98C00;" href="/turtlejs/turtle1.0sandbox">
-                      Sandbox
-                  </div>
-                  <div style="background-color:#E74C3C;" href="/turtlejs/turtle1.0api">
-                      API
-                  </div>
-            </xmp>
+                    <div style="margin-left:40px;">
+                        component（组件）：
+                    </div>
+                    <div>
+                        <pre style="width: inherit;margin:0 20px;height:100px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444"><span style="color:#170">&lt;div</span> <span style="color:#00c">style</span>=<span style="color:#a11">"margin:0 20px;height:150px;"</span> <span style="color:#00c">class</span>=<span style="color:#a11">"ct3"</span><span style="color:#170">&gt;</span><br>  <span style="color:#170">&lt;ui:swiper</span> <span style="color:#00c">slideclass</span>=<span style="color:#a11">"bgreen5 ct2"</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;script</span> <span style="color:#00c">type</span>=<span style="color:#a11">"option"</span><span style="color:#170">&gt;</span><br>        {<br>            pagination: '.w',<br>            paginationClickable: true,<br>            direction: 'vertical',<br>            loop:true<br>        }<br>      <span style="color:#170">&lt;/script</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;set</span> <span style="color:#00c">style</span>=<span style="color:#a11">"line-height:150px;"</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>1<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>2<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>3<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>4<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;/set</span><span style="color:#170">&gt;</span><br>  <span style="color:#170">&lt;/ui:swiper</span><span style="color:#170">&gt;</span><br><span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span></pre>
+                    </div>
+                    <div style="margin-left:40px;">
+                        result（执行结果）：
+                    </div>
+                    <div style="margin:0 20px;height:120px;" class="ct3">
+                      <ui:swiper slideclass="bgray2 ct2">
+                          <script type="option">
+                            {
+                                pagination: '.w',
+                                paginationClickable: true,
+                                direction: 'vertical',
+                                loop:true
+                            }
+                          </script>
+                          <set style="line-height:120px;">
+                          <div>1</div>
+                          <div>2</div>
+                          <div>3</div>
+                          <div>4</div>
+                          </set>
+                      </ui:swiper>
+                    </div>
+                    <div style="margin-left:40px;">
+                        <a href="/turtlejs/turtle1.0component">查看更多</a>
+                    </div>
+              </div>
+              <div style="background-color:#E98C00;" href="/turtlejs/turtle1.0sandbox">
+                  Sandbox
+              </div>
+              <div style="background-color:#E74C3C;" href="/turtlejs/turtle1.0api">
+                  API
+              </div>
+            </ui:swiper>
             <style>
                 .swiper-slide,.swiper-slide a{
                     color:#fff !important;
@@ -182,19 +163,8 @@
                     cursor: pointer;
                 }
             </style>
-        </div>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer" style="padding-top:40px;">
-        
-      <footer class="inner">
-        <p class="copyright">Turtlejs maintained by <a href="https://github.com/make-in-china">make-in-china</a></p>
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
+        </ui:content>
+        <ui:bottom></ui:bottom>
+    </xmp>
   </body>
 </html>

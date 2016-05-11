@@ -10,24 +10,24 @@
     <script>
         var ready=new $t.ReadyObject();
         var swiper;
-        $t.service.swiper=function(container,wrapper,content,slideClass){
-            if(slideClass){
-                slideClass=slideClass.split(" ");
+        $t.service.swiper=function(container,wrapper,content,slideclass){
+            if(slideclass){
+                slideclass=slideclass.split(" ");
             }else{
-                slideClass=[];
+                slideclass=[];
             }
             var opn;
             if(content[0].nodeName==="SCRIPT" && content[0].type==="option"){
                 opn=$t.fn.execByScope(this,'('+content[0].innerHTML+')',null,outer,content)
                 content.shift();
             }
-            if(!opn.slideClass){
-                opn.slideClass="swiper-slide";
+            if(!opn.slideclass){
+                opn.slideclass="swiper-slide";
             }
-            slideClass.push(opn.slideClass);
+            slideclass.push(opn.slideclass);
             var lst=content;
             for(var i=0;i<lst.length;i++){
-                $t.addClasses(lst[i],slideClass);
+                $t.addClasses(lst[i],slideclass);
             }
             if(opn.slidesPerColumn>0){
                 var p=$t.toPercent(1/opn.slidesPerColumn);
@@ -65,7 +65,7 @@
                 }); 
             });
         };
-        swiper=$t.require($t.config.baseUIPath+"/swiper-3.3.1.min.js","Swiper");
+        swiper=$t.require($t.config.baseUIPath[0]+"/swiper-3.3.1.min.js","Swiper");
         ready.isReady=true;
         /*$t.includeJSFiles("js/swiper-3.3.1.min.js",function(){
             swiper=Swiper;
@@ -81,11 +81,11 @@
         </div>
     </div>
     <script var="container,wrapper">
-        var slideClass="{slideclass!}";
+        var slideclass="{slideclass!}";
         if(!$t.service.swiper){
             var t=this;
             $t.renderBefore("swiper.script",t.childNodes[0],outer,outerElement);
         }
-        $t.service.swiper(container,wrapper,outerElement,slideClass);
+        $t.service.swiper(container,wrapper,outerElement,slideclass);
     </script>
 </xmp>
