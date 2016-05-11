@@ -15,42 +15,56 @@
     </script>
   </head>
   <body class='scrolly'>
-    
     <xmp>
-        <! scope resize|v:0>
+        <! scope resize|value:0>
         <ui:top2></ui:top2>
         <ui:content>
-            <!! window.addEventListener('resize',function(){resize.v=document.documentElement.clientWidth;})>
-            <div : :style.width="resize.v|v>650?'150px':''" style="float:left;min-height:30px;z-index:2;" >
-                <div : :style.position="resize.v|v>650?'fixed':''" style="line-height: 120%;" class="fz12">
-                    <div>逻辑语句
-                        <set : :style.display="resize.v|v>650?'block':''" style="padding:5px 10px;cursor:pointer;font-family:宋体;">
-                            <a href="#if" >If</a>
-                            <a href="#switch" >Switch</a>
-                            <a href="#while" >While</a>
-                            <a href="#for" >For</a>
-                            <a href="#forin" >For in</a>
-                        </set>
-                    </div>
-                    <div>脚本语法
-                        <set : :style.display="resize.v|v>650?'block':''" style="padding:5px 10px;cursor:pointer;font-family:宋体;">
-                            <a href="#!=" >运算和返回</a>
-                            <a href="#" >绑定</a>
-                            <a href="#" >变量域和变量</a>
-                        </set>
-                    </div>
+            <!! window.addEventListener('resize',function(){resize.value=document.documentElement.clientWidth;})>
+            <div : :style.width="resize.value|v>649?'150px':''" style="float:left;min-height:30px;z-index:2;" >
+                <div : :style.position="resize.value|v>649?'fixed':''" style="line-height: 120%;" class="fz12">
+                    
+                    <set class="fz18" : :style.display="resize.value|v>649?'block':''" style="padding:5px 10px;cursor:pointer;">
+                        
+                        <a href="#scope" >变量域和变量</a>
+                        <a href="#if" >If</a>
+                        <a href="#switch" >Switch</a>
+                        <a href="#while" >While</a>
+                        <a href="#for" >For</a>
+                        <a href="#forin" >For in</a>
+                        <a href="#run" >运算和返回</a>
+                        <a href="#bind" >绑定</a>
+                    </set>
                 </div>
             </div>
-            <div style="float:left;min-width:500px;max-width:650px;">
+            <div style="float:left;min-width:500px;max-width:650px;padding-bottom: 30px;">
+                <div style="padding: 40px;" class="fz12">本库使用注释来进行逻辑控制
+                     <br>比如&lt;! if 1><br> (注：&lt;!注释> 等同于 &lt;!--注释-->)
+                </div>
+                
+                <a name="scope"></a>
+                <h4>1</h4>
+                <div style="margin-left:40px;">
+                    &lt;! scope [name|]variable1:1,variable2:2>：
+                    作用域和作用域变量
+                </div>
+                <div>
+                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444"></pre>
+                </div>
+                <div style="margin-left:40px;">
+                    >:_
+                    <br/>
+                </div>
+                
                 <a name="if"></a>
+                <h4>2</h4>
                 <div style="margin-left:40px;">
                     if：
                 </div>
                 <div>
-                    <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! var v:1&gt;                                <br>&lt;! if v===3&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v===3<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! else if v===2&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v===2<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! else&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v的值为&lt;!= v&gt;<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! end&gt;</pre>
+                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! var v:1&gt;                                <br>&lt;! if v===3&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v===3<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! else if v===2&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v===2<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! else&gt;<br>    <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>v的值为&lt;!= v&gt;<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;! end&gt;</pre>
                 </div>
                 <div style="margin-left:40px;">
-                    result（执行结果）：
+                    >:_
                     <! scope if|v:1>
                     <! if v===3>
                         <div>v===3</div>
@@ -61,14 +75,15 @@
                     <! end>
                 </div>
                 <a name="switch"></a>
+                <h4>3</h4>
                 <div style="margin-left:40px;">
                     switch：
                 </div>
                 <div>
-                    <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope switch|v:1&gt;<br>&lt;! switch v&gt;<br>&lt;! case 1&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:red"</span><span style="color:#170">&gt;</span>赤<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case 1&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:orange"</span><span style="color:#170">&gt;</span>橙<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span>&lt;!! v++&gt;<br>&lt;! case 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:yellow"</span><span style="color:#170">&gt;</span>黄<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:green"</span><span style="color:#170">&gt;</span>绿<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case break 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:blue"</span><span style="color:#170">&gt;</span>蓝<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! default&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:purple"</span><span style="color:#170">&gt;</span>紫<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! end&gt;</pre>
+                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope switch|v:1&gt;<br>&lt;! switch v&gt;<br>&lt;! case 1&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:red"</span><span style="color:#170">&gt;</span>赤<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case 1&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:orange"</span><span style="color:#170">&gt;</span>橙<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span>&lt;!! v++&gt;<br>&lt;! case 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:yellow"</span><span style="color:#170">&gt;</span>黄<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:green"</span><span style="color:#170">&gt;</span>绿<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! case break 2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:blue"</span><span style="color:#170">&gt;</span>蓝<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! default&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">style</span>=<span style="color:#a11">"color:purple"</span><span style="color:#170">&gt;</span>紫<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>&lt;! end&gt;</pre>
                 </div>
                 <div style="margin-left:40px;">
-                    result（执行结果）：
+                    >:_
                     <br/>
                         <! scope switch|v:1>
                         <! switch v>
@@ -82,14 +97,15 @@
                 </div>
                 
                 <a name="while"></a>
+                <h4>4</h4>
                 <div style="margin-left:40px;">
                     while：
                 </div>
                 <div>
-                    <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope while|v:1&gt;<br>&lt;! while v<span style="color:#170">&lt;</span>=<span style="color:#a11">10</span><span style="color:#170">&gt;</span><br><span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span><br>  &lt;! if v==4&gt;&lt;! break&gt;&lt;! else&gt;&lt;!= v&gt;&lt;! end&gt;<br><span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;!! v++&gt;<br>&lt;! end&gt;</pre>
+                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope while|v:1&gt;<br>&lt;! while v<span style="color:#170">&lt;</span>=<span style="color:#a11">10</span><span style="color:#170">&gt;</span><br><span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span><br>  &lt;! if v==4&gt;&lt;! break&gt;&lt;! else&gt;&lt;!= v&gt;&lt;! end&gt;<br><span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>&lt;!! v++&gt;<br>&lt;! end&gt;</pre>
                 </div>
                 <div style="margin-left:40px;">
-                    result（执行结果）：
+                    >:_
                     <br/>
                     <! scope while|v:1>
                     <! while v<=10>
@@ -101,14 +117,15 @@
                 </div>
                 
                 <a name="for"></a>
+                <h4>5</h4>
                 <div style="margin-left:40px;">
                     for：
                 </div>
                 <div>
-                    <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope for1|v:1,k:10&gt;<br>&lt;! for v=10;-1<span style="color:#170">&lt;k;k--</span><span style="color:#170">&gt;</span><br>&lt;! if k==3&gt;&lt;! break&gt;&lt;! else&gt;&lt;!= k&gt;&lt;! end&gt;<br>&lt;! end&gt;</pre>
+                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope for1|v:1,k:10&gt;<br>&lt;! for v=10;-1<span style="color:#170">&lt;k;k--</span><span style="color:#170">&gt;</span><br>&lt;! if k==3&gt;&lt;! break&gt;&lt;! else&gt;&lt;!= k&gt;&lt;! end&gt;<br>&lt;! end&gt;</pre>
                 </div>
                 <div style="margin-left:40px;">
-                    result（执行结果）：
+                    >:_
                     <br/>
                     <! scope for1|v:1,k:10>
                     <! for v=10;-1<k;k-->
@@ -116,14 +133,15 @@
                     <! end>
                 </div>
                 <a name="forin"></a>
+                <h4>6</h4>
                 <div style="margin-left:40px;">
-                    for：
+                    for in：
                 </div>
                 <div>
-                    <pre style="width: inherit;margin:0 20px;font:100 12px/18px monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope for2|n:'',m:["a","b","c","d","e","f"]&gt;<br>&lt;! for n in m&gt;<br>    <span style="color:#170">&lt;span</span><span style="color:#170">&gt;</span>&lt;!= m[n]&gt;<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>    &lt;! if n=='3'&gt;<br>        &lt;! break&gt;<br>    &lt;! end&gt;<br>&lt;! end&gt;</pre>
+                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope for2|n:'',m:["a","b","c","d","e","f"]&gt;<br>&lt;! for n in m&gt;<br>    <span style="color:#170">&lt;span</span><span style="color:#170">&gt;</span>&lt;!= m[n]&gt;<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span><br>    &lt;! if n=='3'&gt;<br>        &lt;! break&gt;<br>    &lt;! end&gt;<br>&lt;! end&gt;</pre>
                 </div>
                 <div style="margin-left:40px;">
-                    result（执行结果）：
+                    >:_
                     <br/>
                     <! scope for2|n:'',m:["a","b","c","d","e","f"]>
                     <! for n in m>
@@ -133,10 +151,45 @@
                         <! end>
                     <! end>
                 </div>
+                
+                <a name="run"></a>
+                <h4>7</h4>
+                <div style="margin-left:40px;">
+                   &lt;!! condition> 、 &lt;!= condition>：
+                </div>
+                <div>
+                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope run|v:1&gt;<br><span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>无返回的运算"&lt;!! v++&gt;"<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br><span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span>有返回的运算"&lt;!= v&gt;"<span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span></pre>
+                </div>
+                <div style="margin-left:40px;">
+                    >:_
+                    <br/>
+                    <! scope run|v:1>
+                    <div>无返回的运算"<!! v++>"</div>
+                    <div>有返回的运算"<!= v>"</div>
+                </div>
+                
+                <a name="bind"></a>
+                <h4>8</h4>
+                <div style="margin-left:40px;">
+                    &lt;!- variable[|script]>：
+                </div>
+                <div>
+                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! var vxv:2&gt;<br><span style="color:#170">&lt;! var vxv:2&gt;<br><span style="color:#170">&lt;input</span> <span style="color:#00c">bind</span>=<span style="color:#a11">"vxv"</span><span style="color:#170">/&gt;</span>&lt;!- vxv|"的平方为:"+v*v&gt;<br><span style="color:#170">&lt;br</span><span style="color:#170">/&gt;</span><br><span style="color:#170">&lt;input</span> <span style="color:#00c">bind</span>=<span style="color:#a11">"vxv"</span><span style="color:#170">/&gt;</span>&lt;!- vxv|"的3次方为:"+v*v*v&gt;</pre>
+                </div>
+                <div style="margin-left:40px;">
+                    >:_
+                    <br/>
+                    <! var vxv:2>
+                    <input bind="vxv"/><!- vxv|"的平方为:"+v*v>
+                    <br/>
+                    <input bind="vxv"/><!- vxv|"的3次方为:"+v*v*v>
+                </div>
+                
+                
             </div>
         </ui:content>
         <ui:bottom></ui:bottom>
-        <!! resize.v=document.documentElement.clientWidth>
+        <!! resize.value=document.documentElement.clientWidth>
     </xmp>
   </body>
 </html>
