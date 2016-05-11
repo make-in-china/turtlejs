@@ -58,8 +58,11 @@
                 </div>
             </div>
             <div style="float:left;min-width:500px;max-width:650px;padding-bottom: 30px;">
-                <div style="padding: 40px;" class="fz12">本库使用注释来进行逻辑控制
-                     <br>比如&lt;! if 1><br> (注：&lt;!注释> 等同于 &lt;!--注释-->)
+                <div style="padding: 40px;" class="fz12">
+                                                               本库使用注释来进行逻辑控制
+                     <br>比如&lt;! if 1>
+                     <br> (注：&lt;!注释> 等同于 &lt;!--注释-->)
+                     <br>下列例子具体输出结果可以审查元素查看
                 </div>
                 
                 <a name="scope"></a>
@@ -228,27 +231,32 @@
                 <div style="margin-left:40px;">
                     &lt;!- variable[|script]>：
                 </div>
+                <div style="margin-left:40px;">
+                    td组件定义：（第14章讲解组件）
+                </div>
                 <div>
-                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! var vxv:2&gt;<br><span style="color:#170"></pre>
+                    
+                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444"><span style="color:#170">&lt;xmp</span> <span style="color:#00c">ui</span>=<span style="color:#a11">"td"</span><span style="color:#170">&gt;</span><br>  <span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span><br>    <span style="color:#170">&lt;div</span> <span style="color:#00c">class</span>=<span style="color:#a11">'wem16 right'</span><span style="color:#170">&gt;</span><br>      {name}&lt;! if {way!1}!=2&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">class</span>=<span style="color:#a11">"fblue15"</span><span style="color:#170">&gt;</span>单向<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span>&lt;! end&gt;&lt;! if {way!1}==3&gt;+&lt;! end&gt;&lt;! if {way!1}!=1&gt;<span style="color:#170">&lt;span</span> <span style="color:#00c">class</span>=<span style="color:#a11">"fred15"</span><span style="color:#170">&gt;</span>双向<span style="color:#170">&lt;/span</span><span style="color:#170">&gt;</span>&lt;! end&gt;绑定：<br>    <span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>    <span style="color:#170">&lt;div</span> <span style="color:#00c">class</span>=<span style="color:#a11">'left pdip5'</span><span style="color:#170">&gt;</span><br>      &lt;!content&gt;<br>    <span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>  <span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br><span style="color:#170">&lt;/xmp</span><span style="color:#170">&gt;</span></pre>
+                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! scope x|vvvv:"turtle绑定测试",vv:0,vvv:0&gt;<br><span style="color:#170">&lt;div</span><span style="color:#170">&gt;</span><br>    <span style="color:#170">&lt;div</span> <span style="color:#00c">class</span>=<span style="color:#a11">"iub"</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;ui:td</span> <span style="color:#00c">name</span>=<span style="color:#a11">"checkbox属性 “checked” "</span> <span style="color:#00c">way</span>=<span style="color:#a11">1</span><span style="color:#170">&gt;</span><br>        <span style="color:#170">&lt;set</span> <span style="color:#00c">lazy</span> <span style="color:#00c">bind</span>=<span style="color:#a11">"vvvv"</span><span style="color:#170">&gt;</span><br>          <span style="color:#170">&lt;input</span> <span style="color:#00c">type</span>=<span style="color:#a11">"checkbox"</span> <span style="color:#00c">bind</span>=<span style="color:#a11">"vv"</span> <span style="color:#00c">:</span> <span style="color:#00c">:checked</span>=<span style="color:#a11">"vvv"</span><span style="color:#170">/&gt;</span><br>          双向A+双向B<br>        <span style="color:#170">&lt;/set</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;/ui:td</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;ui:td</span> <span style="color:#00c">name</span>=<span style="color:#a11">"checkbox内置"</span> <span style="color:#00c">way</span>=<span style="color:#a11">2</span><span style="color:#170">&gt;</span><br>        <span style="color:#170">&lt;input</span> <span style="color:#00c">type</span>=<span style="color:#a11">"checkbox"</span> <span style="color:#00c">bind</span>=<span style="color:#a11">"vvvv"</span> <span style="color:#00c">:</span> <span style="color:#00c">:checked</span>=<span style="color:#a11">"vvv"</span><span style="color:#170">/&gt;</span><br>        双向A<br>      <span style="color:#170">&lt;/ui:td</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;ui:td</span> <span style="color:#00c">name</span>=<span style="color:#a11">"checkbox属性 “checked” "</span> <span style="color:#00c">way</span>=<span style="color:#a11">1</span><span style="color:#170">&gt;</span><br>        <span style="color:#170">&lt;input</span> <span style="color:#00c">type</span>=<span style="color:#a11">"checkbox"</span> <span style="color:#00c">:</span> <span style="color:#00c">:checked</span>=<span style="color:#a11">"vvvv"</span><span style="color:#170">/&gt;</span><br>        单向A<br>      <span style="color:#170">&lt;/ui:td</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;ui:td</span> <span style="color:#00c">name</span>=<span style="color:#a11">"checkbox属性 “checked” "</span> <span style="color:#00c">way</span>=<span style="color:#a11">2</span><span style="color:#170">&gt;</span><br>        <span style="color:#170">&lt;input</span> <span style="color:#00c">type</span>=<span style="color:#a11">"checkbox"</span> <span style="color:#00c">bind</span>=<span style="color:#a11">"vv"</span> <span style="color:#00c">:</span> <span style="color:#00c">:checked</span>=<span style="color:#a11">"vvv"</span><span style="color:#170">/&gt;</span><br>        双向B<br>      <span style="color:#170">&lt;/ui:td</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;ui:td</span> <span style="color:#00c">name</span>=<span style="color:#a11">"按钮属性 “disabled” "</span> <span style="color:#00c">way</span>=<span style="color:#a11">1</span><span style="color:#170">&gt;</span><br>        <span style="color:#170">&lt;button</span> <span style="color:#00c">:</span> <span style="color:#00c">:disabled</span>=<span style="color:#a11">"vvvv"</span><span style="color:#170">&gt;</span><br>          disabled="&lt;!- vvvv&gt;"<br>        <span style="color:#170">&lt;/button</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;/ui:td</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;ui:td</span> <span style="color:#00c">name</span>=<span style="color:#a11">"div内置"</span> <span style="color:#00c">way</span>=<span style="color:#a11">1</span><span style="color:#170">&gt;</span><br>        <span style="color:#170">&lt;div</span> <span style="color:#00c">bind</span>=<span style="color:#a11">"vvvv"</span><span style="color:#170">&gt;</span><span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;/ui:td</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;ui:td</span> <span style="color:#00c">name</span>=<span style="color:#a11">"div属性 “style.display” "</span> <span style="color:#00c">way</span>=<span style="color:#a11">1</span><span style="color:#170">&gt;</span><br>        <span style="color:#170">&lt;div</span> <span style="color:#00c">show</span>=<span style="color:#a11">'vvvv!=""'</span><span style="color:#170">&gt;</span><br>          className!="uhide"<br>        <span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;/ui:td</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;ui:td</span> <span style="color:#00c">name</span>=<span style="color:#a11">"input内置"</span> <span style="color:#00c">way</span>=<span style="color:#a11">2</span><span style="color:#170">&gt;</span><br>        <span style="color:#170">&lt;input</span> <span style="color:#00c">bind</span>=<span style="color:#a11">"vvvv"</span><span style="color:#170">/&gt;</span><br>        &lt;!- vvvv|v.length==0?'不能为空':''&gt;<br>      <span style="color:#170">&lt;/ui:td</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;ui:td</span> <span style="color:#00c">name</span>=<span style="color:#a11">"textArea内置"</span> <span style="color:#00c">way</span>=<span style="color:#a11">2</span><span style="color:#170">&gt;</span><br>        <span style="color:#170">&lt;textArea</span> <span style="color:#00c">bind</span>=<span style="color:#a11">"vvvv"</span><span style="color:#170">&gt;</span><span style="color:#f00">&lt;/textarea</span><span style="color:#f00">&gt;</span><br>      <span style="color:#170">&lt;/ui:td</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;ui:td</span> <span style="color:#00c">name</span>=<span style="color:#a11">"a属性 “href” "</span> <span style="color:#00c">way</span>=<span style="color:#a11">1</span><span style="color:#170">&gt;</span><br>        <span style="color:#170">&lt;a</span> <span style="color:#00c">:</span> <span style="color:#00c">:href</span>=<span style="color:#a11">"vvvv"</span><span style="color:#170">&gt;</span>&lt;!- vvvv&gt;<span style="color:#170">&lt;/a</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;/ui:td</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;ui:td</span> <span style="color:#00c">name</span>=<span style="color:#a11">"下拉内置"</span> <span style="color:#00c">way</span>=<span style="color:#a11">2</span><span style="color:#170">&gt;</span><br>        <span style="color:#170">&lt;select</span> <span style="color:#00c">bind</span>=<span style="color:#a11">"vvvv"</span> <span style="color:#00c">class</span>=<span style="color:#a11">"wem5"</span><span style="color:#170">&gt;</span><br>          <span style="color:#170">&lt;option</span> <span style="color:#170">&gt;</span><span style="color:#170">&lt;/option</span><span style="color:#170">&gt;</span><br>          <span style="color:#170">&lt;option</span> <span style="color:#170">&gt;</span>-1<span style="color:#170">&lt;/option</span><span style="color:#170">&gt;</span><br>          <span style="color:#170">&lt;option</span> <span style="color:#170">&gt;</span>0<span style="color:#170">&lt;/option</span><span style="color:#170">&gt;</span><br>          <span style="color:#170">&lt;option</span> <span style="color:#170">&gt;</span>1<span style="color:#170">&lt;/option</span><span style="color:#170">&gt;</span><br>          <span style="color:#170">&lt;option</span> <span style="color:#170">&gt;</span>2<span style="color:#170">&lt;/option</span><span style="color:#170">&gt;</span><br>          <span style="color:#170">&lt;option</span> <span style="color:#170">&gt;</span>3<span style="color:#170">&lt;/option</span><span style="color:#170">&gt;</span><br>          <span style="color:#170">&lt;option</span> <span style="color:#00c">value</span>=<span style="color:#a11">"true"</span><span style="color:#170">&gt;</span>真<span style="color:#170">&lt;/option</span><span style="color:#170">&gt;</span><br>          <span style="color:#170">&lt;option</span> <span style="color:#00c">value</span>=<span style="color:#a11">"false"</span><span style="color:#170">&gt;</span>假<span style="color:#170">&lt;/option</span><span style="color:#170">&gt;</span><br>        <span style="color:#170">&lt;/select</span><span style="color:#170">&gt;</span><br>      <span style="color:#170">&lt;/ui:td</span><span style="color:#170">&gt;</span><br>    <span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span><br><span style="color:#170">&lt;/div</span><span style="color:#170">&gt;</span></pre>
                 </div>
                 <div style="margin-left:40px;">
                     >:_
                     <br/>
-                    <! scope x|v:"turtle绑定测试",vv:0,vvv:0>
-                      <div>
+                    <! scope x|vvvv:"turtle绑定测试",vv:0,vvv:0>
+                    <div>
                         <div class="iub">
                           <ui:td name="checkbox属性 “checked” " way=1>
-                            <set lazy bind="v">
+                            <set lazy bind="vvvv">
                               <input type="checkbox" bind="vv" : :checked="vvv"/>
                               双向A+双向B
                             </set>
                           </ui:td>
                           <ui:td name="checkbox内置" way=2>
-                            <input type="checkbox" bind="v" : :checked="vvv"/>
+                            <input type="checkbox" bind="vvvv" : :checked="vvv"/>
                             双向A
                           </ui:td>
                           <ui:td name="checkbox属性 “checked” " way=1>
-                            <input type="checkbox" : :checked="v"/>
+                            <input type="checkbox" : :checked="vvvv"/>
                             单向A
                           </ui:td>
                           <ui:td name="checkbox属性 “checked” " way=2>
@@ -256,30 +264,30 @@
                             双向B
                           </ui:td>
                           <ui:td name="按钮属性 “disabled” " way=1>
-                            <button : :disabled="v">
-                              disabled="<!- v>"
+                            <button : :disabled="vvvv">
+                              disabled="<!- vvvv>"
                             </button>
                           </ui:td>
                           <ui:td name="div内置" way=1>
-                            <div bind="v"></div>
+                            <div bind="vvvv"></div>
                           </ui:td>
                           <ui:td name="div属性 “style.display” " way=1>
-                            <div show='v!=""'>
+                            <div show='vvvv!=""'>
                               className!="uhide"
                             </div>
                           </ui:td>
                           <ui:td name="input内置" way=2>
-                            <input bind="v"/>
-                            <!- v|v.length==0?'不能为空':''>
+                            <input bind="vvvv"/>
+                            <!- vvvv|v.length==0?'不能为空':''>
                           </ui:td>
                           <ui:td name="textArea内置" way=2>
-                            <textArea bind="v"></textarea>
+                            <textArea bind="vvvv"></textarea>
                           </ui:td>
                           <ui:td name="a属性 “href” " way=1>
-                            <a : :href="v"><!- v></a>
+                            <a : :href="vvvv"><!- vvvv></a>
                           </ui:td>
                           <ui:td name="下拉内置" way=2>
-                            <select bind="v" class="wem5">
+                            <select bind="vvvv" class="wem5">
                               <option ></option>
                               <option >-1</option>
                               <option >0</option>
@@ -291,7 +299,7 @@
                             </select>
                           </ui:td>
                         </div>
-                      </div>
+                    </div>
                 </div>
                 
                 
