@@ -15,15 +15,25 @@
     </script>
   </head>
   <body class='scrolly'>
+    <xmp ui="td">
+      <div>
+        <div class='wem16 right'>
+          {name}<! if {way!1}!=2><span class="fblue15">单向</span><! end><! if {way!1}==3>+<! end><! if {way!1}!=1><span class="fred15">双向</span><! end>绑定：
+        </div>
+        <div class='left pdip5'>
+          <!content>
+        </div>
+      </div>
+    </xmp>
     <xmp>
         <! scope resize|value:0>
         <ui:top2></ui:top2>
         <ui:content>
             <!! window.addEventListener('resize',function(){resize.value=document.documentElement.clientWidth;})>
             <div : :style.width="resize.value|v>649?'150px':''" style="float:left;min-height:30px;z-index:2;" >
-                <div : :style.position="resize.value|v>649?'fixed':''" style="line-height: 120%;" class="fz12">
+                <div : :style.position="resize.value|v>649?'fixed':''" style="line-height: 120%;padding-left:5px;" class="fz12">
                     
-                    <set class="fz18" : :style.display="resize.value|v>649?'block':''" style="padding:5px 10px;cursor:pointer;">
+                    <set class="fz18" : :style.display="resize.value|v>649?'block':'inline-block'" style="width:8em;padding:5px 0;cursor:pointer;">
                         
                         <a href="#scope" >1.变量域和变量</a>
                         <a href="#if" >2.If</a>
@@ -33,6 +43,17 @@
                         <a href="#forin" >6.For in</a>
                         <a href="#run" >7.运算和返回</a>
                         <a href="#bind" >8.绑定</a>
+                        <a href="#elembind" >9.标签绑定</a>
+                        <a href="#elemexec" >10.标签运算</a>
+                        <a href="#getset" >11.get set标签</a>
+                        <a href="#lazy" >12.lazy属性</a>
+                        <a href="#service" >13.服务</a>
+                        <a href="#component" >14.组件</a>
+                        <a href="#componentprops" >14.1组件数据</a>
+                        <a href="#component#" >14.2组件交互</a>
+                        <a href="#componenttree" >14.3组件层次</a>
+                        <a href="#componentextend" >14.4组件继承</a>
+                        <a href="#componentbuild" >14.5组件编译</a>
                     </set>
                 </div>
             </div>
@@ -200,6 +221,77 @@
                     <input bind="vxv"/><!- vxv|"的平方为:"+v*v>
                     <br/>
                     <input bind="vxv"/><!- vxv|"的3次方为:"+v*v*v>
+                </div>
+                
+                <a name="elembind"></a>
+                <h4>9</h4>
+                <div style="margin-left:40px;">
+                    &lt;!- variable[|script]>：
+                </div>
+                <div>
+                    <pre style="width: inherit;margin:0 20px;font:monaco, andale mono, courier new;background-color:#fefefe;word-break:break-all;word-wrap:break-word;color:#444">&lt;! var vxv:2&gt;<br><span style="color:#170"></pre>
+                </div>
+                <div style="margin-left:40px;">
+                    >:_
+                    <br/>
+                    <! scope x|v:"turtle绑定测试",vv:0,vvv:0>
+                      <div>
+                        <div class="iub">
+                          <ui:td name="checkbox属性 “checked” " way=1>
+                            <set lazy bind="v">
+                              <input type="checkbox" bind="vv" : :checked="vvv"/>
+                              双向A+双向B
+                            </set>
+                          </ui:td>
+                          <ui:td name="checkbox内置" way=2>
+                            <input type="checkbox" bind="v" : :checked="vvv"/>
+                            双向A
+                          </ui:td>
+                          <ui:td name="checkbox属性 “checked” " way=1>
+                            <input type="checkbox" : :checked="v"/>
+                            单向A
+                          </ui:td>
+                          <ui:td name="checkbox属性 “checked” " way=2>
+                            <input type="checkbox" bind="vv" : :checked="vvv"/>
+                            双向B
+                          </ui:td>
+                          <ui:td name="按钮属性 “disabled” " way=1>
+                            <button : :disabled="v">
+                              disabled="<!- v>"
+                            </button>
+                          </ui:td>
+                          <ui:td name="div内置" way=1>
+                            <div bind="v"></div>
+                          </ui:td>
+                          <ui:td name="div属性 “style.display” " way=1>
+                            <div show='v!=""'>
+                              className!="uhide"
+                            </div>
+                          </ui:td>
+                          <ui:td name="input内置" way=2>
+                            <input bind="v"/>
+                            <!- v|v.length==0?'不能为空':''>
+                          </ui:td>
+                          <ui:td name="textArea内置" way=2>
+                            <textArea bind="v"></textarea>
+                          </ui:td>
+                          <ui:td name="a属性 “href” " way=1>
+                            <a : :href="v"><!- v></a>
+                          </ui:td>
+                          <ui:td name="下拉内置" way=2>
+                            <select bind="v" class="wem5">
+                              <option ></option>
+                              <option >-1</option>
+                              <option >0</option>
+                              <option >1</option>
+                              <option >2</option>
+                              <option >3</option>
+                              <option value="true">真</option>
+                              <option value="false">假</option>
+                            </select>
+                          </ui:td>
+                        </div>
+                      </div>
                 </div>
                 
                 
