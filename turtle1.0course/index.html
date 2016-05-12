@@ -31,8 +31,8 @@
         <ui:content>
             <!! window.addEventListener('resize',function(){resize.value=document.documentElement.clientWidth;})>
             <div : :style.width="resize.value|v>800?'150px':''" style="float:left;min-height:30px;z-index:2;" >
-                <div style="line-height: 120%;padding-left:5px;" class="fz13 scrolly">
-                    <set class="fz18" : :style.display="resize.value|v>800?'block':'inline-block'" style="width:8em;padding:5px 0;cursor:pointer;">
+                <div style="line-height: 120%;padding-left:5px;" class="fz14 fb">
+                    <set class="fz18" : :style.display="resize.value|v>800?'block':'inline-block'" style="width:8em;padding:5px 0;cursor:pointer;color:#3B77B8 !important;">
                         <a href="#scope" >1.变量域和变量</a>
                         <a href="#if" >2.If</a>
                         <a href="#switch" >3.Switch</a>
@@ -62,8 +62,11 @@
                         <title>
                         <!这是普通注释><!--这也是普通注释-->
                         
-                        <!if true><!--turtlejs命令写在注释里-->
-                        <!--if true --><!--同样是turtlejs命令写在注释里-->
+                        <!if true>
+                        <!--turtlejs命令写在注释里-->
+                        
+                        <!--if true -->
+                        <!--同样是turtlejs命令写在注释里-->
                         </title>
                     </ui:highlightcode>
                      <br>下列例子具体输出结果可以审查元素查看
@@ -151,12 +154,19 @@
                     <title>
                     <!scope switch|v:1>
                     <!switch v>
-                    <!case 1><span style="color:red">赤</span>
-                    <!case 1><span style="color:orange">橙</span><!! v++>
-                    <!case 2><span style="color:yellow">黄</span>
-                    <!case 2><span style="color:green">绿</span>
-                    <!case break 2><span style="color:blue">蓝</span>
-                    <!default><span style="color:purple">紫</span>
+                        <!case 1>
+                            <span style="color:red">赤</span>
+                        <!case 1>
+                            <span style="color:orange">橙</span>
+                            <!! v++>
+                        <!case 2>
+                            <span style="color:yellow">黄</span>
+                        <!case 2>
+                            <span style="color:green">绿</span>
+                        <!case break 2>
+                            <span style="color:blue">蓝</span>
+                        <!default>
+                            <span style="color:purple">紫</span>
                     <!end>
                     </title>
                 </ui:highlightcode>
@@ -165,12 +175,19 @@
                     <br/>
                     <!scope switch|v:1>
                     <!switch v>
-                    <!case 1><span style="color:red">赤</span>
-                    <!case 1><span style="color:orange">橙</span><!! v++>
-                    <!case 2><span style="color:yellow">黄</span>
-                    <!case 2><span style="color:green">绿</span>
-                    <!case break 2><span style="color:blue">蓝</span>
-                    <!default><span style="color:purple">紫</span>
+                        <!case 1>
+                            <span style="color:red">赤</span>
+                        <!case 1>
+                            <span style="color:orange">橙</span>
+                            <!! v++>
+                        <!case 2>
+                            <span style="color:yellow">黄</span>
+                        <!case 2>
+                            <span style="color:green">绿</span>
+                        <!case break 2>
+                            <span style="color:blue">蓝</span>
+                        <!default>
+                            <span style="color:purple">紫</span>
                     <!end>
                 </div>
                 
