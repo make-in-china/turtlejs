@@ -31,9 +31,9 @@
         <ui:content>
             <!! window.addEventListener('resize',function(){resize.value=document.documentElement.clientWidth;})>
             <div : :style.width="resize.value|v>800?'150px':''" style="float:left;min-height:30px;z-index:2;" >
-                <div style="line-height: 120%;padding-left:5px;" class="fz14 fb">
+                <div style="line-height: 120%;padding-left:10px;padding-top:10px;" class="fz14 fb">
                     <set class="fz18" : :style.display="resize.value|v>800?'block':'inline-block'" style="width:8em;padding:5px 0;cursor:pointer;color:#3B77B8 !important;">
-                        <a href="#scope" >1.变量域和变量</a>
+                        <a href="#scope" >1.作用域和变量</a>
                         <a href="#if" >2.If</a>
                         <a href="#switch" >3.Switch</a>
                         <a href="#while" >4.While</a>
@@ -56,28 +56,40 @@
                 </div>
             </div>
             <div style="float:left;min-width:300px;max-width:650px;padding-bottom: 30px;">
-                <div style="padding: 40px;">
+                <div style="padding: 20px;">
                                                                本库使用注释来进行逻辑控制
-                     <ui:highlightcode>
-                        <title>
-                        <!这是普通注释><!--这也是普通注释-->
-                        
-                        <!if true>
-                        <!--turtlejs命令写在注释里-->
-                        
-                        <!--if true -->
-                        <!--同样是turtlejs命令写在注释里-->
-                        </title>
-                    </ui:highlightcode>
-                     <br>下列例子具体输出结果可以审查元素查看
+                     <br>可审查元素查看输出结果的dom结构
                 </div>
                 
+                 <ui:highlightcode>
+                    <title>
+                    <!while v<=10>
+                    <!if true>
+                    <!--命令写在缩写注释里-->
+                    
+                    <!--if true-->
+                    <!--命令写在完整注释里-->
+                    
+                    <!!
+                        if(1){
+                            debugger;
+                        }
+                    >
+                    <!--多行命令写在缩写注释里,不支持大于号-->
+                    
+                    <!--!
+                        if(1){
+                            debugger;
+                        }
+                    -->
+                    <!--多行命令写在完整注释里-->
+                    </title>
+                </ui:highlightcode>
                 <a name="scope"></a>
-                <h4>1</h4>
+                <h4>1.作用域和变量</h4>
                 <div style="margin-left:40px;">
                     &lt;! scope [name|]variable1:1,variable2:2>：
                     <br/>
-                    作用域和作用域变量
                 </div>
                 <ui:highlightcode>
                     <title>
@@ -118,7 +130,7 @@
                 </div>
                 
                 <a name="if"></a>
-                <h4>2</h4>
+                <h4>2.判断</h4>
                 <div style="margin-left:40px;">
                     if：
                 </div>
@@ -146,7 +158,7 @@
                     <!end>
                 </div>
                 <a name="switch"></a>
-                <h4>3</h4>
+                <h4>3.分支</h4>
                 <div style="margin-left:40px;">
                     switch：
                 </div>
@@ -192,7 +204,7 @@
                 </div>
                 
                 <a name="while"></a>
-                <h4>4</h4>
+                <h4>4.为真循环</h4>
                 <div style="margin-left:40px;">
                     while：
                 </div>
@@ -220,7 +232,7 @@
                 </div>
                 
                 <a name="for"></a>
-                <h4>5</h4>
+                <h4>5.递推循环</h4>
                 <div style="margin-left:40px;">
                     for：
                 </div>
@@ -241,7 +253,7 @@
                     <!end>
                 </div>
                 <a name="forin"></a>
-                <h4>6</h4>
+                <h4>6.遍历循环</h4>
                 <div style="margin-left:40px;">
                     for in：
                 </div>
@@ -269,7 +281,7 @@
                 </div>
                 
                 <a name="run"></a>
-                <h4>7</h4>
+                <h4>7.运算</h4>
                 <div style="margin-left:40px;">
                    &lt;!! condition> 、 &lt;!= condition>：
                 </div>
@@ -289,7 +301,7 @@
                 </div>
                 
                 <a name="bind"></a>
-                <h4>8</h4>
+                <h4>8.绑定</h4>
                 <div style="margin-left:40px;">
                     &lt;!- variable[|script]>：
                 </div>
@@ -311,7 +323,7 @@
                 </div>
                 
                 <a name="elembind"></a>
-                <h4>9</h4>
+                <h4>9.标签绑定</h4>
                 <div style="margin-left:40px;">
                     &lt;!- variable[|script]>：
                 </div>
