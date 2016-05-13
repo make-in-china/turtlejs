@@ -34,39 +34,42 @@
           <a target="_blank" : href:="'view-source:'+window.location.href">查看本页源码</a>
           <ui:button text="查看组件树">
             <script>
-                var elems=[];
-                var elem;
-                function append(cpns,space){
-                    for(var i=0;i<cpns.length;i++){
-                        var elem=document.createElement("div");
-                        elem.innerHTML='&lt;'+cpns[i].template.componentName+'&gt;';
-                        elem.style.paddingLeft=space+"em";
-                        
-                        elems.push(elem);
-                        
-                        var elem2=document.createElement("a");
-                        elem2.href="javascript:;";
-                        elem2.innerHTML="移除";
-                        (function(elem,c){
-                            elem2.onclick=function(){
-                                $t.removeNode(elem);
-                                c.remove();
+                function refresh(){
+                    var elems=[];
+                    var elem;
+                    function append(cpns,space){
+                        for(var i=0;i<cpns.length;i++){
+                            var elem=document.createElement("div");
+                            elem.innerHTML='&lt;'+cpns[i].template.componentName+'&gt;';
+                            elem.style.paddingLeft=space+"em";
+                            
+                            elems.push(elem);
+                            
+                            var elem2=document.createElement("a");
+                            elem2.href="javascript:;";
+                            elem2.innerHTML="移除";
+                            (function(c){
+                                elem2.onclick=function(){
+                                    c.remove();
+                                    refresh();
+                                }
+                            })(cpns[i]);
+                            
+                            elem.insertBefore(elem2,elem.childNodes[0]);
+                            
+                            
+                            var c=cpns[i].child;
+                            if(c.length>0){
+                                append(c,space+2);
                             }
-                        })(elem,cpns[i]);
-                        
-                        elem.insertBefore(elem2,elem.childNodes[0]);
-                        
-                        
-                        var c=cpns[i].child;
-                        if(c.length>0){
-                            append(c,space+2);
                         }
                     }
+                    append($t.rootComponents,0);
+                    var tree=$t.ui.panel.components[0];
+                    tree.show();
+                    tree.setContent(elems);
                 }
-                append($t.rootComponents,0);
-                var tree=$t.ui.panel.components[0];
-                tree.show();
-                tree.setContent(elems);
+                refresh()
             </script>
           </ui:button>
           <!! $t.ui.panel.components[0].hide();>
