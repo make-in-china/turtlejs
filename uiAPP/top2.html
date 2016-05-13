@@ -38,12 +38,25 @@
                 var elem;
                 function append(cpns,space){
                     for(var i=0;i<cpns.length;i++){
-                        var elem=document.createElement("a");
+                        var elem=document.createElement("div");
                         elem.innerHTML='&lt;'+cpns[i].template.componentName+'&gt;';
                         elem.style.paddingLeft=space+"em";
-                        elem.style.display="block";
-                        elem.href="javascript:;";
+                        
                         elems.push(elem);
+                        
+                        var elem2=document.createElement("a");
+                        elem2.href="javascript:;";
+                        elem2.innerHTML="移除";
+                        (function(elem,c){
+                            elem2.onclick=function(){
+                                $t.removeNode(elem);
+                                c.remove();
+                            }
+                        })(elem,cpns[i]);
+                        
+                        elem.insertBefore(elem2,elem.childNodes[0]);
+                        
+                        
                         var c=cpns[i].child;
                         if(c.length>0){
                             append(c,space+2);
