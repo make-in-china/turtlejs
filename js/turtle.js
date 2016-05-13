@@ -2474,7 +2474,7 @@ var turtle,$t;
             var s="\r\n"+new Array(tabSpace+1).join(" ")+this.toString();
             var child=this.child;
             for(var i=0;i<child.length;i++){
-                s+=child[i].treeDiagram(tabSpace+2);
+                s+=child[i].treeDiagram(tabSpace+8);
             }
             return s;
         },
