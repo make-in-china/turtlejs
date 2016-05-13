@@ -9,16 +9,16 @@ var turtle,$t;
         slice               = Arrayprototype.slice,
         getPrototypeOf      = Object.getPrototypeOf,
         appendChild         = Node.prototype.appendChild,
-        readyRE = /complete|loaded|interactive/,
-        memberRE=/{[a-zA-Z\d\.\%\u4e00-\u9fa5]+\!?(['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\1\!?(['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\2}/g,
-        orderRE=/^\s?(if|while|for|switch|break|-|scope|content|bind|!|var|=)(\s|$)/g,
-        orderCaseRE=/^\s?(else if|else|case break|case|default|end)(\s|$)/g,
-        operatorRE=/\!=|==|=|<|>|\|/,
-        camelCaseRE=/-(\w)/g,
-        _OrderBlockStack=newArrayObject('OrderBlockStack'),
-        isIE=(!!window.ActiveXObject||"ActiveXObject" in window);
-
-   if (!("classList" in document.documentElement)) {
+        readyRE             = /complete|loaded|interactive/,
+        memberRE            = /{[a-zA-Z\d\.\%\u4e00-\u9fa5]+\!?(['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\1\!?(['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\2}/g,
+        orderRE             = /^\s?(if|while|for|switch|break|-|scope|content|bind|!|var|=)(\s|$)/g,
+        orderCaseRE         = /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
+        operatorRE          = /\!=|==|=|<|>|\|/,
+        camelCaseRE         = /-(\w)/g,
+        _OrderBlockStack    = newArrayObject('OrderBlockStack'),
+        isIE                = (!!window.ActiveXObject||"ActiveXObject" in window);
+    
+    if (!("classList" in document.documentElement)) {
         Object.defineProperty(HTMLElement.prototype, 'classList', {
             get: function() {
                 var self = this;
@@ -2457,7 +2457,6 @@ var turtle,$t;
         t.store=slice.call(nodes);
         t.store.unshift(begin);
         t.store.push(end);
-        debugger;
         for(var i=nodes.length;i>0;i--){
             node.removeChild(nodes[0]);
         }
@@ -2488,7 +2487,12 @@ var turtle,$t;
                 }
                 return elements;
             }
-            return this.store.slice().splice(1,this.store.length-2);
+            if(isArray(this.store)){
+                return this.store.slice().splice(1,this.store.length-2);    
+            }else{
+                return [];
+            }
+            
         },
         get child(){
             return getComponents(this.elements);
@@ -2797,38 +2801,50 @@ var turtle,$t;
             return parseHTML(getTemplate(node));    
         }
     }
-    function getTemplate(node){
-        switch(node.nodeName){
-            case "TEMPLATE":
-            case "XMP":
-            case "SCRIPT":
-            case "STYLE":
-                return node.innerHTML;
-            case "TITLE":
-                return node.innerText;
-            case "TEXTAREA":
-                return node.defaultValue;
+    var templates=newObject("Templates",{toString:function(){
+       
+        var s=[];
+        var desc;
+        for(var i in $t.templates){
+            if(!$t.templates.hasOwnProperty(i)){
+                continue;
+            }
+            desc='<'+i.toLowerCase();
+            if($t.templates[i].hasOwnProperty("type")){
+                desc+=' type="'+$t.templates[i]["type"]+'"';
+            }
+            desc+='>';
+            s.push(desc);
         }
-    }
-    function isUI(node){
-        if(/UI:[A-Z\d]+/.test(node.nodeName)){
-            return true;
-        }
-        return node.nodeName=="SCRIPT"&&getAttr(node,'type')=='ui';
-    }
+        return s.join("\n");
+    }});
+    templates.XMP={};
+    templates.TEMPLATE={};
+    templates.TITLE={getData:function(node){return node.innerText;}};
+    templates.STYLE={type:"xmp"};
+    templates.SCRIPT={type:"xmp"};
+    templates.TEXTAREA={type:"xmp",getData:function(node){return node.defaultValue;}};
+    
     function isTemplate(node){
-        switch(node.nodeName){
-            case "TEMPLATE":
-            case "XMP":
-            case "TITLE":
+        var nodeName=node.nodeName;
+        if(templates.hasOwnProperty(nodeName)){
+            if(templates[nodeName].hasOwnProperty('type')){
+                return getAttr(node,'type')==='xmp';
+            }else{
                 return true;
-            case "SCRIPT":
-            case "STYLE":
-            case "TEXTAREA":
-                if(getAttr(node,'type')=='xmp')
-                    return true;
+            }
         }
         return false;
+    }
+    function getTemplate(node){
+        var nodeName=node.nodeName;
+        if(templates.hasOwnProperty(nodeName)){
+            if(templates[nodeName].hasOwnProperty('getData')){
+                return templates[nodeName].getData(node);
+            }else{
+                return node.innerHTML;
+            }
+        }
     }
     function findTemplates(nodes){
         var temps=[];
@@ -2838,6 +2854,14 @@ var turtle,$t;
         });
         return temps;
     }
+    function isUI(node){
+        if(/UI:[A-Z\d]+/.test(node.nodeName)){
+            return true;
+        }
+        return node.nodeName=="SCRIPT"&&getAttr(node,'type')=='ui';
+    }
+    
+    
     function compileDocument(scriptNode,uiList,fn){
         var appends=[];
         
@@ -2859,7 +2883,7 @@ var turtle,$t;
         }
         oldHTML=b.innerHTML;
         for(var i=0;i<templateXMP.length;i++){
-            ret=parseHTML(getTemplate(templateXMP[i]));
+            parseHTML(getTemplate(templateXMP[i]));
         }
         var s=compileCls();
         var uiComplie=compileUI(uiList);;
@@ -3526,6 +3550,7 @@ var turtle,$t;
         };
         this.require=require;
         this.isIE=isIE;
+        this.templates=templates;
     }
     Turtle.prototype=fn;
     turtle=$t=new Turtle();
