@@ -8,10 +8,10 @@
         tID,
         t = window.inputbox = {},
         body = document.body,
-        Text = $t.keyNode['Text'].pop(),
-        input = $t.keyNode['input'].pop(),
+        Text = $t.refNode['Text'].pop(),
+        input = $t.refNode['input'].pop(),
         buttonPanel = Text.children[1],
-        elemOK = $t.keyNode['elemOK'].pop();
+        elemOK = $t.refNode['elemOK'].pop();
     Text.box = t;
     removeNode(Text);
     function pressKey(input, key) {
