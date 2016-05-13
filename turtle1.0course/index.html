@@ -29,8 +29,10 @@
         <div ref="c" class="bgray0 fgray15 shadowless2 mdip5 pdip15 rem1">
             >:<br/>
             <div ref="b"></div>
+            <a ref="a" href="javascript:;">试一试</a>
         </div>
         <script>
+            var a=$t.refNode["a"].pop();
             var b=$t.refNode["b"].pop();
             var c=$t.refNode["c"].pop();
             var isRun=$t.parseBool('{run!true}');
@@ -38,6 +40,12 @@
             if(!isRun){
                 $t.removeNode(c);
             }else{
+                a.onclick=function(){
+                    var cpn=$t.renderBefore("turtlecontrolpanel",component.end);
+                    cpn.max();
+                    cpn.runHTML(outerElement[0].innerText);
+                    $t.removeNode(a);
+                }
                 b.innerHTML=$t.nodesToString(outerElement[0].childNodes);
             }
         </script>
@@ -241,12 +249,10 @@ scopeTop:x=<!= x>,y=<!= y>
                     &lt;!- variable[|script]>：
                 </div>
                 <ui:io><title>
-<title>
 <!var vxv:2>
 <input bind="vxv"/><!- vxv|"的平方为:"+v*v>
 <br/>
 <input bind="vxv"/><!- vxv|"的3次方为:"+v*v*v>
-</title>
                 </title></ui:io>
                 
                 <ui:ahchortitle></ui:ahchortitle>

@@ -1,0 +1,31 @@
+<xmp>
+    <set lazy append style="box-sizing:border-box;" class="w100">
+        <ui:growpanel title="Turtle控制台">
+            <div class="mdip2">
+                <textarea ref="script" class="fz18 bgray2 w100 hem10 fgray15 bdw0 rdip5 pdip5" style="outline-width:0; resize:none;box-sizing:border-box;"><!= "我是控制台"></textarea>
+                <br/>
+                <a ref="run" href="javascript:;">运行 &gt;:_</a>
+                <br/>
+                <div ref="ret" class="rdip5 bgray2 fgray15 fz18 bgray2 hem10 fgray15 bdw0"></div>
+            </div>
+        </ui:growpanel>
+    </set>
+    <script>
+        component.max=function(){
+            component.max=component.child[0].max;
+            return component.max();
+        }
+        var script=$t.refNode.script.pop();
+        var run=$t.refNode.run.pop();
+        var ret=$t.refNode.ret.pop();
+        run.onclick=function(){
+            ret.innerHTML='';
+            $t.appendNodes($t.parseHTML(script.value),ret);
+        }
+        component.runHTML=function(html){
+            script.value=html;
+            ret.innerHTML='';
+            $t.appendNodes($t.parseHTML(html),ret);
+        }
+    </script>
+</xmp>

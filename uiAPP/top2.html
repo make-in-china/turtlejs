@@ -1,29 +1,29 @@
-<xmp service="run">
+<xmp service="runJS">
     function(script){
         $t.refNode.script[0].value=script;
         $t.refNode.ret[0].innerHTML=eval(script);
+        $t.ui.growpanel.components[0].max();
     }
 </xmp>
 <xmp>
     <div id="header_wrap" class="outer">
         <div class="zidx3 abs">
             <set lazy append class="bgray15" style="font-family: 微软雅黑;">
-                <ui:growpanel title="控制台" extend="0">
+                <ui:growpanel title="JS控制台" extend="0">
                     <div class="mdip2">
                         <textarea ref="script" class="fz18 bgray2 wem20 hem5 fgray15 bdw0 rdip5 pdip5" style="outline-width: 0; resize:none;"></textarea>
                         <br/>
-                        <ui:button text="运行>:">
-                            <script var="script">
-                                $t.refNode.ret[0].innerHTML=eval(script.value);
+                        <ui:button text="运行 >:_">
+                            <script>
+                                $t.refNode.ret[0].innerHTML=eval($t.refNode.script[0].value);
                             </script>
                         </ui:button>
-                            <br/>
-                            <textarea ref="ret" class="rdip5 bgray2 fgray15 fz18 bgray2 w100 hem10 fgray15 bdw0" style="outline-width: 0; resize:none;"></textarea>
+                        <br/>
+                        <textarea ref="ret" class="rdip5 bgray2 fgray15 fz18 bgray2 w100 hem10 fgray15 bdw0" style="outline-width: 0; resize:none;"></textarea>
                     </div>
                 </ui:growpanel>
-                <ui:panel title="组件树">
-                    
-                </ui:panel>
+                
+                <ui:panel title="组件树"></ui:panel>
             </set>
             
         </div>
