@@ -7,8 +7,8 @@
 <xmp>
     <div id="header_wrap" class="outer">
         <div class="zidx3 abs">
-            <set lazy append class="bgray15">
-                <ui:growpanel title="命令行" extend="0">
+            <set lazy append class="bgray15" style="font-family: 微软雅黑;">
+                <ui:growpanel title="控制台" extend="0">
                     <div class="mdip2">
                         <textarea ref="script" class="fz18 bgray2 wem20 hem5 fgray15 bdw0 rdip5 pdip5" style="outline-width: 0; resize:none;"></textarea>
                         <br/>
@@ -30,7 +30,7 @@
         <header class="inner">
           <h1 id="project_title">Turtlejs（龟计算）</h1>
           <h2 id="project_tagline">make it for fun</h2>
-          本博客由turtlejs构建完成
+          本博客由turtlejs构建完成，该博客的所有组件都未进行压缩
           <a target="_blank" : href:="'view-source:'+window.location.href">查看本页源码</a>
           <ui:button text="查看组件树">
             <script>
@@ -40,7 +40,7 @@
                     function append(cpns,space){
                         for(var i=0;i<cpns.length;i++){
                             var elem=document.createElement("div");
-                            elem.innerHTML='&lt;'+cpns[i].template.componentName+'&gt;';
+                            elem.innerHTML='&lt;ui:'+cpns[i].template.componentName+'&gt;props='+JSON.stringify(cpns[i].props);
                             elem.style.paddingLeft=space+"em";
                             
                             elems.push(elem);
