@@ -15,7 +15,7 @@
     </script>
   </head>
   <body class='scrolly'>
-    <xmp ui="td">
+    <xmp ui="temlline">
       <div>
         <div class='wem16 right'>
           {name}<!if {way!1}!=2><span class="fblue15">单向</span><!end><!if {way!1}==3>+<!end><!if {way!1}!=1><span class="fred15">双向</span><!end>绑定：
@@ -36,21 +36,26 @@
             var b=$t.refNode["b"].pop();
             var c=$t.refNode["c"].pop();
             var isRun=$t.parseBool('{run!true}');
+            var isTry=$t.parseBool('{try!true}');
             $t.renderBefore("highlightcode",c,outerElement);
             if(!isRun){
                 $t.removeNode(c);
             }else{
-                a.onclick=function(){
-                    var cpn=$t.renderBefore("turtlecontrolpanel",component.end);
-                    cpn.max();
-                    cpn.runHTML(outerElement[0].innerText);
+                if(isTry){
+                    a.onclick=function(){
+                        var cpn=$t.renderBefore("turtlecontrolpanel",component.end);
+                        cpn.max();
+                        cpn.runHTML(outerElement[0].innerText);
+                        $t.removeNode(a);
+                    }
+                }else{
                     $t.removeNode(a);
                 }
                 b.innerHTML=$t.nodesToString(outerElement[0].childNodes);
             }
         </script>
     </xmp>
-    <xmp ui="ahchortitle">
+    <xmp ui="ahchorpanel">
         <a : name:="ahchor++;$t.refNode.ahchor[ahchor].getAttribute('href').slice(1)"></a>
         <div class="imdip10 fb">
             <span class="fz24"><!= $t.refNode.ahchor[ahchor].innerHTML></span>
@@ -61,8 +66,9 @@
             <! if 0<ahchor>
             <a : href:="$t.refNode.ahchor[ahchor-1].getAttribute('href')">上一个( <!= $t.refNode.ahchor[ahchor-1].innerHTML>)</a>
             <! end>
-            <a href="#">顶部</a>
+            <a href="#">返回顶部</a>
         </div>
+        <div style="margin-left:40px;padding-bottom:50px;padding-top:10px;"><!content></div>
     </xmp>
     <xmp>
         <!scope resize|value:0>
@@ -74,28 +80,31 @@
             <div : :style.width="resize.value|v>800?'150px':''" style="float:left;min-height:30px;z-index:2;" >
                 <div style="line-height: 120%;padding-left:10px;padding-top:10px;" class="fz14 fb">
                     <!var ahchor:1>
-                    <set class="fz18" ref="ahchor" : :style.display="resize.value|v>800?'block':'inline-block'" style="width:10em;padding:5px 0;cursor:pointer;color:#3B77B8 !important;">
-                        
-                        <a href="#begin"><!= ahchor++>.简介</a>
-                        <a href="#scope"><!= ahchor++>.作用域和变量</a>
-                        <a href="#if"><!= ahchor++>.分支命令If</a>
-                        <a href="#switch"><!= ahchor++>.分支命令Switch</a>
-                        <a href="#while"><!= ahchor++>.循环命令While</a>
-                        <a href="#for"><!= ahchor++>.循环命令For</a>
-                        <a href="#forin"><!= ahchor++>.循环命令For in</a>
-                        <a href="#run"><!= ahchor++>.运算和返回</a>
-                        <a href="#bind"><!= ahchor++>.数据绑定</a>
-                        <a href="#elembind"><!= ahchor++>.标签数据绑定</a>
-                        <a href="#elemexec"><!= ahchor++>.标签运算</a>
-                        <a href="#getset"><!= ahchor++>.get set标签</a>
-                        <a href="#lazy"><!= ahchor++>.lazy属性</a>
-                        <a href="#service"><!= ahchor++>.服务</a>
-                        <a href="#component"><!= ahchor++>.组件</a>
-                        <a href="#componentprops"><!= ahchor++>.组件数据</a>
-                        <a href="#component#"><!= ahchor++>.组件交互</a>
-                        <a href="#componenttree"><!= ahchor++>.组件层次</a>
-                        <a href="#componentextend"><!= ahchor++>.组件继承</a>
-                        <a href="#componentbuild"><!= ahchor++>.组件编译</a>
+                    <set class="fz18" ref="ahchor" : href:="'#ahchor'+ahchor" :style.display="resize.value|v>800?'block':'inline-block'" style="width:10em;padding:5px 0;cursor:pointer;color:#3B77B8 !important;">
+                        <a><!= ahchor++>.简介</a>
+                        <a><!= ahchor++>.渲染如何生效和生效范围</a>
+                        <a><!= ahchor++>.命令说明</a>
+                        <a><!= ahchor++>.作用域和变量</a>
+                        <a><!= ahchor++>.分支命令If</a>
+                        <a><!= ahchor++>.分支命令Switch</a>
+                        <a><!= ahchor++>.循环命令While</a>
+                        <a><!= ahchor++>.循环命令For</a>
+                        <a><!= ahchor++>.循环命令For in</a>
+                        <a><!= ahchor++>.脚本运算</a>
+                        <a><!= ahchor++>.标签单向绑定</a>
+                        <a><!= ahchor++>.标签双向绑定</a>
+                        <a><!= ahchor++>.数据绑定</a>
+                        <a><!= ahchor++>.更多绑定示例</a>
+                        <a><!= ahchor++>.标签运算</a>
+                        <a><!= ahchor++>.get set标签</a>
+                        <a><!= ahchor++>.lazy属性</a>
+                        <a><!= ahchor++>.服务</a>
+                        <a><!= ahchor++>.组件</a>
+                        <a><!= ahchor++>.组件数据</a>
+                        <a><!= ahchor++>.组件交互</a>
+                        <a><!= ahchor++>.组件层次</a>
+                        <a><!= ahchor++>.组件继承</a>
+                        <a><!= ahchor++>.组件编译</a>
                     </set>
                 </div>
             </div>
@@ -108,8 +117,18 @@
                 </div>
                 
                 
-                
-                <ui:ahchortitle></ui:ahchortitle>
+                <ui:ahchorpanel>
+                    没什么好说的
+                </ui:ahchorpanel>
+                <ui:ahchorpanel>
+       turtle的渲染从模板标签开始，什么是模板标签？
+                <ui:io try="false"><title>
+以下为当前支持的模板标签:
+<pre style="box-sizing:border-box;"
+><!= $t.templates.toString("")></pre>
+                </title></ui:io>
+                </ui:ahchorpanel>
+                <ui:ahchorpanel>
                  <ui:io run="false"><title>
 <!if true>
 <!--命令写在缩写注释里-->
@@ -131,34 +150,50 @@
 -->
 <!--多行命令写在完整注释里-->
                 </title></ui:io>
+                </ui:ahchorpanel>
                 
-                <ui:ahchortitle></ui:ahchortitle>
-                <div style="margin-left:40px;">
-                    &lt;! scope [name|]variable1:1,variable2:2>：
-                    <br/>
-                </div>
+                <ui:ahchorpanel>
+                                                            作用域的语法为：<br>
+                    scope 名字<br>
+                                                            或 <br>
+                    scope 名字|变量1:值,变量2:值,...,变量n:值
                 <ui:io><title>
-<!scope scopeTop|x:1,y:1>
+<!scope A|x:1,y:1>
 <div>
-    <!scope scope2|x:2>
+    <!scope B|x:2><!--创建一个作用域-->
     <div>
-        <!scope scope3>
+        <!scope C>
         <!var y:3><!--定义一个变量在scope3上-->
-        scope3:x=<!= x>,y=<!= y>
-        scopeTop.x=<!= scopeTop.x>
-        scopeTop.y=<!= scopeTop.y>
-    </div>
-    scope2:x=<!= x>,y=<!= y>    
-</div>
-scopeTop:x=<!= x>,y=<!= y>
+        C域可访问(x=<!= x>,y=<!= y>)<br>
+        A域可访问(x=<!= A.x>)<br>
+        A域可访问(y=<!= A.y>)
+    </div><br>
+    B域可访问(x=<!= x>,y=<!= y>   ) 
+</div><br>
+A域可访问(x=<!= x>,y=<!= y>)
 </title>
                 </title></ui:io>
+                </ui:ahchorpanel>
                 
-                
-                <ui:ahchortitle></ui:ahchortitle>
-                <div style="margin-left:40px;">
-                    if：
-                </div>
+                <ui:ahchorpanel>
+                    if的语法为：<br>
+                    if xxx<br>
+                    ...<br>
+                    end<br>
+                                                             或<br>
+                    if xxx<br>
+                    ...<br>
+                    else<br>
+                    ...<br>
+                    end<br>
+                                                             或<br>
+                    if xxx<br>
+                    ...<br>
+                    else if xxx<br>
+                    ...<br>
+                    end<br><br>
+                    
+                    注:xxx表示任意js语句;
                 <ui:io><title>
 <!scope if|v:1>
 <!if v===3>
@@ -169,11 +204,20 @@ scopeTop:x=<!= x>,y=<!= y>
     <div>v=<!= v></div>
 <!end>
                 </title></ui:io>
+                </ui:ahchorpanel>
                 
-                <ui:ahchortitle></ui:ahchortitle>
-                <div style="margin-left:40px;">
-                    switch：
-                </div>
+                <ui:ahchorpanel>
+                    switch的语法为：<br>
+                    switch xxx<br>
+                    case xxx<br>
+                    ...<br>
+                    case break xxx<br>
+                    ...<br>
+                    default<br>
+                    ...<br>
+                    end<br><br>
+                    注:xxx表示任意js语句;<br>
+                    case break与js不太一样，它表示如果本语句命中则不会继续
                 <ui:io><title>
 <!scope switch|v:1>
 <!switch v>
@@ -192,37 +236,57 @@ scopeTop:x=<!= x>,y=<!= y>
         <span style="color:purple">紫</span>
 <!end>
                 </title></ui:io>
+                </ui:ahchorpanel>
                 
-                
-                <ui:ahchortitle></ui:ahchortitle>
-                <div style="margin-left:40px;">
-                    while：
-                </div>
+                <ui:ahchorpanel>
+                    while的语法为：<br>
+                    while xxx<br>
+                    ...<br>
+                    break<br>
+                    ...<br>
+                    end<br><br>
+                    注:xxx表示任意js语句;<br>
+                    break表示中止循环，需要判断语句配合。
                 <ui:io><title>
 <!scope while|v:1>
 <!while v<=10>
 <div>
-  <!if v==4><!break><!else><!= v><!end>
+  <!if v===4><!break><!else><!= v><!end>
 </div>
 <!! v++>
 <!end>
                 </title></ui:io>
+                </ui:ahchorpanel>
                 
-                <ui:ahchortitle></ui:ahchortitle>
-                <div style="margin-left:40px;">
-                    for：
-                </div>
+                <ui:ahchorpanel>
+                    for的语法为：<br>
+                    for xxx;xxx;xxx<br>
+                    ...<br>
+                    break<br>
+                    ...<br>
+                    end<br><br>
+                    注:xxx表示任意js语句;<br>
+                    与js类似
+                    break表示中止循环，需要判断语句配合。
                 <ui:io><title>
 <!scope for1|v:1,k:10>
 <!for v=10;-1<k;k-->
 <!if k==3><!break><!else><!= k><!end>
 <!end>
                 </title></ui:io>
+                </ui:ahchorpanel>
                 
-                <ui:ahchortitle></ui:ahchortitle>
-                <div style="margin-left:40px;">
-                    for in：
-                </div>
+                <ui:ahchorpanel>
+                
+                    for的语法为：<br>
+                    for xxx in xxx<br>
+                    ...<br>
+                    break<br>
+                    ...<br>
+                    end<br><br>
+                    注:xxx表示任意js语句;<br>
+                    与js类似
+                    break表示中止循环，需要判断语句配合。
                 <ui:io><title>
 <!scope for2|n:'',m:["a","b","c","d","e","f"]>
 <!for n in m>
@@ -232,82 +296,105 @@ scopeTop:x=<!= x>,y=<!= y>
     <!end>
 <!end>
                 </title></ui:io>
+                </ui:ahchorpanel>
                 
-                
-                <ui:ahchortitle></ui:ahchortitle>
-                <div style="margin-left:40px;">
-                   &lt;!! condition> 、 &lt;!= condition>：
-                </div>
-                <ui:io><title>
+                <ui:ahchorpanel>
+                    无返回的语法为：<br>! xxx<br>
+                    有返回的语法为：<br>= xxx<br>
+                    注:xxx表示任意js语句;<br>
+                    <ui:io><title>
 <!scope run|v:1>
 <div>无返回的运算"<!! v++>"</div>
 <div>有返回的运算"<!= v>"</div>
-                </title></ui:io>
+                    </title></ui:io>
+                </ui:ahchorpanel>
+                <ui:ahchorpanel>
+                                                           标签 绑定（单向绑定）的语法为：<br>
+                    :属性名="scope变量名"<br>
+                    深层属性语法为<br>
+                    :属性.属性.属性="scope变量名"<br>
+                    深层驼峰语法为<br>
+                    :style.padding-top="scope变量名"<br>
+                    
+                    <ui:io><title>
+<!var default:"瀑布流数据显示">
+<input : :value="default"/>
+                    </title></ui:io>
+                </ui:ahchorpanel>
                 
-                <ui:ahchortitle></ui:ahchortitle>
-                <div style="margin-left:40px;">
-                    &lt;!- variable[|script]>：
-                </div>
-                <ui:io><title>
-<!var vxv:2>
-<input bind="vxv"/><!- vxv|"的平方为:"+v*v>
+                <ui:ahchorpanel>
+                标签绑定（双向绑定）的语法为：<br>
+                    bind="scope变量名"<br>
+                    注：这里使用了temlline组件，这是一个页面临时组件（后面章节讲解组件）
+                    <ui:io><title>
+<!var bind2:"我们绑定啦">
+<input bind="bind2"/>
 <br/>
-<input bind="vxv"/><!- vxv|"的3次方为:"+v*v*v>
-                </title></ui:io>
+<textarea bind="bind2"></textarea>
+                    </title></ui:io>
+                </ui:ahchorpanel>
+                <ui:ahchorpanel>
+                                                            绑定（单向绑定）的语法为：<br>
+                    - 名字<br>
+                                                            或 <br>
+                    - 名字|xxx<br>
+                    注:xxx表示任意js语句,构造为function(v){return eval('('+xxx+')')}形式<br>
+                    <ui:io><title>
+<!var vxv:2>
+<input bind="vxv"/>
+<br/><!- vxv>
+<br/><!- vxv|v+"的3次方为:"+v*v*v>
+                    </title></ui:io>
+                </ui:ahchorpanel>
                 
-                <ui:ahchortitle></ui:ahchortitle>
-                <div style="margin-left:40px;">
-                    &lt;!- variable[|script]>：
-                </div>
-                <div style="margin-left:40px;">
-                    td组件定义：（第14章讲解组件）
-                </div>
-                <ui:io><title>
+                <ui:ahchorpanel>
+                    注：这里使用了temlline组件，这是一个页面临时组件（后面章节讲解组件）
+                    <ui:io><title>
 <!scope x|vvvv:"turtle绑定测试",vv:0,vvv:0>
 <div>
     <div class="iub">
-      <ui:td name="checkbox属性 “checked” " way=1>
+      <ui:temlline name="checkbox属性 “checked” " way=1>
         <set lazy bind="vvvv">
           <input type="checkbox" bind="vv" : :checked="vvv"/>
           双向A+双向B
         </set>
-      </ui:td>
-      <ui:td name="checkbox内置" way=2>
+      </ui:temlline>
+      <ui:temlline name="checkbox内置" way=2>
         <input type="checkbox" bind="vvvv" : :checked="vvv"/>
         双向A
-      </ui:td>
-      <ui:td name="checkbox属性 “checked” " way=1>
+      </ui:temlline>
+      <ui:temlline name="checkbox属性 “checked” " way=1>
         <input type="checkbox" : :checked="vvvv"/>
         单向A
-      </ui:td>
-      <ui:td name="checkbox属性 “checked” " way=2>
+      </ui:temlline>
+      <ui:temlline name="checkbox属性 “checked” " way=2>
         <input type="checkbox" bind="vv" : :checked="vvv"/>
         双向B
-      </ui:td>
-      <ui:td name="按钮属性 “disabled” " way=1>
+      </ui:temlline>
+      <ui:temlline name="按钮属性 “disabled” " way=1>
         <button : :disabled="vvvv">
           disabled="<!- vvvv>"
         </button>
-      </ui:td>
-      <ui:td name="div内置" way=1>
+      </ui:temlline>
+      <ui:temlline name="div内置" way=1>
         <div bind="vvvv"></div>
-      </ui:td>
-      <ui:td name="div属性 “style.display” " way=1>
+      </ui:temlline>
+      <ui:temlline name="div属性 “style.display” " way=1>
         <div show='vvvv!=""'>
           className!="uhide"
         </div>
-      </ui:td>
-      <ui:td name="input内置" way=2>
+      </ui:temlline>
+      <ui:temlline name="input内置" way=2>
         <input bind="vvvv"/>
         <!- vvvv|v.length==0?'不能为空':''>
-      </ui:td>
-      <ui:td name="textArea内置" way=2>
+      </ui:temlline>
+      <ui:temlline name="textArea内置" way=2>
         <textArea bind="vvvv"></textarea>
-      </ui:td>
-      <ui:td name="a属性 “href” " way=1>
+      </ui:temlline>
+      <ui:temlline name="a属性 “href” " way=1>
         <a : :href="vvvv"><!- vvvv></a>
-      </ui:td>
-      <ui:td name="下拉内置" way=2>
+      </ui:temlline>
+      <ui:temlline name="下拉内置" way=2>
         <select bind="vvvv" class="wem5">
           <option ></option>
           <option >-1</option>
@@ -318,11 +405,11 @@ scopeTop:x=<!= x>,y=<!= y>
           <option value="true">真</option>
           <option value="false">假</option>
         </select>
-      </ui:td>
+      </ui:temlline>
     </div>
 </div>
-                </title></ui:io>
-                
+                    </title></ui:io>
+                </ui:ahchorpanel>
                 
             </div>
         </ui:content>
