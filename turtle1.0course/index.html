@@ -25,6 +25,23 @@
         </div>
       </div>
     </xmp>
+    <xmp ui="io">
+        <div ref="c" class="bgray0 fgray15 shadowless2 mdip5 pdip15 rem1">
+            >:_<br/>
+            <div ref="b"></div>
+        </div>
+        <script>
+            var b=$t.refNode["b"].pop();
+            var c=$t.refNode["c"].pop();
+            var isRun=$t.parseBool('{run!true}');
+            $t.renderBefore("highlightcode",c,outerElement);
+            if(!isRun){
+                $t.removeNode(c);
+            }else{
+                b.innerHTML=$t.nodesToString(outerElement[0].childNodes);
+            }
+        </script>
+    </xmp>
     <xmp>
         <!scope resize|value:0>
         <ui:top2></ui:top2>
@@ -60,13 +77,13 @@
                 </div>
             </div>
             <div style="float:left;min-width:300px;max-width:650px;padding-bottom: 30px;">
+                
                 <div style="padding: 20px;">
                                                                本库使用注释来进行逻辑控制
                      <br>可审查元素查看输出结果的dom结构
                 </div>
                 
-                 <ui:highlightcode>
-                    <title>
+                 <ui:io run="false"><title>
                     <!while v<=10>
                     <!if true>
                     <!--命令写在缩写注释里-->
@@ -87,16 +104,15 @@
                         }
                     -->
                     <!--多行命令写在完整注释里-->
-                    </title>
-                </ui:highlightcode>
+                </title></ui:io>
+                
                 <a name="scope"></a>
                 <h4>1.作用域和变量</h4>
                 <div style="margin-left:40px;">
                     &lt;! scope [name|]variable1:1,variable2:2>：
                     <br/>
                 </div>
-                <ui:highlightcode>
-                    <title>
+                <ui:io><title>
                     <!scope scopeTop|x:1,y:1>
                     <div>
                         <!scope scope2|x:2>
@@ -111,35 +127,15 @@
                     </div>
                     scopeTop:x=<!= x>,y=<!= y>
                     </title>
-                </ui:highlightcode>
-                <div style="margin-left:40px;">
-                    >:_
-                    <br/>
-                    <div>
-                        <!scope scopeTop|x:1,y:1>
-                        
-                        <div>
-                            <!scope scope2|x:2>
-                            <div>
-                                <!scope scope3>
-                                <!var y:3><!--定义一个变量在scope3上-->
-                                scope3:x=<!= x>,y=<!= y>
-                                scopeTop.x=<!= scopeTop.x>
-                                scopeTop.y=<!= scopeTop.y>
-                            </div>
-                            scope2:x=<!= x>,y=<!= y>    
-                        </div>
-                        scopeTop:x=<!= x>,y=<!= y>
-                    </div>
-                </div>
+                </title></ui:io>
+                
                 
                 <a name="if"></a>
                 <h4>2.判断</h4>
                 <div style="margin-left:40px;">
                     if：
                 </div>
-                <ui:highlightcode>
-                    <title>
+                <ui:io><title>
                     <!scope if|v:1>
                     <!if v===3>
                         <div>v===3</div>
@@ -148,26 +144,14 @@
                     <!else>
                         <div>v=<!= v></div>
                     <!end>
-                    </title>
-                </ui:highlightcode>
-                <div style="margin-left:40px;">
-                    >:_
-                    <!scope if|v:1>
-                    <!if v===3>
-                        <div>v===3</div>
-                    <!else if v===2>
-                        <div>v===2</div>
-                    <!else>
-                        <div>v=<!= v></div>
-                    <!end>
-                </div>
+                </title></ui:io>
+                
                 <a name="switch"></a>
                 <h4>3.分支</h4>
                 <div style="margin-left:40px;">
                     switch：
                 </div>
-                <ui:highlightcode>
-                    <title>
+                <ui:io><title>
                     <!scope switch|v:1>
                     <!switch v>
                         <!case 1>
@@ -184,36 +168,15 @@
                         <!default>
                             <span style="color:purple">紫</span>
                     <!end>
-                    </title>
-                </ui:highlightcode>
-                <div style="margin-left:40px;">
-                    >:_
-                    <br/>
-                    <!scope switch|v:1>
-                    <!switch v>
-                        <!case 1>
-                            <span style="color:red">赤</span>
-                        <!case 1>
-                            <span style="color:orange">橙</span>
-                            <!! v++>
-                        <!case 2>
-                            <span style="color:yellow">黄</span>
-                        <!case 2>
-                            <span style="color:green">绿</span>
-                        <!case break 2>
-                            <span style="color:blue">蓝</span>
-                        <!default>
-                            <span style="color:purple">紫</span>
-                    <!end>
-                </div>
+                </title></ui:io>
+                
                 
                 <a name="while"></a>
                 <h4>4.为真循环</h4>
                 <div style="margin-left:40px;">
                     while：
                 </div>
-                <ui:highlightcode>
-                    <title>
+                <ui:io><title>
                     <!scope while|v:1>
                     <!while v<=10>
                     <div>
@@ -221,48 +184,28 @@
                     </div>
                     <!! v++>
                     <!end>
-                    </title>
-                </ui:highlightcode>
-                <div style="margin-left:40px;">
-                    >:_
-                    <br/>
-                    <!scope while|v:1>
-                    <!while v<=10>
-                    <div>
-                      <!if v==4><!break><!else><!= v><!end>
-                    </div>
-                    <!! v++>
-                    <!end>
-                </div>
+                </title></ui:io>
                 
                 <a name="for"></a>
                 <h4>5.递推循环</h4>
                 <div style="margin-left:40px;">
                     for：
                 </div>
-                <ui:highlightcode>
+                <ui:io><title>
                     <title>
                     <!scope for1|v:1,k:10>
                     <!for v=10;-1<k;k-->
                     <!if k==3><!break><!else><!= k><!end>
                     <!end>
                     </title>
-                </ui:highlightcode>
-                <div style="margin-left:40px;">
-                    >:_
-                    <br/>
-                    <!scope for1|v:1,k:10>
-                    <!for v=10;-1<k;k-->
-                    <!if k==3><!break><!else><!= k><!end>
-                    <!end>
-                </div>
+                </title></ui:io>
+                
                 <a name="forin"></a>
                 <h4>6.遍历循环</h4>
                 <div style="margin-left:40px;">
                     for in：
                 </div>
-                <ui:highlightcode>
-                    <title>
+                <ui:io><title>
                     <!scope for2|n:'',m:["a","b","c","d","e","f"]>
                     <!for n in m>
                         <span><!= m[n]></span>
@@ -270,61 +213,33 @@
                             <!break>
                         <!end>
                     <!end>
-                    </title>
-                </ui:highlightcode>
-                <div style="margin-left:40px;">
-                    >:_
-                    <br/>
-                    <!scope for2|n:'',m:["a","b","c","d","e","f"]>
-                    <!for n in m>
-                        <span><!= m[n]></span>
-                        <!if n=='3'>
-                            <!break>
-                        <!end>
-                    <!end>
-                </div>
+                </title></ui:io>
+                
                 
                 <a name="run"></a>
                 <h4>7.运算</h4>
                 <div style="margin-left:40px;">
                    &lt;!! condition> 、 &lt;!= condition>：
                 </div>
-                <ui:highlightcode>
-                    <title>
+                <ui:io><title>
                     <!scope run|v:1>
                     <div>无返回的运算"<!! v++>"</div>
                     <div>有返回的运算"<!= v>"</div>
-                    </title>
-                </ui:highlightcode>
-                <div style="margin-left:40px;">
-                    >:_
-                    <br/>
-                    <!scope run|v:1>
-                    <div>无返回的运算"<!! v++>"</div>
-                    <div>有返回的运算"<!= v>"</div>
-                </div>
+                </title></ui:io>
                 
                 <a name="bind"></a>
                 <h4>8.绑定</h4>
                 <div style="margin-left:40px;">
                     &lt;!- variable[|script]>：
                 </div>
-                <ui:highlightcode>
+                <ui:io><title>
                     <title>
                     <!var vxv:2>
                     <input bind="vxv"/><!- vxv|"的平方为:"+v*v>
                     <br/>
                     <input bind="vxv"/><!- vxv|"的3次方为:"+v*v*v>
                     </title>
-                </ui:highlightcode>
-                <div style="margin-left:40px;">
-                    >:_
-                    <br/>
-                    <!var vxv:2>
-                    <input bind="vxv"/><!- vxv|"的平方为:"+v*v>
-                    <br/>
-                    <input bind="vxv"/><!- vxv|"的3次方为:"+v*v*v>
-                </div>
+                </title></ui:io>
                 
                 <a name="elembind"></a>
                 <h4>9.标签绑定</h4>
@@ -334,8 +249,7 @@
                 <div style="margin-left:40px;">
                     td组件定义：（第14章讲解组件）
                 </div>
-                <ui:highlightcode>
-                    <title>
+                <ui:io><title>
                     <!scope x|vvvv:"turtle绑定测试",vv:0,vvv:0>
                     <div>
                         <div class="iub">
@@ -394,70 +308,7 @@
                           </ui:td>
                         </div>
                     </div>
-                    </title>
-                </ui:highlightcode>
-                <div style="margin-left:40px;">
-                    >:_
-                    <br/>
-                    <!scope x|vvvv:"turtle绑定测试",vv:0,vvv:0>
-                    <div>
-                        <div class="iub">
-                          <ui:td name="checkbox属性 “checked” " way=1>
-                            <set lazy bind="vvvv">
-                              <input type="checkbox" bind="vv" : :checked="vvv"/>
-                              双向A+双向B
-                            </set>
-                          </ui:td>
-                          <ui:td name="checkbox内置" way=2>
-                            <input type="checkbox" bind="vvvv" : :checked="vvv"/>
-                            双向A
-                          </ui:td>
-                          <ui:td name="checkbox属性 “checked” " way=1>
-                            <input type="checkbox" : :checked="vvvv"/>
-                            单向A
-                          </ui:td>
-                          <ui:td name="checkbox属性 “checked” " way=2>
-                            <input type="checkbox" bind="vv" : :checked="vvv"/>
-                            双向B
-                          </ui:td>
-                          <ui:td name="按钮属性 “disabled” " way=1>
-                            <button : :disabled="vvvv">
-                              disabled="<!- vvvv>"
-                            </button>
-                          </ui:td>
-                          <ui:td name="div内置" way=1>
-                            <div bind="vvvv"></div>
-                          </ui:td>
-                          <ui:td name="div属性 “style.display” " way=1>
-                            <div show='vvvv!=""'>
-                              className!="uhide"
-                            </div>
-                          </ui:td>
-                          <ui:td name="input内置" way=2>
-                            <input bind="vvvv"/>
-                            <!- vvvv|v.length==0?'不能为空':''>
-                          </ui:td>
-                          <ui:td name="textArea内置" way=2>
-                            <textArea bind="vvvv"></textarea>
-                          </ui:td>
-                          <ui:td name="a属性 “href” " way=1>
-                            <a : :href="vvvv"><!- vvvv></a>
-                          </ui:td>
-                          <ui:td name="下拉内置" way=2>
-                            <select bind="vvvv" class="wem5">
-                              <option ></option>
-                              <option >-1</option>
-                              <option >0</option>
-                              <option >1</option>
-                              <option >2</option>
-                              <option >3</option>
-                              <option value="true">真</option>
-                              <option value="false">假</option>
-                            </select>
-                          </ui:td>
-                        </div>
-                    </div>
-                </div>
+                </title></ui:io>
                 
                 
             </div>

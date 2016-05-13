@@ -104,7 +104,6 @@
             result.push(
                 new constructor(order, commentMatch.index +beginIndex+ orderLine.indexOf(order), 'color4')
             );
-            
             if(condition){
                 if(order==="scope"||order==="-"){
                     condition=splitByOnce(condition,"|")[1];
