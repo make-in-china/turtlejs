@@ -14,12 +14,12 @@
             var add=$t.refNode["add"].pop();
             var sub=$t.refNode["sub"].pop();
             var content=$t.refNode["content"].pop();
-            component.max=add.onclick=function(){
+            part.max=add.onclick=function(){
                 removeClass(sub,"uhide");
                 addClass(add,"uhide");
                 removeClass(content,"uhide");
             }
-            component.min=sub.onclick=function(){
+            part.min=sub.onclick=function(){
                 removeClass(add,"uhide");
                 addClass(sub,"uhide");
                 addClass(content,"uhide");

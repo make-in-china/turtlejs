@@ -344,24 +344,26 @@
         }
     </style>
     <script>
-        $t.service.SyntaxHighlighter=$t.require([$t.config.baseUIPath[0]+"/shCore.js",$t.config.baseUIPath[0]+"/shBrushXml.js"],"SyntaxHighlighter");
+        $t.service.SyntaxHighlighter=$t.require([part.template.path+"/shCore.js",part.template.path+"/shBrushXml.js"],"SyntaxHighlighter");
     </script>
 </xmp>
 <xmp>
     <! var i:0>
     <! for ;i<outer.length;i++>
-    <pre ref="code" class="brush: {brush!html};"></pre>
+    <div class="animated fadeIn">
+        <pre ref="code" class="brush: {brush!html};"></pre>
+    </div>
     <! end>
     <script>
         if(!$t.service.SyntaxHighlighter){
             var t=this;
-            $t.renderBefore("highlightcode.style",t.childNodes[0],outer,outerElement);
+            $t.renderBefore("highlightcode.style",part.template.sortPath,t.childNodes[0],outer,outerElement);
         }
         var code;
         for(var i=outer.length-1;i>-1;i--){
             code=$t.refNode.code.pop();
             code.appendChild(outer[i])
         }
-        $t.service.SyntaxHighlighter.all();
+        $t.service.SyntaxHighlighter.highlight(code);
     </script>
 </xmp>

@@ -7,21 +7,23 @@
     </iframe>
     <script>
         var ret=$t.refNode.ret.pop();
-        component.ready=new $t.ReadyObject();
+        part.ready=new $t.ReadyObject();
         ret.onload=function(){
             var scriptInject=ret.contentDocument.createElement("script");
             scriptInject.setAttribute("src","{turtlejspath}");
             scriptInject.setAttribute("baseuipath",$t.config.baseUIPath);
             scriptInject.innerHTML=ret.childNodes[0].data;
             ret.contentDocument.head.appendChild(scriptInject);
-            component.runHTML=function(html){
+            part.runHTML=function(html){
                 ret.contentWindow.pushUI(html);
                 ret.style.height=ret.contentDocument.documentElement.scrollHeight+"px";
             }
             var tid=setInterval(function(){
                 if(ret.contentWindow.hasOwnProperty("$t")){
                     clearInterval(tid);
-                    component.ready.isReady=true;
+                    setTimeout(function(){
+                        part.ready.isReady=true;    
+                    },100);
                 }    
             },10);
         }

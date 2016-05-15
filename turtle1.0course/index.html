@@ -10,35 +10,40 @@
     <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" media="screen" href="../stylesheets/stylesheet.css">
     
-    <script extend="1" baseUIPath="../ui,../uiAPP" src="../js/turtle.js"></script>
+    <script extend="1" baseUIPath="{name:'ui',path:'../ui'};{name:'app',path:'../uiAPP'}" src="../js/turtle.js"></script>
   </head>
   <body class='scrolly'>
-    <xmp ui="io">
-        <a ref="a" href="javascript:;">试一试<br></a>
+    <xmp ui="io2">
+        <a ref="try" href="javascript:;">试一试<br></a>
         <div ref="runbox" class="uhide">
             <textarea ref="script" class="fz18 w100 hem10 rdip5 pdip5" style="outline-width:0; resize:none;box-sizing:border-box;"></textarea>
             <a ref="run" href="javascript:;">运行：</a>
         </div>
         <script>
-            var a=$t.refNode["a"].pop();
+            var btnTry=$t.refNode["try"].pop();
             var script=$t.refNode["script"].pop();
             var run=$t.refNode["run"].pop();
             var runbox=$t.refNode["runbox"].pop();
             var isRun=$t.parseBool('{run!true}');
-            $t.renderBefore("highlightcode",a,outerElement);
+            var isTry=$t.parseBool('{try!true}');
+            $t.renderBefore("highlightcode",'ui',btnTry,outerElement);
             if(isRun){
                 var s="";
-                a.onclick=function(){
-                    $t.removeNode(a);
-                    $t.removeNode(runbox);
-                    cpn.begin.parentNode.insertBefore(runbox,cpn.begin);
-                    removeClass(runbox,'uhide');
-                    script.value=s;
+                if(!isTry){
+                    $t.removeNode(btnTry);
+                }else{    
+                    btnTry.onclick=function(){
+                        $t.removeNode(btnTry);
+                        $t.removeNode(runbox);
+                        cpn.begin.parentNode.insertBefore(runbox,cpn.begin);
+                        removeClass(runbox,'uhide');
+                        script.value=s;
+                    }
                 }
                 run.onclick=function(){
                     cpn.runHTML(script.value);
                 }
-                var cpn=$t.renderBefore("turtlesanbox",a,null,null,
+                var cpn=$t.renderBefore("turtlesanbox","app",btnTry,null,null,
                 {src:"../blank.html"
                 ,turtlejspath:"js/turtle.js"});
                 cpn.ready.on(function(){
@@ -54,8 +59,24 @@
                     cpn.runHTML(s);
                 });
             }else{
-                $t.removeNode(a);
+                $t.removeNode(btnTry);
             }
+        </script>
+    </xmp>
+    <xmp ui="io">
+        <div ref="loadding" class="uhide">加载中...</div>
+        <script>
+            var loadding=$t.refNode.loadding.pop();
+            $t.readyByRenderDocument.on(function(){
+                $t.onViewOnce(loadding.parentNode,document.body,function(){
+                    setTimeout(function(){
+                        $t.removeClass(loadding,"uhide");
+                        $t.renderBefore("io2",null,part.end,null,outerElement,part.props);
+                        $t.removeNode(loadding);    
+                    },500);
+                });    
+            });
+              
         </script>
     </xmp>
     <xmp ui="ahchorpanel">
@@ -69,20 +90,20 @@
             <! if 0<ahchor>
             <a : href:="$t.refNode.ahchor[ahchor-1].getAttribute('href')">上一个( <!= $t.refNode.ahchor[ahchor-1].innerHTML>)</a>
             <! end>
-            <br><a href="#">返回顶部</a>
         </div>
         <div style="margin-left:40px;padding-bottom:50px;padding-top:10px;"><!content></div>
     </xmp>
     
     <xmp>
-        <!scope resize|value:0>
-        <ui:top2></ui:top2>
-        <ui:content>
-            <!! window.addEventListener('resize',function(){resize.value=document.documentElement.clientWidth;})>
-            <div : :style.width="resize.value|v>800?'150px':''" style="float:left;min-height:30px;z-index:2;" >
+        
+        <!scope g|width:0>
+        <app:top2></app:top2>
+        <app:content>
+            <!! window.addEventListener('resize',function(){g.width=document.documentElement.clientWidth;})>
+            <div : :style.width="g.width|v>800?'150px':''" style="float:left;min-height:30px;z-index:2;" >
                 <div style="line-height: 120%;padding-left:10px;padding-top:10px;" class="fz14 fb">
                     <!var ahchor:1>
-                    <set class="fz18" ref="ahchor" : href:="'#ahchor'+ahchor" :style.display="resize.value|v>800?'block':'inline-block'" style="width:10em;padding:5px 0;cursor:pointer;color:#3B77B8 !important;">
+                    <set class="fz18" ref="ahchor" : href:="'#ahchor'+ahchor" :style.display="g.width|v>800?'block':'inline-block'" style="width:10em;padding:5px 0;cursor:pointer;color:#3B77B8 !important;">
                         <a><!= ahchor++>.简介</a>
                         <a><!= ahchor++>.渲染如何生效和生效范围</a>
                         <a><!= ahchor++>.命令说明</a>
@@ -121,7 +142,7 @@
                 
                 
                 <ui:ahchorpanel>
-                    没什么好说的
+                    暂无简介
                 </ui:ahchorpanel>
                 <ui:ahchorpanel>
        turtle的渲染默认从模板标签开始。<br>
@@ -617,13 +638,13 @@ style="display:inline-block;">
                 <ui:ahchorpanel>
                 </ui:ahchorpanel>
             </div>
-        </ui:content>
-        <ui:bottom></ui:bottom>
+        </app:content>
+        <app:bottom></app:bottom>
         
-        <!! resize.value=document.documentElement.clientWidth>
+        <!! g.width=document.documentElement.clientWidth>
         
     </xmp>
-    </div>
+    <div style="position:fixed;bottom:0;right:0;"><a href="#">返回顶部</a></div>
   </body>
 </html>
 

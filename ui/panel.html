@@ -13,13 +13,13 @@
     <script>
         var panel=$t.refNode.panel.pop();
         var content=$t.refNode.content.pop();
-        component.show=function(){
+        part.show=function(){
             panel.style.display="inline-block";
         }
-        component.hide=function(){
+        part.hide=function(){
             panel.style.display="none";
         }
-        component.setContent=function(elems){
+        part.setContent=function(elems){
             content.innerHTML="";
             $t.appendNodes(elems,content);
         }

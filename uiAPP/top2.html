@@ -2,7 +2,7 @@
     function(script){
         $t.refNode.script[0].value=script;
         $t.refNode.ret[0].innerHTML=eval(script);
-        $t.ui.growpanel.components[0].max();
+        $t.ui.growpanel.parts[0].max();
     }
 </xmp>
 <xmp>
@@ -40,7 +40,7 @@
                     function append(cpns,space){
                         for(var i=0;i<cpns.length;i++){
                             var elem=document.createElement("div");
-                            elem.innerHTML='&lt;ui:'+cpns[i].template.componentName+'&gt;props='+JSON.stringify(cpns[i].props);
+                            elem.innerHTML='&lt;ui:'+cpns[i].template.partName+'&gt;props='+JSON.stringify(cpns[i].props);
                             elem.style.paddingLeft=space+"em";
                             
                             elems.push(elem);
@@ -64,15 +64,15 @@
                             }
                         }
                     }
-                    append($t.rootComponents,0);
-                    var tree=$t.ui.panel.components[0];
+                    append($t.rootParts,0);
+                    var tree=$t.ui.panel.parts[0];
                     tree.show();
                     tree.setContent(elems);
                 }
                 refresh()
             </script>
           </ui:button>
-          <!! $t.ui.panel.components[0].hide();>
+          <!! $t.ui.panel.parts[0].hide();>
         </header>
         
     </div>

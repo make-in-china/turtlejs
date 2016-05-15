@@ -65,7 +65,7 @@
                 }); 
             });
         };
-        swiper=$t.require($t.config.baseUIPath[0]+"/swiper-3.3.1.min.js","Swiper");
+        swiper=$t.require(part.template.path+"/swiper-3.3.1.min.js","Swiper");
         ready.isReady=true;
         /*$t.includeJSFiles("js/swiper-3.3.1.min.js",function(){
             swiper=Swiper;
@@ -84,7 +84,7 @@
         var slideclass="{slideclass!}";
         if(!$t.service.swiper){
             var t=this;
-            $t.renderBefore("swiper.script",t.childNodes[0],outer,outerElement);
+            $t.renderBefore("swiper.script",part.templacte.sortPath,t.childNodes[0],outer,outerElement);
         }
         $t.service.swiper(container,wrapper,outerElement,slideclass);
     </script>
