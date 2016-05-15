@@ -3533,6 +3533,7 @@ var turtle,$t;
                 if(item.fn.length===1){
                     if(items.length===1){
                         window.addEventListener('scroll',scroll);
+                        scroll();
                     }
                 }
             }
