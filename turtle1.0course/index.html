@@ -69,14 +69,11 @@
             var loadding=$t.refNode.loadding.pop();
             $t.readyByRenderDocument.on(function(){
                 $t.onViewOnce(loadding.parentNode,document.body,function(){
-                    setTimeout(function(){
-                        $t.removeClass(loadding,"uhide");
-                        $t.renderBefore("io2",null,part.end,null,outerElement,part.props);
-                        $t.removeNode(loadding);    
-                    },500);
-                });    
+                    $t.removeClass(loadding,"uhide");
+                    $t.renderBefore("io2",null,part.end,null,outerElement,part.props);
+                    $t.removeNode(loadding);
+                });
             });
-              
         </script>
     </xmp>
     <xmp ui="ahchorpanel">
