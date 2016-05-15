@@ -14,7 +14,7 @@
   </head>
   <body class='scrolly'>
     <xmp ui="io">
-        <a ref="a" href="javascript:;">试一试</a>
+        <a ref="a" href="javascript:;">试一试<br></a>
         <div ref="runbox" class="uhide">
             <textarea ref="script" class="fz18 w100 hem10 rdip5 pdip5" style="outline-width:0; resize:none;box-sizing:border-box;"></textarea>
             <a ref="run" href="javascript:;">运行：</a>
@@ -144,14 +144,14 @@
 
 <!!
     if(1){
-        debugger;
+        console.log(debugger);
     }
 >
 <!--多行命令写在缩写注释里-->
 
 <!--!
     if(1){
-        debugger;
+        console.log(debugger);
     }
 -->
 <!--多行命令写在完整注释里-->
@@ -590,7 +590,7 @@ style="display:inline-block;">
     }
 </script>   
                     </title><title>
-<!= debugger;$t.ui.testset.service.test("买一送一")>
+<!= $t.ui.testset.service.test("买一送一")>
                     </title></ui:io>        
                 </ui:ahchorpanel>
                 <!-- 组件 -->
