@@ -3509,7 +3509,6 @@ var turtle,$t;
         function ViewWatch(elemScroll){
             var items=[];
             var onceItems=[];
-            this.needWatch=0;
             this.target=elemScroll;
             this.on=function(elem,fn){
                 var idx=indexOfTarget(onceItems,elem);
@@ -3527,8 +3526,7 @@ var turtle,$t;
                     items.push(item);
                 }
                 if(item.fn.length===1){
-                    this.needWatch++;
-                    if(this.needWatch===1){
+                    if(items.length===1){
                         window.addEventListener('scroll',scroll);
                     }
                 }
@@ -3553,12 +3551,11 @@ var turtle,$t;
                         for(var j=0;j<len;j++){
                             fns.pop()();
                         }
-                        this.needWatch--;
                         items.splice(i,1);
                         i--;
                     }
                 }
-                if(this.needWatch===0){
+                if(items.length===0){
                     window.removeEventListener('scroll',scroll);
                 }
             }

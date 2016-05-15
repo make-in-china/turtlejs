@@ -1,5 +1,5 @@
 <xmp>
-    <iframe ref="ret" src="{src}" class="w100" style="outline-width:0; resize:none;box-sizing:border-box;">
+    <iframe ref="ret" src="{src}" class="w100 mdip10 shadowless bdw2 bdssolid pdip10" style="outline-width:0; resize:none;box-sizing:border-box;">
         window.pushUI=$t.getClosure(function(callee,window,$t,uiHTML){
             document.body.innerHTML=uiHTML;
             $t.renderDocument();
@@ -13,19 +13,17 @@
             scriptInject.setAttribute("src","{turtlejspath}");
             scriptInject.setAttribute("baseuipath",$t.config.baseUIPath);
             scriptInject.innerHTML=ret.childNodes[0].data;
-            ret.contentDocument.head.appendChild(scriptInject);
+            ret.contentDocument.body.appendChild(scriptInject);
             part.runHTML=function(html){
                 ret.contentWindow.pushUI(html);
-                ret.style.height=ret.contentDocument.documentElement.scrollHeight+"px";
+                ret.style.height=ret.contentDocument.documentElement.scrollHeight+30+"px";
             }
             var tid=setInterval(function(){
                 if(ret.contentWindow.hasOwnProperty("$t")){
                     clearInterval(tid);
-                    setTimeout(function(){
-                        part.ready.isReady=true;    
-                    },100);
+                    part.ready.isReady=true;    
                 }    
-            },10);
+            },1);
         }
     </script>
 </xmp>
