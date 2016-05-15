@@ -1,7 +1,12 @@
 
 var turtle,$t;
 (function(){
-    try{document.write("<style>xmp,[type=xmp]{display:none}</style>");/* 这里隐藏我们的模板，防止闪一下*/}catch(e){}
+    /* 隐藏我们的模板，防止闪一下*/
+    // var span=document.createElement('span');
+    // span.innerHTML='<style>xmp,[type=xmp]{display:none}</style>';
+    // document.body.appendChild(span.children[0]);
+    // span.innerHTML='';
+    
     var 
         arrayPrototype      = Array.prototype,
         Objectprototype     = Object.prototype,
