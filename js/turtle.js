@@ -1465,7 +1465,7 @@ var turtle,$t;
     }
     function throwError(err){
         try{
-            throw new Error(err);
+            throw new Error('turtle:\n'+err);
         }catch(e){
             _catch(e);
         }
@@ -1545,19 +1545,6 @@ var turtle,$t;
             console.log(err.join('\r\n'));
         }
         return s;
-    }
-    function parseDefine(node){
-        switch(true){
-            case node.hasAttribute('service'):
-                defineServiceByNode(node);
-                break;
-            case node.hasAttribute('ui'):
-                defineUIByNode(node);
-                break;
-            case node.hasAttribute('class'):
-                defineClasses(node);
-                break;
-        }
     }
     function getUIName(node){
         if(/UI:[A-Z\d]+/.test(node.nodeName)){
@@ -2184,8 +2171,16 @@ var turtle,$t;
                         switch(attr[i].name){
                             case 'class':
                                 var value2=ns[j].getAttribute(attr[i].name);
-                                if(value2)
-                                    value=value2+' '+value;
+                                if(value2){
+                                    value+=(/ $/.test(value)?'':' ')+value2;
+                                }
+                                break;
+                            case 'style':
+                                var value2=ns[j].getAttribute(attr[i].name);
+                                if(value2){
+                                    value+=(/; *$/.test(value)?'':';')+value2;
+                                }
+                                    
                                 break;
                         }
                         ns[j].setAttribute(attr[i].name,value);
@@ -2785,6 +2780,78 @@ var turtle,$t;
         initHTML(_uiMain.childNodes);
         return takeChildNodes(_uiMain);
     }
+    
+    function parseXMP(node){
+        if(isDefine(node)){
+            parseDefine(node);
+        }else{
+            return parseHTML(getTemplate(node));    
+        }
+    }
+    var templates=newObject("Templates",
+        {
+            toString:function(){
+                var s=[];
+                var desc;
+                for(var i in this){
+                    if(!this.hasOwnProperty(i)){
+                        continue;
+                    }
+                    desc='<'+i.toLowerCase();
+                    if(this[i].hasOwnProperty("type")){
+                        desc+=' type="'+this[i]["type"]+'"';
+                    }
+                    desc+='>';
+                    s.push(desc);
+                }
+                return s.join("\n");
+            },get items(){
+                var items=[];
+                
+                for(var i in this){
+                    if(!this.hasOwnProperty(i)){
+                        continue;
+                    }
+                    var item={name:i.toLowerCase()};
+                    items.push(extend(item,this[i]));
+                }
+                return items;
+            },findByString:function(str){
+                var ts=this.items;
+                var regExes=[];
+                for(var i=0;i<ts.length;i++){
+                    var s='(<'+ts[i].name;
+                    if(ts[i].hasOwnProperty('type')){
+                        s+=' +type=[\'"]'+ts[i].type+'[\'"]';
+                    }
+                    s+='([\\s\\S]*?)>([\\s\\S]*?)<\\/'+ts[i].name+'>';
+                    s+=')';
+                    regExes.push(s);
+                }
+                var re=eval('(/'+regExes.join("|")+'/g)');
+                return str.match(re);
+            }
+        }
+    );
+    templates.XMP={};
+    templates.TEMPLATE={};
+    templates.TITLE={getData:function(node){return node.innerText;}};
+    templates.STYLE={type:"xmp"};
+    templates.SCRIPT={type:"xmp"};
+    templates.TEXTAREA={type:"xmp",getData:function(node){return node.defaultValue;}};
+    function parseDefine(node){
+        switch(true){
+            case node.hasAttribute('service'):
+                defineServiceByNode(node);
+                break;
+            case node.hasAttribute('ui'):
+                defineUIByNode(node);
+                break;
+            case node.hasAttribute('class'):
+                defineClasses(node);
+                break;
+        }
+    }
     function isDefine(node){
         switch(true){
             case node.hasAttribute('service'):
@@ -2794,36 +2861,6 @@ var turtle,$t;
         }
         return false;
     }
-    function parseXMP(node){
-        if(isDefine(node)){
-            parseDefine(node);
-        }else{
-            return parseHTML(getTemplate(node));    
-        }
-    }
-    var templates=newObject("Templates",{toString:function(){
-       
-        var s=[];
-        var desc;
-        for(var i in $t.templates){
-            if(!$t.templates.hasOwnProperty(i)){
-                continue;
-            }
-            desc='<'+i.toLowerCase();
-            if($t.templates[i].hasOwnProperty("type")){
-                desc+=' type="'+$t.templates[i]["type"]+'"';
-            }
-            desc+='>';
-            s.push(desc);
-        }
-        return s.join("\n");
-    }});
-    templates.XMP={};
-    templates.TEMPLATE={};
-    templates.TITLE={getData:function(node){return node.innerText;}};
-    templates.STYLE={type:"xmp"};
-    templates.SCRIPT={type:"xmp"};
-    templates.TEXTAREA={type:"xmp",getData:function(node){return node.defaultValue;}};
     
     function isTemplate(node){
         var nodeName=node.nodeName;
@@ -3279,14 +3316,14 @@ var turtle,$t;
             compilename=takeAttr(scriptNode,'compilename',null),
             compileuilist=takeAttr(scriptNode,'compileuilist',null);
         if(baseuipath){
-            turtle.config.baseUIPath=baseuipath.split(",");
+            $t.config.baseUIPath=baseuipath.split(",");
         }
         if(extend)
-            turtle.extend(window,turtle.fn);
+            $t.extend(window,$t.fn);
         if(sciript.length>0){
             execTurtleScript(scriptNode,null,null);
         }
-            
+        $t.url=scriptNode.getAttribute("src");
         if (compile != null){
             if(getQueryString("turtle_nocompile")!="1"){
                 $t.xhr.get(scriptNode.src+'.setup',false,function(text){
@@ -3514,6 +3551,7 @@ var turtle,$t;
     //fn.delay=delay;
     fn.getStateFunction=getStateFunction;
     function Turtle(){
+        this.isTemplate=isTemplate;
         this.config={baseUIPath:['ui'],baseServicePath:'service',debugMode:2};
         this.event={onerror:function(e){log(e);alert(e)}};
         this.getUI=getUI;
@@ -3551,6 +3589,7 @@ var turtle,$t;
         this.require=require;
         this.isIE=isIE;
         this.templates=templates;
+        this.url="";
     }
     Turtle.prototype=fn;
     turtle=$t=new Turtle();

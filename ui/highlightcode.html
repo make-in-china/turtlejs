@@ -339,13 +339,6 @@
           
           font-style: italic !important;
         }
-        
-        /*.syntaxhighlighter .comments {
-          font-style: italic !important;
-        }*/
-        /*.syntaxhighlighter .keyword {
-          font-weight: bold !important;
-        }*/
         .toolbar{
             display:none !important;
         }
@@ -355,14 +348,19 @@
     </script>
 </xmp>
 <xmp>
+    <! var i:0>
+    <! for ;i<outer.length;i++>
     <pre ref="code" class="brush: {brush!html};"></pre>
-    <script var="code">
+    <! end>
+    <script>
         if(!$t.service.SyntaxHighlighter){
             var t=this;
             $t.renderBefore("highlightcode.style",t.childNodes[0],outer,outerElement);
         }
-        for(var i=0;i<outer.length;i++){
-            code.appendChild(outer[i]);
+        var code;
+        for(var i=outer.length-1;i>-1;i--){
+            code=$t.refNode.code.pop();
+            code.appendChild(outer[i])
         }
         $t.service.SyntaxHighlighter.all();
     </script>
