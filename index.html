@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
     
-    <script extend="1" baseuipath="ui,uiAPP" src="js/turtle.js"></script>
+    <script extend="1" baseuipath="{name:'ui',path:'ui'};{name:'app',path:'uiAPP'}" src="js/turtle.js"></script>
   </head>
   <body class='scrolly'>
 
@@ -31,7 +31,7 @@
     </div>
 
     <xmp>
-        <ui:content>
+        <app:content>
             <ui:swiper>
               <script type="option">
                 {
@@ -161,8 +161,8 @@
                     cursor: pointer;
                 }
             </style>
-        </ui:content>
-        <ui:bottom></ui:bottom>
+        </app:content>
+        <app:bottom></app:bottom>
     </xmp>
   </body>
 </html>
