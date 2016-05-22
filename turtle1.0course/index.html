@@ -29,9 +29,7 @@
             $t.renderBefore("highlightcode",'ui',btnTry,outerElement);
             if(isRun){
                 var s="";
-                if(!isTry){
-                    $t.removeNode(btnTry);
-                }else{    
+                if(isTry){
                     btnTry.onclick=function(){
                         $t.removeNode(btnTry);
                         $t.removeNode(runbox);
@@ -58,6 +56,9 @@
                     }
                     cpn.runHTML(s);
                 });
+                if(!isTry){
+                    $t.removeNode(btnTry);
+                };
             }else{
                 $t.removeNode(btnTry);
             }
@@ -141,6 +142,7 @@
                 <ui:ahchorpanel>
                     暂无简介
                 </ui:ahchorpanel>
+                <!-- 渲染如何生效和生效范围 -->
                 <ui:ahchorpanel>
        turtle的渲染默认从模板标签开始。<br>
        1.什么是模板标签？
@@ -583,7 +585,7 @@ style="display:inline-block;">
                 </ui:ahchorpanel>
                 <!-- 服务 -->
                 <ui:ahchorpanel>
-                                                            服务来源有4个：HTML片断，js片断，未编译的组件文件，编译后的服务js<br>
+                                                            服务来源有4个：HTML片断，js写入，未编译的组件文件，编译后的服务js<br>
                                                             服务分类有全局服务和组件服务
                     <ui:io><title>
 <!-- 全局服务  HTML片断，当前页面和UI文件支持该方式 -->
@@ -609,12 +611,45 @@ style="display:inline-block;">
 </script>   
                     </title><title>
 <!= $t.ui.testset.service.test("买一送一")>
-                    </title></ui:io>        
+                    </title></ui:io>
+                            
                 </ui:ahchorpanel>
                 <!-- 组件 -->
                 <ui:ahchorpanel>
-                    组件来源有4个：HTML片断，js片断，未编译的UI文件，编译后的组件js<br>
+                    组件来源有4个：HTML片断，js写入，未编译的UI文件，编译后的组件js<br>
+                    1.HTML片断：<br>
+                    在页面文件&lt;body>内模板标签外任意位置使用以下语法定义内置组件<br>
+                    在模板标签上添加ui="组件名"属性
+                    <ui:io try="false"><title>
+以下为当前支持的模板标签:
+<pre style="box-sizing:border-box;"
+><!= $t.templates.toString("")></pre>
+                </title></ui:io>
+                
+                    <ui:io><title>
+style type="xmp"
+<style type="xmp" ui="组件1">
+    <div>组件</div>
+    <div>1</div>
+</style>
+script type="xmp"
+<script type="xmp" ui="组件2">
+    <div>组件</div>
+    <div>2</div>
+</script>
+textarea type="xmp"
+<textarea type="xmp" ui="组件3">
+    <div>组件</div>
+    <div>3</div>
+</textarea>
+                    </title><title>
+<ui:组件1></ui:组件1>
+<ui:组件2></ui:组件2>
+<ui:组件3></ui:组件3>
+                    </title></ui:io>
                     
+                    2.js写入：<br>
+                    turtle.ui.define("");
                 </ui:ahchorpanel>
                 <!-- 组件数据 props-->
                 <ui:ahchorpanel>
