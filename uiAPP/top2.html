@@ -1,7 +1,7 @@
 <xmp service="runJS">
     function(script){
-        $t.refNode.script[0].value=script;
-        $t.refNode.ret[0].innerHTML=eval(script);
+        $t.refs.script[0].value=script;
+        $t.refs.ret[0].innerHTML=eval(script);
         $t.ui.growpanel.parts[0].max();
     }
 </xmp>
@@ -15,7 +15,7 @@
                         <br/>
                         <ui:button text="运行 >:_">
                             <script>
-                                $t.refNode.ret[0].innerHTML=eval($t.refNode.script[0].value);
+                                $t.refs.ret[0].innerHTML=eval($t.refs.script[0].value);
                             </script>
                         </ui:button>
                         <br/>

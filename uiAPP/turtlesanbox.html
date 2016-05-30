@@ -6,7 +6,7 @@
         },window,$t);
     </iframe>
     <script>
-        var ret=$t.refNode.ret.pop();
+        var ret=$t.refs.ret.pop();
         part.ready=new $t.ReadyObject();
         ret.onload=function(){
             var scriptInject=ret.contentDocument.createElement("script");
