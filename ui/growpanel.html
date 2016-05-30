@@ -11,9 +11,9 @@
         </div>
         <div class="ub-f1 zidx2" ref="content"><!content></div>
         <script>
-            var add=$t.refNode["add"].pop();
-            var sub=$t.refNode["sub"].pop();
-            var content=$t.refNode["content"].pop();
+            var add=$t.refs.add.pop();
+            var sub=$t.refs.sub.pop();
+            var content=$t.refs.content.pop();
             part.max=add.onclick=function(){
                 removeClass(sub,"uhide");
                 addClass(add,"uhide");

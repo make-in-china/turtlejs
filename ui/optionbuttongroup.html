@@ -1,4 +1,15 @@
-<script type="xmp" service="_obgsetCheck">
+<xmp><!content>
+<script>
+    var team="{team!}";
+    var noclick={noclick!false};
+    var checkClasses="{checkclass!}";
+    var index=parseInt("{index!-1}");
+    var noCheckClasses="{nocheckclass!}";
+    if(outerElement.length!==0){
+        $t.ui.optionbuttongroup.service.require("setCheck")(outerElement,team,noclick,index,checkClasses,noCheckClasses);
+    }
+</script></xmp>
+<script xmp ui="optionbuttongroup" service="setCheck">
     function(group,team,noclick,index,checkClasses,noCheckClasses){
       var checkClass;
       var noCheckClass;
@@ -37,16 +48,4 @@
       }
       if(group[index])group[index].check();
     }
-  </script>
-<xmp><!content>
-<script>
-    var team="{team!}";
-    var noclick={noclick!false};
-    var checkClasses="{checkClass!}";
-    var index=parseInt("{index!-1}");
-    var noCheckClasses="{noCheckClass!}";
-    
-    if(outerElement.length!==0){
-        $t.service.require("_obgsetCheck")(outerElement,team,noclick,index,checkClasses,noCheckClasses);
-    }
-</script></xmp>
+</script>

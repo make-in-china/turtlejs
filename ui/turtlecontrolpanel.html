@@ -15,9 +15,9 @@
             component.max=component.child[0].max;
             return component.max();
         }
-        var script=$t.refNode.script.pop();
-        var run=$t.refNode.run.pop();
-        var ret=$t.refNode.ret.pop();
+        var script=$t.refs.script.pop();
+        var run=$t.refs.run.pop();
+        var ret=$t.refs.ret.pop();
         run.onclick=function(){
             ret.innerHTML='';
             $t.appendNodes($t.parseHTML(script.value),ret);

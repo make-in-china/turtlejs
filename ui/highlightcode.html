@@ -361,7 +361,7 @@
         }
         var code;
         for(var i=outer.length-1;i>-1;i--){
-            code=$t.refNode.code.pop();
+            code=$t.refs.code.pop();
             code.appendChild(outer[i])
         }
         $t.service.SyntaxHighlighter.highlight(code);

@@ -8,10 +8,10 @@
         tID,
         t = window.inputbox = {},
         body = document.body,
-        Text = $t.refNode['Text'].pop(),
-        input = $t.refNode['input'].pop(),
+        Text = $t.refs.Text.pop(),
+        input = $t.refs.input.pop(),
         buttonPanel = Text.children[1],
-        elemOK = $t.refNode['elemOK'].pop();
+        elemOK = $t.refs.elemOK.pop();
     Text.box = t;
     removeNode(Text);
     function pressKey(input, key) {
@@ -289,7 +289,7 @@
       <div data-key="9">
         9
       </div>
-      <div key="elemOK" class="fa fb" data-key="OK" style="width:4.5em;">
+      <div ref="elemOK" class="fa fb" data-key="OK" style="width:4.5em;">
         &#xf178;
       </div>
     </div>
@@ -385,20 +385,20 @@
       <div data-key="z">
         z
       </div>
-      <div key="elemOK" class="fa fb" data-key="OK" style="width:3em;">
+      <div ref="elemOK" class="fa fb" data-key="OK" style="width:3em;">
         &#xf178;
       </div>
     </div>
   </set>
 </xmp>
 <xmp>
-  <div key='Text' class="full bblack4 pdip5 fz18" style="z-index: 147483640;">
-    <div data-key="input" key="elemInputTop" class="ifz20 ihdip20 ipdip3 mdipb8 pdip8 bgray15 ub rdip10 shadowless">
+  <div ref='Text' class="full bblack4 pdip5 fz18" style="z-index: 147483640;">
+    <div data-key="input" ref="elemInputTop" class="ifz20 ihdip20 ipdip3 mdipb8 pdip8 bgray15 ub rdip10 shadowless">
       <div>
         {text}:
       </div>
       <div data-key="input" class="ub ub-f1 bdw1 ub lb2 bgray15">
-        <input key="input" data-key="input" type="email" style="outline:none;" class="fz16 ub ub-f1 rdip10 bdw0">
+        <input ref="input" data-key="input" type="email" style="outline:none;" class="fz16 ub ub-f1 rdip10 bdw0">
       </div>
       
       <! if appcan.detect.browser.name!=='safari'>
@@ -435,7 +435,7 @@
         <! default>
         <div class="imdip3 ub ict ibgray15 ishadowless2 iclick2 irdip5 ibfrdip5 ihem2">
           <div class="ub-f1" data-key=" "></div>
-          <div key="elemOK" class="fa wem3 fb" data-key="OK">
+          <div ref="elemOK" class="fa wem3 fb" data-key="OK">
             &#xf178;
           </div>
         </div>
