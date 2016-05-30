@@ -20,12 +20,12 @@
             <a ref="run" href="javascript:;">运行：</a>
         </div>
         <script>
-            var btnTry=$t.refNode["try"].pop();
-            var script=$t.refNode["script"].pop();
-            var run=$t.refNode["run"].pop();
-            var runbox=$t.refNode["runbox"].pop();
-            var isRun=$t.parseBool('{run!true}');
-            var isTry=$t.parseBool('{try!true}');
+            var btnTry=$t.refs.try.pop();/*弹出注册*/
+            var script=$t.refs.script.pop();/*弹出注册*/
+            var run=$t.refs.run.pop();/*弹出注册*/
+            var runbox=$t.refs.runbox.pop();/*弹出注册*/
+            var isRun={run!true}.bool;
+            var isTry={try!true}.bool;
             $t.renderBefore("highlightcode",'ui',btnTry,outerElement);
             if(isRun){
                 var s="";
@@ -67,7 +67,7 @@
     <xmp ui="io">
         <div ref="loadding" class="uhide">加载中...</div>
         <script>
-            var loadding=$t.refNode.loadding.pop();
+            var loadding=$t.refs.loadding.pop();
             $t.readyByRenderDocument.on(function(){
                 $t.onViewOnce(loadding.parentNode,document.body,function(){
                     $t.removeClass(loadding,"uhide");
@@ -78,15 +78,15 @@
         </script>
     </xmp>
     <xmp ui="ahchorpanel">
-        <a : name:="ahchor++;$t.refNode.ahchor[ahchor].getAttribute('href').slice(1)"></a>
+        <a : name:="ahchor++;$t.refs.ahchor[ahchor].getAttribute('href').slice(1)"></a>
         <div class="imdip10 fb">
-            <span class="fz24"><!= $t.refNode.ahchor[ahchor].innerHTML></span>
+            <span class="fz24"><!= $t.refs.ahchor[ahchor].innerHTML></span>
             
-            <! if ahchor<$t.refNode.ahchor.length-1>
-            <a : href:="$t.refNode.ahchor[ahchor+1].getAttribute('href')">下一个( <!= $t.refNode.ahchor[ahchor+1].innerHTML>)</a>
+            <! if ahchor<$t.refs.ahchor.length-1>
+            <a : href:="$t.refs.ahchor[ahchor+1].getAttribute('href')">下一个( <!= $t.refs.ahchor[ahchor+1].innerHTML>)</a>
             <! end>
             <! if 0<ahchor>
-            <a : href:="$t.refNode.ahchor[ahchor-1].getAttribute('href')">上一个( <!= $t.refNode.ahchor[ahchor-1].innerHTML>)</a>
+            <a : href:="$t.refs.ahchor[ahchor-1].getAttribute('href')">上一个( <!= $t.refs.ahchor[ahchor-1].innerHTML>)</a>
             <! end>
         </div>
         <div style="margin-left:40px;padding-bottom:50px;padding-top:10px;"><!content></div>
@@ -103,8 +103,8 @@
                     <!var ahchor:1>
                     <set class="fz18" ref="ahchor" : href:="'#ahchor'+ahchor" :style.display="g.width|v>800?'block':'inline-block'" style="width:10em;padding:5px 0;cursor:pointer;color:#3B77B8 !important;">
                         <a><!= ahchor++>.简介</a>
-                        <a><!= ahchor++>.渲染如何生效和生效范围</a>
-                        <a><!= ahchor++>.命令说明</a>
+                        <a><!= ahchor++>.渲染</a>
+                        <a><!= ahchor++>.命令系统</a>
                         <a><!= ahchor++>.作用域和变量</a>
                         <a><!= ahchor++>.分支命令If</a>
                         <a><!= ahchor++>.分支命令Switch</a>
@@ -422,7 +422,7 @@ style="display:inline-block;">
                     注：这里使用了temlline组件，这是一个页面临时组件（后面章节讲解组件）<br>
                     此例还用到了本库的class样式，这也是本库一个特色，后面会进行讲解。
                     <ui:io><title>
-<style type="xmp" ui="tl">
+<style xmp ui="tl">
   <div>
     <div class='wem16 right'>
       {name}<! if {way!1}!=2><span class="fblue15">单向</span><! end><! if {way!1}==3>+<! end><! if {way!1}!=1><span class="fred15">双向</span><! end>绑定：
@@ -529,7 +529,7 @@ style="display:inline-block;">
                     （无此属性时属性会被替换，class,style等属性会出错）<br><br>
                     <ui:io><title>
 <!-- 定义一个组件 组件在后续教程里会讲解 -->
-<style type="xmp" ui="testset">
+<style xmp ui="testset">
     <div><div><!content></div></div>
 </style>
                     </title><title>
@@ -572,7 +572,7 @@ style="display:inline-block;">
 
                     <ui:io><title>
 <!-- 定义一个组件 组件在后续教程里会讲解 -->
-<style type="xmp" ui="testset">
+<style xmp ui="testset">
     <div><div><!content></div></div>
 </style>
                     </title><title>
@@ -589,7 +589,7 @@ style="display:inline-block;">
                                                             服务分类有全局服务和组件服务
                     <ui:io><title>
 <!-- 全局服务  HTML片断，当前页面和UI文件支持该方式 -->
-<script type="xmp" service="test">
+<script xmp service="test">
     function(s){
         /*匿名函数*/
        return s+s;
@@ -599,11 +599,11 @@ style="display:inline-block;">
                     </title></ui:io>
                     <ui:io><title>
 <!-- 定义一个组件 组件在后续教程里会讲解 -->
-<style type="xmp" ui="testset">
+<style xmp ui="testset">
     <div><div><!content></div></div>
 </style>
 <!-- 组件服务  HTML片断，当前页面和UI文件支持该方式 -->
-<script type="xmp" service="test" ui="testset">
+<script xmp service="test" ui="testset">
     function(s){
        /*匿名函数*/
        return s+s;
@@ -627,19 +627,16 @@ style="display:inline-block;">
                 </title></ui:io>
                 
                     <ui:io><title>
-style type="xmp"
-<style type="xmp" ui="组件1">
-    <div>组件</div>
+<!style xmp>
+<style xmp ui="组件1">
     <div>1</div>
 </style>
-script type="xmp"
-<script type="xmp" ui="组件2">
-    <div>组件</div>
+<!script xmp>
+<script xmp ui="组件2">
     <div>2</div>
 </script>
-textarea type="xmp"
-<textarea type="xmp" ui="组件3">
-    <div>组件</div>
+<!textarea xmp>
+<textarea xmp ui="组件3">
     <div>3</div>
 </textarea>
                     </title><title>
@@ -650,9 +647,45 @@ textarea type="xmp"
                     
                     2.js写入：<br>
                     turtle.ui.define("");
+                    <ui:io><title>
+<script>
+    $t.ui.define("组件1","","",{datas:[
+        '<div>组件1：从对象解析的组件模板</div>']});
+        
+    $t.ui.define('组件2','','',$t.ui.组件1).datas=[
+        '<div>组件2：从组件1拷贝的组件模板，但修改了datas</div>'];
+    
+    $t.ui.define('组件3','','',
+        '组件3：<b>HTML字符串生成的组件</b>');
+</script>
+<ui:组件1></ui:组件1>
+<ui:组件2></ui:组件2>
+<ui:组件3></ui:组件3>
+                    </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 组件数据 props-->
                 <ui:ahchorpanel>
+                
+                    <ui:io><title>
+<style xmp ui="people">
+    <div style="padding:5px;">
+        <div class="fred15"><!= JSON.stringify(props)></div>
+        <div>姓名：{name}</div>
+        <div>性别：{sex!男}.only(男,女;男)</div>
+        <div>婚否：{merry!否}.only(是,否;是)</div>
+        <div>生日：{birth!}.date(yyyy年MM月dd日)</div>
+        <div class="fgray8">
+        填表时间：{birth!}.date(yyyy年MM月dd日hh小时mm分ss秒)</div>
+    </div>
+</style>
+                    </title><title>
+<ui:people name="功夫茶猫"></ui:people>
+<ui:people name="功夫茶猫" sex="男"></ui:people>
+<ui:people name="功夫茶猫" sex="男" merry="否"></ui:people>
+<ui:people name="功夫茶猫" sex="男" merry></ui:people>
+<ui:people name="功夫茶猫" sex="男" merry="乱写数据"></ui:people>
+                    </title></ui:io>
+                
                 </ui:ahchorpanel>
                 <!-- 组件执行上下文 -->
                 <ui:ahchorpanel>

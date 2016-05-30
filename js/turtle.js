@@ -1,12 +1,6 @@
 
 var turtle,$t;
 (function(){
-    /* 隐藏我们的模板，防止闪一下*/
-    // var span=document.createElement('span');
-    // span.innerHTML='<style>xmp,[type=xmp]{display:none}</style>';
-    // document.body.appendChild(span.children[0]);
-    // span.innerHTML='';
-    
     var 
         arrayPrototype      = Array.prototype,
         Objectprototype     = Object.prototype,
@@ -15,27 +9,48 @@ var turtle,$t;
         getPrototypeOf      = Object.getPrototypeOf,
         appendChild         = Node.prototype.appendChild,
         readyRE             = /complete|loaded|interactive/,
-        memberRE            = /{[a-zA-Z\d\.\%\u4e00-\u9fa5]+\!?(['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\1\!?(['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\2}/g,
+        memberRE            = /{([a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\.\,\;\%\u4e00-\u9fa5]+\))?))?/g,
         orderRE             = /^\s?(if|while|for|switch|break|-|scope|content|bind|!|var|=)(\s|$)/g,
         orderCaseRE         = /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
         operatorRE          = /\!=|==|=|<|>|\|/,
         camelCaseRE         = /-(\w)/g,
         isIE                = (!!window.ActiveXObject||"ActiveXObject" in window);
-    
+    var dateFormat=(function(){
+        return function(format,d){ 
+            var o = {
+                "M+" : d.getMonth() + 1, //month
+                "d+" : d.getDate(), //day
+                "h+" : d.getHours(), //hour
+                "m+" : d.getMinutes(), //minute
+                "s+" : d.getSeconds(), //second
+                "q+" : Math.floor((d.getMonth() + 3) / 3), //quarter
+                "S" : d.getMilliseconds() //millisecond
+            }
+
+            if (/(y+)/.test(format)) {
+                format = format.replace(RegExp.$1, (d.getFullYear() + "").substr(4 - RegExp.$1.length));
+            }
+
+            for (var k in o) {
+                if (new RegExp("(" + k + ")").test(format)) {
+                    format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+                }
+            }
+            return format;
+        }
+    })();
     if (!("classList" in document.documentElement)) {
         Object.defineProperty(HTMLElement.prototype, 'classList', {
             get: function() {
                 var self = this;
                 function update(fn) {
                     return function(value) {
-                        var classes = self.className.split(/\s+/g),
+                        var classes = self.className.split(/[\s\n\r]+/g),
                             index = classes.indexOf(value);
-                        
                         fn(classes, index, value);
                         self.className = classes.join(" ");
                     }
                 }
-                
                 return {                    
                     add: update(function(classes, index, value) {
                         if (!~index) classes.push(value);
@@ -248,8 +263,6 @@ var turtle,$t;
         }
         return keys;
     }
-
-    
     function _catch(e,onerror){
         if(isFunction(onerror)){
             onerror(e);
@@ -463,7 +476,7 @@ var turtle,$t;
                     return _value.call(this, value);
                 };
                 newProperty.set=function(newValue) {
-                    if(value == newValue)return;
+                    // if(value == newValue)return;
                     value = newValue;
                     _value.call(this, value);
                     fnOnSet.call(obj,name);
@@ -473,7 +486,7 @@ var turtle,$t;
                     return _value;
                 };
                 newProperty.set=function(newValue) {
-                    if(_value == newValue)return;
+                    // if(_value == newValue)return;
                     _value = newValue;
                     fnOnSet.call(obj,name);
                 };
@@ -539,7 +552,9 @@ var turtle,$t;
                         var o=obj.__bind__;
                         for(var j in o){
                             if(o[j].targetName===name){
-                                obj[o[j].name]=this[name];
+                                if(obj[o[j].name]!=this[name]){/*相同则不重置*/
+                                    obj[o[j].name]=this[name];
+                                }
                             }
                         }
                     }
@@ -1224,7 +1239,7 @@ var turtle,$t;
             if(keyVar.length>0){
                 keyVar=keyVar.split(',');
                 for(var i=0;i<keyVar.length;i++){
-                    var ui=$t.refNode[keyVar[i]];
+                    var ui=$t.refs[keyVar[i]];
                     if(ui){
                         args.push(ui[ui.length-1]);
                     }else{
@@ -1524,16 +1539,16 @@ var turtle,$t;
             _catch(e);
         }
     }
-    function replaceByObjectAttr(s,obj){
+    /*function replaceByObjectAttr(s,obj){
         var err=[];
         s=s.replace(memberRE,
             function(s){
-                var isDefault;
+                var hasDefault;
                 var dft;
                 var limitValue;
                 s=s.substring(1,s.length-1);
-                isDefault=/\!/.test(s);
-                if(isDefault){
+                hasDefault=/\!/.test(s);
+                if(hasDefault){
                     s=s.split('!');
                     dft=s[1];
                     if(s.length>2)
@@ -1546,7 +1561,7 @@ var turtle,$t;
                     }else{
                         return obj[s];
                     }
-                }else if(isDefault){
+                }else if(hasDefault){
                     return dft;
                 }else{
                     err.push('不可缺少'+s+'属性');
@@ -1566,12 +1581,12 @@ var turtle,$t;
         var err=[];
         s=s.replace(memberRE,
             function(s){
-                var isDefault;
+                var hasDefault;
                 var dft;
                 var limitValue;
                 s=s.substring(1,s.length-1);
-                isDefault=/\!/.test(s);
-                if(isDefault){
+                hasDefault=/\!/.test(s);
+                if(hasDefault){
                     s=s.split('!');
                     dft=s[1];
                     if(s.length>2)
@@ -1584,7 +1599,7 @@ var turtle,$t;
                     }else{
                         return node.getAttribute(s);
                     }   
-                }else if(isDefault){
+                }else if(hasDefault){
                     return dft;
                 }else{
                      err.push(getUIInfo(node).name+'不可缺少'+s+'参数');
@@ -1599,7 +1614,7 @@ var turtle,$t;
             console.log(err.join('\r\n'));
         }
         return s;
-    }
+    }*/
     /*function parseText(node,outerChildNodes,outerElement,props,part){
         node.data=execTemplateScript(node.data,node.parentNode,outerChildNodes,outerElement,props,part);
     }*/
@@ -2103,7 +2118,7 @@ var turtle,$t;
             }
         ,attributeParser={
             ref:function(node,outerChildNodes,outerElement,props,part){
-                $t.refNode.push(node.getAttribute('ref'),node);
+                $t.refs.push(node.getAttribute('ref'),node);
                 node.removeAttribute('ref');
             }
             ,":":function(node,outerChildNodes,outerElement,props,part){
@@ -2136,7 +2151,7 @@ var turtle,$t;
                 try{
                     parseComment(node,outerChildNodes,outerElement,props,part);    
                 }catch(e){_catch(e)}
-                return;
+                return treeEach.c_noIn;
             }
             if(node.nodeType!==1){
                 return;
@@ -2353,53 +2368,77 @@ var turtle,$t;
             }
         }
     }
-    function UIParam(name,isDefault,defaultValue,limitValue){
+    function UIParam(name,hasDefault,filter,filterParam,defaultValue,limitValue){
         this.name=name;
-        this.isDefault=isDefault;
+        this.hasDefault=hasDefault;
         this.defaultValue=defaultValue;
         this.limitValue=limitValue;
+        this.filter=filter;
+        this.filterParam=filterParam;
     }
-    function UITemplate(name,sortPath,path,s,isInnerUI){
+    function UITemplate(name,sortPath,path,s){
         var t=this;
-        t.params=[];
-        t.datas=[];
-        t.parts=[];
-        t.isInnerUI=parseBool(isInnerUI);
-        if(isObject(s)){
-            extend(t,s);
-            return;
-        }
-        var start=0;
-        var idx=0;
-        s.replace(memberRE,function(s0,s1,s2,index,sSource){
-            var isDefault;
-            var dft;
-            var limitValue;
-            var name;
-            var s;
-            s=s0.substring(1,s0.length-1);
-            isDefault=/\!/.test(s);
-            if(isDefault){
-                s=s.split('!');
-                dft=s[1];
-                if(s.length>2)
-                    limitValue=s[2];
-                name=s[0];
-            }else{
-                name=s;
-            }
-            idx++;
-            t.params.push(new UIParam(name,isDefault,dft,limitValue));
-            t.datas.push(sSource.substring(start,index));
-            start=index+s0.length;
-            return '';
-        });
-        t.datas.push(s.substring(start,s.length));
-        t.service=new Service();
+        
         t.name=name;
         t.sortPath=sortPath;
         t.path=path;
         t.partName=t.name.replace(/[\.]/g,"_");
+        t.parts=[];
+        
+        if(isObject(s)){
+            if(!isArray(s.params)){
+                t.params=[];    
+            }else{
+                t.params=s.params;
+            }
+            
+            if(!isArray(s.datas)){
+                t.datas=[];
+            }else{
+                t.datas=s.datas;
+            }
+            t.isJSDefine=true;
+            
+            if(isObject(s.service)){
+                if(!(s.service instanceof Service)){
+                    t.service=new Service(s.service);
+                }else{
+                    t.service=s.service;
+                }
+            }else{
+                t.service=new Service();
+            }
+        }else{
+                
+            t.params=[];
+            t.datas=[];
+            t.isJSDefine=false;
+            t.service=new Service();
+            
+            var start=0;
+            var idx=0;
+            s.replace(memberRE,function(s0,name,s1,dft,s2,s3,limit,s4,s5,s6,filter,filterParam,index,sSource){
+                var hasDefault;
+                if(s1==="!"){
+                    if(s1!==s3){
+                        dft=limit;
+                        limit="";
+                    }
+                    hasDefault=true;
+                }else{
+                    hasDefault=false;
+                }
+                if(filterParam){
+                    filterParam=filterParam.substring(1,filterParam.length-1);
+                }
+                idx++;
+                t.params.push(new UIParam(name,hasDefault,filter,filterParam,dft,limit));
+                t.datas.push(sSource.substring(start,index));
+                start=index+s0.length;
+                return '';
+            });
+            t.datas.push(s.substring(start,s.length));
+        }
     }
     UITemplate.prototype={
         renderIn:function(elem,outerChildNodes,outerElement,props,part){
@@ -2457,11 +2496,14 @@ var turtle,$t;
                     }else{
                         v=props[p.name];
                     }
-                }else if(p.isDefault){
+                }else if(p.hasDefault){
                     v=p.defaultValue;
                 }else{
                     err.push(this.name+'不可缺少'+p.name+'参数');
                     v=undefined;
+                }
+                if(p.filter&&paramFilter.hasOwnProperty(p.filter)){
+                    v=paramFilter[p.filter](v,p.filterParam);
                 }
                 d.splice(i+1, 0, v);  
             }
@@ -2470,6 +2512,7 @@ var turtle,$t;
                     alert(err.join('\r\n'));
                 }
                 console.log(err.join('\r\n'));
+                debugger;
                 return;
             }
             var part=newPart(this,uiNode,execTemplateScript(d.join(''),that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part)
@@ -2480,6 +2523,36 @@ var turtle,$t;
             removeNode(uiNode);
         
             return part;
+        },toDefineString:function(){
+            var s='$t.ui.define("'+this.name+'","'+this.sortPath+'","'+this.path+'",{datas:';
+            s+=JSON.stringify(this.datas).replace(/<\/script>/g,'</scr"+"ipt>');
+            s+=',params:[';
+            var params=[];
+            var ps=this.params;
+            for(var i=0;i<ps.length;i++){
+                var dft=JSON.stringify(ps[i].defaultValue);
+                var limitValue=JSON.stringify(ps[i].limitValue);
+                
+                if(limitValue===undefined){
+                    limitValue="";
+                }else{
+                    limitValue=','+limitValue;
+                }
+                if(dft===undefined){
+                    if(limitValue!==""){
+                        dft=",undefined";
+                    }else{
+                        dft="";
+                    }
+                }else{
+                    dft=','+dft;
+                }
+                params.push('new $t.UIParam("'+ps[i].name+'",'+ps[i].hasDefault+',"'+ps[i].filter+'","'+ps[i].filterParam+'"'+dft+limitValue+')')
+            }
+            s+=params.join(',');
+            s+='],service:'+this.service.toDefineString();
+            s+="});";
+            return s;
         }
     }
     
@@ -2659,7 +2732,7 @@ var turtle,$t;
         return child;
     }
     function defineServiceByNode(node){
-        name=node.getAttribute('service');
+        var name=node.getAttribute('service');
         if(name){
             nodeName=node.getAttribute('ui');
             if(nodeName){
@@ -2682,7 +2755,7 @@ var turtle,$t;
     function defineUIByNode(node){
         var name=getAttr(node,'ui');
         if(name){
-            $t.ui.define(name,'','',getTemplate(node),true);
+            $t.ui.define(name,'','',getTemplate(node));
         }
         removeNode(node);
     }
@@ -2698,7 +2771,7 @@ var turtle,$t;
         for(;i<cs.length;i++){
             node=cs[i];
             if(!isTemplate(node)){
-                alert('最上层必须是ui/service模板标签，\r\n模板标签包含（xmp,template,title和含type="xmp"的script,style,textarea）');
+                alert('最上层必须是ui/service模板标签');
                 return;
             }
             if(node.hasAttribute('service')){
@@ -2756,7 +2829,9 @@ var turtle,$t;
             node.removeChild(node.childNodes[0]);    
         }
         var cpn=ui.render(node, node.parentNode,outerChildNodes,outerElement,null,part);
-        step.next =cpn.elements.length;
+        if(cpn){
+            step.next =cpn.elements.length;    
+        }
     }
     function getUI(uiName,uiSortPath,outerChildNodes,outerElement,props,part){
         var ui=importUIHTML(uiName,uiSortPath);
@@ -2823,6 +2898,64 @@ var turtle,$t;
             return parseHTML(getTemplate(node));    
         }
     }
+    var paramFilter=newObject("ParamFilter");
+    paramFilter.bool=function(v){
+        return parseBool(v);
+    }
+    paramFilter.int=function(v){
+        return parseInt(v);
+    }
+    paramFilter.float=function(v){
+        return parseFloat(v);
+    }
+    paramFilter.date=function(v,p){
+        var d=new Date(v);
+        if(d.toDateString()==='Invalid Date'){
+            d=new Date();
+        }
+        return dateFormat(p,d);
+    }
+    paramFilter.only=function(v,p){
+        if(p.indexOf(';')===-1){
+            return v;
+        }
+        var arr=p.split(';');
+        var datas=arr[0].split(',');
+        if(arr.length>0){
+            var filter=arr[1];
+        }else{
+            var filter='';
+        }
+        if(datas.indexOf(v)!==-1){
+            return v;
+        }else{
+            return filter;
+        }
+    }
+    paramFilter.udftotrue=function(v){
+        return v===undefined?true:v;
+    }
+    paramFilter.anytotrue=function(v){
+        return v!==undefined?true:v;
+    }
+    paramFilter.udftofalse=function(v){
+        return v===undefined?false:v;
+    }
+    paramFilter.anytofalse=function(v){
+        return v!==undefined?false:v;
+    }
+    paramFilter.udftonull=function(v){
+        return v===undefined?null:v;
+    }
+    paramFilter.anytonull=function(v){
+        return v!==undefined?null:v;
+    }
+    paramFilter.udftoemptystr=function(v){
+        return v===undefined?"":v;
+    }
+    paramFilter.anytoemptystr=function(v){
+        return v!==undefined?"":v;
+    }
     var templates=newObject("Templates",
         {
             toString:function(){
@@ -2833,8 +2966,8 @@ var turtle,$t;
                         continue;
                     }
                     desc='<'+i.toLowerCase();
-                    if(this[i].hasOwnProperty("type")){
-                        desc+=' type="'+this[i]["type"]+'"';
+                    if(this[i].hasOwnProperty("xmp")){
+                        desc+=' xmp';
                     }
                     desc+='>';
                     s.push(desc);
@@ -2856,8 +2989,8 @@ var turtle,$t;
                 var regExes=[];
                 for(var i=0;i<ts.length;i++){
                     var s='(<'+ts[i].name;
-                    if(ts[i].hasOwnProperty('type')){
-                        s+=' +type=[\'"]'+ts[i].type+'[\'"]';
+                    if(ts[i].hasOwnProperty('xmp')){
+                        s+='[\\s\\S]*? +xmp';
                     }
                     s+='([\\s\\S]*?)>([\\s\\S]*?)<\\/'+ts[i].name+'>';
                     s+=')';
@@ -2871,9 +3004,9 @@ var turtle,$t;
     templates.XMP={};
     templates.TEMPLATE={};
     templates.TITLE={getData:function(node){return node.innerText;}};
-    templates.STYLE={type:"xmp"};
-    templates.SCRIPT={type:"xmp"};
-    templates.TEXTAREA={type:"xmp",getData:function(node){return node.defaultValue;}};
+    templates.STYLE={xmp:undefined};
+    templates.SCRIPT={xmp:undefined};
+    templates.TEXTAREA={xmp:undefined,getData:function(node){return node.defaultValue;}};
     function parseDefine(node){
         switch(true){
             case node.hasAttribute('service'):
@@ -2958,6 +3091,13 @@ var turtle,$t;
             },
             hasSortPath:function(sortPath){
                 return _paths.hasOwnProperty(sortPath);
+            },
+            toString:function(){
+                var arr=[];
+                for(var i in _paths){
+                    arr.push("{name:'"+_paths[i].name+"',path:'"+_paths[i].path+"'}")
+                }
+                return arr.join(';');
             }
         });
         lockObject(baseUIPath);
@@ -2999,9 +3139,10 @@ var turtle,$t;
             parseHTML(getTemplate(templateXMP[i]));
         }
         var s=compileCls();
+        /*获取ui定义*/
         var uiComplie=compileUI(uiList);;
         s+=uiComplie.script;
-        removeNode(xmpStyle);
+        // removeNode(xmpStyle);
         scriptNode.innerHTML=s+scriptNode.innerHTML;
         for(var i in $t.jsScript){
             removeNode($t.jsScript[i]);
@@ -3067,19 +3208,23 @@ var turtle,$t;
             if(uiList[0].length>0){
                 for(var i=0;i<uiList.length;i++){
                     uiList[i]=trimLine(uiList[i]);
-                    importUIHTML(uiList[i]);
+                    var s=uiList[i].split(':');
+                    importUIHTML(s[1],s[0]);
                 }
             }
         }
+        s=[];
         for(var e in $t.ui){
             if($t.ui.hasOwnProperty(e)){
                 var o=$t.ui[e];
-                var sj=JSON.stringify(o).replace(/<\/script>/g,'</scr"+"ipt>');
-                if(o.isInnerUI){
-                    s.push('$t.ui.define("'+e+','+sj+')");');
+                
+                if(!o.sortPath){
+                    /*内置组件直接定义到html*/
+                    s.push(o.toDefineString());
                 }else{
-                    s.push('$t.importUIJS("'+e+'");');
-                    compileJS.push({name:e,script:'$t.ui.define("'+e+'",'+sj+');'});
+                    /*外置js组件*/
+                    s.push('$t.importUIJS("'+e+'","'+o.sortPath+'");');/*同步加载*/
+                    compileJS.push({name:e,path:o.path,script:o.toDefineString()});
                 }
             }
         }
@@ -3287,24 +3432,33 @@ var turtle,$t;
                     }
                 }
             },
-            define:function(name,sortPath,path,s,isInnerUI){
-                this[name]=new UITemplate(name,sortPath,path,s,isInnerUI);
+            define:function(name,sortPath,path,s){
+                this[name]=new UITemplate(name,sortPath,path,s);
                 this.emitOnDefine(name,this[name]);
+                return this[name];
             }
         }
-    function Service(){
+    function Service(fns){
         Object.defineProperty(this,"__defineCallbacks__",{
                 value: [],
                 writable: false,
                 enumerable: false,
                 configurable: false
             }
-        )
+        );
+        if(isObject(fns)){
+            for(var i in fns){
+                if(isFunction(fns[i])){
+                    this[i]=fns[i];
+                    this.emitOnDefine(i,this[i]);
+                }
+            }
+        }
     }
     Service.prototype=
         {
             require:function(n){
-                if(!this.hasOwnProperty[n]){
+                if(!this.hasOwnProperty(n)){
                     this[n]=getService(n);
                 }
                 return this[n];
@@ -3318,6 +3472,21 @@ var turtle,$t;
                     _catch(e);
                 }
                 this.emitOnDefine(name,this[name]);
+            },
+            toDefineString:function(){
+                var s='new $t.Service(';
+                var fns=[];
+                for(var i in this){
+                    if(this.hasOwnProperty(i)){
+                        fns.push('"'+i+'":'+this[i].toString());    
+                    }
+                }
+                if(fns.length>0){
+                    s+='{'+fns.join(',')+'})';
+                }else{
+                    s+=')';
+                }
+                return s;
             }
         }
     function UITeam(){}
@@ -3377,7 +3546,15 @@ var turtle,$t;
     function makeCompileString(){
         var script=$t.turtleScriptElement.cloneNode();
         script.setAttribute('compile','');
-        script.setAttribute('compileuilist',getKeyArray($t.ui).join(','));
+        // script.setAttribute('uibasepath',$t.config.baseUIPath.toString());
+        var obj=$t.ui,
+            arr=[];
+        forEach(obj,function(v,key){
+            if(obj[key].sortPath){
+                arr.push(obj[key].sortPath+':'+key);
+            }
+        },this,false);
+        script.setAttribute('compileuilist',arr.join(','));
         
         return script.outerHTML;
     }
@@ -3387,8 +3564,8 @@ var turtle,$t;
             compile=takeAttr(scriptNode,'compile',null),
             load=getAttr(scriptNode,'load',null),
             sciript=scriptNode.innerHTML,
-            baseuipath=takeAttr(scriptNode,'baseuipath',null),
-            extend=takeAttr(scriptNode,'extend',null),
+            baseuipath=getAttr(scriptNode,'baseuipath',null),
+            extend=getAttr(scriptNode,'extend',null),
             compilename=takeAttr(scriptNode,'compilename',null),
             compileuilist=takeAttr(scriptNode,'compileuilist',null);
         if(baseuipath){
@@ -3427,7 +3604,7 @@ var turtle,$t;
         }
         function r1(){
             $t.ready(function() {
-                turtle.compileDocument(scriptNode,compileuilist,function(s,uiList){
+                turtle.compileDocument(scriptNode,compileuilist,function(s,compileJS){
                     if(!compilename){
                         compilename=getNameByURL(getNameByLocation());
                         if(/\./.test(compilename)){
@@ -3453,9 +3630,9 @@ var turtle,$t;
                         c.appendChild(br.cloneNode());
                         c.appendChild(br.cloneNode());
                         c.appendChild(document.createTextNode(text));
-                        for(var i=0;i<uiList.length;i++){
-                            var url = compile.url + "?uiName=" + uiList[i].name;
-                            $t.xhr.post(url,uiList[i].script,false,function(text){
+                        for(var i=0;i<compileJS.length;i++){
+                            var url = compile.url + "?uiName=" + compileJS[i].name + "&uiPath=" + compileJS[i].path;
+                            $t.xhr.post(url,compileJS[i].script,false,function(text){
                                 c.appendChild(br.cloneNode());
                                 c.appendChild(document.createTextNode(text));
                             });
@@ -3500,8 +3677,7 @@ var turtle,$t;
         lockObject(this);
         this.debugMode=2;
     }
-    var onViewOnce;
-    (function(){
+    var onViewOnce=(function(){
         var viewWatchs=[];
         function indexOfTarget(arr,o){
             for(var i=0;i<arr.length;i++){
@@ -3545,7 +3721,7 @@ var turtle,$t;
                 for(var i=0;i<items.length;i++){
                     var elem=items[i].target;
                     var t2=0,l2=0;
-                    while(elem.parentNode!==elemScroll){
+                    while(elem!==elemScroll){
                         t2+=elem.offsetTop;
                         l2+=elem.offsetLeft;
                         elem=elem.parentNode;
@@ -3567,7 +3743,7 @@ var turtle,$t;
             }
         }
         
-        onViewOnce=function(elem,elemScroll,fn){
+        return function(elem,elemScroll,fn){
             var idx=indexOfTarget(viewWatchs,elemScroll);
             
             if(idx===-1){
@@ -3670,8 +3846,8 @@ var turtle,$t;
     fn.replaceNodeByNode=replaceNodeByNode;
     fn.replaceNodeByString=replaceNodeByString;
     fn.insertNodesBefore=insertNodesBefore;
-    fn.replaceByObjectAttr=replaceByObjectAttr;
-    fn.replaceByNodeAttr=replaceByNodeAttr;
+    //fn.replaceByObjectAttr=replaceByObjectAttr;
+    //fn.replaceByNodeAttr=replaceByNodeAttr;
     fn.appendNodes=appendNodes;
     fn.nodesToString=nodesToString;
     fn.parseBool=parseBool;
@@ -3688,6 +3864,7 @@ var turtle,$t;
     fn.getDPI=getDPI;
     fn.removeNode=removeNode;
     fn.ReadyObject=ReadyObject;
+    fn.dateFormat=dateFormat;
     //fn.base64Decode=decode;
     //fn.base64Encode=encode;
     fn.objectChange=objectChange;
@@ -3724,14 +3901,14 @@ var turtle,$t;
         this.parseHTML=parseHTML;
         this.parseXMP=parseXMP;
         this.renderDocument=renderDocument;
-        this.compileUI=compileUI;
+        // this.compileUI=compileUI;
         this.compileDocument=compileDocument;
-        this.initCls=initCls;
+        // this.initCls=initCls;
         this.initHTML=initHTML;
         this.ui=new UI();
         this.jsScript=newHashObject('JSHash');
         this.styleClasses=newKeyArrayObject("StyleClasses");
-        this.refNode=newKeyArrayObject("RefNode");
+        this.refs=newKeyArrayObject("RefElements");
         this.clsNode=newArrayObject('ClassNode');
         this.getNode=newHashObject('GetNode');
         this.service=new Service();
@@ -3746,6 +3923,8 @@ var turtle,$t;
         this.fn=fn;
         this.turtleScriptElement='';
         this.makeCompileString=makeCompileString;
+        this.Service=Service;
+        this.UIParam=UIParam;
         this.renderParser={
             attributeParser:attributeParser,
             elementParser:elementParser
@@ -3754,6 +3933,8 @@ var turtle,$t;
         this.isIE=isIE;
         this.templates=templates;
         this.url="";
+        this.catch=_catch;
+        this.paramFilter=paramFilter;
     }
     Turtle.prototype=fn;
     turtle=$t=new Turtle();
