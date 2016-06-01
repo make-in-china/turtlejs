@@ -105,6 +105,7 @@
                         <a><!= ahchor++>.简介</a>
                         <a><!= ahchor++>.渲染</a>
                         <a><!= ahchor++>.命令系统</a>
+                        <a><!= ahchor++>.异步渲染</a>
                         <a><!= ahchor++>.作用域和变量</a>
                         <a><!= ahchor++>.分支命令If</a>
                         <a><!= ahchor++>.分支命令Switch</a>
@@ -185,9 +186,36 @@
 <br>注释正常，返回正常结果:<br>
 <!= 3<5>
                 </title></ui:io>
-                （不会js的朋友可能不高兴了，用不用命令系统当然是你的自由，但我强烈推荐您使用命令系统）
+                （强烈推荐）
                 </ui:ahchorpanel>
-                
+                <!-- 异步渲染 -->
+                <ui:ahchorpanel>
+                    异步渲染有2种方式：<br>
+                    1:async命令块<br>
+                    2:async节点属性<br>
+                    <ui:io><title>
+<div style="height:3em;">
+    async命令块，可包含多个标签
+    <!async>
+    <br><a>异</a><a>步</a>
+    <!end>
+    <!async 2000>
+    <br>异步2秒
+    <!end>
+</div>
+                </title></ui:io>
+                    <ui:io><title>
+<div style="height:3em;">async节点属性
+    <div async>
+    异步
+    </div>
+    <div async="2000">
+    异步2秒
+    </div>
+</div>
+                </title></ui:io>
+                </ui:ahchorpanel>
+                <!-- 作用域和变量 -->
                 <ui:ahchorpanel>
                                                             作用域的语法为：<br>
                     scope 名字<br>
