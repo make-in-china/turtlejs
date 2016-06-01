@@ -9,8 +9,8 @@ var turtle,$t;
         getPrototypeOf      = Object.getPrototypeOf,
         appendChild         = Node.prototype.appendChild,
         readyRE             = /complete|loaded|interactive/,
-        memberRE            = /{([a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\.\,\;\%\u4e00-\u9fa5]+\))?))?/g,
-        orderRE             = /^\s?(if|while|for|switch|break|-|scope|content|bind|!|var|=)(\s|$)/g,
+        memberRE            = /{([a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]+\))?))?/g,
+        orderRE             = /^\s?(if|while|for|switch|async|break|-|scope|content|bind|!|var|=)(\s|$)/g,
         orderCaseRE         = /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
         operatorRE          = /\!=|==|=|<|>|\|/,
         camelCaseRE         = /-(\w)/g,
@@ -316,10 +316,10 @@ var turtle,$t;
         return stacks.join("\r\n");
     }
     function getFileNameByURL(url){
-        return url.match(/[a-zA-Z\d\.]+\.[a-zA-Z\d]+$/)[0];
+        return url.match(/[a-zA-Z\d\._]+\.[a-zA-Z\d]+$/)[0];
     }
     function getNameByURL(url){
-        return url.match(/[a-zA-Z\d\.]+\.[a-zA-Z\d]+$/)[0].replace(/\.[a-zA-Z\d]+$/,'');
+        return url.match(/[a-zA-Z\d\._]+\.[a-zA-Z\d]+$/)[0].replace(/\.[a-zA-Z\d]+$/,'');
     }
     function getNameByLocation(){
         return getFileNameByURL(window.location.href);
@@ -382,6 +382,163 @@ var turtle,$t;
             }    
         }
     }
+    var locStorage=(function(){
+
+        var storage = window.localStorage,
+                i=0,
+                len=0;
+        /*
+        从本地存储获取值
+        @param String key 设置localstorage的key
+        @param String value 设置localstorage的val
+    
+        */
+        function setValue(key,val){
+            try{
+                if(storage){
+                    if(!appcan.isString(val)){
+                        val = JSON.stringify(val);
+                    }
+                    storage.setItem(key,val);
+                }else{
+    
+                }
+            }catch(e){
+                _catch(e);
+            }
+        }
+        /*
+            批量设置localstorage
+    
+        */
+        function setValues(key){
+            if(appcan.isPlainObject(key)){
+                for(var k in key){
+                    if(key.hasOwnPropery(k)){
+                        setValue(k,key[k]);
+                    }
+                }
+            }else if(appcan.isArray(key)){
+                for(i=0,len=key.length;i<len;i++){
+                    if(key[i]){
+                        setValue.apply(this,key[i]);
+                    }
+                }
+            }else{
+                setValue.apply(this,arguments);
+            }
+        }
+    
+        /*
+        从localStorage拿出对应的值
+        @param String key 获取值的key
+    
+        */
+        function popValue(key){
+            if(!key){
+                return;
+            }
+            try{
+                if(storage){
+                    var v=storage.getItem(key);
+                    storage.removeItem(key);
+                    return v;
+                }
+            }catch(e){
+                _catch(e);
+            }
+        }
+        /*
+        从localStorage获取对应的值
+        @param String key 获取值的key
+    
+        */
+        function getValue(key){
+            if(!key){
+                return;
+            }
+            try{
+                if(storage){
+                    return storage.getItem(key);
+                }
+            }catch(e){
+                _catch(e);
+            }
+        }
+        /*
+        从localStorage获取所有的keys
+    
+        */
+        function getKeys(){
+            var res = [];
+            var key = '';
+            for (var i=0,len=storage.length; i< len; i++){
+                key = storage.key(i);
+                if(key){
+                    res.push(key);
+                }
+            }
+            return res;
+        }
+    
+        /*
+        青春对应的key
+        @param String key
+    
+    
+        */
+        function clear(key){
+            try{
+                if(key && isString(key)){
+                    storage.removeItem(key);
+                }else{
+                    storage.clear();
+                }
+            }catch(e){
+                _catch(e);
+            }
+        }
+    
+        /*
+        localStorage剩余空间大小
+    
+        */
+        function leaveSpace(){
+            var space = 1024 * 1024 * 5 - unescape(encodeURIComponent(JSON.stringify(storage))).length;
+            return space;
+        }
+        
+        /*
+            获取或者设置localStorage的值
+            @param String key
+            @param String val
+            
+        */
+        function val(key,value){
+            if(arguments.length === 1){
+                return getValue(key);
+            }
+            setValue(key,value);
+        }
+        
+        
+        function contains(key){
+            return storage.hasOwnProperty(key);
+        }
+        
+        
+        return {
+            getVal:getValue,
+            setVal:setValues,
+            leaveSpace:leaveSpace,
+            remove:clear,
+            keys:getKeys,
+            val:val,
+            contains:contains,
+            popVal:popValue
+        };
+    
+    })();
     function hasCustomToString(obj) {
       return isFunction(obj.toString) && obj.toString !== toString;
     }
@@ -821,7 +978,7 @@ var turtle,$t;
     
     function repeatCall(delay,repeat,fn){
         var i=0;
-        id=setInterval(function(){
+        var id=setInterval(function(){
             i++;
             if(repeat!=-1&&i>=repeat){
                 clearInterval(id);
@@ -1170,6 +1327,11 @@ var turtle,$t;
         for(var i=0;i<nodes.length;i++){
             parent.insertBefore2(nodes[i],node);
         }
+    }
+    function insertNodeBefore(node,node2){
+        var parent=node.parentNode;
+        if(parent==null)return;
+        parent.insertBefore2(node2,node);
     }
     function appendNodes(nodes,parent){
         var c=toArray(nodes);
@@ -1732,6 +1894,34 @@ var turtle,$t;
             }
         }
     }
+    function parseAsyncOrder(info,node,outerChildNodes,outerElement,props,part){
+        return addOrderToNode(node,info,outerChildNodes,outerElement,props,part,function(){
+            return {
+                run:function(){
+                    var order=this;
+                    var ns=takeBlockBetween(this.node,this.endNode);
+                    var delay=parseInt(this.condition);
+                    if(delay===NaN){
+                        delay=0;
+                    }
+                    removeNode(this.endNode);
+                    var mark=document.createComment('async');
+                    replaceNodeByNode(this.node,mark);
+                    this.endNode=null;
+                    this.node=null;
+                    setTimeout(function(){
+                        var elem=document.createElement('div');
+                        replaceNodeByNode(mark,elem);
+                        mark=null;
+                        appendNodes(ns,elem);
+                        initHTML(elem.childNodes,outerChildNodes,outerElement,props,part);
+                        takeOutChildNodes(elem);
+                        elem=null;
+                    },delay);
+                }
+            }
+        });
+    }
     function parseSwitchOrder(info,node,outerChildNodes,outerElement,props,part){
         
         return addOrderToNode(node,info,outerChildNodes,outerElement,props,part,function(){
@@ -2024,6 +2214,7 @@ var turtle,$t;
         return breakElement;
     }
     function parseCommentOrderNoScript(info,node,outerChildNodes,outerElement,props,part){
+        /*不渲染，纯找结构*/
         switch(info.order){
             case 'while':
                 return parseWhileOrder(info,node,outerChildNodes,outerElement,props,part);
@@ -2036,6 +2227,9 @@ var turtle,$t;
                 break;
             case 'switch':
                 return parseSwitchOrder(info,node,outerChildNodes,outerElement,props,part);
+                break;
+            case 'async':
+                return parseAsyncOrder(info,node,outerChildNodes,outerElement,props,part);
                 break;
         }
     }
@@ -2090,6 +2284,9 @@ var turtle,$t;
             case 'switch':
                 return parseSwitchOrder(info,node,outerChildNodes,outerElement,props,part);
                 break;
+            case 'async':
+                return parseAsyncOrder(info,node,outerChildNodes,outerElement,props,part);
+                break;
         }
     }
     function getLastOrder(name){
@@ -2109,6 +2306,20 @@ var turtle,$t;
     function parseLazy(node,outerChildNodes,outerElement,props,part){
         node.removeAttribute('lazy');
         initHTML(node.childNodes,outerChildNodes,outerElement,props,part);
+    }
+    function parseAsync(node,outerChildNodes,outerElement,props,part){
+        var delay=parseInt(node.getAttribute('async'));
+        node.removeAttribute('async');
+        var mark=document.createComment('async');
+        replaceNodeByNode(node,mark);
+        if(delay===NaN){
+            delay=0;
+        }
+        setTimeout(function(){
+            replaceNodeByNode(mark,node);
+            mark=null;
+            initHTML([node],outerChildNodes,outerElement,props,part);
+        },delay);
     }
     var elementParser={
                 GET:parseGet,
@@ -2155,6 +2366,10 @@ var turtle,$t;
             }
             if(node.nodeType!==1){
                 return;
+            }
+            if(node.hasAttribute('async')){
+                parseAsync(node,outerChildNodes,outerElement,props,part);
+                return treeEach.c_repeat;
             }
             if(node.hasAttribute('lazy')){
                 parseLazy(node,outerChildNodes,outerElement,props,part);
@@ -2864,7 +3079,7 @@ var turtle,$t;
         else
             removeNode(node);
     }
-    function initCls(){
+    function replaceCls(){
         var arr=$t.clsNode;
         for(i=0;i<arr.length;i++){
             var cls=arr[i].getAttribute('cls');
@@ -2884,8 +3099,13 @@ var turtle,$t;
         });
         return s;
     }
-    function parseHTML(uiHTML){
-        var _uiMain=document.createElement('ui:parseHTML');
+    function parseHTML(uiHTML,elem){
+        var _uiMain;
+        if(elem instanceof Element){
+            _uiMain=elem;
+        }else{
+            _uiMain=document.createElement('ui:parseHTML');
+        }
         _uiMain.innerHTML=uiHTML;
         initHTML(_uiMain.childNodes);
         return takeChildNodes(_uiMain);
@@ -3116,17 +3336,14 @@ var turtle,$t;
         }
     }
     function compileDocument(scriptNode,uiList,fn){
-        var appends=[];
-        
-        document.head.appendChild=function(e){
-            appends.push(e);
-            Node.prototype.appendChild.call(this,e);
-        }
         var 
-            b=document.body,
-            xmps=findTemplates(b.children),
+            html,
+            xmps=findTemplates(document.body.children),
             templateXMP=[];
             
+        $t.xhr.get(location.href,false,function(s){
+            html=s;
+        });
         for(var i=0;i<xmps.length;i++){
             if(isDefine(xmps[i])){
                 parseDefine(xmps[i]);
@@ -3134,7 +3351,6 @@ var turtle,$t;
                 templateXMP.push(xmps[i]);
             }
         }
-        oldHTML=b.innerHTML;
         for(var i=0;i<templateXMP.length;i++){
             parseHTML(getTemplate(templateXMP[i]));
         }
@@ -3142,33 +3358,23 @@ var turtle,$t;
         /*获取ui定义*/
         var uiComplie=compileUI(uiList);;
         s+=uiComplie.script;
-        // removeNode(xmpStyle);
-        scriptNode.innerHTML=s+scriptNode.innerHTML;
-        for(var i in $t.jsScript){
-            removeNode($t.jsScript[i]);
-        }
-        for(var i=0;i<appends.length;i++){
-            var parentNode=appends[i].parentNode;
-            if(parentNode){
-                parentNode.removeChild(appends[i]);
-            }
-        }
-        delete document.head.appendChild;
-        s='';
-        var ns=document.childNodes;
         
-        b.innerHTML=oldHTML;
-        for(var i=0;i<ns.length;i++){
-            switch(ns[i].nodeType){
-                case 10:/*<!DOCTYPE xxx>*/
-                    s+='<!DOCTYPE '+ns[i].name+(ns[i].publicId?' '+ns[i].publicId:'')+(ns[i].systemId?' '+ns[i].systemId:'')+'>';
-                    break;
-                case 1:/*<html>*/
-                    s+=ns[i].outerHTML;
-                    break;
+        var x=scriptNode.outerHTML;
+        var inner;
+        if(s.length>0){
+            inner=scriptNode.innerHTML;
+            if(/[^ \r\n]/.test(inner)){
+                inner='\r\n;'+s;
+            }else{
+                inner=s;
             }
+        }else{
+            inner='';
         }
-        fn(s,uiComplie.compileJS);
+        var newTurtle=x.substring(0,x.length-9);
+        newTurtle=newTurtle.replace(/ compile=(['"]).*?\1/,'').replace(/ compileuilist=(['"]).*?\1/,'');
+        html=html.replace(x,newTurtle+inner+'</script>');
+        fn(html,uiComplie.compileJS,inner);
     }
     function propertyToJS(v){
         var s=JSON.stringify({xx:v});
@@ -3195,7 +3401,7 @@ var turtle,$t;
             var ret=parseHTML(getTemplate(templateXMP[i]));
             replaceNodeByNodes(templateXMP[i],ret);
         }
-        initCls();
+        replaceCls();
         
         /*initLink();*/
         renderDocument.endTime=new Date();
@@ -3561,32 +3767,36 @@ var turtle,$t;
     function beforeReady(){
         var 
             scriptNode=$t.turtleScriptElement=document.scripts[document.scripts.length-1],
-            compile=takeAttr(scriptNode,'compile',null),
+            compile=getAttr(scriptNode,'compile',null),
             load=getAttr(scriptNode,'load',null),
-            sciript=scriptNode.innerHTML,
+            script=scriptNode.innerHTML,
             baseuipath=getAttr(scriptNode,'baseuipath',null),
             extend=getAttr(scriptNode,'extend',null),
-            compilename=takeAttr(scriptNode,'compilename',null),
-            compileuilist=takeAttr(scriptNode,'compileuilist',null);
+            compilename=getAttr(scriptNode,'compilename',null),
+            compileuilist=getAttr(scriptNode,'compileuilist',null),
+            compileInfo;
         if(baseuipath){
             baseUIPath.push(baseuipath.split(";"));
         }else{
             baseUIPath.push('{path:"ui",name:"ui"}');
         }
-        if(extend)
+        if(extend){
             $t.extend(window,$t.fn);
-        if(sciript.length>0){
-            execTurtleScript(scriptNode,null,null);
         }
         $t.url=scriptNode.getAttribute("src");
-        if (compile != null){
+        if (compile !== null){
             if(getQueryString("turtle_nocompile")!="1"){
                 $t.xhr.get(scriptNode.src+'.setup',false,function(text){
-                    eval('compile='+text);
+                    try{
+                        eval('compileInfo='+text);    
+                    }catch(e){
+                        _catch(e);
+                    }
                 });
             }
+            $t.isCompile=true;
         }
-        var resume=(compile && compile.isOn && compile.url)?r1:r2;
+        var resume=(compileInfo && compileInfo.isOn && compileInfo.url)?r1:r2;
         if(load){
             var loads=load.split(",");
             var i=0;
@@ -3602,9 +3812,13 @@ var turtle,$t;
         }else{
             resume();
         }
+        
+        if(script.length>0){
+            execScript(scriptNode);
+        }
         function r1(){
             $t.ready(function() {
-                turtle.compileDocument(scriptNode,compileuilist,function(s,compileJS){
+                $t.compileDocument(scriptNode,compileuilist,function(html,compileJS,importScripts){
                     if(!compilename){
                         compilename=getNameByURL(getNameByLocation());
                         if(/\./.test(compilename)){
@@ -3612,12 +3826,17 @@ var turtle,$t;
                         }
                         console.log('未提供compilename，自动设置为“'+compilename+'”');
                     }
-                    var url = compile.url + "?htmlName=" + compilename;
+                    var url = compileInfo.url + "?htmlName=" + compilename;
                     
                     var b=document.body;
                     b.innerHTML='<div style="background-color:#fff;position:absolute;left:0;right:0;bottom:0;top:0;">开始编译页面</div>';
                     var c=b.children[0];
-                    $t.xhr.post(url,s,false,function(text){
+                    switch(compile){
+                        case 'onlyBody':
+                            html='<xmp><script>'+importScripts+'</script></xmp>'+html.match(/(<body[\s\S]*?>)([\s\S]*?)(<\/body>)/)[2];
+                            break;
+                    }
+                    $t.xhr.post(url,html,false,function(text){
                         var br= document.createElement('br');
                         var sec=document.createElement('span');
                         var timeout=1000;
@@ -3631,7 +3850,7 @@ var turtle,$t;
                         c.appendChild(br.cloneNode());
                         c.appendChild(document.createTextNode(text));
                         for(var i=0;i<compileJS.length;i++){
-                            var url = compile.url + "?uiName=" + compileJS[i].name + "&uiPath=" + compileJS[i].path;
+                            var url = compileInfo.url + "?uiName=" + compileJS[i].name + "&uiPath=" + compileJS[i].path;
                             $t.xhr.post(url,compileJS[i].script,false,function(text){
                                 c.appendChild(br.cloneNode());
                                 c.appendChild(document.createTextNode(text));
@@ -3846,6 +4065,8 @@ var turtle,$t;
     fn.replaceNodeByNode=replaceNodeByNode;
     fn.replaceNodeByString=replaceNodeByString;
     fn.insertNodesBefore=insertNodesBefore;
+    fn.insertNodeBefore=insertNodeBefore;
+    
     //fn.replaceByObjectAttr=replaceByObjectAttr;
     //fn.replaceByNodeAttr=replaceByNodeAttr;
     fn.appendNodes=appendNodes;
@@ -3903,7 +4124,7 @@ var turtle,$t;
         this.renderDocument=renderDocument;
         // this.compileUI=compileUI;
         this.compileDocument=compileDocument;
-        // this.initCls=initCls;
+        this.replaceCls=replaceCls;
         this.initHTML=initHTML;
         this.ui=new UI();
         this.jsScript=newHashObject('JSHash');
@@ -3935,6 +4156,8 @@ var turtle,$t;
         this.url="";
         this.catch=_catch;
         this.paramFilter=paramFilter;
+        this.locStorage=locStorage;
+        this.isCompile=false;
     }
     Turtle.prototype=fn;
     turtle=$t=new Turtle();
