@@ -729,7 +729,7 @@ style="display:inline-block;">
                 组件定义时可定义继承的组件（简单继承）
                     <ui:io><title>
 <style xmp ui="a">
-    (这里是a组件的内容)
+    (这里是a组件的内容:{text})
     <script>
         part.toString=function(){
             return 'a';
@@ -752,8 +752,8 @@ style="display:inline-block;">
 </style>
                     </title>
                     <title>
-<ui:b></ui:b><br>
-<ui:c></ui:c>
+<ui:b text='功夫茶猫'></ui:b><br>
+<ui:c text='功夫茶猫'></ui:c>
                     </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 组件编译 -->

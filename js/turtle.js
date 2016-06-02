@@ -2758,7 +2758,7 @@ var turtle,$t;
             }
             
             if(this.extends instanceof UITemplate){
-                var ext=this.extends.beExtends(uiNode,props);
+                var ext=this.extends.beExtends(uiNode,that,outerChildNodes,outerElement,props,part);
             }
             var html=this.joinDatasByProps(props);
             if(html===undefined){
