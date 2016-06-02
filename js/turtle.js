@@ -1917,6 +1917,7 @@ var turtle,$t;
                         initHTML(elem.childNodes,outerChildNodes,outerElement,props,part);
                         takeOutChildNodes(elem);
                         elem=null;
+                        replaceCls();
                     },delay);
                 }
             }
@@ -2308,7 +2309,7 @@ var turtle,$t;
         initHTML(node.childNodes,outerChildNodes,outerElement,props,part);
     }
     function parseAsync(node,outerChildNodes,outerElement,props,part){
-        var delay=parseInt(node.getAttribute('async'));
+        var delay=parseInt(execByScope(node,node.getAttribute('async')),null,outerChildNodes,outerElement,props,part);
         node.removeAttribute('async');
         var mark=document.createComment('async');
         replaceNodeByNode(node,mark);
@@ -2319,6 +2320,7 @@ var turtle,$t;
             replaceNodeByNode(mark,node);
             mark=null;
             initHTML([node],outerChildNodes,outerElement,props,part);
+            replaceCls();
         },delay);
     }
     var elementParser={
@@ -2591,7 +2593,7 @@ var turtle,$t;
         this.filter=filter;
         this.filterParam=filterParam;
     }
-    function UITemplate(name,sortPath,path,s){
+    function UITemplate(name,sortPath,path,s,ext){
         var t=this;
         
         t.name=name;
@@ -2612,6 +2614,13 @@ var turtle,$t;
             }else{
                 t.datas=s.datas;
             }
+            
+            if(!isObject(s.extends)){
+                t.extends=null;
+            }else{
+                t.extends=s.extends;
+            }
+            
             t.isJSDefine=true;
             
             if(isObject(s.service)){
@@ -2629,7 +2638,7 @@ var turtle,$t;
             t.datas=[];
             t.isJSDefine=false;
             t.service=new Service();
-            
+            t.extends=ext;
             var start=0;
             var idx=0;
             s.replace(memberRE,function(s0,name,s1,dft,s2,s3,limit,s4,s5,s6,filter,filterParam,index,sSource){
@@ -2656,6 +2665,7 @@ var turtle,$t;
         }
     }
     UITemplate.prototype={
+        /*调用render*/
         renderIn:function(elem,outerChildNodes,outerElement,props,part){
             if(!isArray(outerChildNodes)){
                 outerChildNodes=[];
@@ -2669,6 +2679,7 @@ var turtle,$t;
             }
             return this.render(uiNode,elem,outerChildNodes,outerElement,props,part);
         },
+        /*调用render*/
         renderBefore:function(elem,outerChildNodes,outerElement,props,part){
             if(!isArray(outerChildNodes)){
                 outerChildNodes=[];
@@ -2682,26 +2693,11 @@ var turtle,$t;
             }
             return this.render(uiNode,elem,outerChildNodes,outerElement,props,part);
         },
-        render:function(uiNode,that,outerChildNodes,outerElement,props,part){
-            var d=slice.call(this.datas);
-            var err=[];
-            if(!uiNode){
-                uiNode=document.createElement("ui:render");
-            }
-            setQuestionAtrr(uiNode,outerChildNodes,outerElement,props,part);
+        /*由props构建html字符串*/
+        joinDatasByProps:function(props){
             
-            if(!isObject(props)){
-                props={};
-            }
-            var attrs=uiNode.attributes;
-            var len=attrs.length;
-            for(var i=0;i<len;i++){
-                var name=attrs[0].name;
-                if(!props.hasOwnProperty(name)){
-                    props[name]=attrs[0].value;    
-                }
-                uiNode.removeAttributeNode(attrs[0]);
-            }
+            var err=[];
+            var d=slice.call(this.datas);
             for(var i=0;i<d.length-1;i+=2){
                 var v;
                 var p=this.params[i/2];
@@ -2726,11 +2722,49 @@ var turtle,$t;
                 if($t.config.debugMode==2){
                     alert(err.join('\r\n'));
                 }
-                console.log(err.join('\r\n'));
-                debugger;
+                log(err.join('\r\n'));
+                bp();
                 return;
             }
-            var part=newPart(this,uiNode,execTemplateScript(d.join(''),that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part)
+            return d.join('');
+        },
+        /*变成别人的扩展*/
+        beExtends:function(uiNode,that,outerChildNodes,outerElement,props,part){
+            if(this.extends instanceof UITemplate){
+                var ext=this.extends.beExtends(uiNode,that,outerChildNodes,outerElement,props,part);
+            }
+            var html;
+            html=this.joinDatasByProps(props);
+            return newExtentsPart(this,uiNode,ext,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part);
+        },
+        /*渲染dom*/
+        render:function(uiNode,that,outerChildNodes,outerElement,props,part){
+            if(!uiNode){
+                uiNode=document.createElement("ui:render");
+            }
+            setQuestionAtrr(uiNode,outerChildNodes,outerElement,props,part);
+            
+            if(!isObject(props)){
+                props={};
+            }
+            var attrs=uiNode.attributes;
+            var len=attrs.length;
+            for(var i=0;i<len;i++){
+                var name=attrs[0].name;
+                if(!props.hasOwnProperty(name)){
+                    props[name]=attrs[0].value;    
+                }
+                uiNode.removeAttributeNode(attrs[0]);
+            }
+            
+            if(this.extends instanceof UITemplate){
+                var ext=this.extends.beExtends(uiNode,props);
+            }
+            var html=this.joinDatasByProps(props);
+            if(html===undefined){
+                return;
+            }
+            var part=newPart(this,uiNode,ext,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part)
             this.parts.push(part);
             if(uiNode.parentNode!==null){
                 part.insertBefore(uiNode);
@@ -2770,9 +2804,37 @@ var turtle,$t;
             return s;
         }
     }
-    
-    function newPart(template,node,s,outerChildNodes,outerElement,props,part){
-        var t=newObject(template.partName,newPart.prototype);
+    function newExtentsPart(template,node,extPart,s,outerChildNodes,outerElement,props,part){
+        if(extPart){
+            var t=newObject(template.partName,extPart);
+        }else{
+            var t=newObject(template.partName,newPart.prototype);    
+        }
+        var name=template.name;
+        node.innerHTML=s;
+        t.template=template;
+        t.super=extPart;
+        var nodes=node.childNodes;
+        
+        initHTML(nodes,outerChildNodes,outerElement,props,t);
+        t.store=slice.call(nodes);
+        for(var i=nodes.length;i>0;i--){
+            node.removeChild(nodes[0]);
+        }
+        t.concat=function(arr){
+            if(t.super){
+                return t.super.concat(t.store).concat(arr);
+            }
+            return t.store.concat(arr);
+        }
+        return t;
+    }
+    function newPart(template,node,extPart,s,outerChildNodes,outerElement,props,part){
+        if(extPart){
+            var t=newObject(template.partName,extPart);
+        }else{
+            var t=newObject(template.partName,newPart.prototype);    
+        }
         var name=template.name;
         node.innerHTML=s;
         var begin=t.begin=document.createComment('<'+name+'>');
@@ -2784,15 +2846,21 @@ var turtle,$t;
         t.template=template;
         t.onInsert=null;
         t.isInsert=false;
+        t.super=extPart;
         var nodes=node.childNodes;
         
         initHTML(nodes,outerChildNodes,outerElement,props,t);
-        t.store=slice.call(nodes);
-        t.store.unshift(begin);
-        t.store.push(end);
+        
+        if(extPart){
+            t.store=extPart.concat(slice.call(nodes));
+        }else{
+            t.store=slice.call(nodes);
+        }
         for(var i=nodes.length;i>0;i--){
             node.removeChild(nodes[0]);
         }
+        t.store.unshift(begin);
+        t.store.push(end);
         return t;
     }
     newPart.prototype={
@@ -2969,20 +3037,30 @@ var turtle,$t;
     }
     function defineUIByNode(node){
         var name=getAttr(node,'ui');
+        var ext=getAttr(node,'extends',null);
+        if(isString(ext)){
+            if(!isObject($t.ui[ext])){
+                throwError('找不到可继承的模板：'+ext);
+            }else{
+                ext=$t.ui[ext];
+            }
+        }
         if(name){
-            $t.ui.define(name,'','',getTemplate(node));
+            $t.ui.define(name,'','',getTemplate(node),ext);
         }
         removeNode(node);
     }
     function parseUITemplate(uiName,uiSortPath,uiPath,template){
         var _uiMain=document.createElement('ui:parseUITemplate');
         _uiMain.innerHTML=template;
-        var cs=_uiMain.children;
-        var i=0;
-        var node;
-        var s;
-        var name;
-        var nodeName;
+        var 
+            cs=_uiMain.children,
+            i=0,
+            node,
+            s,
+            name,
+            nodeName,
+            ext;
         for(;i<cs.length;i++){
             node=cs[i];
             if(!isTemplate(node)){
@@ -2993,11 +3071,12 @@ var turtle,$t;
                 defineServiceByNode(node);
                 i--;
             }else{
-                s=getTemplate(node);
                 nodeName=node.getAttribute('ui');
                 if(!nodeName)nodeName=uiName;
                 if(!$t.ui.hasOwnProperty(nodeName)){
-                    $t.ui.define(nodeName,uiSortPath,uiPath,s);
+                    s=getTemplate(node);
+                    ext=getAttr(node,'extends');
+                    $t.ui.define(nodeName,uiSortPath,uiPath,s,ext);
                 }else{
                     alert('不能重复定义ui：'+nodeName);
                 }
@@ -3638,8 +3717,8 @@ var turtle,$t;
                     }
                 }
             },
-            define:function(name,sortPath,path,s){
-                this[name]=new UITemplate(name,sortPath,path,s);
+            define:function(name,sortPath,path,s,ext){
+                this[name]=new UITemplate(name,sortPath,path,s,ext);
                 this.emitOnDefine(name,this[name]);
                 return this[name];
             }
@@ -3764,7 +3843,7 @@ var turtle,$t;
         
         return script.outerHTML;
     }
-    function beforeReady(){
+    function aftertInit(){
         var 
             scriptNode=$t.turtleScriptElement=document.scripts[document.scripts.length-1],
             compile=getAttr(scriptNode,'compile',null),
@@ -3833,6 +3912,7 @@ var turtle,$t;
                     var c=b.children[0];
                     switch(compile){
                         case 'onlyBody':
+                        
                             html='<xmp><script>'+importScripts+'</script></xmp>'+html.match(/(<body[\s\S]*?>)([\s\S]*?)(<\/body>)/)[2];
                             break;
                     }
@@ -4158,9 +4238,10 @@ var turtle,$t;
         this.paramFilter=paramFilter;
         this.locStorage=locStorage;
         this.isCompile=false;
+        this.throwError=throwError;
     }
     Turtle.prototype=fn;
     turtle=$t=new Turtle();
-    beforeReady();
+    aftertInit();
     
 })();

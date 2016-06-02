@@ -726,6 +726,35 @@ style="display:inline-block;">
                 </ui:ahchorpanel>
                 <!-- 组件继承 -->
                 <ui:ahchorpanel>
+                组件定义时可定义继承的组件（简单继承）
+                    <ui:io><title>
+<style xmp ui="a">
+    (这里是a组件的内容)
+    <script>
+        part.toString=function(){
+            return 'a';
+        }
+    </script>
+</style>
+<!-- 继承a组件 -->
+<style xmp ui="b" extends='a'>
+    <script>
+        /*覆盖父组件函数*/
+        part.toString=function(){
+            return part.super.toString()+'b';
+        }
+    </script>
+    b.toString()='<!= part>'
+</style>
+<!-- 继承a组件 -->
+<style xmp ui="c" extends='a'>
+    c.toString()='<!= part>'
+</style>
+                    </title>
+                    <title>
+<ui:b></ui:b><br>
+<ui:c></ui:c>
+                    </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 组件编译 -->
                 <ui:ahchorpanel>
