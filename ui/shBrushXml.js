@@ -16,12 +16,12 @@
  */
 ;(function()
 {
-	// CommonJS
-	typeof(require) != 'undefined' ? SyntaxHighlighter = require('shCore').SyntaxHighlighter : null;
+    // CommonJS
+    typeof(require) != 'undefined' ? SyntaxHighlighter = require('shCore').SyntaxHighlighter : null;
 
-	function Brush()
-	{
-		function process(match, regexInfo)
+    function Brush()
+    {
+        function process(match, regexInfo)
         {
             var constructor = SyntaxHighlighter.Match,
                 code = match[0],
@@ -39,6 +39,7 @@
 
                 while ((attributes = regex.exec(code)) != null) 
                 {
+                    debugger;
                     result.push(new constructor(attributes.name, match.index + attributes.index, 'color1'));
                     result.push(new constructor(attributes.value, match.index + attributes.index + attributes[0].indexOf(attributes.value), 'string'));
                 }
@@ -73,7 +74,7 @@
             return result;
         }
         var commentRE=new XRegExp('(&lt;|<)!(--)?( *?)([\\s\\S]*?)( *?)\\2(&gt;|>)','gm');
-        var orderRE=new XRegExp('^( *?)(if|while|for|switch|break|\-|scope|content|bind|\!|var|\=|else if|else|case break|case|default|end)( *?)([\\s\\S]*)','gm');
+        var orderRE=new XRegExp('^( *?)(if|while|for|switch|break|async|\-|scope|content|bind|\!|var|\=|else if|else|case break|case|default|end)( *?)([\\s\\S]*)','gm');
         var noOrderRE=new XRegExp('(&lt;|<)!(--)?([\\s\\S]*?)\\2(&gt;|>)','gm');
         var constructor = SyntaxHighlighter.Match;
         function comment(match){
@@ -170,12 +171,12 @@
     
         
         
-		this.regexList = [
-		    { regex: noOrderRE,                                                                             func: comment },    // <! ... turtle order>
-			{ regex: new XRegExp('(\\&lt;|<)\\!\\[[\\w\\s]*?\\[(.|\\s)*?\\]\\](\\&gt;|>)', 'gm'),           css: 'color2' },    // <![ ... [ ... ]]>
-			{ regex: new XRegExp('(&lt;|<)[\\s\\/\\?]*(\\w+)(?<attributes>.*?)[\\s\\/\\?]*(&gt;|>)', 'sg'), func: process }
-		];
-		var getCodeLinesHtml=this.getCodeLinesHtml;
+        this.regexList = [
+            { regex: noOrderRE,                                                                             func: comment },    // <! ... turtle order>
+            { regex: new XRegExp('(\\&lt;|<)\\!\\[[\\w\\s]*?\\[(.|\\s)*?\\]\\](\\&gt;|>)', 'gm'),           css: 'color2' },    // <![ ... [ ... ]]>
+            { regex: new XRegExp('(&lt;|<)[\\s\\/\\?]*(\\w+)(?<attributes>.*?)[\\s\\/\\?]*(&gt;|>)', 'sg'), func: process }
+        ];
+        var getCodeLinesHtml=this.getCodeLinesHtml;
         var getLineNumbersHtml;
         this.getCodeLinesHtml=function(a,b){
             if(/^(&nbsp;)* *\n/.test(a)){
@@ -193,13 +194,13 @@
             }
             return getCodeLinesHtml.call(this,a,b);
         }
-	};
+    };
 
-	Brush.prototype	= new SyntaxHighlighter.Highlighter();
-	Brush.aliases	= ['xml', 'xhtml', 'xslt', 'html'];
+    Brush.prototype = new SyntaxHighlighter.Highlighter();
+    Brush.aliases   = ['xml', 'xhtml', 'xslt', 'html'];
 
-	SyntaxHighlighter.brushes.Xml = Brush;
+    SyntaxHighlighter.brushes.Xml = Brush;
 
-	// CommonJS
-	typeof(exports) != 'undefined' ? exports.Brush = Brush : null;
+    // CommonJS
+    typeof(exports) != 'undefined' ? exports.Brush = Brush : null;
 })();
