@@ -32,41 +32,71 @@
             if (match.attributes != null) 
             {
                 var attributes,
-                    regex = new XRegExp('(?<name> [\\w:\\-\\.]+)' +
-                                        '\\s*=\\s*' +
-                                        '(?<value> ".*?"|\'.*?\'|\\w+)',
+                    regex = new XRegExp('\\s(?<name>[\\w:\\-\\.]+)' +
+                                        '(?<eq> \\s*?=\\s*)?' +
+                                        '(?<quot>["\'])?'+
+                                        '(?<value>.*?)?'+
+                                        '(?<quot2>\\3)?(?:\\s|&gt;|>|\\\\)',
                                         'xg');
-
+                    
                 while ((attributes = regex.exec(code)) != null) 
                 {
-                    debugger;
-                    result.push(new constructor(attributes.name, match.index + attributes.index, 'color1'));
-                    result.push(new constructor(attributes.value, match.index + attributes.index + attributes[0].indexOf(attributes.value), 'string'));
+                    result.push(new constructor(attributes.name, match.index + attributes.index+1, 'color1'));
+                    if(attributes.eq&&attributes.value){
+                        result.push(new constructor(attributes.eq, match.index + attributes.index + attributes[0].indexOf(attributes.eq), 'keyword'));
+                        
+                        if(attributes.quot&&attributes.quot2){
+                            var idx=attributes[0].indexOf(attributes.quot);
+                            result.push(new constructor(attributes.quot, match.index + attributes.index + idx, 'quot'));
+                            result.push(new constructor(attributes.quot2, match.index + attributes.index + idx+1+attributes.value.length, 'quot'));
+                        }
+                        if(attributes.name==='style'){
+                            var styleregex=new XRegExp('(?<name>[\\w:\\-\\.]+)\\s*?:\\s*' +
+                                        '(?<value> .*?)\\s*'+
+                                        '(?<semicolon> (;|$))',
+                                        'xg');
+                            var styvalregex=new XRegExp('(?<value> .*?)'+
+                                        '(?<unit>(em|ex|ch|rem|vw|vh|vmax|vmin|cm|mm|q|in|pt|pc|px))',
+                                        'xg');
+                            var attrstyle;
+                            while ((attrstyle = styleregex.exec(attributes.value)) != null)
+                            {
+                                var idx=match.index+attributes.index+attributes[0].indexOf(attributes.value);
+                                result.push(new constructor(attrstyle.name, idx, 'string'));
+                                if(attrstyle.value){
+                                    var attr=styvalregex.exec(attrstyle.value);
+                                    result.push(new constructor(attrstyle.semicolon,  idx+attrstyle[0].indexOf(attrstyle.semicolon), 'keyword'));
+                                    idx=idx+attrstyle[0].indexOf(attrstyle.value);
+                                    if(attr&&attr.unit){
+                                        result.push(new constructor(attr.value,  idx, 'styleunit'));
+                                        result.push(new constructor(attr.unit,  idx+attr.value.length, 'string'));
+                                    }else{
+                                        result.push(new constructor(attrstyle.value, idx, 'stylevalue'));    
+                                    }
+                                    
+                                }    
+                            }
+                            
+                        }else{
+                            result.push(new constructor(attributes.value, match.index + attributes.index + attributes[0].indexOf(attributes.value), 'string2'));    
+                        }
+                        
+                    }
+                    
                 }
             }
-            // if(tag[1].length+tag[2].length!=tag[0].length){
-//                 
-                // result.push(
-                    // new constructor(match[1]+"/", match.index, 'anglebracket')
-                // );
-            // }else{
-//                 
-                // result.push(
-                    // new constructor(match[1], match.index, 'anglebracket')
-                // );
-            // }
-            // result.push(
-                // new constructor(match[4], match.index+tag[0].length-tag[0].lastIndexOf(match[4])-1, 'anglebracket')
-            // );
             if (tag != null){
                 if(tag.name==="title"){
                     result.push(
                         new constructor((new Array(match[0].length+1)).join(" "), match.index, 'comments')
                     );
                 }else{
-                    result.push(
-                        new constructor(tag.name, match.index + tag[0].indexOf(tag.name), 'keyword')
-                    );
+                    result.push(new constructor(match.left, match.index + match[0].indexOf(match.left), 'keyword'));
+                    result.push(new constructor(match.right, match.index + match[0].indexOf(match.right), 'keyword'));
+                    if(match.leftslash){
+                        result.push(new constructor(match.leftslash, match.index + match[0].indexOf(match.leftslash), 'keyword2'));    
+                    }
+                    result.push(new constructor(tag.name, match.index + tag[0].indexOf(tag.name), 'keyword2'));
                 }
             }
                 
@@ -76,6 +106,7 @@
         var commentRE=new XRegExp('(&lt;|<)!(--)?( *?)([\\s\\S]*?)( *?)\\2(&gt;|>)','gm');
         var orderRE=new XRegExp('^( *?)(if|while|for|switch|break|async|\-|scope|content|bind|\!|var|\=|else if|else|case break|case|default|end)( *?)([\\s\\S]*)','gm');
         var noOrderRE=new XRegExp('(&lt;|<)!(--)?([\\s\\S]*?)\\2(&gt;|>)','gm');
+
         var constructor = SyntaxHighlighter.Match;
         function comment(match){
             var commentMatch=commentRE.exec(match[0]);
@@ -174,7 +205,7 @@
         this.regexList = [
             { regex: noOrderRE,                                                                             func: comment },    // <! ... turtle order>
             { regex: new XRegExp('(\\&lt;|<)\\!\\[[\\w\\s]*?\\[(.|\\s)*?\\]\\](\\&gt;|>)', 'gm'),           css: 'color2' },    // <![ ... [ ... ]]>
-            { regex: new XRegExp('(&lt;|<)[\\s\\/\\?]*(\\w+)(?<attributes>.*?)[\\s\\/\\?]*(&gt;|>)', 'sg'), func: process }
+            { regex: new XRegExp('(?<left>&lt;|<)(?<leftslash>\\/)?(\\w+)(?<attributes>.*?)[\\s\\/\\?]*(?<right>&gt;|>)', 'sg'), func: process }
         ];
         var getCodeLinesHtml=this.getCodeLinesHtml;
         var getLineNumbersHtml;
