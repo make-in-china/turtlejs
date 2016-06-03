@@ -4,7 +4,6 @@
     <title>教程</title>
     <meta charset="utf-8">
     <meta name="description" content="Turtlejs : make it for fun">
-    <meta name="viewport" content="target-densitydpi=device-dpi,width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" href="../css/turtle.min.css">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
@@ -12,7 +11,7 @@
     
     <script extend="1" baseUIPath="{name:'ui',path:'../ui'};{name:'app',path:'../uiAPP'}" src="../js/turtle.js"></script>
   </head>
-  <body class='scrolly'>
+  <body style="min-width:600px;overflow:scroll;">
     <xmp ui="io2">
         <a ref="try" href="javascript:;">试一试<br></a>
         <div ref="runbox" class="uhide">
@@ -83,7 +82,7 @@
         </a>
         <!! $t.refs.ahchorbox[0].appendChild($t.refs.ahchor.last())>
         <a name="{title}"></a>
-        <div class="ipdip10">
+        <div class="ipdip10 " >
             <span class="fz24 fb"><!= $t.refs.ahchor.length>.{title}</span>
             <span class="fz18" style="display:inline-block;">
                 <! if 1<$t.refs.ahchor.length>
