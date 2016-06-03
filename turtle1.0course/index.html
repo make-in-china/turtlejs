@@ -78,16 +78,30 @@
         </script>
     </xmp>
     <xmp ui="ahchorpanel">
-        <a : name:="ahchor++;$t.refs.ahchor[ahchor].getAttribute('href').slice(1)"></a>
-        <div class="imdip10 fb">
-            <span class="fz24"><!= $t.refs.ahchor[ahchor].innerHTML></span>
-            
-            <! if ahchor<$t.refs.ahchor.length-1>
-            <a : href:="$t.refs.ahchor[ahchor+1].getAttribute('href')">下一个( <!= $t.refs.ahchor[ahchor+1].innerHTML>)</a>
-            <! end>
-            <! if 0<ahchor>
-            <a : href:="$t.refs.ahchor[ahchor-1].getAttribute('href')">上一个( <!= $t.refs.ahchor[ahchor-1].innerHTML>)</a>
-            <! end>
+        <a class="fz18" ref="ahchor" : href="#{title}" :style.display="g.width|v>800?'block':'inline-block'" style="width:10em;padding:5px 0;cursor:pointer;color:#3B77B8 !important;">
+            <!= $t.refs.ahchor.length>.{title}
+        </a>
+        <!! $t.refs.ahchorbox[0].appendChild($t.refs.ahchor.last())>
+        <a name="{title}"></a>
+        <div class="ipdip10">
+            <span class="fz24 fb"><!= $t.refs.ahchor.length>.{title}</span>
+            <span class="fz18" style="display:inline-block;">
+                <! if 1<$t.refs.ahchor.length>
+                    <a : href:="$t.refs.ahchor[$t.refs.ahchor.length-2].href" style="display:block;">
+                                                上一章节:<!= $t.refs.ahchor[$t.refs.ahchor.length-2].innerHTML>
+                    </a>
+                <! end>
+                <a ref='next' class='uhide'></a>
+                <script>
+                    part.nextLink=$t.refs.next.pop();
+                    if($t.refs.ahchor.length>1){
+                        var prevNext=part.template.parts.last().nextLink;
+                        prevNext.href="#{title}";
+                        prevNext.innerHTML="下一章节：{title}";
+                        $t.removeClass(prevNext,'uhide');
+                    }
+                </script>
+            </span>
         </div>
         <div style="margin-left:40px;padding-bottom:50px;padding-top:10px;"><!content></div>
     </xmp>
@@ -99,39 +113,10 @@
         <app:content>
             <!! window.addEventListener('resize',function(){g.width=document.documentElement.clientWidth;})>
             <div : :style.width="g.width|v>800?'150px':''" style="float:left;min-height:30px;z-index:2;" >
-                <div style="line-height: 120%;padding-left:10px;padding-top:10px;" class="fz14 fb">
-                    <!var ahchor:1>
-                    <set class="fz18" ref="ahchor" : href:="'#ahchor'+ahchor" :style.display="g.width|v>800?'block':'inline-block'" style="width:10em;padding:5px 0;cursor:pointer;color:#3B77B8 !important;">
-                        <a><!= ahchor++>.简介</a>
-                        <a><!= ahchor++>.渲染</a>
-                        <a><!= ahchor++>.命令系统</a>
-                        <a><!= ahchor++>.异步渲染</a>
-                        <a><!= ahchor++>.作用域和变量</a>
-                        <a><!= ahchor++>.分支命令If</a>
-                        <a><!= ahchor++>.分支命令Switch</a>
-                        <a><!= ahchor++>.循环命令While</a>
-                        <a><!= ahchor++>.循环命令For</a>
-                        <a><!= ahchor++>.循环命令For in</a>
-                        <a><!= ahchor++>.脚本运算</a>
-                        <a><!= ahchor++>.标签双向绑定</a>
-                        <a><!= ahchor++>.标签运算和绑定</a>
-                        <a><!= ahchor++>.深层运算和绑定</a>
-                        <a><!= ahchor++>.文本绑定</a>
-                        <a><!= ahchor++>.更多绑定示例</a>
-                        <a><!= ahchor++>.get标签</a>
-                        <a><!= ahchor++>.set标签</a>
-                        <a><!= ahchor++>.服务</a>
-                        <a><!= ahchor++>.组件</a>
-                        <a><!= ahchor++>.组件数据</a>
-                        <a><!= ahchor++>.组件执行上下文</a>
-                        <a><!= ahchor++>.组件交互</a>
-                        <a><!= ahchor++>.组件层次</a>
-                        <a><!= ahchor++>.组件继承</a>
-                        <a><!= ahchor++>.组件编译</a>
-                    </set>
+                <div ref="ahchorbox" style="line-height: 120%;padding-left:10px;padding-top:10px;" class="fz14 fb">
+
                 </div>
             </div>
-            <!! ahchor=-1>
             <div style="float:left;min-width:300px;max-width:650px;padding-bottom: 30px;">
                 
                 <div style="padding: 20px;">
@@ -140,11 +125,11 @@
                 </div>
                 
                 
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="简介">
                     最终目标：网页通过拖拽组件完成框架（框架），通过选择样式和特性完成个性化（界面），扩展事件完成业务流（交互）
                 </ui:ahchorpanel>
                 <!-- 渲染如何生效和生效范围 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="开始turtle">
        turtle的渲染默认从模板标签开始。<br>
        1.什么是模板标签？
                 <ui:io try="false"><title>
@@ -154,7 +139,7 @@
                 </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 命令说明 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="命令系统">
                     直接在html里加上编程语法会怎样呢？尝试过后，本库的命令系统诞生了。
                 <ui:io run="false"><title>
 <!if true>
@@ -189,7 +174,7 @@
                 （强烈推荐）
                 </ui:ahchorpanel>
                 <!-- 异步渲染 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="异步渲染">
                     异步渲染有2种方式：<br>
                     1:async命令块<br>
                     2:async节点属性<br>
@@ -216,7 +201,7 @@
                 </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 作用域和变量 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="作用域和变量">
                                                             作用域的语法为：<br>
                     scope 名字<br>
                                                             或 <br>
@@ -238,8 +223,8 @@ A域可访问(x=<!= x>,y=<!= y>)
 </title>
                 </title></ui:io>
                 </ui:ahchorpanel>
-                
-                <ui:ahchorpanel>
+                <!-- 分支命令if -->
+                <ui:ahchorpanel title="分支命令If">
                     if的语法为：<br>
                     if xxx<br>
                     ...<br>
@@ -269,8 +254,8 @@ A域可访问(x=<!= x>,y=<!= y>)
 <!end>
                 </title></ui:io>
                 </ui:ahchorpanel>
-                
-                <ui:ahchorpanel>
+                <!-- 分支命令switch -->
+                <ui:ahchorpanel title="分支命令Switch">
                     switch的语法为：<br>
                     switch xxx<br>
                     case xxx<br>
@@ -301,8 +286,8 @@ A域可访问(x=<!= x>,y=<!= y>)
 <!end>
                 </title></ui:io>
                 </ui:ahchorpanel>
-                
-                <ui:ahchorpanel>
+                <!-- 循环命令 -->
+                <ui:ahchorpanel title="循环命令While">
                     while的语法为：<br>
                     while xxx<br>
                     ...<br>
@@ -322,7 +307,7 @@ A域可访问(x=<!= x>,y=<!= y>)
                 </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- for -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="循环命令For">
                     for的语法为：<br>
                     for xxx;xxx;xxx<br>
                     ...<br>
@@ -340,7 +325,7 @@ A域可访问(x=<!= x>,y=<!= y>)
                 </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- for in -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="循环命令For in">
                 
                     for的语法为：<br>
                     for xxx in xxx<br>
@@ -361,8 +346,7 @@ A域可访问(x=<!= x>,y=<!= y>)
 <!end>
                 </title></ui:io>
                 </ui:ahchorpanel>
-                <!-- != -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="脚本运算">
                     无返回的语法为：<br>! xxx<br>
                     有返回的语法为：<br>= xxx<br>
                     注:xxx表示任意js语句;<br>
@@ -374,7 +358,7 @@ A域可访问(x=<!= x>,y=<!= y>)
                 </ui:ahchorpanel>
                 
                 <!-- 标签双向绑定 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="标签双向绑定">
                 标签绑定（双向绑定）的语法为：<br>
                     bind="scope变量名"<br>
                     <ui:io><title>
@@ -386,7 +370,7 @@ A域可访问(x=<!= x>,y=<!= y>)
                 </ui:ahchorpanel>
                 
                 <!-- 标签运算和绑定-->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="标签运算和绑定">
                 标签运算的语法为：<br>&lt;div :>启动运算（不写冒号则表示不检测标签内的运算）<br>
                 &lt;div :="xxx">启动并运算
                     &lt;div : 属性名:="xxx">运算xxx并返回值到属性名
@@ -412,7 +396,7 @@ A域可访问(x=<!= x>,y=<!= y>)
                     </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 深层运算和绑定 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="深层运算和绑定">
                                                            深层运算的语法为：<br>
                     属性.属性.属性:="scope变量名"<br><br>
                     驼峰语法为<br>
@@ -432,7 +416,7 @@ style="display:inline-block;">
                 </ui:ahchorpanel>
                 
                 <!-- 文本绑定 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="文本绑定">
                                                             绑定（单向绑定）的语法为：<br>
                     - 名字<br>
                                                             或 <br>
@@ -446,7 +430,7 @@ style="display:inline-block;">
                     </title></ui:io>
                 </ui:ahchorpanel>
                 
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="更多绑定示例">
                     注：这里使用了temlline组件，这是一个页面临时组件（后面章节讲解组件）<br>
                     此例还用到了本库的class样式，这也是本库一个特色，后面会进行讲解。
                     <ui:io><title>
@@ -522,7 +506,7 @@ style="display:inline-block;">
                 </ui:ahchorpanel>
                 
                 <!-- get -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="get标签">
                     get标签是内置标签<br>
                     get标签支持的属性为：name<br>
                     get会移除自身，并放置到turtle.getNode[name]下<br>
@@ -541,7 +525,7 @@ style="display:inline-block;">
                     </title></ui:io>
                     </ui:ahchorpanel>
                     <!-- set -->
-                    <ui:ahchorpanel>
+                    <ui:ahchorpanel title="set标签">
                     set标签也是内置标签<br>
                     set标签可包围多个DOM元素或不包围任何DOM元素（<set></set>）<br>
                     <b>1.</b>当包围多个DOM元素时：<br>
@@ -612,7 +596,7 @@ style="display:inline-block;">
                     
                 </ui:ahchorpanel>
                 <!-- 服务 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="服务">
                                                             服务来源有4个：HTML片断，js写入，未编译的组件文件，编译后的服务js<br>
                                                             服务分类有全局服务和组件服务
                     <ui:io><title>
@@ -643,7 +627,7 @@ style="display:inline-block;">
                             
                 </ui:ahchorpanel>
                 <!-- 组件 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="组件">
                     组件来源有4个：HTML片断，js写入，未编译的UI文件，编译后的组件js<br>
                     1.HTML片断：<br>
                     在页面文件&lt;body>内模板标签外任意位置使用以下语法定义内置组件<br>
@@ -692,7 +676,7 @@ style="display:inline-block;">
                     </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 组件数据 props-->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="组件数据">
                 
                     <ui:io><title>
 <style xmp ui="people">
@@ -716,16 +700,16 @@ style="display:inline-block;">
                 
                 </ui:ahchorpanel>
                 <!-- 组件执行上下文 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="组件执行上下文">
                 </ui:ahchorpanel>
                 <!-- 组件交互 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="组件交互">
                 </ui:ahchorpanel>
                 <!-- 组件层次 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="组件层次">
                 </ui:ahchorpanel>
                 <!-- 组件继承 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="组件继承">
                 组件定义时可定义继承的组件（简单继承）
                     <ui:io><title>
 <style xmp ui="a">
@@ -757,7 +741,7 @@ style="display:inline-block;">
                     </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 组件编译 -->
-                <ui:ahchorpanel>
+                <ui:ahchorpanel title="组件编译">
                 </ui:ahchorpanel>
             </div>
         </app:content>

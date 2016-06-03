@@ -39,6 +39,9 @@ var turtle,$t;
             return format;
         }
     })();
+    function last(){
+        return this[this.length-1];
+    }
     if (!("classList" in document.documentElement)) {
         Object.defineProperty(HTMLElement.prototype, 'classList', {
             get: function() {
@@ -2595,13 +2598,11 @@ var turtle,$t;
     }
     function UITemplate(name,sortPath,path,s,ext){
         var t=this;
-        
         t.name=name;
         t.sortPath=sortPath;
         t.path=path;
         t.partName=t.name.replace(/[\.]/g,"_");
-        t.parts=[];
-        
+        (t.parts=[]).last=last;
         if(isObject(s)){
             if(!isArray(s.params)){
                 t.params=[];    
@@ -3815,7 +3816,7 @@ var turtle,$t;
     newKeyArrayObject.prototype={
         push:function(key,node){
             if(!this.hasOwnProperty(key)){
-                this[key]=[];
+                (this[key]=[]).last=last;
             }
             this[key].push(node);
         },
