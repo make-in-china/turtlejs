@@ -1,5 +1,7 @@
 
-var turtle,$t;
+var turtle,$t,
+    $rootScope,
+    $client;
 (function(){
     var 
         arrayPrototype      = Array.prototype,
@@ -636,7 +638,6 @@ var turtle,$t;
                     return _value.call(this, value);
                 };
                 newProperty.set=function(newValue) {
-                    // if(value == newValue)return;
                     value = newValue;
                     _value.call(this, value);
                     fnOnSet.call(obj,name);
@@ -646,7 +647,6 @@ var turtle,$t;
                     return _value;
                 };
                 newProperty.set=function(newValue) {
-                    // if(_value == newValue)return;
                     _value = newValue;
                     fnOnSet.call(obj,name);
                 };
@@ -1461,10 +1461,11 @@ var turtle,$t;
         }
     }
     function _getBindObject(scope,name){
-        var length=name.length;
+        'use strict'
+        var i,obj,length=name.length;;
         while(scope){
-            var obj=scope;
-            for(var i=0;i<length;i++){
+            obj=scope;
+            for(i=0;i<length;i++){
                 if(obj.hasOwnProperty(name[i])){
                     if(i<length-1){
                         obj=obj[name[i]];
@@ -1475,6 +1476,20 @@ var turtle,$t;
                 }
             }   
             scope=scope.__parent__;
+        }
+        
+        obj=window[name[0]];
+        if(obj){
+            for(i=1;i<length;i++){
+                if(obj.hasOwnProperty(name[i])){
+                    if(i<length-1){
+                        obj=obj[name[i]];
+                        continue;
+                    }else{
+                        return obj;    
+                    }
+                }
+            }
         }
         return null;
     }
@@ -1551,6 +1566,10 @@ var turtle,$t;
         name=bindVar[bindVar.length-1];
         scope=$t.uiScope.get(node);
         obj=_getBindObject(scope,bindVar);
+        if(obj===null){
+            throwError('不能获取绑定属性:'+cdtn[0]);
+            return;
+        }
         exp=function(v){
             try{
                 return _execExpressionsByScope.call(scope,cdtn[1],v,node);
@@ -1588,6 +1607,10 @@ var turtle,$t;
         name=bindVar[bindVar.length-1];
         scope=$t.uiScope.get(node);
         obj=_getBindObject(scope,bindVar);
+        if(obj===null){
+            throwError('不能获取绑定属性:'+cdtn[0]);
+            return;
+        }
         if(cdtn.length==2){
             exp=function(v){
                 obj2[name2]=execNodeValueEval(v,node,cdtn[1]);
@@ -1618,7 +1641,10 @@ var turtle,$t;
         }else{
             obj=_getBindObject(scope,[name]);
         }
-        if(!obj)return;
+        if(obj===null){
+            throwError('不能获取绑定属性:'+cdtn[0]);
+            return;
+        }
         
         if(cdtn.length==2){
             exp=function(v){
@@ -1649,7 +1675,10 @@ var turtle,$t;
         }else{
             obj=_getBindObject(scope,[name]);
         }
-        if(!obj)return;
+        if(obj===null){
+            throwError('不能获取绑定属性:'+cdtn[0]);
+            return;
+        }
         
         if(cdtn.length==2){
             exp=function(v){
@@ -3594,12 +3623,63 @@ var turtle,$t;
             scopeParent[name]=this;
         }
     }
+    function Client(){
+        'use strict'
+        var data={};
+        var isListen=false;
+        var events=[];
+        var t=this;
+        function emit(){
+            'use strict'
+            for(var i=0;i<events.length;i++){
+                events[i]();
+            }
+        }
+        function setSizeProperty(name,fn){
+            'use strict'
+            data[name]=undefined;
+            t[name]=function(v){
+                'use strict'
+                /*此属性用于被绑定*/
+                if(data[name]===undefined&&t.__bind__){
+                    if(isListen===false){
+                        isListen=true;
+                        window.addEventListener('resize',emit);
+                    }
+                    var bind=t.__bind__;
+                    var getV=function(){
+                        t[name]=fn();
+                    }
+                    data[name]=fn();
+                    events.push(getV);
+                }
+                if(v){
+                    data[name]=v;
+                }
+                return data[name];
+            }
+        }
+        setSizeProperty('width',function(){'use strict'
+            return document.documentElement.clientWidth;});
+        setSizeProperty('height',function(){'use strict'
+            return document.documentElement.clientHeight;});
+        
+        setSizeProperty('left',function(){'use strict'
+            return document.documentElement.clientLeft;});
+        setSizeProperty('top',function(){'use strict'
+            return document.documentElement.clientTop;});
+            
+        setSizeProperty('right',function(){'use strict'
+            return document.documentElement.clientLeft+document.documentElement.clientWidth;});
+        setSizeProperty('bottom',function(){'use strict'
+            return document.documentElement.clientTop+document.documentElement.clientHeight;});
+        
+    }
     function RootScope(){
         this.__actionNode__=document.documentElement;
         this.__children__=[];
         lockObject2(this);
         document.scope=this;
-        window.$rootScope=this;
     }
     function UIScope(){}
     UIScope.prototype={
@@ -3624,7 +3704,7 @@ var turtle,$t;
             }
             return $rootScope;
         },
-        stack:[new RootScope()],
+        stack:[$rootScope],
         cut:function(scope){
             var p=scope.__parent__;
             scope.__parent__=null;
@@ -4240,9 +4320,12 @@ var turtle,$t;
         this.locStorage=locStorage;
         this.isCompile=false;
         this.throwError=throwError;
+        
     }
     Turtle.prototype=fn;
     turtle=$t=new Turtle();
+    $rootScope=new RootScope();
+    $client=new Client();
     aftertInit();
     
 })();
