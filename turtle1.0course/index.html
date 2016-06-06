@@ -88,7 +88,7 @@
             <span class="fz18" style="display:inline-block;">
                 <! if 1<$t.refs.ahchor.length>
                     <a : href:="$t.refs.ahchor[$t.refs.ahchor.length-2].href" style="display:block;">
-                                                上一章节:<!= $t.refs.ahchor[$t.refs.ahchor.length-2].innerHTML>
+                                                上一章节：<!= part.template.parts.last().props.title>
                     </a>
                 <! end>
                 <a ref='next' class='uhide'></a>
@@ -540,13 +540,13 @@ style="display:inline-block;">
     <div><div><!content></div></div>
 </style>
                     </title><title>
-<set append style="background-color:#00f;border:1px #FFFFFF solid">
+<set append style="background-image: url(123/一二三/xx.png);background-color:#00f ; border:1px #FFFFFF solid;">
     <set lazy style="display:block;">
         <ui:testset>1</ui:testset>
         可获得颜色，display:block;没被替换
     </set>
 </set>
-<set style="background-color:#00f;border:1px #FFFFFF solid;">
+<set style="background-color:#00f ; border:1px #FFFFFF solid;">
     <set lazy style="display:block;">
         <ui:testset>1</ui:testset>
         可获得颜色，display:block;被替换
@@ -699,16 +699,14 @@ style="display:inline-block;">
                 </ui:ahchorpanel>
                 <!-- 组件交互 -->
                 <ui:ahchorpanel title="组件交互">
-                </ui:ahchorpanel>
-                <!-- 组件层次 -->
-                <ui:ahchorpanel title="组件层次">
+                组件的访问路径有
                 </ui:ahchorpanel>
                 <!-- 组件继承 -->
                 <ui:ahchorpanel title="组件继承">
                 组件定义时可定义继承的组件（简单继承）
                     <ui:io><title>
 <style xmp ui="a">
-    (这里是a组件的内容:{text})
+    (这里是a组件的内容：{text})
     <script>
         part.toString=function(){
             return 'a';
@@ -720,20 +718,50 @@ style="display:inline-block;">
     <script>
         /*覆盖父组件函数*/
         part.toString=function(){
-            return part.super.toString()+'b';
+            return part.super.toString()+'b (修改了toString)';
         }
     </script>
     b.toString()='<!= part>'
 </style>
 <!-- 继承a组件 -->
 <style xmp ui="c" extends='a'>
+    <script>
+        part.super.store[0].data='(修改了界面：'+props.text+')';
+    </script>
     c.toString()='<!= part>'
 </style>
                     </title>
                     <title>
+<ui:a text='功夫茶猫'></ui:a><br>
 <ui:b text='功夫茶猫'></ui:b><br>
 <ui:c text='功夫茶猫'></ui:c>
                     </title></ui:io>
+                </ui:ahchorpanel>
+                <!-- 组件层次 -->
+                <ui:ahchorpanel title="组件层次/树">
+                组件之间的关系可以描述为一棵倒立的树，但区别于react这种框架的是，不要求页面全组件
+                    <ui:io><title>
+<style xmp ui="a">
+    <div>{text}<!content></div>
+</style>
+<style xmp ui="b" extends='a'></style>
+<style xmp ui="c" extends='a'></style>
+                    </title>
+                    <title>
+<div class="hem10">
+<ui:a text='a'>
+    <ui:b text='b'>
+        <ui:c text='c'>功夫茶猫</ui:c>
+    </ui:b>
+</ui:a>
+<!async>
+<!-- 渲染过程中dom不存在任何组件，所以这里异步读取组件树 -->
+组件树结构如下
+<textarea class="w90 hem5" 
+:="node.innerHTML=$t.rootParts.treeDiagram"></textarea>
+<!end>
+</div>
+</title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 组件编译 -->
                 <ui:ahchorpanel title="组件编译">

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
   <head>
-    <title></title>
+    <title>教程</title>
     <meta charset="utf-8">
     <meta name="description" content="Turtlejs : make it for fun">
     <meta name="viewport" content="target-densitydpi=device-dpi,width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -9,19 +9,17 @@
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" media="screen" href="../stylesheets/stylesheet.css">
-    <title>Turtlejs</title>
-    <script baseUIPath="../ui,../uiAPP" src="../js/turtle.js">
-        $t.extend(window,$t.fn);
-    </script>
+    
+    <script extend="1" baseUIPath="{name:'ui',path:'../ui'};{name:'app',path:'../uiAPP'}" src="../js/turtle.js"></script>
   </head>
-  <body class='scrolly'>
+  <body style="overflow:scroll;">
     
     <xmp>
-        <ui:top2></ui:top2>
-        <ui:content>
+        <app:top2></app:top2>
+        <app:content>
             未完成
-        </ui:content>
-        <ui:bottom></ui:bottom>
+        </app:content>
+        <app:bottom></app:bottom>
     </xmp>
   </body>
 </html>
