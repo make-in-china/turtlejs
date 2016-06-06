@@ -16,7 +16,6 @@
  */
 ;(function()
 {
-    // CommonJS
     typeof(require) != 'undefined' ? SyntaxHighlighter = require('shCore').SyntaxHighlighter : null;
 
     function Brush()
@@ -28,13 +27,11 @@
         var keywords =  'break case catch continue ' +
                         'default delete do else ' +
                         'for if in instanceof ' +
-                        'new return switch ' +
-                        'try typeof ' +
-                        'while with debugger'
+                        'new return switch try typeof ' +
+                        'while with debugger Object Array'
                         ;
-        var keywords2 = 'var function console true false';
-        var keywords3 = '\\$t null this throw part super turtle';
-                        
+        var keywords2 = 'var function true false';
+        var keywords3 = 'null this throw';
         var keywordsRE=new RegExp(this.getKeywords(keywords), 'gm');
         var keywords2RE=new RegExp(this.getKeywords(keywords2), 'gm');
         var keywords3RE=new RegExp(this.getKeywords(keywords3), 'gm');
@@ -94,29 +91,55 @@
                         if(attributes.name==='style'){
                             var styleregex=new XRegExp('(?<name>[\\w:\\-\\.]+)\\s*?:\\s*' +
                                         '(?<value> .*?)\\s*'+
-                                        '(?<semicolon> (;|$))',
+                                        '(?<semicolon> (;\\s*|\\s*$))',
                                         'xg');
-                            var styvalregex=new XRegExp('(?<value> .*?)'+
-                                        '(?<unit>(em|ex|ch|rem|vw|vh|vmax|vmin|cm|mm|q|in|pt|pc|px))\\s+(\\s+|$)',
-                                        'xg');
+                            var styvalregex=new XRegExp(
+'(?<value>\\d+)(?<unit>em|ex|ch|rem|vw|vh|vmax|vmin|cm|mm|q|in|pt|pc|px)'+
+'(?:\\s+|$|,)','xg');
+                            var styvalregex2=new XRegExp(
+'(?<color>\\#[\\dabcdefABCDEF]{1,6})(?:\\s+|$|,)','xg');
+                            var styvalregex3=new XRegExp(
+'(^|\\s+)(?<value>[^\\d\\#\\s][^\\(\\)]+)(?:\\s+|$|,)','xg');
+                            var styvalregex4=new XRegExp(
+'(?<fn1>(url|rgba|hsb|rgb)\\()(?<fndata>[\\s\\w\\S\\W]*)?(?<fn2>\\))(?:\\s+|$|,)','xg');
                             var attrstyle;
+                            var idx=attrindex+attributes.index+attributes[0].indexOf(attributes.value);
+                            var idx2,idx3;
                             while ((attrstyle = styleregex.exec(attributes.value)) !== null)
                             {
-                                var idx=attrindex+attributes.index+attributes[0].indexOf(attributes.value);
                                 result.push(new constructor(attrstyle.name, idx, 'string'));
                                 if(attrstyle.value){
-                                    var attr=styvalregex.exec(attrstyle.value);
-                                    debugger;
-                                    result.push(new constructor(attrstyle.semicolon,  idx+attrstyle[0].indexOf(attrstyle.semicolon), 'keyword'));
-                                    idx=idx+attrstyle[0].indexOf(attrstyle.value);
-                                    if(attr&&attr.unit){
-                                        result.push(new constructor(attr.value,  idx, 'styleunit'));
-                                        result.push(new constructor(attr.unit,  idx+attr.value.length, 'string'));
-                                    }else{
-                                        result.push(new constructor(attrstyle.value, idx, 'stylevalue'));    
-                                    }
+                                    var attr;
+                                    result.push(new constructor(attrstyle.semicolon,idx+attrstyle[0].indexOf(attrstyle.semicolon), 'keyword'));
+                                    idx2=idx+attrstyle[0].indexOf(attrstyle.value);
                                     
+                                    idx3=idx2;
+                                    while((attr=styvalregex4.exec(attrstyle.value))!==null){
+                                        result.push(new constructor(attr.fn1, idx3+attr.input.indexOf(attr.fn1), 'keyword2'));
+                                        result.push(new constructor(attr.fn2, idx3+attr.input.indexOf(attr.fn2), 'keyword2'));
+                                        result.push(new constructor(attr.fndata, idx3+attr.input.indexOf(attr.fndata), 'string2'));
+                                        idx3+=attr[0].length;
+                                    }
+                                    idx3=idx2;
+                                    while((attr=styvalregex.exec(attrstyle.value))!==null){
+
+                                        result.push(new constructor(attr.value,  idx3, 'styleunit'));
+                                        result.push(new constructor(attr.unit,  idx3+attr.value.length, 'string'));
+  
+                                        idx3+=attr[0].length;
+                                    }
+                                    idx3=idx2;
+                                    while((attr=styvalregex2.exec(attrstyle.value))!==null){
+                                        result.push(new constructor(attr.color, idx3+attr.input.indexOf(attr.color), 'styleunit'));
+                                        idx3+=attr[0].length;
+                                    }
+                                    idx3=idx2;
+                                    while((attr=styvalregex3.exec(attrstyle.value))!==null){
+                                        result.push(new constructor(attr.value, idx3+attr.input.indexOf(attr.value), 'stylevalue'));
+                                        idx3+=attr[0].length;
+                                    }
                                 }    
+                                idx+=attrstyle[0].length;
                             }
                             
                         }else{
@@ -140,6 +163,9 @@
                     }
                     if(tag.uiname){
                         result.push(new constructor(tag.uiname, match.index + tag[0].indexOf(tag.uiname), 'uiname'));
+                        if (match.attributes !== null){
+                            result.shift();
+                        }
                     }
                     result.push(new constructor(tag.name, match.index + tag[0].indexOf(tag.name), 'keyword2'));
                 }
@@ -147,6 +173,13 @@
                 
 
             return result;
+        }
+        function keyword(match, regexInfo){
+            var idx=match.index;
+            if(match[0].length!==match[1].length){
+                idx++;
+            }
+            return [new constructor(match[1], idx , 'styleunit')];
         }
         var constructor = SyntaxHighlighter.Match;
         function comment(match){
@@ -227,11 +260,13 @@
             { regex: r.multiLineSingleQuotedString,                             css: 'string2' },            // single quoted strings
             { regex: r.singleLineCComments,                                     css: 'comments' },          // one line comments
             { regex: r.multiLineCComments,                                      css: 'comments' },          // multiline comments
-            { regex: /\s*#.*/gm,                                                css: 'preprocessor' },      // preprocessor tags like #region and #endregion
-            { regex: /\w+/g,                                                    css: 'scriptword' },            // keywords
+            { regex: /\s*#.*/gm,                                                css: 'preprocessor' },          // keywords
             { regex: keywordsRE,                                                css: 'string' },            // keywords
-            { regex: keywords2RE,                                               css: 'keyword2' },            // keywords
-            { regex: keywords3RE,                                               css: 'styleunit' },            // keywords
+            { regex: keywords2RE,                                               css: 'keyword2' },          // keywords
+            { regex: keywords3RE,                                               css: 'styleunit' },         // keywords
+            { regex: /(?:^|[^\w\.])(\$t\.\w+|console|part|super|turtle\.\w+)\b/g,func:keyword },       // keywords
+            { regex: /\b\d+\b/g,                                               css: 'styleunit' },       // keywords
+            
             
             { regex: /\={1,3}|\!|\{|\}|\(|\)|\[|\]|\.|\||\:|\?|&gt;|&lt;|;|,|\+|\-|\/|\*/g,          css: 'keyword2' }           // keywords
             ];
