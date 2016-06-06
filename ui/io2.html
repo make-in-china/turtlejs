@@ -1,0 +1,51 @@
+<xmp>
+    <a ref="try" href="javascript:;">试一试<br></a>
+    <div ref="runbox" class="uhide">
+        <textarea ref="script" class="fz18 w100 hem10 rdip5 pdip5" style="outline-width:0; resize:none;box-sizing:border-box;"></textarea>
+        <a ref="run" href="javascript:;">运行：</a>
+    </div>
+    <script>
+        var btnTry=$t.refs.try.pop();/*弹出注册*/
+        var script=$t.refs.script.pop();/*弹出注册*/
+        var run=$t.refs.run.pop();/*弹出注册*/
+        var runbox=$t.refs.runbox.pop();/*弹出注册*/
+        var isRun={run!true}.bool;
+        var isTry={try!true}.bool;
+        $t.renderBefore("highlightcode",'ui',btnTry,outerElement);
+        if(isRun){
+            var s="";
+            if(isTry){
+                btnTry.onclick=function(){
+                    $t.removeNode(btnTry);
+                    $t.removeNode(runbox);
+                    cpn.begin.parentNode.insertBefore(runbox,cpn.begin);
+                    removeClass(runbox,'uhide');
+                    script.value=s;
+                }
+            }
+            run.onclick=function(){
+                cpn.runHTML(script.value);
+            }
+            var cpn=$t.renderBefore("turtlesanbox","app",btnTry,null,null,
+            {src:"../blank.html"
+            ,turtlejspath:"js/turtle.js"});
+            cpn.ready.on(function(){
+                for(var i=0;i<outerElement.length;i++){
+                    var str=outerElement[i].innerText;
+                    var dfn=$t.templates.findByString(str);
+                    if(dfn){
+                        s+=dfn.join("\n");
+                    }else{
+                        s+='\n<xm'+'p>\n'+str+'\n</xm'+'p>';
+                    }
+                }
+                cpn.runHTML(s);
+            });
+            if(!isTry){
+                $t.removeNode(btnTry);
+            };
+        }else{
+            $t.removeNode(btnTry);
+        }
+    </script>
+</xmp>

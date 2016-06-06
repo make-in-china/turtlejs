@@ -13,70 +13,7 @@
     <script extend="1" baseUIPath="{name:'ui',path:'../ui'};{name:'app',path:'../uiAPP'}" src="../js/turtle.js"></script>
   </head>
   <body style="overflow:scroll;">
-    <xmp ui="io2">
-        <a ref="try" href="javascript:;">试一试<br></a>
-        <div ref="runbox" class="uhide">
-            <textarea ref="script" class="fz18 w100 hem10 rdip5 pdip5" style="outline-width:0; resize:none;box-sizing:border-box;"></textarea>
-            <a ref="run" href="javascript:;">运行：</a>
-        </div>
-        <script>
-            var btnTry=$t.refs.try.pop();/*弹出注册*/
-            var script=$t.refs.script.pop();/*弹出注册*/
-            var run=$t.refs.run.pop();/*弹出注册*/
-            var runbox=$t.refs.runbox.pop();/*弹出注册*/
-            var isRun={run!true}.bool;
-            var isTry={try!true}.bool;
-            $t.renderBefore("highlightcode",'ui',btnTry,outerElement);
-            if(isRun){
-                var s="";
-                if(isTry){
-                    btnTry.onclick=function(){
-                        $t.removeNode(btnTry);
-                        $t.removeNode(runbox);
-                        cpn.begin.parentNode.insertBefore(runbox,cpn.begin);
-                        removeClass(runbox,'uhide');
-                        script.value=s;
-                    }
-                }
-                run.onclick=function(){
-                    cpn.runHTML(script.value);
-                }
-                var cpn=$t.renderBefore("turtlesanbox","app",btnTry,null,null,
-                {src:"../blank.html"
-                ,turtlejspath:"js/turtle.js"});
-                cpn.ready.on(function(){
-                    for(var i=0;i<outerElement.length;i++){
-                        var str=outerElement[i].innerText;
-                        var dfn=$t.templates.findByString(str);
-                        if(dfn){
-                            s+=dfn.join("\n");
-                        }else{
-                            s+='\n<xm'+'p>\n'+str+'\n</xm'+'p>';
-                        }
-                    }
-                    cpn.runHTML(s);
-                });
-                if(!isTry){
-                    $t.removeNode(btnTry);
-                };
-            }else{
-                $t.removeNode(btnTry);
-            }
-        </script>
-    </xmp>
-    <xmp ui="io">
-        <div ref="loadding" class="uhide">加载中...</div>
-        <script>
-            var loadding=$t.refs.loadding.pop();
-            $t.readyByRenderDocument.on(function(){
-                $t.onViewOnce(loadding.parentNode,document.body,function(){
-                    $t.removeClass(loadding,"uhide");
-                    $t.renderBefore("io2",null,part.end,null,outerElement,part.props);
-                    $t.removeNode(loadding);
-                });
-            });
-        </script>
-    </xmp>
+    
     <xmp ui="ahchorpanel">
         <a class="fz18" ref="ahchor" : href="#{title}" :style.display="$client.width|v>800?'block':'inline-block'" style="width:10em;padding:5px 0;cursor:pointer;color:#3B77B8 !important;">
             <!= $t.refs.ahchor.length>.{title}

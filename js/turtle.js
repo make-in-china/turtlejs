@@ -28,11 +28,9 @@ var turtle,$t,
                 "q+" : Math.floor((d.getMonth() + 3) / 3), //quarter
                 "S" : d.getMilliseconds() //millisecond
             }
-
             if (/(y+)/.test(format)) {
                 format = format.replace(RegExp.$1, (d.getFullYear() + "").substr(4 - RegExp.$1.length));
             }
-
             for (var k in o) {
                 if (new RegExp("(" + k + ")").test(format)) {
                     format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
@@ -175,6 +173,27 @@ var turtle,$t,
     }else{
         lowercase = function(string) {return isString(string) ? string.toLowerCase() : string;};
         uppercase = function(string) {return isString(string) ? string.toUpperCase() : string;};
+    }
+    function sort(arr,key,fn){
+        var hash={};
+        for(var i in a){
+            var obj=a[i];
+            var keyv=fn?fn(obj[key]):obj[key];
+            if(hash[keyv]){
+                hash[keyv].push(obj);
+            }else{
+                hash[keyv]=[obj];
+            }
+        }
+        console.log(hash);
+        var newarr=[];
+        for(var i in hash){
+            var obj=hash[i];
+            for(var j in obj){
+                newarr.push(obj[j]);
+            }
+        }
+        return newarr;
     }
     function FatFunction(s){
         var condition=s.split('=>');
@@ -388,7 +407,6 @@ var turtle,$t,
         }
     }
     var locStorage=(function(){
-
         var storage = window.localStorage,
                 i=0,
                 len=0;
@@ -2768,7 +2786,7 @@ var turtle,$t,
             return newExtentsPart(this,uiNode,ext,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part);
         },
         /*渲染dom*/
-        render:function(uiNode,that,outerChildNodes,outerElement,props,part){
+        render:function(uiNode,that,outerChildNodes,outerElement,props,part,partName){
             if(!uiNode){
                 uiNode=document.createElement("ui:render");
             }
@@ -2794,7 +2812,7 @@ var turtle,$t,
             if(html===undefined){
                 return;
             }
-            var part=newPart(this,uiNode,ext,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part)
+            var part=newPart(this,uiNode,ext,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part,partName)
             this.parts.push(part);
             if(uiNode.parentNode!==null){
                 part.insertBefore(uiNode);
@@ -2859,11 +2877,15 @@ var turtle,$t,
         }
         return t;
     }
-    function newPart(template,node,extPart,s,outerChildNodes,outerElement,props,part){
+    function newPart(template,node,extPart,s,outerChildNodes,outerElement,props,part,partName){
         if(extPart){
             var t=newObject(template.partName,extPart);
         }else{
             var t=newObject(template.partName,newPart.prototype);    
+        }
+        
+        if(partName){
+            $t.parts.push(partName,t);    
         }
         var name=template.name;
         node.innerHTML=s;
@@ -3139,7 +3161,6 @@ var turtle,$t,
         }
         return $t.ui[uiName];
     }
-
     function parseUI(node,uiInfo,step,part){
         var ui=importUIHTML(uiInfo.name,uiInfo.sortPath);
         if (!ui) {
@@ -3147,12 +3168,16 @@ var turtle,$t,
             console.log(uiInfo.name + '组件不存在！');
             return;
         }
+        
+        var partName=node.getAttribute('partname');
+        node.removeAttribute('partname');
+        
         var outerChildNodes = slice.call(node.childNodes);
         var outerElement = slice.call(node.children);
         for(var i=node.childNodes.length;i>0;i--){
             node.removeChild(node.childNodes[0]);    
         }
-        var cpn=ui.render(node, node.parentNode,outerChildNodes,outerElement,null,part);
+        var cpn=ui.render(node, node.parentNode,outerChildNodes,outerElement,null,part,partName);
         if(cpn){
             step.next =cpn.elements.length;    
         }
@@ -3802,6 +3827,15 @@ var turtle,$t,
                 this[name]=new UITemplate(name,sortPath,path,s,ext);
                 this.emitOnDefine(name,this[name]);
                 return this[name];
+            },
+            toString:function(){
+                var list=[];
+                for(var i in this){
+                    if(this.hasOwnProperty(i)){
+                        list.push(i);    
+                    }
+                }
+                return list.join('\r\n');
             }
         }
     function Service(fns){
@@ -4291,6 +4325,7 @@ var turtle,$t,
         this.jsScript=newHashObject('JSHash');
         this.styleClasses=newKeyArrayObject("StyleClasses");
         this.refs=newKeyArrayObject("RefElements");
+        this.parts=newKeyArrayObject("Parts");
         this.clsNode=newArrayObject('ClassNode');
         this.getNode=newHashObject('GetNode');
         this.service=new Service();

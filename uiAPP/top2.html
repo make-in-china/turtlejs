@@ -27,7 +27,8 @@
                     </div>
                 </ui:growpanel>
                 
-                <ui:panel title="组件树"></ui:panel>
+                <ui:panel partname="tree" title="组件树"></ui:panel>
+                <ui:panel partname="source" title="本页源码"></ui:panel>
             </set>
             
         </div>
@@ -80,9 +81,10 @@
                 }
                 btn.onclick();
                 uilist.onclick=function(){
-                    $t.service.runJS('$t.ui.toString()x');
+                    $t.service.runJS('$t.ui.toString()');
                 }
-                $t.ui.panel.parts[0].hide();
+                $t.parts.tree.last().hide();
+                $t.parts.source.last().hide();
           </script>
         </header>
         
