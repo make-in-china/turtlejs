@@ -6,4 +6,4 @@ make it for fun
 
 I'm new front-end development engineer, please tender with me（新手写库，轻喷）
 
-main里的turtlejs可能不是最新的，最新的在page里。
+branch master里的turtlejs可能不是最新的，最新的在page里。
