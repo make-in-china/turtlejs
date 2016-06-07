@@ -1,6 +1,6 @@
 
 <xmp ui="highlightcode.style">
-    <style>
+    <style :='document.head.appendChild(node)'>
         /**
          * SyntaxHighlighter
          * http://alexgorbatchev.com/SyntaxHighlighter
@@ -59,7 +59,7 @@
           width: 100% !important;
           margin: 1em 0 1em 0 !important;
           position: relative !important;
-          overflow: auto !important;
+          /*overflow: auto !important;*/
           /*font-size: 1em !important;*/
         }
         .syntaxhighlighter.source {
@@ -390,6 +390,7 @@
             code=$t.refs.code.pop();
             code.appendChild(outer[i])
         }
+        debugger;
         $t.service.SyntaxHighlighter.highlight(code);
     </script>
 </xmp>

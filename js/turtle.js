@@ -368,6 +368,21 @@ var turtle,$t,
             return fn.apply(obj, arguments);
         };
     }
+    function getStep(fn,count){
+        if(!isNumber(count)){
+            return fn;
+        }
+        var step=count;
+        var _fn=function(){
+            if(step===count){
+                step=1
+                fn.apply(this,arguments);
+            }else{
+                step++;
+            }
+        }
+        return _fn;
+    }
     function getBindTry(obj, fn){
         return function (){
             try{
@@ -1593,12 +1608,13 @@ var turtle,$t,
                 return _execExpressionsByScope.call(scope,cdtn[1],v,node);
             }catch(e){_catch(e)}
         }
-        exp.__that__=exp;
-        $t.bindProperty(obj,name,exp,'__that__');
+        exp.__me__=exp;
+        $t.bindProperty(obj,name,exp,'__me__');
         replaceNodeByNode(node,textNode);
-        bindElementProperty(exp,'__that__',textNode,'data');
-        textNode['data']=exp.__that__;
+        bindElementProperty(exp,'__me__',textNode,'data');
+        textNode['data']=exp.__me__;
     }
+    /*绑定属性与描述*/
     function bindNodeProperty(node,proName,condition){
         var 
             cdtn=splitByOnce(condition,"|"),
@@ -1633,17 +1649,20 @@ var turtle,$t,
             exp=function(v){
                 obj2[name2]=execNodeValueEval(v,node,cdtn[1]);
             }
-            exp.__that__=exp;
-            bindProperty(obj,name,exp,'__that__');
+            exp.__me__=exp;
+            bindProperty(obj,name,exp,'__me__');
         }else{
             bindElementProperty(obj,name,obj2,name2);
             obj2[name2]=obj[name];
         }
     }
+    
     function execNodeValueEval(v,node,s){
         with(this){return eval(s)}
     }
-    
+    /*
+     * 绑定标签属性
+     */ 
     function bindElementPropertyByName(node,elementValueName,condition){
         var 
             cdtn=splitByOnce(condition,"|"),
@@ -1668,8 +1687,8 @@ var turtle,$t,
             exp=function(v){
                 execNodeValueEval(v,node,cdtn[1]);
             }
-            exp.__that__=exp;
-            bindProperty(obj,name,exp,"__that__");
+            exp.__me__=exp;
+            bindProperty(obj,name,exp,"__me__");
         }else{
             if(!node.__bind__)node[elementValueName]=obj[name];
             bindProperty(obj,name,node,elementValueName);
@@ -1702,8 +1721,8 @@ var turtle,$t,
             exp=function(v){
                 execNodeValueEval(v,node,cdtn[1]);
             }
-            exp.__that__=exp;
-            bindProperty(obj,name,exp,"__that__");
+            exp.__me__=exp;
+            bindProperty(obj,name,exp,"__me__");
         }else{
             switch(node.nodeName){
                 case "SELECT":
@@ -2538,12 +2557,33 @@ var turtle,$t,
             node.setAttribute(name,v);
         }
     }
+    function getObjectValue(obj,vars){
+        for(var i in vars){
+            if(vars[i] in obj){
+                obj=obj[vars[i]];
+            }else{
+                return null;
+            }
+        }
+        return obj;
+    }
+    function bindFunction(obj,bindVar,fn){
+        var vars=bindVar.split('.');
+        var propertyName;
+        if(vars.length>0){
+            propertyName=vars.pop();
+            obj=getObjectValue(obj,vars);
+        }else{
+            propertyName=bindVar;
+        }
+        fn.__me__=fn;
+        bindProperty(obj,propertyName,fn,"__me__");
+    }
     function bindNodeFunction(node,bindVar,fn){
         var 
             name,
             scope,
-            obj,
-            obj2;
+            obj;
         if(bindVar.indexOf(".")!=-1){
             bindVar=bindVar.split(".");
         }else{
@@ -2552,9 +2592,9 @@ var turtle,$t,
         name=bindVar[bindVar.length-1];
         scope=$t.uiScope.get(node);
         obj=_getBindObject(scope,bindVar);
-        obj2={fn:fn};
-        bindProperty(obj,name,obj2,"fn");
-        return {object:obj,name:name,targetObject:obj2,targetName:"fn"};
+        fn.__me__=fn;
+        bindProperty(obj,name,fn,"__me__");
+        return {object:obj,name:name,targetObject:fn,targetName:"__me__"};
     }
     function execValueByScope(node,s,v,scope,outer,outerElement,props,part){
         return _execValueByScope.call(getScopeBy(scope,node),s,v,node,outer,outerElement,props,part);
@@ -2968,6 +3008,9 @@ var turtle,$t,
                     }
                 }
             }
+        },
+        get elemParent(){
+            return this.begin.parentNode;
         },
         insertBefore:function(elem){
             if(this.isInsert){
@@ -4204,6 +4247,7 @@ var turtle,$t,
     
     fn.getClosure=getClosure;
     fn.getClosureTry=getOnTry;
+    fn.getStep=getStep;
     
     
     fn.addClass=addClass;
@@ -4294,6 +4338,7 @@ var turtle,$t,
     fn.importUIJS=importUIJS;
     fn.onPropertyChange=onPropertyChange;
     fn.bindNodeProperty=bindNodeProperty;
+    fn.bindFunction=bindFunction;
     fn.newHashObject=newHashObject;
     fn.newArrayObject=newArrayObject;
     fn.includeJSFiles=includeJSFiles;

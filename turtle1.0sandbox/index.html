@@ -13,11 +13,43 @@
     <script extend="1" baseUIPath="{name:'ui',path:'../ui'};{name:'app',path:'../uiAPP'}" src="../js/turtle.js"></script>
   </head>
   <body style="overflow:scroll;">
-    
+    <xmp ui="vctrl">
+        <!content>
+        <script>
+            var col={col!-1}.number;
+            var style;
+            for(var i=0;i<outerElement.length;i++){
+                style=outerElement[i].style;
+                style.display='inline-block';
+                style.boxSizing='border-box';
+            }
+            function setWidth(){
+                
+                var elems=part.elements;
+                var style;
+                var width=part.elemParent.offsetWidth/col;
+                for(var i=0;i<elems.length;i++){
+                    if(elems[i].nodeType===1){
+                        style=elems[i].style;
+                        style.width=width+"px";   
+                    }
+                }
+            }
+            $t.bindFunction($client,'width',$t.getStep(function(v){
+                if(part.isInsert){
+                    setWidth();
+                }
+                
+            }),2);
+            $t.readyByRenderDocument.on(setWidth);
+        </script>
+    </xmp>
     <xmp>
         <app:top2></app:top2>
-        <app:content>
-            未完成
+        <app:content maxwidth="1000">
+            <ui:vctrl col="2">
+                <div>1</div><div>2</div><div>3</div><div>4</div>
+            </ui:vctrl>    
         </app:content>
         <app:bottom></app:bottom>
     </xmp>

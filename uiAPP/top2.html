@@ -28,22 +28,23 @@
                 </ui:growpanel>
                 
                 <ui:panel partname="tree" title="组件树"></ui:panel>
-                <ui:panel partname="source" title="本页源码"></ui:panel>
+                <ui:panel partname="source" title="本页源码"><set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set></ui:panel>
             </set>
             
         </div>
         <header class="inner">
           <h1 id="project_title">Turtlejs（龟计算）</h1>
           <h2 id="project_tagline">make it for fun（预览版）</h2>
-          博客用turtlejs编写，所有页面未进行压缩，方便查看源码学习<br>
+          本教程用turtlejs编写<br>
           <set class="mdip5">
-          <a target="_blank" : href:="'view-source:'+window.location.href">查看本页源码</a>
+          <a ref="source" href="javascript:;">查看未压缩源码</a>
           <a ref="btn" href="javascript:;">查看组件树</a>
           <a ref="uilist" href="javascript:;">查看本页组件</a>
           </set>
           <script>
                var btn=$t.refs.btn.pop();
                var uilist=$t.refs.uilist.pop();
+               var source=$t.refs.source.pop();
                btn.onclick=function(){
                     var elems=[];
                     var elem;
@@ -84,7 +85,19 @@
                     $t.service.runJS('$t.ui.toString()');
                 }
                 $t.parts.tree.last().hide();
-                $t.parts.source.last().hide();
+                var pSource=$t.parts.source.last();
+                var html;
+                $t.xhr.get(location.href,true,function(v){html=v});
+                source.onclick=function(){
+                    
+                    var title=document.createElement('title');
+                    title.innerHTML=html;
+                    var highlight=$t.renderBefore("highlightcode",'ui',part.end,[title]);
+                    
+                    pSource.setContent(highlight.elements);
+                    pSource.show();
+                }
+                pSource.hide();
           </script>
         </header>
         
