@@ -9,7 +9,24 @@
         }
     }
 </xmp>
+
 <xmp>
+    <set lazy append class="zidx3">
+      <ui:move>
+      <set lazy append class="bgray15">
+        <ui:panel partname="tree" title="组件树">
+            <set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set>
+        </ui:panel>
+        </set>
+      </ui:move>
+      <ui:move>
+        <set lazy append class="bgray15">
+        <ui:panel partname="source">
+            <set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set>
+        </ui:panel>
+        </set>
+      </ui:move>
+      </set>
     <div id="header_wrap" class="outer">
         <div class="zidx3 fixed right0">
             <set lazy append class="bgray15" style="font-family: 微软雅黑;">
@@ -26,9 +43,6 @@
                         <textarea ref="ret" class="rdip5 bgray4 fgray15 fz18 w100 hem10 fgray15 bdw0" style="outline-width: 0; resize:none;"></textarea>
                     </div>
                 </ui:growpanel>
-                
-                <ui:panel partname="tree" title="组件树"></ui:panel>
-                <ui:panel partname="source" title="本页源码"><set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set></ui:panel>
             </set>
             
         </div>
@@ -36,15 +50,17 @@
           <h1 id="project_title">Turtlejs（龟计算）</h1>
           <h2 id="project_tagline">make it for fun（预览版）</h2>
           本教程用turtlejs编写<br>
+          本页清单（
           <set class="mdip5">
-          <a ref="source" href="javascript:;">查看未压缩源码</a>
-          <a ref="btn" href="javascript:;">查看组件树</a>
-          <a ref="uilist" href="javascript:;">查看本页组件</a>
-          </set>
+          <a ref="source" href="javascript:;">源码</a>
+          <a ref="btn" href="javascript:;">组件实例</a>
+          <a ref="uilist" href="javascript:;">组件清单</a>
+          </set>）
           <script>
                var btn=$t.refs.btn.pop();
                var uilist=$t.refs.uilist.pop();
                var source=$t.refs.source.pop();
+               var tree=$t.parts.tree.pop();
                btn.onclick=function(){
                     var elems=[];
                     var elem;
@@ -58,15 +74,28 @@
                             
                             var elem2=document.createElement("a");
                             elem2.href="javascript:;";
-                            elem2.innerHTML="删";
+                            elem2.innerHTML="(删除)";
+                            
+                            var elem3=document.createElement("a");
+                            elem3.href="javascript:;";
+                            elem3.innerHTML="(审查)";
+                            
                             (function(c){
                                 elem2.onclick=function(){
                                     c.remove();
                                     refresh();
                                 }
+                                elem3.onclick=function(){
+                                    var highlight=$t.renderBefore("highlightcode",'ui',part.end,[document.createTextNode(c.innerHTML)]);
+                                    pSource.setContent(highlight.elements);
+                                    
+                                    pSource.setTitle(c.template.name);
+                                    pSource.show();
+                                }
                             })(cpns[i]);
                             
-                            elem.insertBefore(elem2,elem.childNodes[0]);
+                            elem.insertBefore(elem3,elem.childNodes[0]);
+                            elem.insertBefore(elem2,elem3);
                             
                             
                             var c=cpns[i].child;
@@ -76,25 +105,21 @@
                         }
                     }
                     append($t.rootParts,0);
-                    var tree=$t.ui.panel.parts[0];
                     tree.show();
                     tree.setContent(elems);
                 }
-                btn.onclick();
                 uilist.onclick=function(){
                     $t.service.runJS('$t.ui.toString()');
                 }
-                $t.parts.tree.last().hide();
+                tree.hide();
                 var pSource=$t.parts.source.last();
                 var html;
                 $t.xhr.get(location.href,true,function(v){html=v});
                 source.onclick=function(){
-                    
-                    var title=document.createElement('title');
-                    title.innerHTML=html;
-                    var highlight=$t.renderBefore("highlightcode",'ui',part.end,[title]);
-                    
+                    var htmltext=document.createTextNode(html);
+                    var highlight=$t.renderBefore("highlightcode",'ui',part.end,[htmltext]);
                     pSource.setContent(highlight.elements);
+                    pSource.setTitle('本页源码');
                     pSource.show();
                 }
                 pSource.hide();

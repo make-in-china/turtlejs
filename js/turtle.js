@@ -3009,6 +3009,9 @@ var turtle,$t,
                 }
             }
         },
+        get innerHTML(){
+            return nodesToString(this.elements);
+        },
         get elemParent(){
             return this.begin.parentNode;
         },
@@ -4352,6 +4355,8 @@ var turtle,$t,
     //fn.delay=delay;
     fn.getStateFunction=getStateFunction;
     fn.onViewOnce=onViewOnce;
+    fn.removeBlockBetween=removeBlockBetween;
+    fn.takeBlockBetween=takeBlockBetween;
     function Turtle(){
         this.isTemplate=isTemplate;
         this.config=new Config();

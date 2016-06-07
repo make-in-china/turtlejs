@@ -1,8 +1,8 @@
 <xmp>
     <div ref="panel" class="shadowless pdip5 mdip5 rdip5" style="display:inline-block;vertical-align:top;">
         <div class="ub ct">
-            <div class="ub-f1 fb ct pdip5">{title!}</div>
-            <set lazy append class="fz24">
+            <div ref='title' class="ub-f1 fb ct pdip5">{title!}</div>
+            <set lazy append style="font-size:1.5em !important;">
                 <ui:button skin="close"><script var="panel">
                     panel.style.display="none";
                 </script></ui:button>
@@ -13,6 +13,7 @@
     <script>
         var panel=$t.refs.panel.pop();
         var content=$t.refs.content.pop();
+        var elemTitle=$t.refs.title.pop();
         part.show=function(){
             panel.style.display="inline-block";
         }
@@ -22,6 +23,9 @@
         part.setContent=function(elems){
             content.innerHTML="";
             $t.appendNodes(elems,content);
+        }
+        part.setTitle=function(title){
+            elemTitle.innerHTML=title;
         }
     </script>
 </xmp>
