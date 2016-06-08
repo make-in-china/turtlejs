@@ -16,7 +16,8 @@
     <xmp ui="vctrl">
         <!content>
         <script>
-            var col={col!-1}.number;
+            var minwidth={minwidth!1}.number;
+            var noPersent={nopersent!false!true}.bool;
             var style;
             for(var i=0;i<outerElement.length;i++){
                 style=outerElement[i].style;
@@ -25,30 +26,63 @@
             }
             function setWidth(){
                 
-                var elems=part.elements;
+                var nodes=part.elements;
                 var style;
-                var width=part.elemParent.offsetWidth/col;
-                for(var i=0;i<elems.length;i++){
-                    if(elems[i].nodeType===1){
-                        style=elems[i].style;
-                        style.width=width+"px";   
+                var width=part.elemParent.offsetWidth;
+                var persentWidth=0;
+                var elems=[];
+                var styleWidth;
+                for(var i=0;i<nodes.length;i++){
+                    if(nodes[i].nodeType===1){
+                        if(!noPersent){
+                            styleWidth=nodes[i].style.width;
+                            if($t.isPersent(styleWidth)){
+                                persentWidth+=$t.persentToFloat(styleWidth);
+                            }else{
+                                elems.push(nodes[i]);
+                            }
+                        }else{
+                            elems.push(nodes[i]);
+                        }
                     }
                 }
+                if(!noPersent&&persentWidth>0){
+                    width=width*(1-persentWidth);
+                }
+                var col=parseInt(width/minwidth);
+                if(col>elems.length){
+                    col=elems.length;
+                }else if(col===0){
+                    col=1;
+                }
+                width=width/col;
+                if(width<minwidth){
+                    width=minwidth;
+                }
+                for(var i=0;i<elems.length;i++){
+                    style=elems[i].style;
+                    style.width=width+"px";
+                }
             }
-            $t.bindFunction($client,'width',$t.getStep(function(v){
+            part.resize=function(v){
                 if(part.isInsert){
                     setWidth();
                 }
-            }),2);
-            $t.readyByRenderDocument.on(setWidth);
+            }
+            $t.readyByRenderDocument.on(part.resize);
+            $t.onResize(part.resize);
         </script>
     </xmp>
     <xmp>
         <app:top2></app:top2>
         <app:content maxwidth="1000">
-            <ui:vctrl col="2">
-                <div>1</div><div>2</div><div>3</div><div>4</div>
-            </ui:vctrl>    
+            <div>
+                <ui:sizebox height="300" width="300" bgcolor="rgba(0,128,192,0.6)">
+                    <ui:vctrl minwidth="100">
+                        <div style="width:70%">1</div><div>2</div><div>3</div><div>4</div>
+                    </ui:vctrl>
+                </ui:sizebox>
+            </div>
         </app:content>
         <app:bottom></app:bottom>
     </xmp>

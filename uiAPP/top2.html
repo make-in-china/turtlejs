@@ -12,21 +12,22 @@
 
 <xmp>
     <set lazy append class="zidx3">
-      <ui:move>
-      <set lazy append class="bgray15">
-        <ui:panel partname="tree" title="组件树">
-            <set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set>
-        </ui:panel>
-        </set>
-      </ui:move>
-      <ui:move>
-        <set lazy append class="bgray15">
-        <ui:panel partname="source">
-            <set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set>
-        </ui:panel>
-        </set>
-      </ui:move>
-      </set>
+        <ui:move>
+            <set lazy append class="bgray15">
+                <ui:panel partname="tree" title="组件树">
+                    <set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set>
+                </ui:panel>
+            </set>
+        </ui:move>
+        <ui:move>
+            <set lazy append class="bgray15">
+                <ui:panel partname="source">
+                    <set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set>
+                </ui:panel>
+            </set>
+        </ui:move>
+    </set>
+    <div ref="rectmask" class="abs zidx10 noevent" style="background-color:rgba(0,128,192,0.5);"></div>
     <div id="header_wrap" class="outer">
         <div class="zidx3 fixed right0">
             <set lazy append class="bgray15" style="font-family: 微软雅黑;">
@@ -44,7 +45,6 @@
                     </div>
                 </ui:growpanel>
             </set>
-            
         </div>
         <header class="inner">
           <h1 id="project_title">Turtlejs（龟计算）</h1>
@@ -60,7 +60,9 @@
                var btn=$t.refs.btn.pop();
                var uilist=$t.refs.uilist.pop();
                var source=$t.refs.source.pop();
+               var rectmask=$t.refs.rectmask.pop();
                var tree=$t.parts.tree.pop();
+               
                btn.onclick=function(){
                     var elems=[];
                     var elem;
@@ -74,33 +76,54 @@
                             
                             var elem2=document.createElement("a");
                             elem2.href="javascript:;";
-                            elem2.innerHTML="(删除)";
+                            elem2.innerHTML=" (删除) ";
                             
                             var elem3=document.createElement("a");
                             elem3.href="javascript:;";
-                            elem3.innerHTML="(审查)";
+                            elem3.innerHTML=" (元素) ";
                             
-                            (function(c){
+                            var elem4=document.createElement("a");
+                            elem4.href="javascript:;";
+                            elem4.innerHTML=" (定义) ";
+                            var hideMask=$t.getReTimeout(function(){
+                                rectmask.style.width='0';
+                                rectmask.style.height='0';
+                            });
+                            (function(cpn){
                                 elem2.onclick=function(){
-                                    c.remove();
+                                    cpn.remove();
                                     refresh();
                                 }
                                 elem3.onclick=function(){
-                                    var highlight=$t.renderBefore("highlightcode",'ui',part.end,[document.createTextNode(c.innerHTML)]);
+                                    var highlight=$t.renderBefore("highlightcode",'ui',part.end,[document.createTextNode(cpn.innerHTML)]);
                                     pSource.setContent(highlight.elements);
-                                    
-                                    pSource.setTitle(c.template.name);
+                                    pSource.setTitle(cpn.template.name);
                                     pSource.show();
+                                }
+                                elem4.onclick=function(){
+                                    var highlight=$t.renderBefore("highlightcode",'ui',part.end,[document.createTextNode('<script>'+cpn.template.toDefineString()+'</sc'+'ript>')]);
+                                    pSource.setContent(highlight.elements);
+                                    pSource.setTitle(cpn.template.name);
+                                    pSource.show();
+                                }
+                                
+                                elem.onmouseenter=function(){
+                                    var rect=cpn.getRect();
+                                    rectmask.style.left=rect.left+'px';
+                                    rectmask.style.top=rect.top+'px';
+                                    rectmask.style.width=rect.width+'px';
+                                    rectmask.style.height=rect.height+'px';
+                                    hideMask(3000);
                                 }
                             })(cpns[i]);
                             
-                            elem.insertBefore(elem3,elem.childNodes[0]);
+                            elem.insertBefore(elem4,elem.childNodes[0]);
+                            elem.insertBefore(elem3,elem4);
                             elem.insertBefore(elem2,elem3);
                             
-                            
-                            var c=cpns[i].child;
-                            if(c.length>0){
-                                append(c,space+2);
+                            var cpn=cpns[i].child;
+                            if(cpn.length>0){
+                                append(cpn,space+2);
                             }
                         }
                     }

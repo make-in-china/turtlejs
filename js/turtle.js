@@ -11,12 +11,15 @@ var turtle,$t,
         getPrototypeOf      = Object.getPrototypeOf,
         appendChild         = Node.prototype.appendChild,
         readyRE             = /complete|loaded|interactive/,
-        memberRE            = /{([a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]+\))?))?/g,
+        memberRE            = /{([a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g,
         orderRE             = /^\s?(if|while|for|switch|async|break|-|scope|content|bind|!|var|=)(\s|$)/g,
         orderCaseRE         = /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
         operatorRE          = /\!=|==|=|<|>|\|/,
         camelCaseRE         = /-(\w)/g,
+        persentRE           = /^\s*([\d.]+)%\s*$/,
         isIE                = (!!window.ActiveXObject||"ActiveXObject" in window);
+    var recalNode           = document.createElement('div');
+    recalNode.setAttribute('style',"width:0 !important;height:0 !important;margin-left:0 !important;margin-right:0 !important;");
     var dateFormat=(function(){
         return function(format,d){ 
             var o = {
@@ -401,24 +404,38 @@ var turtle,$t,
         _fn.enable=true;
         return _fn;
     }
-    
-    function getDebounce(cb){
-        if(isFunction(cb)){
-            var timeid=0;
-            return function(delay){
-                if(timeid>0){
-                    return;
-                }
-                if(!delay){
-                    delay=0;
-                }
-                var t=this;
-                var arg=slice.call(arguments,1);
-                timeid=setTimeout(function(){
-                    timeid=0;
-                    cb.apply(t,arg);
-                },delay);
-            }    
+    function getReTimeout(fn){
+        var timeid=0;
+        return function(delay){
+            if(timeid>0){
+                clearTimeout(timeid);
+            }
+            if(!delay){
+                delay=0;
+            }
+            var t=this;
+            var arg=slice.call(arguments,1);
+            timeid=setTimeout(function(){
+                timeid=0;
+                fn.apply(t,arg);
+            },delay);
+        }
+    }
+    function getDebounce(fn){
+        var timeid=0;
+        return function(delay){
+            if(timeid>0){
+                return;
+            }
+            if(!delay){
+                delay=0;
+            }
+            var t=this;
+            var arg=slice.call(arguments,1);
+            timeid=setTimeout(function(){
+                timeid=0;
+                fn.apply(t,arg);
+            },delay);
         }
     }
     var locStorage=(function(){
@@ -915,6 +932,15 @@ var turtle,$t,
     }
     var isArray = Array.isArray || function(a) {
         return "[object Array]"===_toString.call(a)
+    }
+    function isPersent(s){
+        return persentRE.test(s);
+    }
+    function persentToFloat(s){
+        var v=persentRE.exec(s);
+        if(v){
+            return v[1]/100;
+        }
     }
     function isArrayLike(a){return typeof a.length=='number'}
     function compact(array) { return array.filter(function(item){ return item !== undefined && item !== null }) }
@@ -3009,6 +3035,67 @@ var turtle,$t,
                 }
             }
         },
+        getRect:function(){
+            
+            if(this.isInsert){
+                var rects=[];
+                var rt;
+                // insertNodeBefore(this.begin,recalNode);
+                // rt=[recalNode.offsetLeft,recalNode.offsetTop];
+                // insertNodeBefore(this.end,recalNode);
+                // rt.push(recalNode.offsetLeft,recalNode.offsetTop);
+                // removeNode(recalNode);
+                // rects.push(rt);
+                var cs=this.elements;
+                var elem;
+                var dom=document.documentElement;
+                for(var i=0;i<cs.length;i++){
+                    elem=cs[i];
+                    if(elem.nodeType===1){
+                        var l=0,t=0;
+                        var elem2=elem;
+                        while(elem2!==dom){
+                            t+=elem2.offsetTop;
+                            l+=elem2.offsetLeft;
+                            elem2=elem2.parentNode;
+                        }
+                        rects.push([l,t,elem.offsetWidth,elem.offsetHeight]);
+                    }
+                }
+                
+                var rect={left:0x7fffffff,top:0x7fffffff,width:0,height:0,right:0,bottom:0}
+                for(var i=0;i<rects.length;i++){
+                    rt=rects[i];
+                    if(rt[0]<rect.left){
+                        rect.left=rt[0];
+                    }
+                    if(rt[1]<rect.top){
+                        rect.top=rt[1];
+                    }
+                    var right=rt[0]+rt[2];
+                    var bottom=rt[1]+rt[3];
+                    if(right>rect.right){
+                        rect.right=right;
+                    }
+                    if(bottom>rect.bottom){
+                        rect.bottom=bottom;
+                    }
+                }
+                rect.width=rect.right-rect.left;
+                rect.height=rect.bottom-rect.top;
+                return rect;
+            }else{
+                return {left:0,top:0,width:0,height:0,right:0,bottom:0};
+            }
+        },
+        emitResize:function(){
+            var cs=this.child;
+            for(var i=0;i<cs.length;i++){
+                if("resize" in cs[i]){
+                    cs[i].resize();
+                }
+            }
+        },
         get innerHTML(){
             return nodesToString(this.elements);
         },
@@ -3076,6 +3163,11 @@ var turtle,$t,
              });
              return scopeNodes;
         }
+    }
+    var onResize=function(fn){
+        bindFunction($client,'onResize',getStep(function(v){
+           fn(v);
+        }),2);
     }
     function RootParts(){
         var t=getParts(document.body.childNodes);
@@ -3307,6 +3399,21 @@ var turtle,$t,
     }
     paramFilter.float=function(v){
         return parseFloat(v);
+    }
+    paramFilter.pxtoem=function(v,p){
+        p=parseFloat(p);
+        if(isNaN(p)){
+            p=0;
+        }
+        return (parseFloat(v)/16+p)+'em';
+    }
+    paramFilter.color=function(v){
+        
+        if(/^\s*((#[\dabcdefABCDEF]{3,6})|(rgba\(.*\)))\s*$/.test(v)){
+            return v;
+        }else{
+            return 'transparent';    
+        }
     }
     paramFilter.date=function(v,p){
         var d=new Date(v);
@@ -3730,6 +3837,11 @@ var turtle,$t,
                 return data[name];
             }
         }
+        setSizeProperty('onResize',function(){'use strict'
+            return {width:document.documentElement.clientWidth
+                ,height:document.documentElement.clientHeight};});
+            
+            
         setSizeProperty('width',function(){'use strict'
             return document.documentElement.clientWidth;});
         setSizeProperty('height',function(){'use strict'
@@ -4272,6 +4384,8 @@ var turtle,$t,
     fn.isArray=isArray;
     fn.isRepeat=isRepeat;
     fn.isArrayLike=isArrayLike;
+    fn.isPersent=isPersent;
+    fn.persentToFloat=persentToFloat;
     
     fn.toArray=toArray;
     fn.moveArray=moveArray;
@@ -4282,6 +4396,8 @@ var turtle,$t,
     fn.elementDOMdistance=elementDOMdistance;
     fn.elementInElement=elementInElement;
     fn.getDebounce=getDebounce;
+    fn.getReTimeout=getReTimeout;
+    
     fn.getAttr=getAttr;
     fn.extend=extend;
     fn.extendConst=extendConst;
@@ -4357,6 +4473,7 @@ var turtle,$t,
     fn.onViewOnce=onViewOnce;
     fn.removeBlockBetween=removeBlockBetween;
     fn.takeBlockBetween=takeBlockBetween;
+    
     function Turtle(){
         this.isTemplate=isTemplate;
         this.config=new Config();
@@ -4405,7 +4522,7 @@ var turtle,$t,
         this.locStorage=locStorage;
         this.isCompile=false;
         this.throwError=throwError;
-        
+        this.onResize=onResize;
     }
     Turtle.prototype=fn;
     turtle=$t=new Turtle();

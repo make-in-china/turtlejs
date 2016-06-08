@@ -1,5 +1,26 @@
-<script _="xmp" service="freemove">
-    function(elemMove,d,noOut){
+<xmp>
+    <div ref="box" style="width:{width!50}.pxtoem(1);height:{height!50}.pxtoem(1);">
+        <div ref="content" style="overflow:hidden;width:{width!50}.pxtoem();height:{height!50}.pxtoem();background-color:{bgcolor!}.color;">
+            <!content>
+        </div>
+        <div ref="pt" style="left:{width!50}.pxtoem();top:{height!50}.pxtoem();" class="abs wem1 hem1 la borderbox"></div>
+        <script>
+            var box=$t.refs.box.pop();
+            var content=$t.refs.content.pop();
+            var pt=$t.refs.pt.pop();
+            part.template.service.move(pt,0,0,function(){
+                box.style.width=(pt.offsetLeft+pt.offsetWidth)+'px';
+                box.style.height=(pt.offsetTop+pt.offsetHeight)+'px';
+                content.style.width=pt.offsetLeft+'px';
+                content.style.height=pt.offsetTop+'px';
+                part.emitResize();
+            });
+        </script>
+    </div>
+</xmp>
+<script _="xmp" service="move" ui="sizebox">
+    function(elemMove,arrow,noOut,fn){
+        fn=$t.getDebounce(fn);
         elemMove.addEventListener("mousedown",md);
         elemMove.addEventListener("touchstart",td);
         elemMove.movePosition={left:0,top:0};
@@ -22,7 +43,7 @@
             document.body.addEventListener("touchmove",tm);
         }
         function mmove(e){
-            switch(d){
+            switch(arrow){
                 case 1:
                     setLeft(startLeft+e.x-start.x);
                     break;
@@ -41,6 +62,7 @@
                     setLeft(startLeft+e.x-start.x);
                     setTop(startTop+e.y-start.y);
             }
+            fn(30);
         }
         function mm(e){
             if(start){
@@ -70,7 +92,7 @@
             elemMove.movePosition.top=v;
         }
         function tmove(e){
-            switch(d){
+            switch(arrow){
                 case 1:
                     setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
                     break;
@@ -89,6 +111,7 @@
                     setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
                     setTop(startTop+e.changedTouches[0].clientY-start.changedTouches[0].clientY);
             }
+            fn(30);
         }
         function tm(e){
             if(start){
@@ -111,16 +134,3 @@
         }        
     }
 </script>
-<xmp>
-    <script>
-        var direction={direction!0}.number;
-        var noOut={noout!false}.number;
-        for(var i in outerElement){
-            var n=document.createElement("div");
-            n.appendChild(outerElement[i]);
-            this.appendChild(n);
-            n.className="abs";
-            $t.service.require("freemove")(n,direction,noOut);
-        }
-    </script>
-</xmp>
