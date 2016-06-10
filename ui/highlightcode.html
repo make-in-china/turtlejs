@@ -170,12 +170,12 @@
         }
         .syntaxhighlighter.printing .line.alt1 .content,
         .syntaxhighlighter.printing .line.alt2 .content,
-        .syntaxhighlighter.printing .line.highlighted .number,
+        .syntaxhighlighter.printing .line.highlighted .int,
         .syntaxhighlighter.printing .line.highlighted.alt1 .content,
         .syntaxhighlighter.printing .line.highlighted.alt2 .content {
           background: none !important;
         }
-        .syntaxhighlighter.printing .line .number {
+        .syntaxhighlighter.printing .line .int {
           color: #bbbbbb !important;
         }
         .syntaxhighlighter.printing .line .content {
@@ -246,7 +246,7 @@
         .syntaxhighlighter .line.highlighted.alt1, .syntaxhighlighter .line.highlighted.alt2 {
           background-color: #233729 !important;
         }
-        .syntaxhighlighter .line.highlighted.number {
+        .syntaxhighlighter .line.highlighted.int {
           color: white !important;
         }
         .syntaxhighlighter table caption {
@@ -391,7 +391,12 @@
         var code;
         for(var i=outer.length-1;i>-1;i--){
             code=$t.refs.code.pop();
-            code.appendChild(outer[i]);
+            if(outer[i].nodeName==='TITLE'){
+                code.appendChild(document.createTextNode(outer[i].childNodes[0].data));    
+            }else{
+                code.appendChild(outer[i]);
+            }
+            
         }
         if(outer.length>0){
             $t.service.SyntaxHighlighter.highlight(code);

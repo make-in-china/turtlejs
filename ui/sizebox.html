@@ -1,136 +1,53 @@
 <xmp>
-    <div ref="box" style="width:{width!50}.pxtoem(1);height:{height!50}.pxtoem(1);">
+    <div>
         <div ref="content" style="overflow:hidden;width:{width!50}.pxtoem();height:{height!50}.pxtoem();background-color:{bgcolor!}.color;">
             <!content>
         </div>
-        <div ref="pt" style="left:{width!50}.pxtoem();top:{height!50}.pxtoem();" class="abs wem1 hem1 la borderbox"></div>
+        <div ref="pt" style="box-sizing:border-box;" class="abs"></div>
         <script>
-            var box=$t.refs.box.pop();
+            var size="{size!both}.only(both,width,height;both)";
             var content=$t.refs.content.pop();
             var pt=$t.refs.pt.pop();
-            part.template.service.move(pt,0,0,function(){
-                box.style.width=(pt.offsetLeft+pt.offsetWidth)+'px';
-                box.style.height=(pt.offsetTop+pt.offsetHeight)+'px';
-                content.style.width=pt.offsetLeft+'px';
-                content.style.height=pt.offsetTop+'px';
-                part.emitResize();
-            });
+            var width={width!50};
+            var height={height!50};
+            var dropMove=$t.require(part.template.path+'/dropMove.js','dropMove');
+            var style=pt.style;
+            switch(size){
+                case 'width':
+                    style.left=width-4+'px';
+                    style.cursor='e-resize';
+                    style.top='0';
+                    style.height=height+'px';
+                    style.width='4px';
+                    dropMove(pt,pt,1,0,function(){
+                        content.style.width=pt.offsetLeft+4+'px';
+                        part.emitResize();
+                    });
+                    break;
+                case 'height':
+                    style.left='0';
+                    style.top=height-4+'px';
+                    style.width=width+'px';
+                    style.height='4px';
+                    style.cursor='n-resize';
+                    dropMove(pt,pt,2,0,function(){
+                        content.style.height=pt.offsetTop+4+'px';
+                        part.emitResize();
+                    });
+                    break;
+                default:
+                    style.left=width-4+'px';
+                    style.top=height-4+'px';
+                    style.width='4px';
+                    style.height='4px';
+                    style.cursor='nwse-resize';
+                    dropMove(pt,pt,0,0,function(){
+                        content.style.width=pt.offsetLeft+4+'px';
+                        content.style.height=pt.offsetTop+4+'px';
+                        part.emitResize();
+                    });
+            }
+            
         </script>
     </div>
 </xmp>
-<script _="xmp" service="move" ui="sizebox">
-    function(elemMove,arrow,noOut,fn){
-        fn=$t.getDebounce(fn);
-        elemMove.addEventListener("mousedown",md);
-        elemMove.addEventListener("touchstart",td);
-        elemMove.movePosition={left:0,top:0};
-        with(document.body){
-            addEventListener("mouseup",mu);
-            addEventListener("touchend",tu);
-            addEventListener("touchcancel",tu);
-        }
-        var start,startLeft,startTop;
-        function md(e){
-            startLeft=elemMove.offsetLeft;
-            startTop=elemMove.offsetTop;
-            start=e;
-            document.body.addEventListener("mousemove",mm);
-        }
-        function td(e){
-            startLeft=elemMove.offsetLeft;
-            startTop=elemMove.offsetTop;
-            start=e.changedTouches[0];
-            document.body.addEventListener("touchmove",tm);
-        }
-        function mmove(e){
-            switch(arrow){
-                case 1:
-                    setLeft(startLeft+e.x-start.x);
-                    break;
-                case 2:
-                    setTop(startTop+e.y-start.y);
-                    break;
-                case 3:
-                    setLeft(startLeft+e.clientX-start.x);
-                    setTop(startTop+e.clientX-start.x);
-                    break;
-                case 4:
-                    setLeft(startLeft+e.clientY-start.y);
-                    setTop(startTop+e.clientY-start.y);
-                    break;
-                default:
-                    setLeft(startLeft+e.x-start.x);
-                    setTop(startTop+e.y-start.y);
-            }
-            fn(30);
-        }
-        function mm(e){
-            if(start){
-                mmove(e);
-            }
-        }
-        function setLeft(v){
-            if(noOut){
-                if(v<0){
-                    v=0;
-                }else if(v+elemMove.scrollWidth>elemMove.parentNode.scrollWidth){
-                    v=elemMove.parentNode.scrollWidth-elemMove.scrollWidth;
-                }
-            }
-            elemMove.style.left=v+'px';
-            elemMove.movePosition.left=v;
-        }
-        function setTop(v){
-            if(noOut){
-                if(v<0){
-                    v=0;
-                }else if(v+elemMove.scrollHeight>elemMove.parentNode.scrollHeight){
-                    v=elemMove.parentNode.scrollHeight-elemMove.scrollHeight;
-                }
-            }
-            elemMove.style.top=v+'px';
-            elemMove.movePosition.top=v;
-        }
-        function tmove(e){
-            switch(arrow){
-                case 1:
-                    setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
-                    break;
-                case 2:
-                    setTop(startTop+e.changedTouches[0].clientY-start.changedTouches[0].clientY);
-                    break;
-                case 3:
-                    setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
-                    setTop(startTop+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
-                    break;
-                case 4:
-                    setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientY);
-                    setTop(startTop+e.changedTouches[0].clientY-start.changedTouches[0].clientY);
-                    break;
-                default:
-                    setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
-                    setTop(startTop+e.changedTouches[0].clientY-start.changedTouches[0].clientY);
-            }
-            fn(30);
-        }
-        function tm(e){
-            if(start){
-                tmove(e);
-            }
-        }
-        function mu(e){
-            if(start){
-                mmove(e);
-                start=null;
-                document.body.removeEventListener("mousemove",mm);
-            }
-        }
-        function tu(e){
-            if(start){
-                tmove(e);
-                start=null;
-                document.body.removeEventListener("touchmove",tm);
-            }
-        }        
-    }
-</script>

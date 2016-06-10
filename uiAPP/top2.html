@@ -9,23 +9,18 @@
         }
     }
 </xmp>
-
 <xmp>
     <set lazy append class="zidx3">
-        <ui:move>
             <set lazy append class="bgray15">
-                <ui:panel partname="tree" title="组件树">
+                <ui:movepanel partname="tree" title="组件树">
                     <set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set>
-                </ui:panel>
+                </ui:movepanel>
             </set>
-        </ui:move>
-        <ui:move>
             <set lazy append class="bgray15">
-                <ui:panel partname="source">
+                <ui:movepanel partname="source">
                     <set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set>
-                </ui:panel>
+                </ui:movepanel>
             </set>
-        </ui:move>
     </set>
     <div ref="rectmask" class="abs zidx10 noevent" style="background-color:rgba(0,128,192,0.5);"></div>
     <div id="header_wrap" class="outer">
@@ -146,8 +141,10 @@
                     pSource.show();
                 }
                 pSource.hide();
+                $t.onResize(function(){
+                    part.emitResize();
+                });
           </script>
         </header>
-        
     </div>
 </xmp>

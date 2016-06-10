@@ -1,0 +1,90 @@
+<xmp>
+        <div ref="content" style="overflow:hidden;width:{width!100%};height:{height!100%};background-color:{bgcolor!}.color;"></div>
+        <get name="pt"><div style="box-sizing:border-box;z-index:2;" class="abs"></div></get>
+        <script>
+            var size="{size!}.only(width,height;width)";
+            var content=$t.refs.content.pop();
+            var minWidth={minwidth!}.intmin(4);
+            var pt=$t.getNode.pt.children[0];
+            delete $t.getNode.pt;
+            var width={width!50}.string;
+            var height={height!50}.string;
+            var dropMove=$t.require(part.template.path+'/dropMove.js','dropMove');
+            var style;
+            var clonePt;
+            if(size==='width'){
+                $t.addClass(content,'ifloat');
+            }
+            var setContent=part.setContent=function(elems){
+                content.innerHTML='';
+                $t.appendNodes(elems,content);
+                $t.initHTML(elems,null,null,null,part);
+                part.emitResize();
+                var pts=[];
+                if(size==='width'){
+                    var resize=function(){
+                        var width=0;
+                        var pos=elems.length-1;
+                        if(pos>0){
+                            for(var i=0;i<pos;i++){
+                                width+=elems[i].offsetWidth;
+                            }
+                            width=content.offsetWidth-width;
+                            
+                            var elem=elems[pos];
+                            while(width<minWidth &&pos>0){
+                                elem.style.width=minWidth+'px';
+                                pos--;
+                                elem=elems[pos];
+                                width+=elem.offsetWidth-minWidth;
+                            }
+                            elem.style.width=width+'px';
+                            
+                        }
+                        for(var i=0;i<pts.length;i++){
+                            pt=pts[i];
+                            elem=pt.elem;
+                            style=pt.style;
+                            style.left=elem.offsetLeft+elem.offsetWidth-4+'px';
+                            style.top=elem.offseTop+'px';
+                        }
+                        part.emitResize();
+                    }
+                    resize();         
+                    for(var i=0;i<elems.length;i++){
+                        elems[i].style.height="100%";
+                    }
+                }
+                for(var i=0;i<elems.length-1;i++){
+                    clonePt=pt.cloneNode();
+                    pts.push(clonePt);
+                    (function(pt,elem){
+                        style=pt.style;
+                        pt.elem=elem;
+                        switch(size){
+                            case 'width':
+                                style.left=elem.offsetLeft+elem.offsetWidth-4+'px';
+                                style.top=elem.offseTop+'px';
+                                style.width='4px';
+                                style.height=elem.offsetHeight+'px';
+                                style.cursor='e-resize';
+                                dropMove(pt,pt,1,0,function(){
+                                    var width=pt.offsetLeft-elem.offsetLeft+4;
+                                    if(width<minWidth){
+                                        width=minWidth;
+                                    }
+                                    elem.style.width=width+'px';
+                                    resize();
+                                });
+                                break;
+                        }
+                    })(clonePt,elems[i]);
+                }
+                $t.appendNodes(pts,content);
+                part.resize=resize;
+            }
+            $t.readyByRenderDocument.on(function(){
+                setContent(outerElement);    
+            });
+        </script>
+</xmp>

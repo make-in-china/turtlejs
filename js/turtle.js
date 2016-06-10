@@ -12,7 +12,7 @@ var turtle,$t,
         appendChild         = Node.prototype.appendChild,
         readyRE             = /complete|loaded|interactive/,
         memberRE            = /{([a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g,
-        orderRE             = /^\s?(if|while|for|switch|async|break|-|scope|content|bind|!|var|=)(\s|$)/g,
+        orderRE             = /^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|var|=)(\s|$)/g,
         orderCaseRE         = /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
         operatorRE          = /\!=|==|=|<|>|\|/,
         camelCaseRE         = /-(\w)/g,
@@ -2365,6 +2365,9 @@ var turtle,$t,
             case 'content':
                 replaceNodeByNodes(node,outerChildNodes);
                 break;
+            case 'elements':
+                replaceNodeByNodes(node,outerElement);
+                break;
             case 'while':
                 return parseWhileOrder(info,node,outerChildNodes,outerElement,props,part);
                 break;
@@ -3225,16 +3228,20 @@ var turtle,$t,
         }
         removeNode(node);
     }
-    function defineUIByNode(node){
-        var name=getAttr(node,'ui');
+    function getExtends(node,sortPath){
         var ext=getAttr(node,'extends',null);
         if(isString(ext)){
-            if(!isObject($t.ui[ext])){
+            if(!isObject(importUIHTML(ext,sortPath))){
                 throwError('找不到可继承的模板：'+ext);
             }else{
                 ext=$t.ui[ext];
+                return ext;
             }
         }
+    }
+    function defineUIByNode(node){
+        var name=getAttr(node,'ui');
+        var ext=getExtends(node,'ui');
         if(name){
             $t.ui.define(name,'','',getTemplate(node),ext);
         }
@@ -3249,8 +3256,7 @@ var turtle,$t,
             node,
             s,
             name,
-            nodeName,
-            ext;
+            nodeName;
         for(;i<cs.length;i++){
             node=cs[i];
             if(!isTemplate(node)){
@@ -3265,8 +3271,7 @@ var turtle,$t,
                 if(!nodeName)nodeName=uiName;
                 if(!$t.ui.hasOwnProperty(nodeName)){
                     s=getTemplate(node);
-                    ext=getAttr(node,'extends');
-                    $t.ui.define(nodeName,uiSortPath,uiPath,s,ext);
+                    $t.ui.define(nodeName,uiSortPath,uiPath,s,getExtends(node,uiSortPath));
                 }else{
                     alert('不能重复定义ui：'+nodeName);
                 }
@@ -3394,6 +3399,25 @@ var turtle,$t,
     paramFilter.bool=function(v){
         return parseBool(v);
     }
+    paramFilter.intmin=function(v,p){
+        v=parseInt(v);
+        p=parseInt(p);
+        if(v<p||isNaN(v)){
+            v=p;
+        }
+        return v;
+    }
+    paramFilter.string=function(v){
+        return '"'+v+'"';
+    }
+    paramFilter.floatmin=function(v,p){
+        v=parseFloat(v);
+        p=parseFloat(p);
+        if(v<p||isNaN(v)){
+            v=p;
+        }
+        return v;
+    }
     paramFilter.int=function(v){
         return parseInt(v);
     }
@@ -3492,6 +3516,10 @@ var turtle,$t,
                 }
                 return items;
             },findByString:function(str){
+                if(str.length===0){
+                    return ;
+                }
+                
                 var ts=this.items;
                 var regExes=[];
                 for(var i=0;i<ts.length;i++){

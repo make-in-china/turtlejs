@@ -65,43 +65,43 @@
        turtle的渲染默认从模板标签开始。<br>
        1.什么是模板标签？
                 <ui:io try="false"><title>
-以下为当前支持的模板标签:
-<pre style="box-sizing:border-box;"
-><!= $t.templates.toString("")></pre>
+                    以下为当前支持的模板标签:
+                    <pre style="box-sizing:border-box;"
+                    ><!= $t.templates.toString("")></pre>
                 </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 命令说明 -->
                 <ui:ahchorpanel title="命令系统">
                     直接在html里加上编程语法会怎样呢？尝试过后，本库的命令系统诞生了。
                 <ui:io run="false"><title>
-<!if true>
-<!--命令写在缩写注释里-->
-
-<!--if true-->
-<!--命令写在完整注释里-->
-
-<!!
-    if(1){
-        console.log(debugger);
-    }
->
-<!--多行命令写在缩写注释里-->
-
-<!--!
-    if(1){
-        console.log(debugger);
-    }
--->
-<!--多行命令写在完整注释里-->
-
-                </title></ui:io>
-缩写注释语法不支持大于号(导致注释闭合)，
-如果要实现5>3这种写法，可以尝试写成3<5
-                <ui:io><title>
-注释被提前闭合,返回错误结果:<br>
-<!= 5>3>
-<br>注释正常，返回正常结果:<br>
-<!= 3<5>
+                    <!if true>
+                    <!--命令写在缩写注释里-->
+                    
+                    <!--if true-->
+                    <!--命令写在完整注释里-->
+                    
+                    <!!
+                        if(1){
+                            console.log(debugger);
+                        }
+                    >
+                    <!--多行命令写在缩写注释里-->
+                    
+                    <!--!
+                        if(1){
+                            console.log(debugger);
+                        }
+                    -->
+                    <!--多行命令写在完整注释里-->
+                    
+                                    </title></ui:io>
+                    缩写注释语法不支持大于号(导致注释闭合)，
+                    如果要实现5>3这种写法，可以尝试写成3<5
+                                    <ui:io><title>
+                    注释被提前闭合,返回错误结果:<br>
+                    <!= 5>3>
+                    <br>注释正常，返回正常结果:<br>
+                    <!= 3<5>
                 </title></ui:io>
                 （强烈推荐）
                 </ui:ahchorpanel>
@@ -111,26 +111,26 @@
                     1:async命令块<br>
                     2:async节点属性<br>
                     <ui:io><title>
-<div style="height:3em;">
-    async命令块，可包含多个标签
-    <!async>
-    <br><a>异</a><a>步</a>
-    <!end>
-    <!async 2000>
-    <br>异步2秒
-    <!end>
-</div>
-                </title></ui:io>
+                        <div style="height:3em;">
+                            async命令块，可包含多个标签
+                            <!async>
+                            <br><a>异</a><a>步</a>
+                            <!end>
+                            <!async 2000>
+                            <br>异步2秒
+                            <!end>
+                        </div>
+                    </title></ui:io>
                     <ui:io><title>
-<div style="height:3em;">async节点属性
-    <div async>
-    异步
-    </div>
-    <div async="2000">
-    异步2秒
-    </div>
-</div>
-                </title></ui:io>
+                        <div style="height:3em;">async节点属性
+                            <div async>
+                            异步
+                            </div>
+                            <div async="2000">
+                            异步2秒
+                            </div>
+                        </div>
+                    </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 作用域和变量 -->
                 <ui:ahchorpanel title="作用域和变量">
@@ -138,22 +138,22 @@
                     scope 名字<br>
                                                             或 <br>
                     scope 名字|变量1:值,变量2:值,...,变量n:值
-                <ui:io><title>
-<!scope A|x:1,y:1>
-<div>
-    <!scope B|x:2><!--创建一个作用域-->
-    <div>
-        <!scope C>
-        <!var y:3><!--定义一个变量在scope3上-->
-        C域可访问(x=<!= x>,y=<!= y>)<br>
-        A域可访问(x=<!= A.x>)<br>
-        A域可访问(y=<!= A.y>)
-    </div><br>
-    B域可访问(x=<!= x>,y=<!= y>   ) 
-</div><br>
-A域可访问(x=<!= x>,y=<!= y>)
-</title>
-                </title></ui:io>
+                    <ui:io><title>
+                        <!scope A|x:1,y:1>
+                        <div>
+                            <!scope B|x:2><!--创建一个作用域-->
+                            <div>
+                                <!scope C>
+                                <!var y:3><!--定义一个变量在scope3上-->
+                                C域可访问(x=<!= x>,y=<!= y>)<br>
+                                A域可访问(x=<!= A.x>)<br>
+                                A域可访问(y=<!= A.y>)
+                            </div><br>
+                            B域可访问(x=<!= x>,y=<!= y>   ) 
+                        </div><br>
+                        A域可访问(x=<!= x>,y=<!= y>)
+                        </title>
+                    </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 分支命令if -->
                 <ui:ahchorpanel title="分支命令If">
@@ -175,16 +175,16 @@ A域可访问(x=<!= x>,y=<!= y>)
                     end<br><br>
                     
                     注:xxx表示任意js语句;
-                <ui:io><title>
-<!scope if|v:1>
-<!if v===3>
-    <div>v===3</div>
-<!else if v===2>
-    <div>v===2</div>
-<!else>
-    <div>v=<!= v></div>
-<!end>
-                </title></ui:io>
+                    <ui:io><title>
+                        <!scope g|v:1>
+                        <!if v===3>
+                            <div>v===3</div>
+                        <!else if v===2>
+                            <div>v===2</div>
+                        <!else>
+                            <div>v=<!= v></div>
+                        <!end>
+                    </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 分支命令switch -->
                 <ui:ahchorpanel title="分支命令Switch">
@@ -199,24 +199,24 @@ A域可访问(x=<!= x>,y=<!= y>)
                     end<br><br>
                     注:xxx表示任意js语句;<br>
                     case break与js不太一样，它表示如果本语句命中则不会继续
-                <ui:io><title>
-<!scope switch|v:1>
-<!switch v>
-    <!case 1>
-        <span style="color:red">赤</span>
-    <!case 1>
-        <span style="color:orange">橙</span>
-        <!! v++>
-    <!case 2>
-        <span style="color:yellow">黄</span>
-    <!case 2>
-        <span style="color:green">绿</span>
-    <!case break 2>
-        <span style="color:blue">蓝</span>
-    <!default>
-        <span style="color:purple">紫</span>
-<!end>
-                </title></ui:io>
+                    <ui:io><title>
+                        <!scope g|v:1>
+                        <!switch v>
+                            <!case 1>
+                                <span style="color:red">赤</span>
+                            <!case 1>
+                                <span style="color:orange">橙</span>
+                                <!! v++>
+                            <!case 2>
+                                <span style="color:yellow">黄</span>
+                            <!case 2>
+                                <span style="color:green">绿</span>
+                            <!case break 2>
+                                <span style="color:blue">蓝</span>
+                            <!default>
+                                <span style="color:purple">紫</span>
+                        <!end>
+                    </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 循环命令 -->
                 <ui:ahchorpanel title="循环命令While">
@@ -228,15 +228,15 @@ A域可访问(x=<!= x>,y=<!= y>)
                     end<br><br>
                     注:xxx表示任意js语句;<br>
                     break表示中止循环，需要判断语句配合。
-                <ui:io><title>
-<!scope while|v:1>
-<!while v<=10>
-<div>
-  <!if v===4><!break><!else><!= v><!end>
-</div>
-<!! v++>
-<!end>
-                </title></ui:io>
+                    <ui:io><title>
+                        <!scope g|v:1>
+                        <!while v<=10>
+                        <div>
+                          <!if v===4><!break><!else><!= v><!end>
+                        </div>
+                        <!! v++>
+                        <!end>
+                    </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- for -->
                 <ui:ahchorpanel title="循环命令For">
@@ -249,12 +249,12 @@ A域可访问(x=<!= x>,y=<!= y>)
                     注:xxx表示任意js语句;<br>
                     与js类似
                     break表示中止循环，需要判断语句配合。
-                <ui:io><title>
-<!scope for1|v:1,k:10>
-<!for v=10;-1<k;k-->
-<!if k==3><!break><!else><!= k><!end>
-<!end>
-                </title></ui:io>
+                    <ui:io><title>
+                        <!scope g|v:1,k:10>
+                        <!for v=10;-1<k;k-->
+                        <!if k==3><!break><!else><!= k><!end>
+                        <!end>
+                    </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- for in -->
                 <ui:ahchorpanel title="循环命令For in">
@@ -268,24 +268,24 @@ A域可访问(x=<!= x>,y=<!= y>)
                     注:xxx表示任意js语句;<br>
                     与js类似
                     break表示中止循环，需要判断语句配合。
-                <ui:io><title>
-<!scope for2|n:'',m:["a","b","c","d","e","f"]>
-<!for n in m>
-    <span><!= m[n]></span>
-    <!if n=='3'>
-        <!break>
-    <!end>
-<!end>
-                </title></ui:io>
+                    <ui:io><title>
+                        <!scope for2|n:'',m:["a","b","c","d","e","f"]>
+                        <!for n in m>
+                            <span><!= m[n]></span>
+                            <!if n=='3'>
+                                <!break>
+                            <!end>
+                        <!end>
+                    </title></ui:io>
                 </ui:ahchorpanel>
                 <ui:ahchorpanel title="脚本运算">
                     无返回的语法为：<br>! xxx<br>
                     有返回的语法为：<br>= xxx<br>
                     注:xxx表示任意js语句;<br>
                     <ui:io><title>
-<!scope run|v:1>
-<div>无返回的运算"<!! v++>"</div>
-<div>有返回的运算"<!= v>"</div>
+                        <!scope run|v:1>
+                        <div>无返回的运算"<!! v++>"</div>
+                        <div>有返回的运算"<!= v>"</div>
                     </title></ui:io>
                 </ui:ahchorpanel>
                 
@@ -294,40 +294,40 @@ A域可访问(x=<!= x>,y=<!= y>)
                 标签绑定（双向绑定）的语法为：<br>
                     bind="scope变量名"<br>
                     <ui:io><title>
-<!var bind2:"我们绑定啦">
-<input bind="bind2"/>
-<br/>
-<textarea bind="bind2"></textarea>
+                        <!var bind2:"我们绑定啦">
+                        <input bind="bind2"/>
+                        <br/>
+                        <textarea bind="bind2"></textarea>
                     </title></ui:io>
                 </ui:ahchorpanel>
                 
                 <!-- 标签运算和绑定-->
                 <ui:ahchorpanel title="标签运算和绑定">
-                标签运算的语法为：<br>&lt;div :>启动运算（不写冒号则表示不检测标签内的运算）<br>
-                &lt;div :="xxx">启动并运算
+                    标签运算的语法为：<br>&lt;div :>启动运算（不写冒号则表示不检测标签内的运算）<br>
+                    &lt;div :="xxx">启动并运算
                     &lt;div : 属性名:="xxx">运算xxx并返回值到属性名
                     &lt;div : :属性名="xxx">运算xxx并返回值到属性名，数据发生变化时，此属性同时更新（单向绑定）
                     
                     注:xxx表示任意js语句;<br>
-                <ui:io><title>
-<!var data:"他们从我这取的数据">
-<a href="javascript:;" :=
-"node.onclick=function(){alert('值：'+data)}">
-<br>点我</a>冒号自身，一次性运行<br><br>
-
-<input : value:="data"/>
-<br>运算xxx并返回值到属性名<br><br>
-
-<input : :value="data"/>编辑我
-<br>运算xxx并返回值到属性名，数据发生变化时，
-此属性同时更新（单向绑定）<br><br>
-
-<input : bind="data"/>编辑我
-<br>绑定input的value为变量值，
-并在input的oninput事件通知变量更新
+                    <ui:io><title>
+                        <!var data:"他们从我这取的数据">
+                        <a href="javascript:;" :=
+                        "node.onclick=function(){alert('值：'+data)}">
+                        <br>点我</a>冒号自身，一次性运行<br><br>
+                        
+                        <input : value:="data"/>
+                        <br>运算xxx并返回值到属性名<br><br>
+                        
+                        <input : :value="data"/>编辑我
+                        <br>运算xxx并返回值到属性名，数据发生变化时，
+                        此属性同时更新（单向绑定）<br><br>
+                        
+                        <input : bind="data"/>编辑我
+                        <br>绑定input的value为变量值，
+                        并在input的oninput事件通知变量更新
                     </title></ui:io>
                 </ui:ahchorpanel>
-                <!-- 深层运算和绑定 -->
+                
                 <ui:ahchorpanel title="深层运算和绑定">
                                                            深层运算的语法为：<br>
                     属性.属性.属性:="scope变量名"<br><br>
@@ -339,15 +339,14 @@ A域可访问(x=<!= x>,y=<!= y>)
                     :style.padding-top="scope变量名"
                     
                     <ui:io><title>
-<!var color:"#00f">
-<input bind="color"/>
-<div : :style.background-color="color"
-style="display:inline-block;">
-背景色绑定为color变量的值</div>
+                        <!var color:"#00f">
+                        <input bind="color"/>
+                        <div : :style.background-color="color"
+                        style="display:inline-block;">
+                        背景色绑定为color变量的值</div>
                     </title></ui:io>
                 </ui:ahchorpanel>
                 
-                <!-- 文本绑定 -->
                 <ui:ahchorpanel title="文本绑定">
                                                             绑定（单向绑定）的语法为：<br>
                     - 名字<br>
@@ -355,10 +354,10 @@ style="display:inline-block;">
                     - 名字|xxx<br>
                     注:xxx表示任意js语句,构造为function(v){return eval('('+xxx+')')}形式<br>
                     <ui:io><title>
-<!var vxv:2>
-<input bind="vxv"/>
-<br/><!- vxv>
-<br/><!- vxv|v+"的3次方为:"+v*v*v>
+                        <!var vxv:2>
+                        <input bind="vxv"/>
+                        <br/><!- vxv>
+                        <br/><!- vxv|v+"的3次方为:"+v*v*v>
                     </title></ui:io>
                 </ui:ahchorpanel>
                 
@@ -366,98 +365,96 @@ style="display:inline-block;">
                     注：这里使用了temlline组件，这是一个页面临时组件（后面章节讲解组件）<br>
                     此例还用到了本库的class样式，这也是本库一个特色，后面会进行讲解。
                     <ui:io><title>
-<style xmp ui="tl">
-  <div>
-    <div class='wem16 right'>
-      {name}<! if {way!1}!=2><span class="fblue15">单向</span><! end><! if {way!1}==3>+<! end><! if {way!1}!=1><span class="fred15">双向</span><! end>绑定：
-    </div>
-    <div class='left pdip5'>
-      <!content>
-    </div>
-  </div>
-</style></title><title>
-<!scope x|vvvv:"turtle绑定测试",vv:0,vvv:0>
-<div>
-    <div class="iub">
-      <ui:tl name="checkbox属性 “checked” " way=1>
-        <set lazy bind="vvvv">
-          <input type="checkbox" bind="vv" : :checked="vvv"/>
-          双向A+双向B
-        </set>
-      </ui:tl>
-      <ui:tl name="checkbox内置" way=2>
-        <input type="checkbox" bind="vvvv" : :checked="vvv"/>
-        双向A
-      </ui:tl>
-      <ui:tl name="checkbox属性 “checked” " way=1>
-        <input type="checkbox" : :checked="vvvv"/>
-        单向A
-      </ui:tl>
-      <ui:tl name="checkbox属性 “checked” " way=2>
-        <input type="checkbox" bind="vv" : :checked="vvv"/>
-        双向B
-      </ui:tl>
-      <ui:tl name="按钮属性 “disabled” " way=1>
-        <button : :disabled="vvvv">
-          disabled="<!- vvvv>"
-        </button>
-      </ui:tl>
-      <ui:tl name="div内置" way=1>
-        <div bind="vvvv"></div>
-      </ui:tl>
-      <ui:tl name="div属性 “style.display” " way=1>
-        <div show='vvvv!=""'>
-          className!="uhide"
-        </div>
-      </ui:tl>
-      <ui:tl name="input内置" way=2>
-        <input bind="vvvv"/>
-        <!- vvvv|v.length==0?'不能为空':''>
-      </ui:tl>
-      <ui:tl name="textArea内置" way=2>
-        <textArea bind="vvvv"></textarea>
-      </ui:tl>
-      <ui:tl name="a属性 “href” " way=1>
-        <a : :href="vvvv"><!- vvvv></a>
-      </ui:tl>
-      <ui:tl name="下拉内置" way=2>
-        <select bind="vvvv" class="wem5">
-          <option ></option>
-          <option >-1</option>
-          <option >0</option>
-          <option >1</option>
-          <option >2</option>
-          <option >3</option>
-          <option value="true">真</option>
-          <option value="false">假</option>
-        </select>
-      </ui:tl>
-    </div>
-</div>
+                        <style xmp ui="tl">
+                          <div>
+                            <div class='wem16 right'>
+                              {name}<! if {way!1}!=2><span class="fblue15">单向</span><! end><! if {way!1}==3>+<! end><! if {way!1}!=1><span class="fred15">双向</span><! end>绑定：
+                            </div>
+                            <div class='left pdip5'>
+                              <!content>
+                            </div>
+                          </div>
+                        </style></title><title>
+                        <!scope x|vvvv:"turtle绑定测试",vv:0,vvv:0>
+                        <div>
+                            <div class="iub">
+                              <ui:tl name="checkbox属性 “checked” " way=1>
+                                <set lazy bind="vvvv">
+                                  <input type="checkbox" bind="vv" : :checked="vvv"/>
+                                  双向A+双向B
+                                </set>
+                              </ui:tl>
+                              <ui:tl name="checkbox内置" way=2>
+                                <input type="checkbox" bind="vvvv" : :checked="vvv"/>
+                                双向A
+                              </ui:tl>
+                              <ui:tl name="checkbox属性 “checked” " way=1>
+                                <input type="checkbox" : :checked="vvvv"/>
+                                单向A
+                              </ui:tl>
+                              <ui:tl name="checkbox属性 “checked” " way=2>
+                                <input type="checkbox" bind="vv" : :checked="vvv"/>
+                                双向B
+                              </ui:tl>
+                              <ui:tl name="按钮属性 “disabled” " way=1>
+                                <button : :disabled="vvvv">
+                                  disabled="<!- vvvv>"
+                                </button>
+                              </ui:tl>
+                              <ui:tl name="div内置" way=1>
+                                <div bind="vvvv"></div>
+                              </ui:tl>
+                              <ui:tl name="div属性 “style.display” " way=1>
+                                <div show='vvvv!=""'>
+                                  className!="uhide"
+                                </div>
+                              </ui:tl>
+                              <ui:tl name="input内置" way=2>
+                                <input bind="vvvv"/>
+                                <!- vvvv|v.length==0?'不能为空':''>
+                              </ui:tl>
+                              <ui:tl name="textArea内置" way=2>
+                                <textArea bind="vvvv"></textarea>
+                              </ui:tl>
+                              <ui:tl name="a属性 “href” " way=1>
+                                <a : :href="vvvv"><!- vvvv></a>
+                              </ui:tl>
+                              <ui:tl name="下拉内置" way=2>
+                                <select bind="vvvv" class="wem5">
+                                  <option ></option>
+                                  <option >-1</option>
+                                  <option >0</option>
+                                  <option >1</option>
+                                  <option >2</option>
+                                  <option >3</option>
+                                  <option value="true">真</option>
+                                  <option value="false">假</option>
+                                </select>
+                              </ui:tl>
+                            </div>
+                        </div>
                     </title></ui:io>
                 </ui:ahchorpanel>
                 
-                <!-- get -->
                 <ui:ahchorpanel title="get标签">
                     get标签是内置标签<br>
                     get标签支持的属性为：name<br>
                     get会移除自身，并放置到turtle.getNode[name]下<br>
                     
                     <ui:io><title>
-<get name="something">
-    <div>1</div>
-    <div>2</div>
-</get>  
-<!= var nodes=$t.getNode.something.children; 
-    var str=nodes.length+','+$t.nodesToString(nodes);
-    $t.getNode.something.innerHTML="";
-    delete $t.getNode.something;
-    str;>
-<!-- 注：$t为turtle缩写 -->
+                        <get name="something">
+                            <div>1</div>
+                            <div>2</div>
+                        </get>  
+                        <!= var nodes=$t.getNode.something.children; 
+                            var str=nodes.length+','+$t.nodesToString(nodes);
+                            $t.getNode.something.innerHTML="";
+                            delete $t.getNode.something;
+                            str;>
+                        <!-- 注：$t为turtle缩写 -->
                     </title></ui:io>
-                    </ui:ahchorpanel>
-                    <!-- set -->
-                    <ui:ahchorpanel title="set标签">
+                </ui:ahchorpanel>
+                <ui:ahchorpanel title="set标签">
                     set标签也是内置标签<br>
                     set标签可包围多个DOM元素或不包围任何DOM元素（<set></set>）<br>
                     <b>1.</b>当包围多个DOM元素时：<br>
@@ -472,30 +469,30 @@ style="display:inline-block;">
                     扩展属性时的行为为追加<br>
                     （无此属性时属性会被替换，class,style等属性会出错）<br><br>
                     <ui:io><title>
-<!-- 定义一个组件 组件在后续教程里会讲解 -->
-<style xmp ui="testset">
-    <div><div><!content></div></div>
-</style>
-                    </title><title>
-<set append style="background-image: url(123/一二三/xx.png);background-color:#00f ; border:1px #FFFFFF solid;">
-    <set lazy style="display:block;">
-        <ui:testset>1</ui:testset>
-        可获得颜色，display:block;没被替换
-    </set>
-</set>
-<set style="background-color:#00f ; border:1px #FFFFFF solid;">
-    <set lazy style="display:block;">
-        <ui:testset>1</ui:testset>
-        可获得颜色，display:block;被替换
-    </set>
-    <set>
-        <ui:testset>2</ui:testset>
-        <ui:testset>3</ui:testset>
-        2,3无法获得颜色，组件获得了style，但组件没有传递style到内部容器
-    </set>
-    <div>4</div>
-    <div>5</div>
-</set>
+                        <!-- 定义一个组件 组件在后续教程里会讲解 -->
+                        <style xmp ui="testset">
+                            <div><div><!content></div></div>
+                        </style>
+                                            </title><title>
+                        <set append style="background-image: url(123/一二三/xx.png);background-color:#00f ; border:1px #FFFFFF solid;">
+                            <set lazy style="display:block;">
+                                <ui:testset>1</ui:testset>
+                                可获得颜色，display:block;没被替换
+                            </set>
+                        </set>
+                        <set style="background-color:#00f ; border:1px #FFFFFF solid;">
+                            <set lazy style="display:block;">
+                                <ui:testset>1</ui:testset>
+                                可获得颜色，display:block;被替换
+                            </set>
+                            <set>
+                                <ui:testset>2</ui:testset>
+                                <ui:testset>3</ui:testset>
+                                2,3无法获得颜色，组件获得了style，但组件没有传递style到内部容器
+                            </set>
+                            <div>4</div>
+                            <div>5</div>
+                        </set>
                     </title></ui:io>
                     <b>2.</b>.当包围单个DOM元素时：<br>
                                                             如果set包含link属性：<br>
@@ -503,10 +500,10 @@ style="display:inline-block;">
                                                             找到后把turtle.getNode[link]的children转移到被包围元素下<br><br>
                                                             否则与包围多个DOM元素时一致<br>
                     <ui:io><title>
-<get name="get">我会在这里出现</get>
-<set link="get">
-    <a></a>
-</set>
+                        <get name="get">我会在这里出现</get>
+                        <set link="get">
+                            <a></a>
+                        </set>
                     </title></ui:io>
                     <b>3.</b>.不包围任何DOM元素时：<br>
                     set支持以下属性：<br>
@@ -515,113 +512,110 @@ style="display:inline-block;">
                                                             此时set的行为为，对父亲DOM元素扩展自身属性（除了append）<br><br>
 
                     <ui:io><title>
-<!-- 定义一个组件 组件在后续教程里会讲解 -->
-<style xmp ui="testset">
-    <div><div><!content></div></div>
-</style>
-                    </title><title>
-<ui:testset>
-<set style="background-color:#00f;border:1px #FFFFFF solid;"></set>
-从内层往上层加特效
-</ui:testset>
+                        <!-- 定义一个组件 组件在后续教程里会讲解 -->
+                        <style xmp ui="testset">
+                            <div><div><!content></div></div>
+                        </style>
+                                            </title><title>
+                        <ui:testset>
+                        <set style="background-color:#00f;border:1px #FFFFFF solid;"></set>
+                        从内层往上层加特效
+                        </ui:testset>
                     </title></ui:io>
                     
                 </ui:ahchorpanel>
-                <!-- 服务 -->
                 <ui:ahchorpanel title="服务">
                                                             服务来源有4个：HTML片断，js写入，未编译的组件文件，编译后的服务js<br>
                                                             服务分类有全局服务和组件服务
                     <ui:io><title>
-<!-- 全局服务  HTML片断，当前页面和UI文件支持该方式 -->
-<script xmp service="test">
-    function(s){
-        /*匿名函数*/
-       return s+s;
-    }
-</script>           </title><title>
-<!= $t.service.test("买一送一")>
+                        <!-- 全局服务  HTML片断，当前页面和UI文件支持该方式 -->
+                        <script xmp service="test">
+                            function(s){
+                                /*匿名函数*/
+                               return s+s;
+                            }
+                        </script>           </title><title>
+                        <!= $t.service.test("买一送一")>
                     </title></ui:io>
                     <ui:io><title>
-<!-- 定义一个组件 组件在后续教程里会讲解 -->
-<style xmp ui="testset">
-    <div><div><!content></div></div>
-</style>
-<!-- 组件服务  HTML片断，当前页面和UI文件支持该方式 -->
-<script xmp service="test" ui="testset">
-    function(s){
-       /*匿名函数*/
-       return s+s;
-    }
-</script>   
+                        <!-- 定义一个组件 组件在后续教程里会讲解 -->
+                        <style xmp ui="testset">
+                            <div><div><!content></div></div>
+                        </style>
+                        <!-- 组件服务  HTML片断，当前页面和UI文件支持该方式 -->
+                        <script xmp service="test" ui="testset">
+                            function(s){
+                               /*匿名函数*/
+                               return s+s;
+                            }
+                        </script>
                     </title><title>
-<!= $t.ui.testset.service.test("买一送一")>
+                        <!= $t.ui.testset.service.test("买一送一")>
                     </title></ui:io>
-                            
                 </ui:ahchorpanel>
-                <!-- 组件 -->
+                
                 <ui:ahchorpanel title="组件">
                     组件来源有4个：HTML片断，js写入，未编译的UI文件，编译后的组件js<br>
                     1.HTML片断：<br>
                     在页面文件&lt;body>内模板标签外任意位置使用以下语法定义内置组件<br>
                     在模板标签上添加ui="组件名"属性
                     <ui:io try="false"><title>
-以下为当前支持的模板标签:
-<pre style="box-sizing:border-box;"
-><!= $t.templates.toString("")></pre>
-                </title></ui:io>
-                
-                    <ui:io><title>
-<!style xmp>
-<style xmp ui="组件1">
-    <div>1</div>
-</style>
-<!script xmp>
-<script xmp ui="组件2">
-    <div>2</div>
-</script>
-<!textarea xmp>
-<textarea xmp ui="组件3">
-    <div>3</div>
-</textarea>
+                        以下为当前支持的模板标签:
+                        <pre style="box-sizing:border-box;"
+                        ><!= $t.templates.toString("")></pre>
+                                        </title></ui:io>
+                                        
+                                            <ui:io><title>
+                        <!style xmp>
+                        <style xmp ui="组件1">
+                            <div>1</div>
+                        </style>
+                        <!script xmp>
+                        <script xmp ui="组件2">
+                            <div>2</div>
+                        </script>
+                        <!textarea xmp>
+                        <textarea xmp ui="组件3">
+                            <div>3</div>
+                        </textarea>
                     </title><title>
-<ui:组件1></ui:组件1>
-<ui:组件2></ui:组件2>
-<ui:组件3></ui:组件3>
+                        <ui:组件1></ui:组件1>
+                        <ui:组件2></ui:组件2>
+                        <ui:组件3></ui:组件3>
                     </title></ui:io>
                     
                     2.js写入：<br>
                     turtle.ui.define("");
                     <ui:io><title>
-<script>
-    $t.ui.define("组件1","","",{datas:[
-        '<div>组件1：从对象解析的组件模板</div>']});
-        
-    $t.ui.define('组件2','','',$t.ui.组件1).datas=[
-        '<div>组件2：从组件1拷贝的组件模板，但修改了datas</div>'];
-    
-    $t.ui.define('组件3','','',
-        '组件3：<b>HTML字符串生成的组件</b>');
-</script>
-<ui:组件1></ui:组件1>
-<ui:组件2></ui:组件2>
-<ui:组件3></ui:组件3>
+                        <script>
+                            $t.ui.define("组件1","","",{datas:[
+                                '<div>组件1：从对象解析的组件模板</div>']});
+                                
+                            $t.ui.define('组件2','','',$t.ui.组件1).datas=[
+                                '<div>组件2：从组件1拷贝的组件模板，但修改了datas</div>'];
+                            
+                            $t.ui.define('组件3','','',
+                                '组件3：<b>HTML字符串生成的组件</b>');
+                        </script>
+                        <ui:组件1></ui:组件1>
+                        <ui:组件2></ui:组件2>
+                        <ui:组件3></ui:组件3>
                     </title></ui:io>
                 </ui:ahchorpanel>
-                <!-- 组件数据 props-->
                 <ui:ahchorpanel title="组件数据">
                 
                     <ui:io><title>
-<style xmp ui="people">
-    <div style="padding:5px;">
-        <div class="fred15"><!= JSON.stringify(props)></div>
-        <div>姓名：{name}</div>
-        <div>性别：{sex!男}.only(男,女;男)</div>
-        <div>婚否：{merry!否}.only(是,否;是)</div>
-        <div>生日：{birth!}.date(yyyy年MM月dd日)</div>
-        <div class="fgray8">
-        填表时间：{birth!}.date(yyyy年MM月dd日hh小时mm分ss秒)</div>
-    </div>
-</style>
+                        <style xmp ui="people">
+                            <div style="padding:5px;">
+                                <div class="fred15"><!= JSON.stringify(props)></div>
+                                <div>姓名：{name}</div>
+                                <div>性别：{sex!男}.only(男,女;男)</div>
+                                <div>婚否：{merry!否}.only(是,否;是)</div>
+                                <div>生日：{birth!}.date(yyyy年MM月dd日)</div>
+                                <div class="fgray8">
+                                填表时间：{birth!}.date(yyyy年MM月dd日hh小时mm分ss秒)</div>
+                            </div>
+                        </style>
                     </title><title>
 <ui:people name="功夫茶猫"></ui:people>
 <ui:people name="功夫茶猫" sex="男"></ui:people>
@@ -642,63 +636,63 @@ style="display:inline-block;">
                 <ui:ahchorpanel title="组件继承">
                 组件定义时可定义继承的组件（简单继承）
                     <ui:io><title>
-<style xmp ui="a">
-    (这里是a组件的内容：{text})
-    <script>
-        part.toString=function(){
-            return 'a';
-        }
-    </script>
-</style>
-<!-- 继承a组件 -->
-<style xmp ui="b" extends='a'>
-    <script>
-        /*覆盖父组件函数*/
-        part.toString=function(){
-            return part.super.toString()+'b (修改了toString)';
-        }
-    </script>
-    b.toString()='<!= part>'
-</style>
-<!-- 继承a组件 -->
-<style xmp ui="c" extends='a'>
-    <script>
-        part.super.store[0].data='(修改了界面：'+props.text+')';
-    </script>
-    c.toString()='<!= part>'
-</style>
+                        <style xmp ui="a">
+                            (这里是a组件的内容：{text})
+                            <script>
+                                part.toString=function(){
+                                    return 'a';
+                                }
+                            </script>
+                        </style>
+                        <!-- 继承a组件 -->
+                        <style xmp ui="b" extends='a'>
+                            <script>
+                                /*覆盖父组件函数*/
+                                part.toString=function(){
+                                    return part.super.toString()+'b (修改了toString)';
+                                }
+                            </script>
+                            b.toString()='<!= part>'
+                        </style>
+                        <!-- 继承a组件 -->
+                        <style xmp ui="c" extends='a'>
+                            <script>
+                                part.super.store[0].data='(修改了界面：'+props.text+')';
+                            </script>
+                            c.toString()='<!= part>'
+                        </style>
                     </title>
                     <title>
-<ui:a text='功夫茶猫'></ui:a><br>
-<ui:b text='功夫茶猫'></ui:b><br>
-<ui:c text='功夫茶猫'></ui:c>
+                        <ui:a text='功夫茶猫'></ui:a><br>
+                        <ui:b text='功夫茶猫'></ui:b><br>
+                        <ui:c text='功夫茶猫'></ui:c>
                     </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 组件层次 -->
                 <ui:ahchorpanel title="组件层次/树">
                 组件之间的关系可以描述为一棵倒立的树，但区别于react这种框架的是，不要求页面全组件
                     <ui:io><title>
-<style xmp ui="a">
-    <div>{text}<!content></div>
-</style>
-<style xmp ui="b" extends='a'></style>
-<style xmp ui="c" extends='a'></style>
+                        <style xmp ui="a">
+                            <div>{text}<!content></div>
+                        </style>
+                        <style xmp ui="b" extends='a'></style>
+                        <style xmp ui="c" extends='a'></style>
                     </title>
                     <title>
-<div class="hem10">
-<ui:a text='a'>
-    <ui:b text='b'>
-        <ui:c text='c'>功夫茶猫</ui:c>
-    </ui:b>
-</ui:a>
-<!async>
-<!-- 渲染过程中dom不存在任何组件，所以这里异步读取组件树 -->
-组件树结构如下
-<textarea class="w90 hem5" 
-:="node.innerHTML=$t.rootParts.treeDiagram"></textarea>
-<!end>
-</div>
-</title></ui:io>
+                        <div class="hem10">
+                        <ui:a text='a'>
+                            <ui:b text='b'>
+                                <ui:c text='c'>功夫茶猫</ui:c>
+                            </ui:b>
+                        </ui:a>
+                        <!async>
+                        <!-- 渲染过程中dom不存在任何组件，所以这里异步读取组件树 -->
+                        组件树结构如下
+                        <textarea class="w90 hem5" 
+                        :="node.innerHTML=$t.rootParts.treeDiagram"></textarea>
+                        <!end>
+                        </div>
+                    </title></ui:io>
                 </ui:ahchorpanel>
                 <!-- 组件编译 -->
                 <ui:ahchorpanel title="组件编译">
