@@ -8,6 +8,7 @@ var turtle,$t,
         Objectprototype     = Object.prototype,
         hasOwnProperty      = Object.prototype.hasOwnProperty,
         slice               = arrayPrototype.slice,
+        push                = arrayPrototype.push,
         getPrototypeOf      = Object.getPrototypeOf,
         appendChild         = Node.prototype.appendChild,
         readyRE             = /complete|loaded|interactive/,
@@ -21,7 +22,8 @@ var turtle,$t,
     var recalNode           = document.createElement('div');
     recalNode.setAttribute('style',"width:0 !important;height:0 !important;margin-left:0 !important;margin-right:0 !important;");
     var dateFormat=(function(){
-        return function(format,d){ 
+        return function(format,d){
+            'use strict' 
             var o = {
                 "M+" : d.getMonth() + 1, //month
                 "d+" : d.getDate(), //day
@@ -1960,7 +1962,6 @@ var turtle,$t,
         }
         var start,offsetLeft,offsetTop;
         function setOffset(){
-            
             var node=elem;
             var t=0,l=0;
             var topE=document.documentElement;
@@ -1984,11 +1985,6 @@ var turtle,$t,
             fnbegin(offsetLeft,offsetTop);
             document.body.addEventListener("touchmove",tm);
         }
-        function mm(e){
-            if(start){
-                fn(getRectByPoint(start.x,start.y,e.clientX,e.clientY));
-            }
-        }
         function getRectByPoint(x1,y1,x2,y2){
             var rect={}
             if(x1>x2){
@@ -2010,6 +2006,11 @@ var turtle,$t,
             rect.left-=offsetLeft;
             rect.top-=offsetTop;
             return rect;
+        }
+        function mm(e){
+            if(start){
+                fn(getRectByPoint(start.x,start.y,e.clientX,e.clientY));
+            }
         }
         function tm(e){
             if(start){
@@ -3134,6 +3135,22 @@ var turtle,$t,
             s+='],service:'+this.service.toDefineString();
             s+="});";
             return s;
+        },
+        getParamsHelp:function(){
+            var p={};
+            var params=this.params;
+            for(var i=0;i<params.length;i++){
+                if(p.hasOwnProperty(params[i].name)){
+                    p[params[i].name]|=!params[i].hasDefault;
+                }else{
+                    p[params[i].name]=!params[i].hasDefault;
+                }
+            }
+            var arr=[];
+            for(var i in p){
+                arr.push({name:i,necessary:p[i]});
+            }
+            return arr;
         }
     }
     function newExtentsPart(template,node,extPart,s,outerChildNodes,outerElement,props,part){
@@ -3147,17 +3164,21 @@ var turtle,$t,
         t.template=template;
         t.super=extPart;
         var nodes=node.childNodes;
-        
+        t.$=new Service(template.service);
         initHTML(nodes,outerChildNodes,outerElement,props,t);
         t.store=slice.call(nodes);
         for(var i=nodes.length;i>0;i--){
             node.removeChild(nodes[0]);
         }
-        t.concat=function(arr){
-            if(t.super){
-                return t.super.concat(t.store).concat(arr);
+        t.to=function(part){
+            var proto=part.$.__proto__;
+            t.$.__proto__=proto;
+            part.$.__proto__=t.$;
+            if(extPart){
+                extPart.to(part);
             }
-            return t.store.concat(arr);
+            
+            push.apply(part.store,t.store);
         }
         return t;
     }
@@ -3183,15 +3204,15 @@ var turtle,$t,
         t.onInsert=null;
         t.isInsert=false;
         t.super=extPart;
+        t.$=new Service(template.service);
         var nodes=node.childNodes;
         
         initHTML(nodes,outerChildNodes,outerElement,props,t);
-        
+        t.store=[];
         if(extPart){
-            t.store=extPart.concat(slice.call(nodes));
-        }else{
-            t.store=slice.call(nodes);
+            extPart.to(t);
         }
+        t.store.push.apply(t.store,nodes);
         for(var i=nodes.length;i>0;i--){
             node.removeChild(nodes[0]);
         }
@@ -3229,7 +3250,6 @@ var turtle,$t,
             }else{
                 return [];
             }
-            
         },
         get child(){
             return getParts(this.elements);
@@ -3254,7 +3274,6 @@ var turtle,$t,
             }
         },
         getRect:function(){
-            
             if(this.isInsert){
                 var rects=[];
                 var rt;
@@ -3332,6 +3351,40 @@ var turtle,$t,
         get elemParent(){
             return this.begin.parentNode;
         },
+        insertTo:function(elem){
+            if(this.isInsert){
+                var elems=this.elements;
+                elems.unshift(this.begin);
+                elems.push(this.end);
+                /*cut scope*/
+                var scopeNodes=this.scopeNodes;
+                for(var i=0;i<scopeNodes.length;i++){
+                    $t.uiScope.cut(scopeNodes[i].scope);
+                }
+                appendNodes(elems,elem);
+                /*link scope*/
+                for(var i=0;i<scopeNodes.length;i++){
+                    $t.uiScope.link(scopeNodes[i].scope,elem);
+                }
+                if(isFunction(this.onInsert)){
+                    this.onInsert(elem);
+                }
+            }else{
+                appendNodes(this.store,elem);
+                /*link scope*/
+                var scopeNodes=this.scopeNodes;
+                for(var i=0;i<scopeNodes.length;i++){
+                    $t.uiScope.link(scopeNodes[i].scope,elem);
+                }
+                if(isFunction(this.onInsert)){
+                    this.onInsert(elem);
+                }
+                this.isInsert=true;
+                if(isFunction(this.oninsert)){
+                    this.oninsert();
+                }
+            }  
+        },
         insertBefore:function(elem){
             if(this.isInsert){
                 var elems=this.elements;
@@ -3361,6 +3414,9 @@ var turtle,$t,
                     this.onInsert(elem);
                 }
                 this.isInsert=true;
+                if(isFunction(this.oninsert)){
+                    this.oninsert();
+                }
             }
         },
         remove:function(){
@@ -3381,6 +3437,9 @@ var turtle,$t,
                 }
                 this.store=elems;
                 this.isInsert=false;
+                if(isFunction(this.onremove)){
+                    this.onremove();
+                }
             }
         },
         get scopeNodes(){
@@ -4268,40 +4327,39 @@ var turtle,$t,
             }
         }
     }
-    Service.prototype=
-        {
-            require:function(n){
-                if(!this.hasOwnProperty(n)){
-                    this[n]=getService(n);
-                }
-                return this[n];
-            },
-            onDefine:UI.prototype.onDefine,
-            emitOnDefine:UI.prototype.emitOnDefine,
-            define:function(name,s){
-                try{
-                    this[name]=eval("("+s+")");    
-                }catch(e){
-                    _catch(e);
-                }
-                this.emitOnDefine(name,this[name]);
-            },
-            toDefineString:function(){
-                var s='new $t.Service(';
-                var fns=[];
-                for(var i in this){
-                    if(this.hasOwnProperty(i)){
-                        fns.push('"'+i+'":'+this[i].toString());    
-                    }
-                }
-                if(fns.length>0){
-                    s+='{'+fns.join(',')+'})';
-                }else{
-                    s+=')';
-                }
-                return s;
+    Service.prototype={
+        require:function(n){
+            if(!this.hasOwnProperty(n)){
+                this[n]=getService(n);
             }
+            return this[n];
+        },
+        onDefine:UI.prototype.onDefine,
+        emitOnDefine:UI.prototype.emitOnDefine,
+        define:function(name,s){
+            try{
+                this[name]=eval("("+s+")");    
+            }catch(e){
+                _catch(e);
+            }
+            this.emitOnDefine(name,this[name]);
+        },
+        toDefineString:function(){
+            var s='new $t.Service(';
+            var fns=[];
+            for(var i in this){
+                if(this.hasOwnProperty(i)){
+                    fns.push('"'+i+'":'+this[i].toString());    
+                }
+            }
+            if(fns.length>0){
+                s+='{'+fns.join(',')+'})';
+            }else{
+                s+=')';
+            }
+            return s;
         }
+    }
     function UITeam(){}
     UITeam.prototype=new function (){
         var t={
@@ -4710,6 +4768,7 @@ var turtle,$t,
     fn.removeItem=removeItem;
     fn.UITemplate=UITemplate;
     fn.importUIJS=importUIJS;
+    fn.importUIHTML=importUIHTML;
     fn.onPropertyChange=onPropertyChange;
     fn.bindNodeProperty=bindNodeProperty;
     fn.bindFunction=bindFunction;

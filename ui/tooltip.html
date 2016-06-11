@@ -1,0 +1,42 @@
+<xmp>
+    <div ref="tip" style="min-width:100px;" class="abs uhide noevent left0 pdip5 rdip8 bgray15 shadowless zidx3 animated duration5 fadeIn"><!content></div>
+    <script>
+        var elemTip=part.elemTip=$t.refs.tip.pop();
+        var width={width!}.string();
+        if(width!==''){
+            elemTip.style.width=width;
+        }
+        var minWidth={minwidth!}.string();
+        if(minWidth!==''){
+            elemTip.style.minWidth=minWidth;
+        }
+        part.oninsert=function(){
+            var p=elemTip.parentNode;
+            if(!p){
+                return;
+            }
+            p.onmouseenter=function(){
+                part.$.onlyshow(elemTip);
+            }
+        };
+    </script>
+</xmp>
+<xmp ui="tooltip" service="onlyshow">
+    (function(){
+        var lst=[];
+        var timeid=[];
+        return function(elemTip){
+            var len=lst.length;
+            for(var i=0;i<len;i++){
+                $t.addClass(lst.pop(),'uhide');
+                clearTimeout(timeid.pop());
+            }
+            $t.removeClass(elemTip,'uhide');
+            elemTip.style.top=-elemTip.offsetHeight+'px';
+            lst.push(elemTip);
+            timeid.push(setTimeout(function(){
+                $t.addClass(lst.pop(),'uhide');
+            },2000));
+        }
+    })()
+</xmp>

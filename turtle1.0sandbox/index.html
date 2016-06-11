@@ -14,27 +14,108 @@
   </head>
   <body style="overflow:scroll;">
     <xmp ui="toolbtn"><div class="pdip2" style="display:inline-block;cursor:pointer;">
+            <ui:tooltip minwidth="150px">{sortpath!}:{name!}<br>{desc!}</ui:tooltip>
             <div ref='toolbtn' class="pdip5 rem1 fz12 ct2 bblue12">
-                <img src="../images/blacktocat.png" class="wem2 hem2"/>
-                <div>{name!}</div>
-                <div>{desc}</div>
+                <img ref="img" class="wem1 hem1"/>
             </div>
         </div><script var='toolbtn'>
-            var btns=$t.refs.toolbtn;
-            var name=props.name;
+            
+            var img=part.elemImg=$t.refs.img.pop();
+            var name={name!}.string();
+            var sortPath={sortpath!}.string();
+            var iconPath={icon!}.string();
+            if(iconPath){
+                img.src=iconPath;
+            }else{
+                img.src="../images/blacktocat.png";
+            }
             part.check=function(){
-                for(var i=0;i<btns.length;i++){
-                    $t.removeClass(btns[i],'fgray15');
-                }
+                part.$.clearCheck();
                 $t.addClass(toolbtn,'fgray15');
                 $rootScope.toolName=name;
+                $rootScope.sortPath=sortPath;
             }
             toolbtn.onclick=function(){
                 part.check();
             }
         </script></xmp>
+    <xmp ui="toolbtn" service="clearCheck">
+        function(){
+            var btns=$t.refs.toolbtn;
+            for(var i=0;i<btns.length;i++){
+                $t.removeClass(btns[i],'fgray15');
+            }
+            $rootScope.toolName='';
+            $rootScope.sortPath='';
+        }
+    </xmp>
+    <xmp ui="paramitem">
+        <!scope m|i:0,datas:props.data>
+        <!for ;i<props.data.length;i++>
+        <div>
+            <span : style.color:="props.data[i].necessary?'#f00':''"><!= props.data[i].name+(props.data[i].necessary?'*':'')></span>：<input : bind:="'datas.'+i+'.value'"/></div>
+        </div>
+        <!end>
+        <div>innerHTML<textarea></textarea></div>
+    </xmp>
+    <xmp ui="paraminputbox">
+        <div ref="panel" class="abs pdip15 left0 top0 right0 bottom0 ct uhide zidx10">
+            <div class="rdip15 ipdip5 pdip1" style="background-image:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#29c3e9), to(#09a3c9));-webkit-box-shadow: inset 0 0 0.0625em #000,.125em .125em 1em rgba(0,0,0,.2);box-shadow:inset 0 0 0.0625em #000,.125em .125em 1em rgba(0,0,0,.2);">
+                <div></div>
+                <div ref="title" class="ct fb fgray15 pdipb10"></div>
+                <div ref="content" class="bgray15 ub-ver ipdip10 ilb fz18 ibdgray12"></div>
+                <div class="bgray15 rdipb14 hdip24 ifloat ict">
+                    <div ref="cancel" class="w50 h100" style="cursor:pointer;">取消</div>
+                    <div ref="ok" class="w50 h100" style="cursor:pointer;">确定</div>
+                </div>
+            </div>
+        </div>
+        <script>
+            var elemPanel=part.elemPanel=$t.refs.panel.pop();
+            var elemTitle=part.elemTitle=$t.refs.title.pop();
+            var elemContent=part.elemContent=$t.refs.content.pop();
+            var elemOK=part.elemOK=$t.refs.ok.pop();
+            var elemCancel=part.elemCancel=$t.refs.cancel.pop();
+            elemCancel.onclick=function(){
+                fnOK=null;
+                $t.addClass(elemPanel,'uhide');
+                paramPart.remove();
+            }
+            var fnOK,paramPart;
+            elemOK.onclick=function(){
+                var data=paramPart.props.data;
+                var newP={};
+                for(var i=0;i<data.length;i++){
+                    if(data[i].necessary&&data[i].value===''){
+                        return;
+                    }
+                    newP[data[i].name]=data[i].value;
+                }
+                var fn=fnOK;
+                elemCancel.onclick();
+                fn(newP);
+            }
+            part.show=function(title,params,fn){
+                
+                for(var i in params){
+                    params[i].value='';
+                }
+                // if(params.length>0){
+                    elemContent.innerHTML='';
+                    paramPart=$t.renderIn('paramitem','ui',elemContent,null,null,{data:params});
+                    elemTitle.innerHTML='请输入参数（'+title+'）';
+                    $t.removeClass(elemPanel,'uhide');
+                    fnOK=fn;
+                // }else{
+                    // fn();
+                // }
+            }
+        </script>
+    </xmp>
     <xmp ui="drawui">
-        <div tabname="布局" ref="panel" class="full" style="overflow: hidden;">
+        
+        <div tabname="布局" ref="panel" class="full" style="overflow: hidden;cursor:pointer;">
+            
             <div style="color:#d0d0d0">
 <div>   这里要实现：</div>
 <div>    1.鼠标画矩形（组件）</div>
@@ -42,9 +123,11 @@
 <div>    3.点击矩形出现菜单（显示属性，跳转到dom节点）</div>
 <div>    4.复制剪切黏贴组件和标签</div>
 <div>    5.拖移组件和标签（切换父和脱离父）</div>
+<div>    6.鼠标移动时高亮</div>
             </div>
             <div ref="rect" style="background-color:rgba(0,128,255,0.5);" class="abs uhide"></div>
             <div ref="menu" style="" class="abs uhide shadowless pdip5 bgray15">
+                <set style="cursor: pointer;">
                 <div>审查节点</div>
                 <div>审查组件</div>
                 <div>审查属性</div>
@@ -56,6 +139,7 @@
                 <div>剪切</div>
                 <div>粘贴</div>
                 <div>删除</div>
+                </set>
             </div>
         </div>
         <script>
@@ -65,20 +149,28 @@
             var pt1,pt2;
             var style=elemRect.style;
             var menuStyle=menu.style;
+            var x1,y1;
+            var body=document.body;
+            var pib=$t.parts.pib.pop();
             $t.dropRect(panel,function(x,y){
                 $t.removeClass(elemRect,'uhide');
                 $t.addClass(menu,'uhide');
-                style.left=x+'px';
-                style.top=y+'px';
+                x1=body.scrollLeft;
+                y1=body.scrollTop;
+                style.left=x+x1+'px';
+                style.top=y+y1+'px';
                 style.width='0';
                 style.height='0';
             },function(rect){
-                style.left=rect.left+'px';
-                style.top=rect.top+'px';
-                style.width=rect.width+'px';
-                style.height=rect.height+'px';
+                style.left=rect.left+x1+'px';
+                style.top=rect.top+y1+'px';
+                style.width=rect.width+body.scrollLeft-x1+'px';
+                style.height=rect.height+body.scrollTop-y1+'px';
             },function(rect){
                 $t.addClass(elemRect,'uhide');
+                if(rect.width===0&&rect.height===0){
+                    return;
+                }
                 var name=$rootScope.toolName;
                 if(name){
                     /*
@@ -106,11 +198,15 @@
                 var end=document.elementFromPoint(rect.screenLeft+rect.width,rect.screenTop+rect.height);
                 elems.push.apply(elems,getElementsBetween(begin,end));
                 elems.push(end);
-                
-                var part=$t.renderBefore(name,'ui',begin);
-                debugger;
-                part.setSize(rect);
-                showMenu(rect);
+                /*
+                 * 键入参数
+                 */
+                var ui=$t.importUIHTML(name,$rootScope.sortPath);
+                pib.show(name,ui.getParamsHelp(),function(props){
+                    var part=$t.renderBefore(name,'ui',begin,null,null,props);
+                    part.setSize(rect);
+                    // showMenu(rect); 
+                });
             }
             var select=part.select=function(rect,name){
                 var elems=[];
@@ -119,13 +215,19 @@
                 var end=document.elementFromPoint(rect.screenLeft+rect.width,rect.screenTop+rect.height);
                 elems.push.apply(elems,getElementsBetween(begin,end));
                 elems.push(end);
-                
-                
             }
+            $t.bindFunction($rootScope,'toolName',function(v){
+                if(v){
+                    panel.style.cursor="crosshair";    
+                }else{
+                    panel.style.cursor="pointer";
+                }
+            });
+            
         </script>
     </xmp>
     <xmp>
-        <!var toolName:''>
+        <!var toolName:'',sortPath:''>
         <app:top2></app:top2>
         <app:content key="Sandbox">
             <ui:button skin="fround" text='沙盘配置：官方组件'></ui:button>
@@ -134,45 +236,31 @@
                     <div style="width:200px;padding:5px;">
                         <ui:tabbox>
                             <div tabname="组件">
-                                <div>
-                                    <ui:vctrl lazy minwidth="30">
-                                        <ui:toolbtn name="" desc="取消"></ui:toolbtn>
-                                        <div>选中：<!- toolName></div>
-                                        <ui:button text="新建组件"></ui:button>
-                                    </ui:vctrl>
+                                <div class="pdip10">
+                                    <a href="javascript:;"> 取消选择 <script type="on">click:function(){  
+                                        $t.ui.toolbtn.service.clearCheck();                                          
+                                    }</script></a>
+                                    <a href="javascript:;"> 新建组件 <script type="on">click:function(){  
+                                                                                  
+                                    }</script></a>
+                                    <!- toolName>
                                 </div>
-                                <!! $t.ui.toolbtn.parts[0].check()>
-                                <ui:growpanel extend="1" title="容器和布局">
-                                    <ui:vctrl lazy minwidth="60">
-                                        <ui:toolbtn name="splitbox" desc="左右分栏"></ui:toolbtn>
-                                        <ui:toolbtn name="vctrl" desc="平分宽度"></ui:toolbtn>
-                                        <ui:toolbtn name="movepanel" desc="移动面板"></ui:toolbtn>
-                                        <ui:toolbtn name="growpanel" desc="伸展面板"></ui:toolbtn>
-                                    </ui:vctrl>
-                                </ui:growpanel>
-                                <ui:growpanel title="元件和逻辑">
-                                    <ui:vctrl minwidth="50">
-                                        
-                                    </ui:vctrl>
-                                </ui:growpanel>
-                                <ui:growpanel title="富组件">
-                                    <ui:vctrl minwidth="50">
-                                        
-                                    </ui:vctrl>
-                                </ui:growpanel>
-                                <ui:growpanel title="动画和其他">
-                                    <ui:vctrl minwidth="50">
-                                        
-                                    </ui:vctrl>
-                                </ui:growpanel>
-                                <ui:growpanel title="非官方">
-                                    <ui:vctrl minwidth="50">
-                                        
-                                    </ui:vctrl>
-                                </ui:growpanel>
+                                <!async>
+                                <!! $rootScope.partsInfo=$t.require('partsInfo.js','partsInfo');>
+                                <!var i:0,j:0>
+                                <!for ;i<partsInfo.length;i++>
+                                    <ui:growpanel extend="1" : title:="partsInfo[i].name">
+                                        <ui:vctrl lazy minwidth="40">
+                                        <!for j=0;j<partsInfo[i].data.length;j++>
+                                            <ui:toolbtn : icon:="partsInfo[i].data[j].icon" sortpath:="partsInfo[i].data[j].sortPath" name:="partsInfo[i].data[j].name" desc:="partsInfo[i].data[j].desc"></ui:toolbtn>
+                                        <!end>
+                                        </ui:vctrl>
+                                    </ui:growpanel>
+                                <!end>
+                                <!! part.emitResize()>
+                                <!end>
                             </div>
                             <div tabname="属性">
-                                <ui:attr ></ui:attr>
                             </div>
                         </ui:tabbox>
                     </div>
@@ -188,6 +276,7 @@
                 </ui:splitbox>
         </app:content>
         <app:bottom></app:bottom>
+        <ui:paraminputbox partname="pib"></ui:paraminputbox>
     </xmp>
   </body>
 </html>
