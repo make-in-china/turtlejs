@@ -1,5 +1,5 @@
 <xmp>
-    <div class="shadowless pdip5 mdip5 rdip5" style="display:inline-block;">
+    <div ref="panel" class="shadowless pdip5 mdip5 rdip5">
         <div class="ub ct">
             <div class="ub-f1 fb {%switch({align!0}){case 2:'ct';break;case 1:'right';}%} pdip5">{title!}</div>
             <set lazy append class="fz24" ref="sub">
@@ -11,9 +11,15 @@
         </div>
         <div class="ub-f1 zidx2" ref="content"><!content></div>
         <script>
-            var add=$t.refs.add.pop();
-            var sub=$t.refs.sub.pop();
-            var content=$t.refs.content.pop();
+            var panel=part.elemPanel=$t.refs.panel.pop();
+            var add=part.elemAdd=$t.refs.add.pop();
+            var sub=part.elemSub=$t.refs.sub.pop();
+            var content=part.elemContent=$t.refs.content.pop();
+            var isInline={inline!false}.bool();
+            if(isInline){
+                panel.style.display='inline-block';
+            }
+            
             part.max=add.onclick=function(){
                 removeClass(sub,"uhide");
                 addClass(add,"uhide");

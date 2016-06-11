@@ -10,7 +10,6 @@
             var pt=$t.refs.pt.pop();
             var width={width!50};
             var height={height!50};
-            var dropMove=$t.require(part.template.path+'/dropMove.js','dropMove');
             var style=pt.style;
             switch(size){
                 case 'width':
@@ -19,7 +18,7 @@
                     style.top='0';
                     style.height=height+'px';
                     style.width='4px';
-                    dropMove(pt,pt,1,0,function(){
+                    $t.dropMove(pt,pt,1,0,function(){
                         content.style.width=pt.offsetLeft+4+'px';
                         part.emitResize();
                     });
@@ -30,7 +29,7 @@
                     style.width=width+'px';
                     style.height='4px';
                     style.cursor='n-resize';
-                    dropMove(pt,pt,2,0,function(){
+                    $t.dropMove(pt,pt,2,0,function(){
                         content.style.height=pt.offsetTop+4+'px';
                         part.emitResize();
                     });
@@ -41,7 +40,7 @@
                     style.width='4px';
                     style.height='4px';
                     style.cursor='nwse-resize';
-                    dropMove(pt,pt,0,0,function(){
+                    $t.dropMove(pt,pt,0,0,function(){
                         content.style.width=pt.offsetLeft+4+'px';
                         content.style.height=pt.offsetTop+4+'px';
                         part.emitResize();

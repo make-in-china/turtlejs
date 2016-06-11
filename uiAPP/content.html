@@ -2,20 +2,20 @@
     <div style="background-color:#2b2b2b;">
         <div style="max-width:{%{maxwidth!800}%}px;margin:0 auto;overflow:hidden;" class="ifloat">
             <ui:vctrl minwidth="100">
-                <set class="ct2 fz25" style="padding:5px 10px;line-height:100%;color:#fff;">
-                  <a href="../turtle1.0course/index.html">
+                <set class="ct2 fz25" style="height:60px;padding:5px 10px;line-height:100%;color:#fff;">
+                  <a ref='Course' href="../turtle1.0course/index.html">
                       Course<br>
                       <span class="fz12">教程</span>
-                  </a><a href="../turtle1.0style/index.html">
+                  </a><a ref='Style' href="../turtle1.0style/index.html">
                       Style<br>
                       <span class="fz12">样式</span>
-                  </a><a href="../turtle1.0sandbox/index.html">
+                  </a><a ref='Sandbox' href="../turtle1.0sandbox/index.html">
                       Sandbox<br>
                       <span class="fz12">沙盒</span>
-                  </a><a href="../turtle1.0api/index.html">
+                  </a><a ref='API' href="../turtle1.0api/index.html">
                       API<br>
                       <span class="fz12">接口</span>
-                  </a><a href="../turtle1.0sandbox/part.html">
+                  </a><a ref='Parts' href="../turtle1.0sandbox/part.html">
                       Parts<br>
                       <span class="fz12">组件</span>
                   </a>
@@ -29,8 +29,19 @@
         </div>
     </div>
     <script>
+        var keys={
+                Course:$t.refs.Course.pop(),
+                Style:$t.refs.Style.pop(),
+                Sandbox:$t.refs.Sandbox.pop(),
+                API:$t.refs.API.pop(),
+                Parts:$t.refs.Parts.pop()
+            };
+        var key={key!Course}.string();
+        $t.addClass(keys[key],'fb');
+        keys[key].style.color="#ffd000";
+        keys[key].href='javascript:;';
         $t.onResize(function(){
             part.emitResize();
-        });
+        })
     </script>
 </xmp>

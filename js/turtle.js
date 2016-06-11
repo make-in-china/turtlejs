@@ -421,7 +421,11 @@ var turtle,$t,
             },delay);
         }
     }
+    function Empty(){}
     function getDebounce(fn){
+        if(!isFunction(fn)){
+            return Empty;
+        }
         var timeid=0;
         return function(delay){
             if(timeid>0){
@@ -1944,14 +1948,220 @@ var turtle,$t,
         }
         return n;
     }
-    function cloneBewtween(node1,node2){
-        var nodes=[];
+    function dropRect(elem,fnbegin,fn,fnend){
         
+        elem.addEventListener("mousedown",md);
+        elem.addEventListener("touchstart",td);
+        elem.movePosition={left:0,top:0};
+        with(document.body){
+            addEventListener("mouseup",mu);
+            addEventListener("touchend",tu);
+            addEventListener("touchcancel",tu);
+        }
+        var start,offsetLeft,offsetTop;
+        function setOffset(){
+            
+            var node=elem;
+            var t=0,l=0;
+            var topE=document.documentElement;
+            while(node!==topE){
+                t+=node.offsetTop;
+                l+=node.offsetLeft;
+                node=node.parentNode;
+            }
+            offsetLeft=l;
+            offsetTop=t;
+        }
+        function md(e){
+            start=e;
+            setOffset();
+            document.body.addEventListener("mousemove",mm);
+            fnbegin(offsetLeft,offsetTop);
+        }
+        function td(e){
+            start=e.changedTouches[0];
+            setOffset();
+            fnbegin(offsetLeft,offsetTop);
+            document.body.addEventListener("touchmove",tm);
+        }
+        function mm(e){
+            if(start){
+                fn(getRectByPoint(start.x,start.y,e.clientX,e.clientY));
+            }
+        }
+        function getRectByPoint(x1,y1,x2,y2){
+            var rect={}
+            if(x1>x2){
+                rect.left=x2;
+                rect.width=x1-x2;
+            }else{
+                rect.left=x1;
+                rect.width=x2-x1;
+            }
+            if(y1>y2){
+                rect.top=y2;
+                rect.height=y1-y2;
+            }else{
+                rect.top=y1;
+                rect.height=y2-y1;
+            }
+            rect.screenLeft=rect.left;
+            rect.screenTop=rect.top;
+            rect.left-=offsetLeft;
+            rect.top-=offsetTop;
+            return rect;
+        }
+        function tm(e){
+            if(start){
+                fn(getRectByPoint(start.changedTouches[0].clientX,start.changedTouches[0].clientY,e.changedTouches[0].clientX,e.changedTouches[0].clientY));
+            }
+        }
+        function mu(e){
+            if(start){
+                fnend(getRectByPoint(start.x,start.y,e.clientX,e.clientY));
+                start=null;
+                document.body.removeEventListener("mousemove",mm);
+            }
+        }
+        function tu(e){
+            if(start){
+                fnend(getRectByPoint(start.changedTouches[0].clientX,start.changedTouches[0].clientY,e.changedTouches[0].clientX,e.changedTouches[0].clientY));
+                start=null;
+                document.body.removeEventListener("touchmove",tm);
+            }
+        }
+    }
+    function dropMove(elemTarget,elemMove,arrow,noOut,fn){
+        fn=getDebounce(fn);
+        elemTarget.addEventListener("mousedown",md);
+        elemTarget.addEventListener("touchstart",td);
+        elemTarget.movePosition={left:0,top:0};
+        with(document.body){
+            addEventListener("mouseup",mu);
+            addEventListener("touchend",tu);
+            addEventListener("touchcancel",tu);
+        }
+        var start,startLeft,startTop;
+        function md(e){
+            startLeft=elemMove.offsetLeft;
+            startTop=elemMove.offsetTop;
+            start=e;
+            document.body.addEventListener("mousemove",mm);
+        }
+        function td(e){
+            startLeft=elemMove.offsetLeft;
+            startTop=elemMove.offsetTop;
+            start=e.changedTouches[0];
+            document.body.addEventListener("touchmove",tm);
+        }
+        function mmove(e){
+            switch(arrow){
+                case 1:
+                    setLeft(startLeft+e.x-start.x);
+                    break;
+                case 2:
+                    setTop(startTop+e.y-start.y);
+                    break;
+                case 3:
+                    setLeft(startLeft+e.clientX-start.x);
+                    setTop(startTop+e.clientX-start.x);
+                    break;
+                case 4:
+                    setLeft(startLeft+e.clientY-start.y);
+                    setTop(startTop+e.clientY-start.y);
+                    break;
+                default:
+                    setLeft(startLeft+e.x-start.x);
+                    setTop(startTop+e.y-start.y);
+            }
+            fn(30);
+        }
+        function mm(e){
+            if(start){
+                mmove(e);
+            }
+        }
+        function setLeft(v){
+            if(noOut){
+                if(v<0){
+                    v=0;
+                }else if(v+elemMove.offsetWidth>elemMove.parentNode.offsetWidth){
+                    v=elemMove.parentNode.offsetWidth-elemMove.offsetWidth;
+                }
+            }
+            elemMove.style.left=v+'px';
+            elemTarget.movePosition.left=v;
+        }
+        function setTop(v){
+            if(noOut){
+                if(v<0){
+                    v=0;
+                }else if(v+elemMove.offsetHeight>elemMove.parentNode.scrollHeight){
+                    v=elemMove.parentNode.offsetHeight-elemMove.offsetHeight;
+                }
+            }
+            elemMove.style.top=v+'px';
+            elemTarget.movePosition.top=v;
+        }
+        function tmove(e){
+            switch(arrow){
+                case 1:
+                    setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
+                    break;
+                case 2:
+                    setTop(startTop+e.changedTouches[0].clientY-start.changedTouches[0].clientY);
+                    break;
+                case 3:
+                    setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
+                    setTop(startTop+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
+                    break;
+                case 4:
+                    setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientY);
+                    setTop(startTop+e.changedTouches[0].clientY-start.changedTouches[0].clientY);
+                    break;
+                default:
+                    setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
+                    setTop(startTop+e.changedTouches[0].clientY-start.changedTouches[0].clientY);
+            }
+            fn(30);
+        }
+        function tm(e){
+            if(start){
+                tmove(e);
+            }
+        }
+        function mu(e){
+            if(start){
+                mmove(e);
+                start=null;
+                document.body.removeEventListener("mousemove",mm);
+            }
+        }
+        function tu(e){
+            if(start){
+                tmove(e);
+                start=null;
+                document.body.removeEventListener("touchmove",tm);
+            }
+        }
+    }
+    function cloneBetween(node1,node2){
+        var nodes=[];
         var l1=getNodeIndex2(node1);
         var l2=getNodeIndex2(node2);
         var p1=node1.parentNode;
         for(var i=l1+1;i<l2;i++){
             nodes.push(deepClone(p1.childNodes[i]));
+        }
+        return nodes;
+    }
+    function getElementsBetween(node1,node2){
+        var nodes=[];
+        var l1=getNodeIndex2(node1);
+        var l2=getNodeIndex2(node2);
+        var p1=node1.parentNode;
+        for(var i=l1+1;i<l2;i++){
+            nodes.push(p1.childNodes[i]);
         }
         return nodes;
     }
@@ -2212,7 +2422,7 @@ var turtle,$t,
                         p.removeChild(this.node);
                         p.removeChild(this.endNode);
                     }else{
-                        var nodes=cloneBewtween(this.node,this.endNode);
+                        var nodes=cloneBetween(this.node,this.endNode);
                         this.node.parentNode.insertBefore2(createBreakElement(nodes,this),this.node);
                     }
                 },
@@ -2290,7 +2500,7 @@ var turtle,$t,
                         p.removeChild(this.node);
                         p.removeChild(this.endNode);
                     }else{
-                        var nodes=cloneBewtween(this.node,this.endNode);
+                        var nodes=cloneBetween(this.node,this.endNode);
                         this.node.parentNode.insertBefore2(createBreakElement(nodes,this),this.node);
                     }
                 },
@@ -2454,6 +2664,11 @@ var turtle,$t,
             ,cls:function(node,outerChildNodes,outerElement,props,part){
                 $t.clsNode.push(node);
                 /*不要删node.removeAttribute('cls');*/
+            }
+            ,partmain:function(node,outerChildNodes,outerElement,props,part){
+                if(part&&!part.partMain){
+                    part.partMain=node;
+                }
             }
         };
     function initHTML(c,outerChildNodes,outerElement,props,part){
@@ -3097,6 +3312,18 @@ var turtle,$t,
                 if("resize" in cs[i]){
                     cs[i].resize();
                 }
+            }
+        },
+        resize:function(){
+            this.emitResize();  
+        },
+        setSize:function(rect){
+            if(this.partMain){
+                var style=this.partMain.style;
+                style.left=rect.left+'px';
+                style.top=rect.top+'px';
+                style.width=rect.width+'px';
+                style.height=rect.height+'px';
             }
         },
         get innerHTML(){
@@ -4501,7 +4728,10 @@ var turtle,$t,
     fn.onViewOnce=onViewOnce;
     fn.removeBlockBetween=removeBlockBetween;
     fn.takeBlockBetween=takeBlockBetween;
-    
+    fn.getElementsBetween=getElementsBetween;
+    fn.cloneBetween=cloneBetween;
+    fn.dropMove=dropMove;
+    fn.dropRect=dropRect;
     function Turtle(){
         this.isTemplate=isTemplate;
         this.config=new Config();

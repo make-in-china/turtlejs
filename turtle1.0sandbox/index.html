@@ -13,20 +13,177 @@
     <script extend="1" baseUIPath="{name:'ui',path:'../ui'};{name:'app',path:'../uiAPP'}" src="../js/turtle.js"></script>
   </head>
   <body style="overflow:scroll;">
-    
+    <xmp ui="toolbtn"><div class="pdip2" style="display:inline-block;cursor:pointer;">
+            <div ref='toolbtn' class="pdip5 rem1 fz12 ct2 bblue12">
+                <img src="../images/blacktocat.png" class="wem2 hem2"/>
+                <div>{name!}</div>
+                <div>{desc}</div>
+            </div>
+        </div><script var='toolbtn'>
+            var btns=$t.refs.toolbtn;
+            var name=props.name;
+            part.check=function(){
+                for(var i=0;i<btns.length;i++){
+                    $t.removeClass(btns[i],'fgray15');
+                }
+                $t.addClass(toolbtn,'fgray15');
+                $rootScope.toolName=name;
+            }
+            toolbtn.onclick=function(){
+                part.check();
+            }
+        </script></xmp>
+    <xmp ui="drawui">
+        <div tabname="布局" ref="panel" class="full" style="overflow: hidden;">
+            <div style="color:#d0d0d0">
+<div>   这里要实现：</div>
+<div>    1.鼠标画矩形（组件）</div>
+<div>    2.画完放置矩形（组件）到父矩形（父组件）</div>
+<div>    3.点击矩形出现菜单（显示属性，跳转到dom节点）</div>
+<div>    4.复制剪切黏贴组件和标签</div>
+<div>    5.拖移组件和标签（切换父和脱离父）</div>
+            </div>
+            <div ref="rect" style="background-color:rgba(0,128,255,0.5);" class="abs uhide"></div>
+            <div ref="menu" style="" class="abs uhide shadowless pdip5 bgray15">
+                <div>审查节点</div>
+                <div>审查组件</div>
+                <div>审查属性</div>
+                <div>审查API</div>
+                <div>前移</div>
+                <div>后移</div>
+                <div>上移</div>
+                <div>复制</div>
+                <div>剪切</div>
+                <div>粘贴</div>
+                <div>删除</div>
+            </div>
+        </div>
+        <script>
+            var panel=part.elemPanel=$t.refs.panel.pop();
+            var elemRect=part.elemRect=$t.refs.rect.pop();
+            var menu=part.elemMenu=$t.refs.menu.pop();
+            var pt1,pt2;
+            var style=elemRect.style;
+            var menuStyle=menu.style;
+            $t.dropRect(panel,function(x,y){
+                $t.removeClass(elemRect,'uhide');
+                $t.addClass(menu,'uhide');
+                style.left=x+'px';
+                style.top=y+'px';
+                style.width='0';
+                style.height='0';
+            },function(rect){
+                style.left=rect.left+'px';
+                style.top=rect.top+'px';
+                style.width=rect.width+'px';
+                style.height=rect.height+'px';
+            },function(rect){
+                $t.addClass(elemRect,'uhide');
+                var name=$rootScope.toolName;
+                if(name){
+                    /*
+                     * 放置
+                     */
+                    pushUI(rect,name);
+                }else{
+                    /*
+                     * 选择
+                     */
+                    select(rect,name);
+                }
+            });
+            var showMenu=part.showMenu=function(rect){
+                
+                $t.removeClass(menu,'uhide');
+                menuStyle.left=rect.left+'px';
+                menuStyle.top=rect.top+'px';
+                
+            }
+            var pushUI=part.pushUI=function(rect,name){
+                var elems=[];
+                var begin=document.elementFromPoint(rect.screenLeft,rect.screenTop);
+                elems.push(begin);
+                var end=document.elementFromPoint(rect.screenLeft+rect.width,rect.screenTop+rect.height);
+                elems.push.apply(elems,getElementsBetween(begin,end));
+                elems.push(end);
+                
+                var part=$t.renderBefore(name,'ui',begin);
+                debugger;
+                part.setSize(rect);
+                showMenu(rect);
+            }
+            var select=part.select=function(rect,name){
+                var elems=[];
+                var begin=document.elementFromPoint(rect.screenLeft,rect.screenTop);
+                elems.push(begin);
+                var end=document.elementFromPoint(rect.screenLeft+rect.width,rect.screenTop+rect.height);
+                elems.push.apply(elems,getElementsBetween(begin,end));
+                elems.push(end);
+                
+                
+            }
+        </script>
+    </xmp>
     <xmp>
+        <!var toolName:''>
         <app:top2></app:top2>
-        <app:content>
+        <app:content key="Sandbox">
+            <ui:button skin="fround" text='沙盘配置：官方组件'></ui:button>
             <set style="max-width:100%;"></set>
-                <ui:splitbox height="1024px"  minwidth="50">
-                    <div style="background-color:#f0f0f0;width:200px;">
-                        <ui:vctrl minwidth="50">
-                            <div>最</div><div>小</div><div>5</div><div>0</div><div>最</div><div>小</div><div>5</div><div>0</div>
-                        </ui:vctrl>
+                <ui:splitbox height="1024px"  minwidth="300">
+                    <div style="width:200px;padding:5px;">
+                        <ui:tabbox>
+                            <div tabname="组件">
+                                <div>
+                                    <ui:vctrl lazy minwidth="30">
+                                        <ui:toolbtn name="" desc="取消"></ui:toolbtn>
+                                        <div>选中：<!- toolName></div>
+                                        <ui:button text="新建组件"></ui:button>
+                                    </ui:vctrl>
+                                </div>
+                                <!! $t.ui.toolbtn.parts[0].check()>
+                                <ui:growpanel extend="1" title="容器和布局">
+                                    <ui:vctrl lazy minwidth="60">
+                                        <ui:toolbtn name="splitbox" desc="左右分栏"></ui:toolbtn>
+                                        <ui:toolbtn name="vctrl" desc="平分宽度"></ui:toolbtn>
+                                        <ui:toolbtn name="movepanel" desc="移动面板"></ui:toolbtn>
+                                        <ui:toolbtn name="growpanel" desc="伸展面板"></ui:toolbtn>
+                                    </ui:vctrl>
+                                </ui:growpanel>
+                                <ui:growpanel title="元件和逻辑">
+                                    <ui:vctrl minwidth="50">
+                                        
+                                    </ui:vctrl>
+                                </ui:growpanel>
+                                <ui:growpanel title="富组件">
+                                    <ui:vctrl minwidth="50">
+                                        
+                                    </ui:vctrl>
+                                </ui:growpanel>
+                                <ui:growpanel title="动画和其他">
+                                    <ui:vctrl minwidth="50">
+                                        
+                                    </ui:vctrl>
+                                </ui:growpanel>
+                                <ui:growpanel title="非官方">
+                                    <ui:vctrl minwidth="50">
+                                        
+                                    </ui:vctrl>
+                                </ui:growpanel>
+                            </div>
+                            <div tabname="属性">
+                                <ui:attr ></ui:attr>
+                            </div>
+                        </ui:tabbox>
                     </div>
-                    <div style="background-color: #e8e8e8;">
-                        <ui:movepanel title="xxx" noout="1">
-                        12345</ui:movepanel>
+                    <div>
+                        <ui:tabbox lazy>
+                            <ui:drawui></ui:drawui>
+                            <iframe tabname="预览"></iframe>
+                            <div tabname="DOM树">DOM树</div>
+                            <div tabname="源码">源码</div>
+                            <div tabname="组件">组件</div>
+                        </ui:tabbox>
                     </div>
                 </ui:splitbox>
         </app:content>
