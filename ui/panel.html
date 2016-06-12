@@ -1,5 +1,5 @@
 <xmp>
-    <div ref="panel" class="shadowless pdip5 mdip5 rdip5" style="display:inline-block;vertical-align:top;">
+    <div partMain ref="panel" class="shadowless pdip5 mdip5 rdip5 hem1" style="display:inline-block;vertical-align:top;">
         <div class="ub ct">
             <div ref='title' class="ub-f1 fb ct pdip5">{title!}</div>
             <set lazy append style="font-size:1.5em !important;">
@@ -11,9 +11,15 @@
         <div ref="content" class="ub-f1 uof"><!content></div>
     </div>
     <script>
-        var panel=$t.refs.panel.pop();
-        var content=$t.refs.content.pop();
-        var elemTitle=$t.refs.title.pop();
+        var panel=part.elemPanel=$t.refs.panel.pop();
+        var content=part.elemContent=$t.refs.content.pop();
+        var elemTitle=part.elemTitle=$t.refs.title.pop();
+        var bgcolor={bgcolor!}.string();
+        if(bgcolor){
+            panel.style.backgroundColor=bgcolor;
+        }else{
+            panel.style.backgroundColor='#fff';
+        }
         part.show=function(){
             panel.style.display="inline-block";
         }

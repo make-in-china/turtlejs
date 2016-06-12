@@ -40,3 +40,16 @@
         }
     })()
 </xmp>
+<xmp ui="tooltip" service="hideAll">
+    (function(){
+        var lst=[];
+        var timeid=[];
+        return function(){
+            var len=lst.length;
+            for(var i=0;i<len;i++){
+                $t.addClass(lst.pop(),'uhide');
+                clearTimeout(timeid.pop());
+            }
+        }
+    })()
+</xmp>

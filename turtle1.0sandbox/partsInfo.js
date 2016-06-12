@@ -2,17 +2,17 @@ var partsInfo=[
     {
         name:"容器和布局",
         data:[
-                {name:"splitbox",sortPath:"ui",desc:"左右分栏",icon:""},
-                {name:"vctrl",sortPath:"ui",desc:"平分宽度",icon:""},
-                {name:"movepanel",sortPath:"ui",desc:"移动面板",icon:""},
-                {name:"growpanel",sortPath:"ui",desc:"伸展面板",icon:""},
-                {name:"panel",sortPath:"ui",desc:"面板",icon:""},
-                {name:"tabbox",sortPath:"ui",desc:"标签面板",icon:""},
-                {name:"bluebox",sortPath:"ui",desc:"蓝色多行面板",icon:""},
-                {name:"sizebox",sortPath:"ui",desc:"大小可变面板",icon:""},
-                {name:"swiper",sortPath:"ui",desc:"swiper3.0轮播组件",icon:""},
-                {name:"turtlecontrolpanel",sortPath:"ui",desc:"调试器",icon:""},
-                {name:"xhr",sortPath:"ui",desc:"xmlhttprequest组件",icon:""}
+                {name:"splitbox",sortPath:"ui",desc:"左右分栏",icon:"../images/splitbox.png"},
+                {name:"vctrl",sortPath:"ui",desc:"平分宽度",icon:"../images/vctrl.png"},
+                {name:"movepanel",sortPath:"ui",desc:"移动面板",icon:"../images/movepanel.png"},
+                {name:"growpanel",sortPath:"ui",desc:"伸展面板",icon:"../images/growpanel.png"},
+                {name:"panel",sortPath:"ui",desc:"面板",icon:"../images/panel.png"},
+                {name:"tabbox",sortPath:"ui",desc:"标签面板",icon:"../images/tabbox.png"},
+                {name:"bluebox",sortPath:"ui",desc:"蓝色多行面板",icon:"../images/bluebox.png"},
+                {name:"sizebox",sortPath:"ui",desc:"大小可变面板",icon:"../images/sizebox.png"},
+                {name:"swiper",sortPath:"ui",desc:"swiper3.0轮播组件",icon:"../images/swiper.png"},
+                {name:"turtlecontrolpanel",sortPath:"ui",desc:"调试器",icon:"../images/debugger.png"},
+                {name:"xhr",sortPath:"ui",desc:"xmlhttprequest组件",icon:"../images/xhr.png"}
             ]
     },
     {

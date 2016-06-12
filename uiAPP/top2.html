@@ -50,14 +50,19 @@
           <a ref="source" href="javascript:;">源码</a>
           <a ref="btn" href="javascript:;">组件实例</a>
           <a ref="uilist" href="javascript:;">组件清单</a>
+          <a ref="remove" href="javascript:;">删除顶部</a>
           </set>）
           <script>
                var btn=$t.refs.btn.pop();
                var uilist=$t.refs.uilist.pop();
                var source=$t.refs.source.pop();
                var rectmask=$t.refs.rectmask.pop();
-               var tree=$t.parts.tree.pop();
+               var remove=$t.refs.remove.pop();
                
+               var tree=$t.parts.tree.pop();
+               remove.onclick=function(){
+                   part.remove();
+               }
                btn.onclick=function(){
                     var elems=[];
                     var elem;

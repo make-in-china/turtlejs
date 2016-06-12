@@ -1509,7 +1509,8 @@ var turtle,$t,
         return _execByScope.call(getScopeBy(scope,node),s,node,outer,outerElement,props,part);
     }
     function _execByScope(s,node,outer,outerElement,props,part){
-        with(this){return eval(arguments[0])};
+        var $$$$$$$$$$$$$$$$=s;
+        with(this){return eval($$$$$$$$$$$$$$$$)};
     }
     function execScope(s,node,outerChildNodes,outerElement,props,part){
         execByScope(node,'extend(this,{'+s+'});',null,outerChildNodes,outerElement,props,part);
@@ -1606,9 +1607,9 @@ var turtle,$t,
     }
     
     function _execExpressionsByScope(s,v,node){
-        var arg={v:v,node:node};
+        var $$$$$$$$$$$$$$$$=s;
         with(this){
-            return eval(arguments[0])
+            return eval($$$$$$$$$$$$$$$$)
         };
     }
     function bindExpressionsByOrder(node,condition){
@@ -2845,8 +2846,8 @@ var turtle,$t,
         return _execValueByScope.call(getScopeBy(scope,node),s,v,node,outer,outerElement,props,part);
     }
     function _execValueByScope(s,v,node,outer,outerElement,props,part){
-        var arg={node:node,v:v,outer:outer,outerElement:outerElement,props:props,part:part}
-        with(this){return eval(arguments[0])};
+        var $$$$$$$$$$$$$$$$=s;
+        with(this){return eval($$$$$$$$$$$$$$$$)};
     }
     function bindEval(node,s,outer,outerElement,props,part,fn){
         var 
@@ -3136,6 +3137,16 @@ var turtle,$t,
             s+="});";
             return s;
         },
+        parseParamsHelp:function(p){
+            var params=this.params;
+            for(var i=0;i<params.length;i++){
+                if(p.hasOwnProperty(params[i].name)){
+                    p[params[i].name]|=!params[i].hasDefault;
+                }else{
+                    p[params[i].name]=!params[i].hasDefault;
+                }
+            }
+        },
         getParamsHelp:function(){
             var p={};
             var params=this.params;
@@ -3145,6 +3156,9 @@ var turtle,$t,
                 }else{
                     p[params[i].name]=!params[i].hasDefault;
                 }
+            }
+            if(this.extends){
+                this.extends.parseParamsHelp(p);
             }
             var arr=[];
             for(var i in p){
@@ -4791,6 +4805,8 @@ var turtle,$t,
     fn.cloneBetween=cloneBetween;
     fn.dropMove=dropMove;
     fn.dropRect=dropRect;
+    fn.slice=slice;
+    fn.push=push;
     function Turtle(){
         this.isTemplate=isTemplate;
         this.config=new Config();
