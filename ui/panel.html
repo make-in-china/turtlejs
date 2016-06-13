@@ -1,14 +1,14 @@
-<xmp>
-    <div partMain ref="panel" class="shadowless pdip5 mdip5 rdip5 hem1" style="display:inline-block;vertical-align:top;">
+<xmp extends="styleprop">
+    <div partMain ref="panel" class="shadowless pdip5 mdip5 rdip5" style="display:inline-block;vertical-align:top;">
         <div class="ub ct">
-            <div ref='title' class="ub-f1 fb ct pdip5">{title!}</div>
+            <div ref='title' class="ub-f1 fb ct pdip5 hem1">{title!}</div>
             <set lazy append style="font-size:1.5em !important;">
                 <ui:button skin="close"><script var="panel">
                     panel.style.display="none";
                 </script></ui:button>
             </set>
         </div>
-        <div ref="content" class="ub-f1 uof"><!content></div>
+        <div ref="content" class="uof"><!content></div>
     </div>
     <script>
         var panel=part.elemPanel=$t.refs.panel.pop();
@@ -32,6 +32,12 @@
         }
         part.setTitle=function(title){
             elemTitle.innerHTML=title;
+        }
+        var setSize=part.setSize;
+        part.setSize=function(rect){
+            $t.addClasses(content,['abs','top32','left5','right5','bottom5']);
+            part.setSize=setSize;
+            part.setSize(rect);
         }
         part.elemTitle=elemTitle;
         part.elemPanel=panel;

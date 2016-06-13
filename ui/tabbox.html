@@ -1,8 +1,8 @@
 <xmp>
-    <div ref="panel" class="abs left0 top0 right0 bottom0">
+    <div partMain ref="panel" class="full">
         <div ref='tabs' style="padding-top:5px;">
             <get name="tabsItem">
-                <div style="border:1px #808080 solid;border-bottom:0px;display: inline-block;padding:5px 10px 0;cursor:pointer;-webkit-border-top-left-radius:5px;-webkit-border-top-right-radius:5px;border-top-left-radius:5px;border-top-right-radius:5px;"></div>
+                <div tabitem style="border:1px #808080 solid;border-bottom:0px;display: inline-block;padding:5px 10px 0;cursor:pointer;-webkit-border-top-left-radius:5px;-webkit-border-top-right-radius:5px;border-top-left-radius:5px;border-top-right-radius:5px;"></div>
             </get>
         </div>
         <div ref='content' style="width:100%;" class="shadowless">
@@ -16,35 +16,46 @@
         var tabsItem=$t.getNode.tabsItem.children[0];
         delete $t.getNode.tabsItem;
         var tabItems=[];
-        part.resize=function(){
+        part.onresize=function(){
             content.style.height=panel.offsetHeight-tabs.offsetHeight+'px';
-            part.emitResize();
         }
-        for(var i=0;i<outerElement.length;i++){
-            var elem=outerElement[i];
-            var name=$t.getAttr(elem,'tabname',null);
-            if(name){
-                var tabItem=tabsItem.cloneNode();
-                tabItem.innerHTML=name;
-                                
-                tabs.appendChild(tabItem);
-                
+        // part.oninsert=function(){
+            // part.emitResize();
+        // }
+        
+        part.addItem=function addItem(name){
+            if(!name){
+                return ;
+            }
+            var elem=document.createElement('div');
+            elem.setAttribute('tabname',name);
+            var tabItem=tabsItem.cloneNode();
+            tabItem.innerHTML=name;
+            tabs.appendChild(tabItem);
+            content.appendChild(elem);
+            tabItems.push([tabItem,elem]);
+            elem.style.display="none";
+            tabItem.style.backgroundColor="rgba(0,0,0,0.1)";
+        }
+        for(var i=0;i<outer.length;i++){
+            var elem=outer[i];
+            if(elem.nodeType===1){
+                var name=$t.getAttr(elem,'tabname',null);
+                if(name){
+                    var tabItem=tabsItem.cloneNode();
+                    tabItem.innerHTML=name;
+                    tabs.appendChild(tabItem);
+                    content.appendChild(elem);
+                    tabItems.push([tabItem,elem]);
+                    elem.style.display="none";
+                    tabItem.style.backgroundColor="rgba(0,0,0,0.1)";
+                }
+            }else if(elem.nodeType===8){
                 content.appendChild(elem);
-                
-                
-                tabItems.push([tabItem,elem]);
-                
-                elem.style.display="none";
-                tabItem.style.backgroundColor="rgba(0,0,0,0.1)";
             }
         }
-        if(tabItems.length>0){
-            tabItems[0][0].style.backgroundColor="";
-            tabItems[0][1].style.display='';
-        }
-        tabs.onclick=function(e){
-            var t=e.target;
-            part.checkElem(t);
+        part.check=function(idx){
+            part.checkElem(tabItems[idx][0]);
         }
         part.checkElem=function(t){
             for(var i=0;i<tabItems.length;i++){
@@ -56,7 +67,21 @@
                     tabItems[i][0].style.backgroundColor="rgba(0,0,0,0.1)";
                 }
             }
+            part.emitResize();
+        }
+        if(tabItems.length>0){
+            part.checkElem(tabItems[0][0]);
+        }else{
+            part.addItem('default');
+            part.checkElem(tabItems[0][0]);
+        }
+        tabs.onclick=function(e){
+            var t=e.target;
+            if(t.hasAttribute('tabitem')){
+                part.checkElem(t);
+            };
         }
         $t.initHTML(content.children,null,null,null,part);
+        part.emitResize();
     </script>
 </xmp>

@@ -21,35 +21,26 @@
         };
     </script>
 </xmp>
-<xmp ui="tooltip" service="onlyshow">
-    (function(){
-        var lst=[];
-        var timeid=[];
-        return function(elemTip){
-            var len=lst.length;
-            for(var i=0;i<len;i++){
-                $t.addClass(lst.pop(),'uhide');
-                clearTimeout(timeid.pop());
-            }
-            $t.removeClass(elemTip,'uhide');
-            elemTip.style.top=-elemTip.offsetHeight+'px';
-            lst.push(elemTip);
-            timeid.push(setTimeout(function(){
-                $t.addClass(lst.pop(),'uhide');
-            },2000));
-        }
-    })()
-</xmp>
+<xmp ui="tooltip" service="list">[]</xmp>
 <xmp ui="tooltip" service="hideAll">
-    (function(){
-        var lst=[];
-        var timeid=[];
-        return function(){
-            var len=lst.length;
-            for(var i=0;i<len;i++){
-                $t.addClass(lst.pop(),'uhide');
-                clearTimeout(timeid.pop());
-            }
+    function(){
+        var lst=this.list;
+        var len=lst.length;
+        for(var i=0;i<len;i++){
+            var item=lst.pop();
+            $t.addClass(item.elem,'uhide');
+            clearTimeout(item.timeid);
         }
-    })()
+    }
+</xmp>
+<xmp ui="tooltip" service="onlyshow">
+    function(elemTip){
+        var lst=this.list;
+        this.hideAll();
+        $t.removeClass(elemTip,'uhide');
+        elemTip.style.top=-elemTip.offsetHeight+'px';
+        lst.push({elem:elemTip,timeid:setTimeout(function(){
+            $t.addClass(lst.pop().elem,'uhide');
+        },2000)});
+    }
 </xmp>

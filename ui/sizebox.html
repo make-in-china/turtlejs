@@ -1,23 +1,24 @@
 <xmp>
-    <div>
-        <div ref="content" style="overflow:hidden;width:{width!50}.pxtoem();height:{height!50}.pxtoem();background-color:{bgcolor!}.color;">
+    <div ref="panel" class="la2 borderbox">
+        <div ref="content" class="uof" style="width:{width!50}px;height:{height!50}px;background-color:{bgcolor!}.color;">
             <!content>
         </div>
-        <div ref="pt" style="box-sizing:border-box;" class="abs"></div>
+        <div ref="pt" class="abs borderbox"></div>
         <script>
             var size="{size!both}.only(both,width,height;both)";
-            var content=$t.refs.content.pop();
-            var pt=$t.refs.pt.pop();
-            var width={width!50};
-            var height={height!50};
+            var content=part.content=$t.refs.content.pop();
+            var panel=part.panel=$t.refs.panel.pop();
+            var pt=part.dropRect=$t.refs.pt.pop();
             var style=pt.style;
             switch(size){
                 case 'width':
-                    style.left=width-4+'px';
                     style.cursor='e-resize';
                     style.top='0';
                     style.height=height+'px';
                     style.width='4px';
+                    part.onresize=function(){
+                        style.left=content.offsetWidth-4+'px';
+                    }
                     $t.dropMove(pt,pt,1,0,function(){
                         content.style.width=pt.offsetLeft+4+'px';
                         part.emitResize();
@@ -25,28 +26,45 @@
                     break;
                 case 'height':
                     style.left='0';
-                    style.top=height-4+'px';
                     style.width=width+'px';
                     style.height='4px';
                     style.cursor='n-resize';
+                    part.onresize=function(){
+                        style.top=content.offsetHeight-4+'px';
+                    }
                     $t.dropMove(pt,pt,2,0,function(){
                         content.style.height=pt.offsetTop+4+'px';
                         part.emitResize();
                     });
                     break;
                 default:
-                    style.left=width-4+'px';
-                    style.top=height-4+'px';
                     style.width='4px';
                     style.height='4px';
                     style.cursor='nwse-resize';
+                    style.backgroundColor="#000";
+                    part.onresize=function(){
+                        style.left=content.offsetWidth-4+'px';
+                        style.top=content.offsetHeight-4+'px';
+                    }
                     $t.dropMove(pt,pt,0,0,function(){
-                        content.style.width=pt.offsetLeft+4+'px';
-                        content.style.height=pt.offsetTop+4+'px';
+                        var style=content.style;
+                        style.width=pt.offsetLeft+4+'px';
+                        style.height=pt.offsetTop+4+'px';
+                        var style=panel.style;
+                        style.width=pt.offsetLeft+4+'px';
+                        style.height=pt.offsetTop+4+'px';
                         part.emitResize();
                     });
             }
-            
+            part.setSize=function(rect){
+                var style=content.style;
+                style.width=rect.width+'px';
+                style.height=rect.height+'px';
+                var style=panel.style;
+                style.width=rect.width+'px';
+                style.height=rect.height+'px';
+                this.emitResize();
+            }
         </script>
     </div>
 </xmp>

@@ -1,5 +1,5 @@
 <xmp>
-    <div partMain ref="content" style="overflow:hidden;width:{width!100%};height:{height!100%};background-color:{bgcolor!}.color;"></div>
+    <div partMain ref="content" class="uof" style="width:{width!100%};height:{height!100%};background-color:{bgcolor!}.color;"></div>
     <get name="pt"><div style="box-sizing:border-box;z-index:2;" class="abs"></div></get>
     <script>
         var size="{size!}.only(width,height;width)";
@@ -47,7 +47,6 @@
                         style.left=elem.offsetLeft+elem.offsetWidth-4+'px';
                         style.top=elem.offseTop+'px';
                     }
-                    part.emitResize();
                 }
                 var needGiveWidth=[];
                 
@@ -77,6 +76,7 @@
                 clonePt=pt.cloneNode();
                 pts.push(clonePt);
                 (function(pt,elem){
+                    elem.style.boxSizing='border-box';
                     style=pt.style;
                     pt.elem=elem;
                     switch(size){
@@ -92,14 +92,15 @@
                                     width=minWidth;
                                 }
                                 elem.style.width=width+'px';
-                                resize();
+                                part.emitResize();
                             });
                             break;
                     }
                 })(clonePt,elems[i]);
             }
             $t.appendNodes(pts,content);
-            part.resize=resize;
+            part.onresize=resize;
+            part.emitResize();
         }
         $t.readyByRenderDocument.on(function(){
             setContent(outerElement);    

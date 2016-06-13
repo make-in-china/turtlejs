@@ -1,0 +1,27 @@
+<!-- 提供继承 -->
+<xmp>
+    <script>
+        part.onInit=function(finalPart){
+            part.$.parse({style!}.string,finalPart.partMain);
+        }
+    </script>
+</xmp>
+<script xmp ui="styleprop" service="parse">
+    (function(){
+        var rg=/;\s*$/;
+        return function(style,partMain){
+            if(partMain){
+                var oldStyle=partMain.getAttribute('style');
+                if(oldStyle.length>0){
+                    if(rg.test(oldStyle)){
+                        style+=oldStyle;
+                    }else{
+                        style+=';'+oldStyle;
+                    }
+                }
+                partMain.setAttribute('style',style);
+            }
+        }
+    })()
+    
+</script>

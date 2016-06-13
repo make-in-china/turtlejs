@@ -977,6 +977,15 @@ var turtle,$t,
         rect.bottom=rect.top+e.offsetHeight;
         return rect;
     }
+    function getOffsetPos(elem1,elem2){
+        var pos={x:0,y:0};
+        while(elem1&&elem1!=elem2){
+            pos.x+=elem1.offsetLeft;
+            pos.y+=elem1.offsetTop;
+            elem1=elem1.parentNode;
+        }
+        return pos;
+    }
     function each(elements, callback) {
         var i,
             key
@@ -1951,17 +1960,28 @@ var turtle,$t,
         }
         return n;
     }
-    function dropRect(elem,fnbegin,fn,fnend){
-        
-        elem.addEventListener("mousedown",md);
-        elem.addEventListener("touchstart",td);
-        elem.movePosition={left:0,top:0};
-        with(document.body){
-            addEventListener("mouseup",mu);
-            addEventListener("touchend",tu);
-            addEventListener("touchcancel",tu);
+    function DropRect(elem,fnbegin,fn,fnend){
+        this.on=function(){
+            elem.addEventListener("mousedown",md);
+            elem.addEventListener("touchstart",td);
+            with(document.body){
+                addEventListener("mouseup",mu);
+                addEventListener("touchend",tu);
+                addEventListener("touchcancel",tu);
+            }
         }
+        this.off=function(){
+            elem.removeEventListener("mousedown",md);
+            elem.removeEventListener("touchstart",td);
+            with(document.body){
+                removeEventListener("mouseup",mu);
+                removeEventListener("touchend",tu);
+                removeEventListener("touchcancel",tu);
+            }
+        }
+        
         var start,offsetLeft,offsetTop;
+        
         function setOffset(){
             var node=elem;
             var t=0,l=0;
@@ -2037,7 +2057,6 @@ var turtle,$t,
         fn=getDebounce(fn);
         elemTarget.addEventListener("mousedown",md);
         elemTarget.addEventListener("touchstart",td);
-        elemTarget.movePosition={left:0,top:0};
         with(document.body){
             addEventListener("mouseup",mu);
             addEventListener("touchend",tu);
@@ -2092,7 +2111,6 @@ var turtle,$t,
                 }
             }
             elemMove.style.left=v+'px';
-            elemTarget.movePosition.left=v;
         }
         function setTop(v){
             if(noOut){
@@ -2103,7 +2121,6 @@ var turtle,$t,
                 }
             }
             elemMove.style.top=v+'px';
-            elemTarget.movePosition.top=v;
         }
         function tmove(e){
             switch(arrow){
@@ -2949,9 +2966,7 @@ var turtle,$t,
                 t.datas=s.datas;
             }
             
-            if(!isObject(s.extends)){
-                t.extends=null;
-            }else{
+            if(isObject(s.extends)){
                 t.extends=s.extends;
             }
             
@@ -2972,7 +2987,9 @@ var turtle,$t,
             t.datas=[];
             t.isJSDefine=false;
             t.service=new Service();
-            t.extends=ext;
+            if(ext){
+                t.extends=ext;    
+            }
             var start=0;
             var idx=0;
             s.replace(memberRE,function(s0,name,s1,dft,s2,s3,limit,s4,s5,s6,filter,filterParam,index,sSource){
@@ -3104,7 +3121,6 @@ var turtle,$t,
                 part.insertBefore(uiNode);
             }
             removeNode(uiNode);
-        
             return part;
         },toDefineString:function(){
             var s='$t.ui.define("'+this.name+'","'+this.sortPath+'","'+this.path+'",{datas:';
@@ -3146,20 +3162,13 @@ var turtle,$t,
                     p[params[i].name]=!params[i].hasDefault;
                 }
             }
-        },
-        getParamsHelp:function(){
-            var p={};
-            var params=this.params;
-            for(var i=0;i<params.length;i++){
-                if(p.hasOwnProperty(params[i].name)){
-                    p[params[i].name]|=!params[i].hasDefault;
-                }else{
-                    p[params[i].name]=!params[i].hasDefault;
-                }
-            }
             if(this.extends){
                 this.extends.parseParamsHelp(p);
             }
+        },
+        getParamsHelp:function(){
+            var p={};
+            this.parseParamsHelp(p);
             var arr=[];
             for(var i in p){
                 arr.push({name:i,necessary:p[i]});
@@ -3232,6 +3241,7 @@ var turtle,$t,
         }
         t.store.unshift(begin);
         t.store.push(end);
+        t.emitInit(t);
         return t;
     }
     newPart.prototype={
@@ -3340,15 +3350,19 @@ var turtle,$t,
             }
         },
         emitResize:function(){
+            
+            if(!this.isInsert){
+                return;
+            }
+            if(this.onresize){
+                if(this.onresize()){
+                    return;
+                }   
+            }
             var cs=this.child;
             for(var i=0;i<cs.length;i++){
-                if("resize" in cs[i]){
-                    cs[i].resize();
-                }
+                cs[i].emitResize();
             }
-        },
-        resize:function(){
-            this.emitResize();  
         },
         setSize:function(rect){
             if(this.partMain){
@@ -3357,6 +3371,8 @@ var turtle,$t,
                 style.top=rect.top+'px';
                 style.width=rect.width+'px';
                 style.height=rect.height+'px';
+                style.boxSizing='border-box';
+                this.emitResize();
             }
         },
         get innerHTML(){
@@ -3433,6 +3449,14 @@ var turtle,$t,
                 }
             }
         },
+        emitInit:function(finalPart){
+            if(this.extends){
+                this.extends.emitInit(finalPart);
+            }
+            if(isFunction(this.onInit)){
+                this.onInit(finalPart);
+            }
+        },
         remove:function(){
             if(this.isInsert){
                 var elems=this.elements;
@@ -3454,6 +3478,10 @@ var turtle,$t,
                 if(isFunction(this.onremove)){
                     this.onremove();
                 }
+                var p=this.parent;
+                if(p){
+                    p.emitResize();    
+                }
             }
         },
         get scopeNodes(){
@@ -3465,6 +3493,12 @@ var turtle,$t,
                  }
              });
              return scopeNodes;
+        }
+    }
+    var emitResize=function(){
+        var parts=RootParts;
+        for(var i=0;i<parts.length;i++){
+            parts[i].emitResize();
         }
     }
     var onResize=function(fn){
@@ -4334,10 +4368,8 @@ var turtle,$t,
         );
         if(isObject(fns)){
             for(var i in fns){
-                if(isFunction(fns[i])){
-                    this[i]=fns[i];
-                    this.emitOnDefine(i,this[i]);
-                }
+                this[i]=fns[i];
+                this.emitOnDefine(i,this[i]);
             }
         }
     }
@@ -4553,6 +4585,7 @@ var turtle,$t,
             $t.ready(function(){
                 $t.renderDocument();
                 $t.readyByRenderDocument.isReady=true;
+                emitResize();
             });
         }
     }
@@ -4717,6 +4750,7 @@ var turtle,$t,
     fn.toArray=toArray;
     fn.moveArray=moveArray;
     fn.getRect=getRect;
+    fn.getOffsetPos=getOffsetPos;
     fn.encodeHTML=encodeHTML;
     fn.decodeHTML=decodeHTML;
     fn.idle=idle;
@@ -4804,7 +4838,7 @@ var turtle,$t,
     fn.getElementsBetween=getElementsBetween;
     fn.cloneBetween=cloneBetween;
     fn.dropMove=dropMove;
-    fn.dropRect=dropRect;
+    fn.DropRect=DropRect;
     fn.slice=slice;
     fn.push=push;
     function Turtle(){
@@ -4856,6 +4890,7 @@ var turtle,$t,
         this.isCompile=false;
         this.throwError=throwError;
         this.onResize=onResize;
+        this.emitResize=emitResize;
     }
     Turtle.prototype=fn;
     turtle=$t=new Turtle();

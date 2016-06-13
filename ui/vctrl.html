@@ -42,14 +42,15 @@
                 style=elems[i].style;
                 style.display='inline-block';
                 style.boxSizing='border-box';
+                style.verticalAlign='top';
                 style.width=width+"px";
             }
         }
-        part.resize=function(v){
+        part.onresize=function(v){
             if(part.isInsert){
                 setWidth();
             }
         }
-        $t.readyByRenderDocument.on(part.resize);
+        $t.readyByRenderDocument.on(part.onresize);
     </script>
 </xmp>

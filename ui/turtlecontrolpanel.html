@@ -11,9 +11,9 @@
         </ui:growpanel>
     </set>
     <script>
-        component.max=function(){
-            component.max=component.child[0].max;
-            return component.max();
+        part.max=function(){
+            part.max=part.child[0].max;
+            return part.max();
         }
         var script=$t.refs.script.pop();
         var run=$t.refs.run.pop();
@@ -22,7 +22,7 @@
             ret.innerHTML='';
             $t.appendNodes($t.parseHTML(script.value),ret);
         }
-        component.runHTML=function(html){
+        part.runHTML=function(html){
             script.value=html;
             ret.innerHTML='';
             $t.appendNodes($t.parseHTML(html),ret);
