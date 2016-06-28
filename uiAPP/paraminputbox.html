@@ -1,0 +1,117 @@
+<xmp ui="paramitem">
+    <!scope m|i:0,datas:props.data>
+    <!for ;i<props.data.length;i++>
+    <div>
+        <span : style.color:="props.data[i].necessary?'#f00':''" class="lhem1"><!= props.data[i].name+(props.data[i].necessary?'*':'')></span>：<br><input : bind:="'datas.'+i+'.value'"/></div>
+    </div>
+    <!end>
+    
+</xmp>
+<xmp extends='ui:skinpanel'>
+    <get to-p-ref='bottom'>
+        <div class='mhem2 ct'>
+            <div p-ref='btnMoreInner' class="fz12 wem8 mdip5 pointer hbblue15 abblue14 hfgray15 hem3 lhem3 uof rem1 bblue0 ct fgray0 shadowless">添加预设内容</div>
+        </div>
+    </get>
+    <script>
+        var 
+            elemContent=part.$content,
+            elemTitle=part.$title,
+            elemPanel=part.$panel,
+            elemBtnMoreInner=part.$btnMoreInner,
+            fnOK,fnCancel,paramPart,
+            r=$rootScope.rect,
+            pdroprect=$t.parts.droprect.last();
+        $t.addClass(elemContent,'ict','fz12');
+        
+        elemBtnMoreInner.onclick=function(e){
+            pdroprect.moreBox.show();
+        }
+        function cancel(){
+            fnCancel();
+            fnCancel=null;
+            fnOK=null;
+            $t.addClass(elemPanel,'uhide');
+            paramPart.remove();
+            window.removeEventListener('keydown',onkeydown);
+        }
+        function onkeydown(e){
+            switch(e.which){
+                case 13:
+                    ok();
+                    break; 
+                case 27:
+                    cancel();
+                    break; 
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                    var p=$t.parts.droprect.last();
+                    var droprect=p.partMain;
+                    var style=droprect.style;
+                    e.stopPropagation();
+                    e.preventDefault();
+                    switch(e.which){
+                        case 37:
+                            style.left=droprect.offsetLeft-1+'px';
+                            r.left=droprect.offsetLeft-p.x;
+                            break;
+                        case 38:
+                            style.top=droprect.offsetTop-1+'px';
+                            r.top=droprect.offsetTop-p.y;
+                            break;
+                        case 39:
+                            style.left=droprect.offsetLeft+1+'px';
+                            r.left=droprect.offsetLeft-p.x;
+                            break;
+                        case 40:
+                            style.top=droprect.offsetTop+1+'px';
+                            r.top=droprect.offsetTop-p.y;
+                            break;
+                    }
+                    break;
+            }
+        }
+        function ok(){
+            var data=paramPart.props.data;
+            var newP={};
+            for(var i=0;i<data.length;i++){
+                if(data[i].value===''){
+                    if(data[i].necessary){
+                        return;
+                    }else{
+                        newP[data[i].name]=undefined;
+                    }
+                }else{
+                    newP[data[i].name]=data[i].value;
+                }
+            }
+            var fn=fnOK;
+            var ihtml='';
+            var useRect=$t.refs.useRect.last().checked;
+            var useLeft=$t.refs.useLeft.last().checked;
+            var useTop=$t.refs.useTop.last().checked;
+            var useWidth=$t.refs.useWidth.last().checked;
+            var useHeight=$t.refs.useHeight.last().checked;
+            cancel();
+            fn(newP,ihtml,useRect,useLeft,useTop,useWidth,useHeight);
+        }
+        part.show=function(title,params,rect,fn,fnc){
+            var elemOK=pdroprect.$ok;
+            var elemCancel=pdroprect.$cancel;
+            elemOK.onclick=ok;
+            elemCancel.onclick=cancel;
+            for(var i in params){
+                params[i].value='';
+            }
+            elemContent.innerHTML='';
+            paramPart=$t.renderIn('paramitem',part.template.sortPath,elemContent,null,null,{data:params,rect:rect});
+            window.addEventListener('keydown',onkeydown);
+            elemTitle.innerHTML=title;
+            $t.removeClass(elemPanel,'uhide');
+            fnOK=fn;
+            fnCancel=fnc;
+        }
+    </script>
+</xmp>

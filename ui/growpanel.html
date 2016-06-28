@@ -1,25 +1,24 @@
-<xmp>
-    <div ref="panel" class="shadowless pdip5 mdip5 rdip5">
+<xmp extends='base'>
+    <div p-main p-ref="panel" class="shadowless pdip5 mdip5 rdip5">
         <div class="ub ct">
             <div class="ub-f1 fb {%switch({align!}.only(0,1,2;0)){case 2:'ct';break;case 1:'right';}%} pdip5">{title!}</div>
-            <set lazy append class="fz24" ref="sub">
+            <set lazy append class="fz24" p-ref="sub">
                 <ui:button skin="sub"></ui:button>
             </set>
-            <set lazy append class="fz24 uhide" ref="add">
+            <set lazy append class="fz24 uhide" p-ref="add">
                 <ui:button skin="add"></ui:button>
             </set>
         </div>
-        <div class="ub-f1 zidx2" ref="content"><!content></div>
+        <div class="ub-f1 zidx2" p-ref="content"><!content></div>
         <script>
-            var panel=part.elemPanel=$t.refs.panel.pop();
-            var add=part.elemAdd=$t.refs.add.pop();
-            var sub=part.elemSub=$t.refs.sub.pop();
-            var content=part.elemContent=$t.refs.content.pop();
+            var panel=part.$panel;
+            var add=part.$add;
+            var sub=part.$sub;
+            var content=part.$content;
             var isInline={inline!false}.bool();
             if(isInline){
                 panel.style.display='inline-block';
             }
-            
             part.max=add.onclick=function(){
                 removeClass(sub,"uhide");
                 addClass(add,"uhide");
@@ -32,7 +31,15 @@
                 addClass(content,"uhide");
             }
             if(!parseBool({extend!0})){
-               sub.onclick();
+                sub.onclick();
+            }
+            part.onSetSize=function(rect){
+                var style=this.partMain.style;
+                style.left=rect.left+'px';
+                style.top=rect.top+'px';
+                style.width=rect.width+'px';
+                style.boxSizing='border-box';
+                this.emitResize();
             }
         </script>
     </div>

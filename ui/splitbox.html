@@ -1,12 +1,12 @@
-<xmp>
-    <div partMain ref="content" class="uof" style="width:{width!100%};height:{height!100%};background-color:{bgcolor!}.color;"></div>
-    <get name="pt"><div style="box-sizing:border-box;z-index:2;" class="abs"></div></get>
+<xmp extends='base'>
+    <div p-main class="uof iborderbox" style="width:{width!100%};height:{height!100%};background-color:{bgcolor!}.color;"></div>
+    <get name="pt"><div style="z-index:2;" class="abs borderbox"></div></get>
     <script>
         var size="{size!}.only(width,height;width)";
-        var content=$t.refs.content.pop();
+        var content=part.partMain;
         var minWidth={minwidth!}.intmin(4);
-        var pt=$t.getNode.pt.children[0];
-        delete $t.getNode.pt;
+        var pt=$t.store.pt.children[0];
+        delete $t.store.pt;
         var width={width!50}.string;
         var height={height!50}.string;
         var style;
@@ -18,7 +18,7 @@
             content.innerHTML='';
             $t.appendNodes(elems,content);
             $t.initHTML(elems,null,null,null,part);
-            part.emitResize();
+            //part.emitResize();
             var pts=[];
             if(size==='width'){
                 var resize=function(){
@@ -31,14 +31,38 @@
                         width=content.offsetWidth-width;
                         
                         var elem=elems[pos];
-                        while(width<minWidth &&pos>0){
-                            elem.style.width=minWidth+'px';
+                        while((width<minWidth||elem.noresize)&&pos>0){
+                            if(!elem.noresize){
+                                elem.style.width=minWidth+'px';
+                            }else{
+                                width-=elem.offsetWidth-minWidth;
+                            }
                             pos--;
                             elem=elems[pos];
                             width+=elem.offsetWidth-minWidth;
                         }
-                        elem.style.width=width+'px';
-                        
+                        if(!elem.noresize){
+                            if(width<minWidth){
+                                elem.style.width=minWidth+'px';
+                                /*分摊多余的宽度*/
+                                var pos=elems.length-1;
+                                width=(minWidth-width)/pos;
+                                for(var i=0;i<pos;i++){
+                                    elems[i].style.width=elems[i].offsetWidth-width+'px';
+                                }
+                            }else{
+                                elem.style.width=width+'px';
+                            }
+                        }else{
+                            if(width<elem.offsetWidth){
+                                /*分摊多余的宽度*/
+                                var pos=elems.length-1;
+                                width=(elem.offsetWidth-width)/pos;
+                                for(var i=0;i<pos;i++){
+                                    elems[i].style.width=elems[i].offsetWidth-width+'px';
+                                }
+                            }
+                        }
                     }
                     for(var i=0;i<pts.length;i++){
                         pt=pts[i];
@@ -50,15 +74,19 @@
                 }
                 var needGiveWidth=[];
                 
-                var width=0;
+                var width=0,elem;
                 for(var i=0;i<elems.length;i++){
-                    elems[i].style.height="100%";
-                    if(elems[i].style.width===''){
-                        needGiveWidth.push(elems[i])
-                    }else if(elems[i].offsetWidth<minWidth){
-                        elems[i].style.width=minWidth+'px';
+                    var elem=elems[i];
+                    elem.style.height="100%";
+                    if(elem.hasAttribute('noresize')){
+                        elem.noresize=true;
                     }
-                    width+=elems[i].offsetWidth;
+                    if(elem.style.width===''){
+                        needGiveWidth.push(elem)
+                    }else if(elem.offsetWidth<minWidth&&!elem.noresize){
+                        elem.style.width=minWidth+'px';
+                    }
+                    width+=elem.offsetWidth;
                 }
                 if(needGiveWidth.length>0){
                     width=(content.offsetWidth-width)/needGiveWidth.length;
@@ -73,10 +101,13 @@
                 resize();
             }
             for(var i=0;i<elems.length-1;i++){
+                elem=elems[i];
+                if(elem.noresize){
+                    continue;
+                }
                 clonePt=pt.cloneNode();
                 pts.push(clonePt);
                 (function(pt,elem){
-                    elem.style.boxSizing='border-box';
                     style=pt.style;
                     pt.elem=elem;
                     switch(size){
@@ -96,7 +127,7 @@
                             });
                             break;
                     }
-                })(clonePt,elems[i]);
+                })(clonePt,elem);
             }
             $t.appendNodes(pts,content);
             part.onresize=resize;

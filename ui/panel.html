@@ -1,19 +1,18 @@
-<xmp extends="styleprop">
-    <div partMain ref="panel" class="shadowless pdip5 mdip5 rdip5" style="display:inline-block;vertical-align:top;">
+<xmp extends="base">
+    <div p-main p-ref="panel" class="shadowless pdip5 mdip5 rdip5" style="display:inline-block;vertical-align:top;">
         <div class="ub ct">
-            <div ref='title' class="ub-f1 fb ct pdip5 hem1">{title!}</div>
-            <set lazy append style="font-size:1.5em !important;">
-                <ui:button skin="close"><script var="panel">
-                    panel.style.display="none";
-                </script></ui:button>
+            <div p-ref='title' class="ub-f1 fb ct pdip5 hem1">{title!}</div>
+            <set lazy p-ref='btn'>
+                <ui:button skin="close" style="font-size:1.5em !important;"></ui:button>
             </set>
         </div>
-        <div ref="content" class="uof"><!content></div>
+        <div p-ref="content" class="uof"><!content></div>
     </div>
     <script>
-        var panel=part.elemPanel=$t.refs.panel.pop();
-        var content=part.elemContent=$t.refs.content.pop();
-        var elemTitle=part.elemTitle=$t.refs.title.pop();
+        var panel=part.$panel;
+        var content=part.$content;
+        var btn=part.$btn;
+        var elemTitle=part.$title;
         var bgcolor={bgcolor!}.string();
         if(bgcolor){
             panel.style.backgroundColor=bgcolor;
@@ -23,7 +22,7 @@
         part.show=function(){
             panel.style.display="inline-block";
         }
-        part.hide=function(){
+        part.hide=btn.onclick=function(){
             panel.style.display="none";
         }
         part.setContent=function(elems){
@@ -33,13 +32,10 @@
         part.setTitle=function(title){
             elemTitle.innerHTML=title;
         }
-        var setSize=part.setSize;
-        part.setSize=function(rect){
+        part.onSetSize=function(rect){
             $t.addClasses(content,['abs','top32','left5','right5','bottom5']);
-            part.setSize=setSize;
+            delete part.onSetSize;
             part.setSize(rect);
         }
-        part.elemTitle=elemTitle;
-        part.elemPanel=panel;
     </script>
 </xmp>

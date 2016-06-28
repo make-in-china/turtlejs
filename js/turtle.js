@@ -4,21 +4,33 @@ var turtle,$t,
     $client;
 (function(){
     var 
-        arrayPrototype      = Array.prototype,
-        Objectprototype     = Object.prototype,
-        hasOwnProperty      = Object.prototype.hasOwnProperty,
-        slice               = arrayPrototype.slice,
-        push                = arrayPrototype.push,
-        getPrototypeOf      = Object.getPrototypeOf,
-        appendChild         = Node.prototype.appendChild,
-        readyRE             = /complete|loaded|interactive/,
-        memberRE            = /{([a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g,
-        orderRE             = /^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|var|=)(\s|$)/g,
-        orderCaseRE         = /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
-        operatorRE          = /\!=|==|=|<|>|\|/,
-        camelCaseRE         = /-(\w)/g,
-        persentRE           = /^\s*([\d.]+)%\s*$/,
-        isIE                = (!!window.ActiveXObject||"ActiveXObject" in window);
+        arrayPrototype          = Array.prototype,
+        Objectprototype         = Object.prototype,
+        hasOwnProperty          = Object.prototype.hasOwnProperty,
+        slice                   = arrayPrototype.slice,
+        push                    = arrayPrototype.push,
+        getPrototypeOf          = Object.getPrototypeOf,
+        appendChild             = Node.prototype.appendChild,
+        addStyleRE              = /;\s*$/;
+        addClassNameRE          = /\s+$/;
+        readyRE                 = /complete|loaded|interactive/,
+        memberRE                = /{([a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g,
+        orderRE                 = /^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|var|=)(\s|$)/g,
+        orderCaseRE             = /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
+        operatorRE              = /\!=|==|=|<|>|\|/,
+        camelCaseRE             = /-(\w)/g,
+        persentRE               = /^\s*([\d.]+)%\s*$/,
+        emptyTextNodeRE         = /^\s*[\r\n]+\s*$/,
+        functionCommentRE       = /\/\*([\s\S]*?)\*\//g,
+        isIE                    = (!!window.ActiveXObject||"ActiveXObject" in window),
+        exec                    = eval,
+        fragment                = document.createDocumentFragment();
+
+    var withthis                = 'with(this){return eval($$$$$$$$$$$$$$$$)};'/*eval支持返回最后一个表达式的值*/,
+        _execValueByScope       = Function('$$$$$$$$$$$$$$$$,v,node,outer,outerElement,props,part',withthis),
+        _execByScope            = Function('$$$$$$$$$$$$$$$$,node,outer,outerElement,props,part',withthis),
+        _execExpressionsByScope = Function('$$$$$$$$$$$$$$$$,v,node',withthis);
+    
     var recalNode           = document.createElement('div');
     recalNode.setAttribute('style',"width:0 !important;height:0 !important;margin-left:0 !important;margin-right:0 !important;");
     var dateFormat=(function(){
@@ -157,12 +169,22 @@ var turtle,$t,
     function requireByScript(s,variable){
         return Function(s+"\r\n;return function(s){return eval('('+s+')');};")()(variable);
     }
-    function log(s){
-        eval("console.log(s)");
+    function NodeName(){
+        s=["xmp","anchor", "area", "audio", "br", "base", "basefont", "body", "button", "canvas", "content", "dlist", "directory", "div", "embed", "fieldset", "font", "form", "frame", "frameset", "hr", "head", "heading", "html", "iframe", "image", "input", "keygen", "li", "label", "legend", "link", "map", "marquee", "media", "menu", "meta", "meter", "mod", "olist", "object", "optgroup", "option", "output", "paragraph", "pre", "progress", "quote", "script", "select", "source", "span", "style", "tablecaption", "tablecell", "tablecol", "table", "tablerow", "tablesection", "textarea", "title", "track", "ulist", "unknown", "video"];
+        for(var i in s){
+            this[s[i]]=s[i];
+        }
     }
-    function bp(){
-        eval("debugger;");
+    function toVarString(s){
+        s=s.split(',');
+        for(var i in s){
+            s[i]=s[i]+'="'+s[i]+'"';
+        }
+        s='var '+s.join(',')+';';
+        return s;
     }
+    var log=Function('s','console.log(s)');
+    var bp=Function('debugger');
     var lowercase,uppercase;
     if ('i'!=='I'.toLowerCase()) {
         lowercase= function(s) {
@@ -190,7 +212,6 @@ var turtle,$t,
                 hash[keyv]=[obj];
             }
         }
-        console.log(hash);
         var newarr=[];
         for(var i in hash){
             var obj=hash[i];
@@ -259,7 +280,7 @@ var turtle,$t,
     function removeNode(node){
         var p=node.parentNode;
         if(p){
-            return node.parentNode.removeChild(node);
+            return p.removeChild(node);
         }else{
             return null;
         }
@@ -604,15 +625,33 @@ var turtle,$t,
       return isFunction(obj.toString) && obj.toString !== toString;
     }
     function getDPI(){
-        var edpi=document.createElement('div');
-        var dpi;
-        edpi.style.height="1em";
-        document.body.appendChild(edpi);
-        dpi=edpi.scrollHeight;
-        edpi.style.height="16px";
-        dpi=dpi/edpi.scrollHeight;
-        document.body.removeChild(edpi);
-        return dpi;
+        if(getDPI.DPI){
+            return getDPI.DPI;
+        }
+        var x,y;
+        if (window.screen.deviceXDPI != undefined) {
+            x = window.screen.deviceXDPI;
+            y = window.screen.deviceYDPI;
+        }
+        else {
+            var tmpNode = document.createElement("div");
+            tmpNode.style.cssText = "width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden";
+            document.body.appendChild(tmpNode);
+            x = parseInt(tmpNode.offsetWidth);
+            y = parseInt(tmpNode.offsetHeight);
+            tmpNode.parentNode.removeChild(tmpNode);    
+        }
+        getDPI.DPI=(x>y?y:x)/96
+        return getDPI.DPI;
+        // var edpi=document.createElement('div');
+        // var dpi;
+        // edpi.style.height="1em";
+        // document.body.appendChild(edpi);
+        // dpi=edpi.scrollHeight;
+        // edpi.style.height="16px";
+        // dpi=dpi/edpi.scrollHeight;
+        // document.body.removeChild(edpi);
+        // return dpi;
     }
     function getClosure(fn) {
         var _args=arguments;
@@ -726,13 +765,15 @@ var turtle,$t,
         desc=null;
     }
     function objectPropertyChange(obj,name,fnOnSet){
-        if(obj.hasOwnProperty(name))
+        if(obj.hasOwnProperty(name)){
             onPropertyChange(obj,name,fnOnSet);
+        }
     }
     function removeItem(arr,obj){
         var index=arr.indexOf(obj);
-        if(index!=-1)
+        if(index!=-1){
             arr.splice(index, 1);
+        }
     }
     function addBindInfo(obj,name,target,targetName,event){
         var bindInfoHash=obj.__bind__;
@@ -856,14 +897,36 @@ var turtle,$t,
         }
         return !!v;
     }
-    function addClass(elem,cls){
-        var lst;
-        if(!elem)
+    function addStyle(elem,style){
+        if(!style){
             return;
-        lst=elem.classList;
-        if(lst.contains(cls))
+        }
+        var oldStyle=elem.getAttribute('style');
+        if(oldStyle){
+            if(addStyleRE.test(oldStyle)){
+                style=oldStyle+style;
+            }else{
+                style=oldStyle+';'+style;
+            }
+        }
+        elem.setAttribute('style',style);
+    }
+    function addClassName(elem,className){
+        if(!className){
             return;
-        lst.add(cls);
+        }
+        var oldClass=elem.getAttribute('class');
+        if(oldClass){
+            if(addClassNameRE.test(oldClass)){
+                className=oldClass+className;
+            }else{
+                className=oldClass+' '+className;
+            }
+        }
+        elem.setAttribute('class',className);
+    }
+    function addClass(elem){
+        addClasses(elem,slice.call(arguments,1));
     }
     function addClasses(elem,clses){
         var lst;
@@ -952,7 +1015,8 @@ var turtle,$t,
     function compact(array) { return array.filter(function(item){ return item !== undefined && item !== null }) }
     function flatten(array) { return array.length > 0 ? [].concat.apply([], array) : array }
     function camelize(str){ return str.replace(/-+(.)?/g, function(match, chr){ return chr ? chr.toUpperCase() : '' }) }
-    function trim(s){return s.replace(/^\s*/g,"").replace(/\s*$/g,"");}
+    function trim(s){return s.replace(/^\s*|\s*$/g,"");}
+    function HTMLTrim(s){return s.replace(/^[\s\r\n]*|[\s\r\n]*$/g,"");}
     function trimLine(s){return s.replace(/^\s*/g,"").replace(/\s*$/g,"").replace(/\s*[\r\n]\s*/g,"");}
     function isRepeat(arr) {
         var hash = {};
@@ -1230,12 +1294,12 @@ var turtle,$t,
         }
     }
     function newObject(type,prototype){
-        var t;
-        eval('var '+type+'=function(){};t='+type);
+        var s='var '+type+'=function(){};';
         if(isObject(prototype)){
-            t.prototype=prototype;
+            s+=type+'.prototype=proto;';
         }
-        return new t();
+        s+='return new '+type+'();';
+        return Function('proto',s)(prototype);
     }
     function newArrayObject(type,prototype){
         if(prototype){
@@ -1300,7 +1364,31 @@ var turtle,$t,
             }catch(e){}
         }
     }*/
-    
+    function Store(){}
+    Store.prototype=extend({
+            take:function(name){
+                if(this.hasOwnProperty(name)){
+                    var ret=this[name];
+                    delete this[name];
+                    if(ret.childNodes.length>1){
+                        return ret.childNodes;
+                    }else{
+                        return ret.childNodes[0];
+                    }
+                }
+            },
+            takeElem:function(name){
+                if(this.hasOwnProperty(name)){
+                    var ret=this[name];
+                    delete this[name];
+                    if(ret.children.length>1){
+                        return ret.children;
+                    }else{
+                        return ret.children[0];
+                    }
+                }
+            }
+        },newHashObject.prototype);
     function XHR(){
         function send(type,url,data,async,fn,fnerror){
             var xhr=new XMLHttpRequest();
@@ -1394,27 +1482,40 @@ var turtle,$t,
     }
     function replaceNodeByNode(node,node2){
         var parent=node.parentNode;
-        if(parent==null)return;
+        if(parent==null){
+            return;
+        }
         insertNode(node,node2);
         parent.removeChild(node);
     }
     function insertNodesBefore(node,nodes){
         var parent=node.parentNode;
-        if(parent==null)return;
-        for(var i=0;i<nodes.length;i++){
-            parent.insertBefore2(nodes[i],node);
+        if(parent==null){
+            return;
         }
+        for(var i=0;i<nodes.length;i++){
+            fragment.appendChild(nodes[i]);
+        }
+        parent.insertBefore2(fragment,node);
     }
     function insertNodeBefore(node,node2){
         var parent=node.parentNode;
         if(parent==null)return;
         parent.insertBefore2(node2,node);
     }
+    /*
+    @param String nodes 节点数组
+    @param Function parent 父节点
+     */
     function appendNodes(nodes,parent){
-        var c=toArray(nodes);
+        var c=slice.call(nodes);
         for(var i=0;i<c.length;i++){
-            parent.appendChild(c[i]);
+            fragment.appendChild(c[i]);
         }
+        parent.appendChild(fragment);
+        // for(var i=0;i<c.length;i++){
+            // parent.appendChild(c[i]);
+        // }
     }
     function getQueryString(name)
     {
@@ -1441,14 +1542,22 @@ var turtle,$t,
         takeOutChildNodes(node);
     }
     function parseGet(node,outerChildNodes,outerElement,props,part){
+        removeNode(node);
         var name=getAttr(node,'name');
         if(name){
-            name=name;
-            initHTML(node.childNodes,outerChildNodes,outerElement,props,part)
-            $t.getNode[name]=node;    
+            initHTML(node.childNodes,outerChildNodes,outerElement,props,part);
+            $t.store[name]=node;    
+            return treeEach.c_noIn;
         }
-        removeNode(node);
-        return treeEach.c_noIn;
+        var toRef=getAttr(node,'to-p-ref');
+        if(toRef&&part){
+            toRef='$'+toRef;
+            if(part[toRef]){
+                appendNodes(node.childNodes,part[toRef]);
+                initHTML(part[toRef].childNodes,outerChildNodes,outerElement,props,part);
+                node.innerHTML='';
+            }
+        }
     }
     function execOnScript(node,outerChildNodes,outerElement,props,part){
         var p=node.parentNode;
@@ -1456,8 +1565,7 @@ var turtle,$t,
             var script=node.innerHTML;
             if(script.length>0){
                 /*设置父对象事件*/
-                var events;
-                eval('events={'+script+'}');
+                var events=exec('({'+script+'})');
                 for(var i in events){
                     if(isFunction(events[i])){
                         p.addEventListener(i,events[i]);
@@ -1516,10 +1624,6 @@ var turtle,$t,
     }
     function execByScope(node,s,scope,outer,outerElement,props,part){
         return _execByScope.call(getScopeBy(scope,node),s,node,outer,outerElement,props,part);
-    }
-    function _execByScope(s,node,outer,outerElement,props,part){
-        var $$$$$$$$$$$$$$$$=s;
-        with(this){return eval($$$$$$$$$$$$$$$$)};
     }
     function execScope(s,node,outerChildNodes,outerElement,props,part){
         execByScope(node,'extend(this,{'+s+'});',null,outerChildNodes,outerElement,props,part);
@@ -1615,12 +1719,6 @@ var turtle,$t,
         obj2[name2]=obj[name];
     }
     
-    function _execExpressionsByScope(s,v,node){
-        var $$$$$$$$$$$$$$$$=s;
-        with(this){
-            return eval($$$$$$$$$$$$$$$$)
-        };
-    }
     function bindExpressionsByOrder(node,condition){
         var cdtn=splitByOnce(condition,'|');
         if(cdtn.length<2)
@@ -1689,7 +1787,7 @@ var turtle,$t,
         }
         if(cdtn.length==2){
             exp=function(v){
-                obj2[name2]=execNodeValueEval(v,node,cdtn[1]);
+                obj2[name2]=_execExpressionsByScope(cdtn[1],v,node);
             }
             exp.__me__=exp;
             bindProperty(obj,name,exp,'__me__');
@@ -1697,10 +1795,6 @@ var turtle,$t,
             bindElementProperty(obj,name,obj2,name2);
             obj2[name2]=obj[name];
         }
-    }
-    
-    function execNodeValueEval(v,node,s){
-        with(this){return eval(s)}
     }
     /*
      * 绑定标签属性
@@ -1727,7 +1821,7 @@ var turtle,$t,
         
         if(cdtn.length==2){
             exp=function(v){
-                execNodeValueEval(v,node,cdtn[1]);
+                _execExpressionsByScope(cdtn[1],v,node);
             }
             exp.__me__=exp;
             bindProperty(obj,name,exp,"__me__");
@@ -1736,16 +1830,25 @@ var turtle,$t,
             bindProperty(obj,name,node,elementValueName);
         }
     }
-    function bindNode(node,condition){
+    function pref(node,part,refName){
+        if(part&&refName){
+            refName=refName.split(',');
+            for(var i=0;i<refName.length;i++){
+                part['$'+refName[i]]=node;    
+            }
+        }
+    }
+    function bindNodeByCondition(node,condition){
         var 
             cdtn=splitByOnce(condition,"|"),
             name=cdtn[0],
             scope,
             obj,
-            exp,
-            elementValueName,
-            eventName;
-        if(!name)return;
+            exp;
+            
+        if(!name){
+            return;
+        }
         scope=$t.uiScope.get(node);
         if(name.indexOf(".")!=-1){
             name=name.split(".");
@@ -1758,51 +1861,58 @@ var turtle,$t,
             throwError('不能获取绑定属性:'+cdtn[0]);
             return;
         }
-        
-        if(cdtn.length==2){
+        if(cdtn.length===2){
             exp=function(v){
-                execNodeValueEval(v,node,cdtn[1]);
+                _execExpressionsByScope(cdtn[1],v,node);
             }
             exp.__me__=exp;
             bindProperty(obj,name,exp,"__me__");
         }else{
-            switch(node.nodeName){
-                case "SELECT":
-                    elementValueName="value";
-                    eventName="change";
-                    break;
-                case "TEXTAREA":
-                    elementValueName="value";
-                    eventName="input";
-                    break;
-                case "INPUT":
-                    switch(node.type){
-                        case "checkbox":
-                            elementValueName="checked";
-                            eventName="click";
-                            break;
-                        default:
-                            elementValueName="value";
-                            eventName="input";
-                            break;
-                    }
-                    break;
-                case "#text":
-                    elementValueName="data";
-                    break;
-                case "BUTTON":
-                case "DIV":
-                default:
-                    elementValueName="innerHTML";
-                    break;
-            }
-            if(!node.__bind__)node[elementValueName]=obj[name];
-            bindElementProperty(obj,name,node,elementValueName);
-            if(eventName){
-                node.addEventListener(eventName,function(){
-                    obj[name]=node[elementValueName];
-                });
-            }
+            bindNode(node,obj,name);
+        }
+    }
+    function bindNode(node,obj,name){
+        var 
+            elementValueName,
+            eventName;
+        switch(node.nodeName){
+            case "SELECT":
+                elementValueName="value";
+                eventName="change";
+                break;
+            case "TEXTAREA":
+                elementValueName="value";
+                eventName="input";
+                break;
+            case "INPUT":
+                switch(node.type){
+                    case "checkbox":
+                        elementValueName="checked";
+                        eventName="click";
+                        break;
+                    default:
+                        elementValueName="value";
+                        eventName="input";
+                        break;
+                }
+                break;
+            case "#text":
+                elementValueName="data";
+                break;
+            case "BUTTON":
+            case "DIV":
+            default:
+                elementValueName="innerHTML";
+                break;
+        }
+        if(!node.__bind__){
+            node[elementValueName]=obj[name];
+        }
+        bindElementProperty(obj,name,node,elementValueName);
+        if(eventName){
+            node.addEventListener(eventName,function(){
+                obj[name]=node[elementValueName];
+            });
         }
     }
     function throwError(err){
@@ -1891,6 +2001,20 @@ var turtle,$t,
     /*function parseText(node,outerChildNodes,outerElement,props,part){
         node.data=execTemplateScript(node.data,node.parentNode,outerChildNodes,outerElement,props,part);
     }*/
+    function getFunctionComment(fn){
+        var s=functionCommentRE.exec(fn.toString());
+        return s[1];
+    }
+    function getFunctionComments(fn){
+        var str=fn.toString();
+        var s;
+        var arr=[];
+        while((s=functionCommentRE.exec(str))!==null){
+            arr.push(s[1]);
+        }
+        functionCommentRE.lastIndex=0;
+        return arr;
+    }
     var getCommentText;
     
     if(Comment.prototype.hasOwnProperty("text")){
@@ -2064,12 +2188,14 @@ var turtle,$t,
         }
         var start,startLeft,startTop;
         function md(e){
+            e.stopPropagation();
             startLeft=elemMove.offsetLeft;
             startTop=elemMove.offsetTop;
             start=e;
             document.body.addEventListener("mousemove",mm);
         }
         function td(e){
+            e.stopPropagation();
             startLeft=elemMove.offsetLeft;
             startTop=elemMove.offsetTop;
             start=e.changedTouches[0];
@@ -2658,15 +2784,19 @@ var turtle,$t,
             }
         ,attributeParser={
             ref:function(node,outerChildNodes,outerElement,props,part){
-                $t.refs.push(node.getAttribute('ref'),node);
+                var refName=node.getAttribute('ref')
                 node.removeAttribute('ref');
+                $t.refs.push(refName.split(','),node);
             }
             ,":":function(node,outerChildNodes,outerElement,props,part){
                 execNodeQuestion(node,outerChildNodes,outerElement,props,part);
                 setQuestionAtrr(node,outerChildNodes,outerElement,props,part);
             }
+            ,'p-ref':function(node,outerChildNodes,outerElement,props,part){
+                pref(node,part,takeAttr(node,'p-ref'));
+            }
             ,bind:function(node,outerChildNodes,outerElement,props,part){
-                bindNode(node,takeAttr(node,'bind'));
+                bindNodeByCondition(node,takeAttr(node,'bind'));
             }
             ,remove:function(node,outerChildNodes,outerElement,props,part){
                 bindRemove(node,takeAttr(node,'remove'),outerChildNodes,outerElement,props,part);
@@ -2684,7 +2814,7 @@ var turtle,$t,
                 $t.clsNode.push(node);
                 /*不要删node.removeAttribute('cls');*/
             }
-            ,partmain:function(node,outerChildNodes,outerElement,props,part){
+            ,'p-main':function(node,outerChildNodes,outerElement,props,part){
                 if(part&&!part.partMain){
                     part.partMain=node;
                 }
@@ -2719,10 +2849,10 @@ var turtle,$t,
                 return;
             }*/
             if(elementParser.hasOwnProperty(node.nodeName)){
-                var ret=elementParser[node.nodeName](node,outerChildNodes,outerElement,props,part);
-                if(ret){
+                /* var ret=*/return elementParser[node.nodeName](node,outerChildNodes,outerElement,props,part);
+                /* if(ret){
                     return ret;
-                };
+                 };*/
             }
             var attrs=slice.call(node.attributes);
             for(var i=0;i<attrs.length;i++){
@@ -2752,8 +2882,8 @@ var turtle,$t,
         if(node.hasAttribute('link')){
             /*设置关联子对象*/
             var link=takeAttr(node,'link');
-            if($t.getNode.hasOwnProperty(link)&&node.children.length==1){
-                appendNodes($t.getNode[link].childNodes,node.children[0]);
+            if($t.store.hasOwnProperty(link)&&node.children.length==1){
+                appendNodes($t.store[link].childNodes,node.children[0]);
                 takeOutChildNodes(node);
             }else{
                 removeNode(node);
@@ -2861,10 +2991,6 @@ var turtle,$t,
     }
     function execValueByScope(node,s,v,scope,outer,outerElement,props,part){
         return _execValueByScope.call(getScopeBy(scope,node),s,v,node,outer,outerElement,props,part);
-    }
-    function _execValueByScope(s,v,node,outer,outerElement,props,part){
-        var $$$$$$$$$$$$$$$$=s;
-        with(this){return eval($$$$$$$$$$$$$$$$)};
     }
     function bindEval(node,s,outer,outerElement,props,part,fn){
         var 
@@ -3017,32 +3143,87 @@ var turtle,$t,
     }
     UITemplate.prototype={
         /*调用render*/
-        renderIn:function(elem,outerChildNodes,outerElement,props,part){
+        renderIn:function(elem,outerChildNodes,outerElement,props,part,partName,reExtends){
+            var uiNode;
             if(!isArray(outerChildNodes)){
                 outerChildNodes=[];
             }
             if(!isArray(outerElement)){
                 outerElement=[];
             }
-            var uiNode=document.createElement("ui:render");
+            uiNode=document.createElement("ui:render");
             if(elem){
                 elem.appendChild(uiNode);    
             }
-            return this.render(uiNode,elem,outerChildNodes,outerElement,props,part);
+            return this.render(uiNode,elem,outerChildNodes,outerElement,props,part,partName,reExtends);
         },
         /*调用render*/
-        renderBefore:function(elem,outerChildNodes,outerElement,props,part){
+        renderBefore:function(elem,outerChildNodes,outerElement,props,part,partName,reExtends){
+            var uiNode;
             if(!isArray(outerChildNodes)){
                 outerChildNodes=[];
             }
             if(!isArray(outerElement)){
                 outerElement=[];
             }
-            var uiNode=document.createElement("ui:render");
+            uiNode=document.createElement("ui:render");
             if(elem&&elem.parentNode){
                 elem.parentNode.insertBefore2(uiNode,elem);
             }
-            return this.render(uiNode,elem,outerChildNodes,outerElement,props,part);
+            return this.render(uiNode,elem,outerChildNodes,outerElement,props,part,partName,reExtends);
+        },
+        /*渲染dom*/
+        render:function(uiNode,that,outerChildNodes,outerElement,props,part,partName,reExtends){
+            
+            var 
+                ext,
+                attrs,
+                len,
+                html,
+                part;
+                
+            
+            if(!isObject(props)){
+                props={};
+            }
+            
+            if(!uiNode){
+                uiNode=document.createElement("ui:render");
+            }else{
+                setQuestionAtrr(uiNode,outerChildNodes,outerElement,part?part.props:props,part);
+            
+                attrs=uiNode.attributes;
+                len=attrs.length;
+                for(var i=0;i<len;i++){
+                    var name=attrs[0].name;
+                    if(!props.hasOwnProperty(name)){
+                        props[name]=attrs[0].value;    
+                    }
+                    uiNode.removeAttributeNode(attrs[0]);
+                }
+            }
+            html=this.joinDatasByProps(props);
+            if(html===undefined){
+                return;
+            }
+            
+            if(reExtends){
+                ext=getExtends(reExtends,this.sortPath);
+            }
+            if(!ext){
+                ext=this.extends;
+            }
+            if(ext instanceof UITemplate){
+                ext=ext.beExtends(uiNode,that,outerChildNodes,outerElement,props,part);
+            }
+            part=newPart(this,uiNode,ext,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part,partName)
+            this.parts.push(part);
+            
+            if(uiNode.parentNode!==null){
+                part.insertBefore(uiNode);
+            }
+            removeNode(uiNode);
+            return part;
         },
         /*由props构建html字符串*/
         joinDatasByProps:function(props){
@@ -3086,43 +3267,9 @@ var turtle,$t,
             }
             var html;
             html=this.joinDatasByProps(props);
-            return newExtentsPart(this,uiNode,ext,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part);
+            return newExtendsPart(this,uiNode,ext,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part);
         },
-        /*渲染dom*/
-        render:function(uiNode,that,outerChildNodes,outerElement,props,part,partName){
-            if(!uiNode){
-                uiNode=document.createElement("ui:render");
-            }
-            setQuestionAtrr(uiNode,outerChildNodes,outerElement,props,part);
-            
-            if(!isObject(props)){
-                props={};
-            }
-            var attrs=uiNode.attributes;
-            var len=attrs.length;
-            for(var i=0;i<len;i++){
-                var name=attrs[0].name;
-                if(!props.hasOwnProperty(name)){
-                    props[name]=attrs[0].value;    
-                }
-                uiNode.removeAttributeNode(attrs[0]);
-            }
-            
-            if(this.extends instanceof UITemplate){
-                var ext=this.extends.beExtends(uiNode,that,outerChildNodes,outerElement,props,part);
-            }
-            var html=this.joinDatasByProps(props);
-            if(html===undefined){
-                return;
-            }
-            var part=newPart(this,uiNode,ext,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part,partName)
-            this.parts.push(part);
-            if(uiNode.parentNode!==null){
-                part.insertBefore(uiNode);
-            }
-            removeNode(uiNode);
-            return part;
-        },toDefineString:function(){
+        toDefineString:function(){
             var s='$t.ui.define("'+this.name+'","'+this.sortPath+'","'+this.path+'",{datas:';
             s+=JSON.stringify(this.datas).replace(/<\/script>/g,'</scr"+"ipt>');
             s+=',params:[';
@@ -3176,7 +3323,7 @@ var turtle,$t,
             return arr;
         }
     }
-    function newExtentsPart(template,node,extPart,s,outerChildNodes,outerElement,props,part){
+    function newExtendsPart(template,node,extPart,s,outerChildNodes,outerElement,props,part){
         if(extPart){
             var t=newObject(template.partName,extPart);
         }else{
@@ -3186,12 +3333,13 @@ var turtle,$t,
         node.innerHTML=s;
         t.template=template;
         t.super=extPart;
+        t.isExtend=true
         var nodes=node.childNodes;
         t.$=new Service(template.service);
         initHTML(nodes,outerChildNodes,outerElement,props,t);
-        t.store=slice.call(nodes);
+        t.store=[];
         for(var i=nodes.length;i>0;i--){
-            node.removeChild(nodes[0]);
+            t.store.push(node.removeChild(nodes[0]));
         }
         t.to=function(part){
             var proto=part.$.__proto__;
@@ -3222,16 +3370,25 @@ var turtle,$t,
         end.part=begin.part=t;
         begin.sign=1;
         end.sign=0;
+        
         t.props=props;
         t.template=template;
         t.onInsert=null;
-        t.isInsert=false;
         t.super=extPart;
+        t.isExtend=false;
+        var sp=t;
+        while(sp.super){
+            sp=sp.super
+        }
+        t.basePart=sp?sp:t;
+        t.basePart.isInsert=false;
         t.$=new Service(template.service);
+        t.store=[];
+        
         var nodes=node.childNodes;
         
         initHTML(nodes,outerChildNodes,outerElement,props,t);
-        t.store=[];
+        
         if(extPart){
             extPart.to(t);
         }
@@ -3260,6 +3417,9 @@ var turtle,$t,
             return s;
         },
         get elements(){
+            if(this.isExtend){
+                return [];
+            }
             if(this.isInsert){
                 var elements=[];
                 var node=this.begin.nextSibling;
@@ -3278,8 +3438,7 @@ var turtle,$t,
         get child(){
             return getParts(this.elements);
         },
-        get parent(){
-            var node=this.begin;
+        getParentPart:function(node){
             while(1){
                 if(node.previousSibling!==null){
                     node=node.previousSibling;
@@ -3295,7 +3454,10 @@ var turtle,$t,
                         return node.part;
                     }
                 }
-            }
+            } 
+        },
+        get parent(){
+            return this.getParentPart(this.begin);
         },
         getRect:function(){
             if(this.isInsert){
@@ -3364,7 +3526,7 @@ var turtle,$t,
                 cs[i].emitResize();
             }
         },
-        setSize:function(rect){
+        onSetSize:function(rect){
             if(this.partMain){
                 var style=this.partMain.style;
                 style.left=rect.left+'px';
@@ -3373,6 +3535,14 @@ var turtle,$t,
                 style.height=rect.height+'px';
                 style.boxSizing='border-box';
                 this.emitResize();
+            }
+        },
+        setSize:function(rect){
+            if(this.onSetSize){
+                return this.onSetSize(rect);
+            }
+            if(this.super){
+                this.super.setSize(rect);
             }
         },
         get innerHTML(){
@@ -3443,17 +3613,26 @@ var turtle,$t,
                 if(isFunction(this.onInsert)){
                     this.onInsert(elem);
                 }
-                this.isInsert=true;
+                this.basePart.isInsert=true;
                 if(isFunction(this.oninsert)){
                     this.oninsert();
                 }
             }
         },
-        emitInit:function(finalPart){
-            if(this.extends){
-                this.extends.emitInit(finalPart);
+        getSuper:function(name){
+            if(this.super){
+                if(this.super.template.name===name){
+                    return this.super;    
+                }else{
+                    return this.super.getSuper(name);
+                }
             }
-            if(isFunction(this.onInit)){
+        },
+        emitInit:function(finalPart){
+            if(this.super){
+                this.super.emitInit(finalPart);
+            }
+            if(this.hasOwnProperty('onInit')&&isFunction(this.onInit)){
                 this.onInit(finalPart);
             }
         },
@@ -3474,7 +3653,7 @@ var turtle,$t,
                     }
                 }
                 this.store=elems;
-                this.isInsert=false;
+                this.basePart.isInsert=false;
                 if(isFunction(this.onremove)){
                     this.onremove();
                 }
@@ -3562,20 +3741,28 @@ var turtle,$t,
         }
         removeNode(node);
     }
-    function getExtends(node,sortPath){
+    function getExtendsByNode(node,sortPath){
         var ext=getAttr(node,'extends',null);
         if(isString(ext)){
-            if(!isObject(importUIHTML(ext,sortPath))){
-                throwError('找不到可继承的模板：'+ext);
-            }else{
-                ext=$t.ui[ext];
-                return ext;
-            }
+            return getExtends(ext,sortPath);
         }
+    }
+    function getExtends(extName,sortPath){
+        var ext;
+        if(extName.indexOf(':')!==-1){
+            extName=extName.split(':');
+            sortPath=extName[0]?extName[0]:sortPath;
+            extName=extName[1];
+        }
+        if(!isObject(importUIHTML(extName,sortPath))){
+            throwError('找不到可继承的模板：'+extName);
+        }
+        ext=$t.ui[extName];
+        return ext;
     }
     function defineUIByNode(node){
         var name=getAttr(node,'ui');
-        var ext=getExtends(node,'ui');
+        var ext=getExtendsByNode(node,'ui');
         if(name){
             $t.ui.define(name,'','',getTemplate(node),ext);
         }
@@ -3605,7 +3792,7 @@ var turtle,$t,
                 if(!nodeName)nodeName=uiName;
                 if(!$t.ui.hasOwnProperty(nodeName)){
                     s=getTemplate(node);
-                    $t.ui.define(nodeName,uiSortPath,uiPath,s,getExtends(node,uiSortPath));
+                    $t.ui.define(nodeName,uiSortPath,uiPath,s,getExtendsByNode(node,uiSortPath));
                 }else{
                     alert('不能重复定义ui：'+nodeName);
                 }
@@ -3616,7 +3803,7 @@ var turtle,$t,
         if(!$t.ui.hasOwnProperty(uiName)){
             var uiPath=baseUIPath.getPathBySortPath(uiSortPath);
             $t.xhr.get(uiPath + '/' + (uiName + '.js').toLowerCase(),false,function(text){
-                eval(text);
+                exec(text);
             });
         }
         return $t.ui[uiName];
@@ -3639,49 +3826,60 @@ var turtle,$t,
         return $t.ui[uiName];
     }
     function parseUI(node,uiInfo,step,part){
-        var ui=importUIHTML(uiInfo.name,uiInfo.sortPath);
+        var 
+            partName,
+            reExtends,
+            outerChildNodes,
+            outerElement,
+            cpn,
+            ui=importUIHTML(uiInfo.name,uiInfo.sortPath);
+            
         if (!ui) {
             removeNode(node);
-            console.log(uiInfo.name + '组件不存在！');
+            throwError(uiInfo.name + '组件不存在！');
             return;
         }
         
-        var partName=node.getAttribute('partname');
-        node.removeAttribute('partname');
+        partName=takeAttr(node,'p-name');
         
-        var outerChildNodes = slice.call(node.childNodes);
-        var outerElement = slice.call(node.children);
+        
+        reExtends=takeAttr(node,'re-extends');
+        
+        outerChildNodes= slice.call(node.childNodes);
+        outerElement = slice.call(node.children);
+        
         for(var i=node.childNodes.length;i>0;i--){
             node.removeChild(node.childNodes[0]);    
         }
-        var cpn=ui.render(node, node.parentNode,outerChildNodes,outerElement,null,part,partName);
+        
+        cpn=ui.render(node, node.parentNode,outerChildNodes,outerElement,null,part,partName,reExtends);
         if(cpn){
             step.next =cpn.elements.length;    
         }
     }
-    function getUI(uiName,uiSortPath,outerChildNodes,outerElement,props,part){
+    function getUI(uiName,uiSortPath,outerChildNodes,outerElement,props,part,partName,reExtends){
         var ui=importUIHTML(uiName,uiSortPath);
         if (!ui) {
             console.log(uiName + '组件不存在！');
             return;
         }
-        return ui.renderIn(null,outerChildNodes,outerElement,props,part);
+        return ui.renderIn(null,outerChildNodes,outerElement,props,part,partName,reExtends);
     }
-    function renderIn(uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part){
+    function renderIn(uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part,partName,reExtends){
         var ui=importUIHTML(uiName,uiSortPath);
         if (!ui) {
             console.log(uiName + '组件不存在！');
             return;
         }
-        return ui.renderIn(elem,outerChildNodes,outerElement,props,part);
+        return ui.renderIn(elem,outerChildNodes,outerElement,props,part,partName,reExtends);
     }
-    function renderBefore(uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part){
+    function renderBefore(uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part,partName,reExtends){
         var ui=importUIHTML(uiName,uiSortPath);
         if (!ui) {
             console.log(uiName + '组件不存在！');
             return;
         }
-        return ui.renderBefore(elem,outerChildNodes,outerElement,props,part);
+        return ui.renderBefore(elem,outerChildNodes,outerElement,props,part,partName,reExtends);
     }
     function parseXMP2(node){
         var ret=parseXMP(node);
@@ -3710,14 +3908,9 @@ var turtle,$t,
         });
         return s;
     }
-    function parseHTML(uiHTML,elem){
-        var _uiMain;
-        if(elem instanceof Element){
-            _uiMain=elem;
-        }else{
-            _uiMain=document.createElement('ui:parseHTML');
-        }
-        _uiMain.innerHTML=uiHTML;
+    function parseHTML(sHTML){
+        var _uiMain=document.createElement('ui:parseHTML');
+        _uiMain.innerHTML=sHTML;
         initHTML(_uiMain.childNodes);
         return takeChildNodes(_uiMain);
     }
@@ -3865,7 +4058,7 @@ var turtle,$t,
                     s+=')';
                     regExes.push(s);
                 }
-                var re=eval('(/'+regExes.join("|")+'/g)');
+                var re=exec('(/'+regExes.join("|")+'/g)');
                 return str.match(re);
             }
         }
@@ -3948,7 +4141,7 @@ var turtle,$t,
             },
             parseUIPath:function(s){
                 try{
-                    var o=eval('('+s+')');
+                    var o=exec('('+s+')');
                     if(isObject(o)&&o.hasOwnProperty('name')&&o.hasOwnProperty('path')){
                         _paths[o.name]=o;
                         this.push(o);
@@ -4032,9 +4225,9 @@ var turtle,$t,
     }
     function renderDocument(noAppend){
         renderDocument.beginTime=new Date();
-        if($t.body.length>0){
+        /*if($t.body.length>0){
             document.body.innerHTML=$t.body;
-        }
+        }*/
         var 
             xmps=findTemplates(document.body.children),
             i,
@@ -4318,46 +4511,45 @@ var turtle,$t,
             }
         )
     }
-    UI.prototype=
-        {
-            onDefine:function(name,fn){
-                if(!isFunction(fn)){
-                    return;
-                }
-                if(!isString(name)){
-                    return;
-                }
-                if(name.length===0){
-                    return;
-                }
-                this.__defineCallbacks__.push({name:name,fn:fn});
-                if(this.hasOwnProperty(name)){
-                    fn(this[name]);
-                }
-            },
-            emitOnDefine:function(name,fn){
-                var cbs=this.__defineCallbacks__;
-                for(var i=0;i<cbs.length;i++){
-                    if(cbs[i].name===name||cbs[i].name==="*"){
-                        cbs[i].fn(fn);
-                    }
-                }
-            },
-            define:function(name,sortPath,path,s,ext){
-                this[name]=new UITemplate(name,sortPath,path,s,ext);
-                this.emitOnDefine(name,this[name]);
-                return this[name];
-            },
-            toString:function(){
-                var list=[];
-                for(var i in this){
-                    if(this.hasOwnProperty(i)){
-                        list.push(i);    
-                    }
-                }
-                return list.join('\r\n');
+    UI.prototype={
+        onDefine:function(name,fn){
+            if(!isFunction(fn)){
+                return;
             }
+            if(!isString(name)){
+                return;
+            }
+            if(name.length===0){
+                return;
+            }
+            this.__defineCallbacks__.push({name:name,fn:fn});
+            if(this.hasOwnProperty(name)){
+                fn(this[name]);
+            }
+        },
+        emitOnDefine:function(name,fn){
+            var cbs=this.__defineCallbacks__;
+            for(var i=0;i<cbs.length;i++){
+                if(cbs[i].name===name||cbs[i].name==="*"){
+                    cbs[i].fn(fn);
+                }
+            }
+        },
+        define:function(name,sortPath,path,s,ext){
+            this[name]=new UITemplate(name,sortPath,path,s,ext);
+            this.emitOnDefine(name,this[name]);
+            return this[name];
+        },
+        toString:function(){
+            var list=[];
+            for(var i in this){
+                if(this.hasOwnProperty(i)){
+                    list.push(i);    
+                }
+            }
+            return list.join('\r\n');
         }
+    }
     function Service(fns){
         Object.defineProperty(this,"__defineCallbacks__",{
                 value: [],
@@ -4384,7 +4576,7 @@ var turtle,$t,
         emitOnDefine:UI.prototype.emitOnDefine,
         define:function(name,s){
             try{
-                this[name]=eval("("+s+")");    
+                this[name]=exec("("+s+")");    
             }catch(e){
                 _catch(e);
             }
@@ -4406,6 +4598,581 @@ var turtle,$t,
             return s;
         }
     }
+    var stringNode={
+        'script':/^\/script[>\s]/,
+        'template':/^\/template[>\s]/,
+        'style':/^\/style[>\s]/,
+        'title':/^\/title[>\s]/,
+        'textarea':/^\/textarea[>\s]/,
+        'xmp':/^\/xmp[>\s]/
+    }
+    var htmlParse={
+        '':function(html,m){
+            var nodeName=m.node.nodeName;
+            if(nodeName in stringNode){
+                m.action='stringNode';
+                m.stringNodeRegExp=stringNode[nodeName];
+                m.stringNodeKeyLength=nodeName.length+2;
+                m.stringNodeStart=m.index;
+                return;
+            }else{
+                m.action='textNode';
+                m.textNodeStart=m.index;
+            }
+        },
+        textNode:function(html,m){
+            var data;
+            switch(html[m.index]){
+                case '<':
+                    if(m.textNodeStart!==m.index){
+                        
+                        data=html.substring(m.textNodeStart,m.index);
+                        if(!emptyTextNodeRE.test(data)){
+                            m.node(data,3);
+                        }
+                        m.textNodeStart=0;
+                    }
+                    m.xmlNodeStart=m.index;
+                    m.index++;
+                    m.action='xmlNode';
+                    break;
+                default:
+                    m.index++;
+            }
+        },
+        createXMLNode:function(html,m){
+            m.xmlNodeStart=0;
+            if(m.xmlNodeNameStart>0){
+                //无属性标签
+                var nodeName=html.substring(m.xmlNodeNameStart,m.index);
+                m.node=m.node(nodeName);
+                m.xmlNodeNameStart=0;
+                m.index++;
+            }
+            m.action='';
+        },
+        setXMLNodeClose:function(html,m){
+            var n=m.node;
+            var name=trim(html.substring(m.xmlNodeNameStart,m.index));
+            while(n){
+                if(n.nodeType===1&&n.nodeName===name){
+                    n.isClose=true;
+                    m.node=n.parentNode;
+                    m.action='';
+                    m.xmlNodeNameStart=0;
+                    return;
+                }
+                n=n.parent;
+            }
+            /*当注释*/
+            m.node(name,8);
+        },
+        setAttrStart:function(m){
+            m.action='attributes';
+            m.attrStart=0;
+            m.attrNameEnd=0;
+            m.equlIndex=0;
+            m.stringStart=0;
+            m.stringStartChar='';
+        },
+        xmlNode:function(html,m){
+            switch(html[m.index]){
+                case '>':
+                    this.createXMLNode(html,m);
+                    break;
+                case ' ':
+                    this.createXMLNode(html,m);
+                    m.action='attributes';
+                    break;
+                case '!':
+                    if(m.xmlNodeStart===m.index-1){
+                        m.action='comment';    
+                    }
+                    m.index++;
+                    break;
+                case '/':
+                    if(m.xmlNodeStart===m.index-1){
+                        m.action='endXmlNode';
+                        m.index++;
+                        m.xmlNodeNameStart=m.index;
+                        return;
+                    }else if(m.length>=m.index+1){
+                        if(html.substr(m.index+1,1)==='>'){
+                            this.createXMLNode(html,m);
+                            m.index++;
+                            return;
+                        }
+                    }
+                    break;
+                default:
+                    if(m.xmlNodeNameStart===0){
+                        m.xmlNodeNameStart=m.index;
+                    }
+                    m.index++;
+            }
+        },
+        endXmlNode:function(html,m){
+            switch(html[m.index]){
+                case '>':
+                    this.setXMLNodeClose(html,m);
+                    m.index++;
+                    break;
+                default:
+                    m.index++;
+            }
+        },
+        comment:function(html,m){
+            switch(html[m.index]){
+                case '>':
+                    m.node('',8);
+                    m.index++;
+                    break;
+                case '-':
+                    if(m.length>=m.index+2){
+                        if(html.substr(m.index+1,1)==='-'){
+                            m.commentStart=m.index+2;
+                            m.action='comment3';
+                            m.index+=2;
+                        }else{
+                            m.index++;
+                        }
+                    }else{
+                        m.index++;
+                    }
+                    break;
+                case 'd':
+                case 'D':
+                    if(m.length>=m.index+7){
+                        if(html.substr(m.index+1,6).toUpperCase()==='OCTYPE'){
+                            m.node('',10);
+                            m.index+=13;
+                            m.action='';
+                        }
+                    }
+                    break;
+                default:
+                    m.commentStart=m.index;
+                    m.action='comment2';
+                    m.index++;
+            }
+        },
+        comment2:function(html,m){
+            if(html[m.index]==='>'){
+                var vNode=m.node(html.substring(m.commentStart,m.index),8);
+                vNode.dbplus=false;
+                m.commentStart=0;
+                m.action='';
+                
+            }
+            m.index++;
+        },
+        comment3:function(html,m){
+            if(html[m.index]==='-'){
+                if(m.length>=m.index+3){
+                    if(html.substr(m.index+1,2)==='->'){
+                        var vNode=m.node(html.substring(m.commentStart,m.index),8);
+                        vNode.dbplus=true;
+                        m.commentStart=0;
+                        m.action='';
+                        m.index+=3;
+                        return;
+                    }
+                }
+            }
+            m.index++;
+        },
+        attributes:function(html,m){
+            switch(html[m.index]){
+                case '/':
+                    if(m.length>=m.index+2){
+                        if(html.substring(m.index+1,1)==='>'){
+                            m.action='';
+                        }
+                    }
+                    m.attrStart=m.attrNameEnd=0;
+                    m.index++;
+                    break;
+                case '>':
+                    m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                    m.action='';
+                    m.index++;
+                    break;
+                case ' ':
+                    if(m.attrStart>0&&m.attrNameEnd===0){
+                        m.attrNameEnd=m.index;
+                    }
+                    m.index++;
+                    break;
+                case '=':
+                    if(m.attrStart>0&&m.attrNameEnd===0){
+                        m.attrNameEnd=m.index;
+                    }
+                    m.equlIndex=m.index;
+                    m.action='attrValue';
+                    m.index++;
+                    break;
+                default:
+                    if(m.attrStart===0){
+                        m.attrStart=m.index;
+                    }else if(m.equlIndex>0){
+                        m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                        this.setAttrStart(m);
+                    }
+                    m.index++;
+            }
+        },
+        attrValue:function(html,m){
+            switch(html[m.index]){
+                case '>':
+                    /*忽略等号*/
+                    m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                    m.action='';
+                    m.index++;
+                    break;
+                case ' ':
+                    m.index++;
+                    break;
+                case '"':
+                    m.stringStartChar='"';
+                    m.action='atvstring';
+                    m.index++;
+                    m.stringStart=m.index;
+                    break;
+                case "'":
+                    m.stringStartChar='\'';
+                    m.action='atvstring';
+                    m.index++;
+                    m.stringStart=m.index;
+                    break;
+                case "/":
+                    if(m.length>=m.index+2){
+                        if(html.substring(m.index+1,1)==='>'){
+                            m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                            m.action='';
+                            m.index+=2;
+                            return;
+                        }
+                    }
+                    m.index++
+                    break;
+                default:
+                    m.action='atvbetweenSpace';
+                    m.betweenSpaceStart=m.index;
+                    m.index++;
+            }
+        },
+        atvbetweenSpace:function(html,m){
+            switch(html[m.index]){
+                case ' ':
+                    m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.stringStart,m.index));
+                    this.setAttrStart(m);
+                    m.index++;
+                    break;
+                default:
+                    m.index++;
+            }
+        },
+        atvstring:function(html,m){
+            switch(html[m.index]){
+                case '\\':
+                    m.index+=2;
+                    break;
+                case m.stringStartChar:
+                    m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.stringStart,m.index));
+                    this.setAttrStart(m);
+                    m.index++;
+                    break;
+                default:
+                    m.index++;
+            }
+        },
+        stringNode:function(html,m){
+            if(html[m.index]==='<'){
+                if(m.length>=m.index+m.stringNodeKeyLength+1){
+                    if(m.stringNodeRegExp.test(html.substr(m.index+1,m.stringNodeKeyLength))){
+                        m.node.text(HTMLTrim(html.substring(m.stringNodeStart,m.index)));
+                        m.stringNodeStart=0;
+                        m.stringNodeRegExp=null;
+                        m.action='';
+                        m.node.isClose=true;
+                        m.node=m.node.parentNode;
+                        m.index+=m.stringNodeKeyLength+1;
+                        m.stringNodeKeyLength=0;
+                        return;        
+                    }
+                }
+            }
+            m.index++;
+        }
+    }
+    function VDOM(html,vNode){
+        
+        if(!(vNode instanceof VNode)){
+            vNode=new VNode('document');
+            vNode.isClose=true;
+        }
+        var 
+            m={
+                index:0,
+                node:vNode,
+                action:'',
+                length:html.length,
+                textNodeStart:0,
+                xmlNodeStart:0,
+                xmlNodeNameStart:0,
+                attrStart:0,
+                attrNameEnd:0,
+                equlIndex:0,
+                stringStart:0,
+                stringStartChar:'',
+                betweenSpaceStart:0,
+                stringNodeStart:0,
+                stringNodeRegExp:null,
+                stringNodeKeyLength:0
+            };
+        while(m.index<html.length){
+            htmlParse[m.action](html,m);
+        }
+        return vNode;
+    }
+    function NullValueHash(s){
+        var arr=s.split(s);
+        for(var i in arr){
+            this[arr[i]]=null;
+        }
+    }
+    var VNode=(function(){
+        var closeSelf=new NullValueHash(
+            'br,input,hr,map,img,area,base,link,meta,frame,param,basefont,col'
+        );
+        function VNode(name,nodeType){
+            var t=function(name,nodeType){
+                if(name!==undefined){
+                    return t.append(name,nodeType);
+                }else{
+                    t.isClose=true;
+                    return t.parentNode;
+                }
+            }
+            t.__proto__=VNode.prototype;
+            if(nodeType===undefined){
+                nodeType=1;
+            }
+            switch(nodeType){
+                case 1:
+                    t.nodeName=name.toUpperCase();
+                    t.attributes=newArrayObject('attributes') ;
+                    t.children=[];
+                    t.childNodes=[];
+                    t.isClose=name in closeSelf;
+                    break;
+                case 3:
+                    t.data=name;
+                    t.isClose=true;
+                case 8:
+                    t.data=name;
+                    t.isClose=true;
+                    break;
+                case 10:
+                    t.isClose=true;
+                    break;
+            }
+            t.parentNode=null;
+            t.nodeType=nodeType;
+            return t;
+        }
+        function append(name,nodeType){
+            return _appendChild.call(this,new VNode(name,nodeType));
+        }
+        function appendChild(vNode){
+            var idx=this.childNodes.indexOf(vNode);
+            if(idx===-1){
+                return _appendChild.call(this,vNode);
+            }else{
+                return vNode;
+            }
+        }
+        function _appendChild(vNode){
+            this.childNodes.push(vNode);
+            if(vNode.nodeType===1){
+                this.children.push(vNode);
+            }
+            var p=vNode.parentNode;
+            if(p){
+                p.removeChild(vNode);
+            }
+            vNode.parentNode=this;
+            return vNode;
+        }
+        function removeChild(vNode){
+            if(!vNode||this.childNodes.length===0){
+                return vNode;
+            }
+            removeItem(this.childNodes,vNode);
+            removeItem(this.children,vNode);
+            return vNode;
+        }
+        function setAttribute(name,value){
+            if(name){
+                this.attributes[name]=value;
+                return $t.getBind(this,setAttribute);
+            }else{
+                return this;
+            }
+        }
+        function removeAttribute(name){
+            delete this[name];
+        }
+        function addText(){
+            var s=Array.prototype.join.call(arguments,'\r\n');
+            var t=new VNode(s,3);
+            this.children.push(t);
+            return this;
+        }
+        function addText2(fn){
+            var t=new VNode($t.getFunctionComment(fn),3);
+            this.children.push(t);
+            return this;
+        }
+        function hasAttribute(name){
+            return this.attributes.hasOwnProperty(name);
+        }
+        function insertBefore(newNode,node){
+            var p1=node.parentNode;
+            if(!p1){
+                return;
+            }
+            var chds=p1.childNodes
+            var idx=chds.indexOf(node);
+            if(idx===-1){
+                return;
+            }
+            var p2=newNode.parentNode;
+            if(p2){
+                p2.removeChild(newNode);
+            }
+            chds.splice(idx,0,newNode);
+            newNode.parentNode=p2;
+        }
+        VNode.prototype={
+            constructor:VNode,
+            attr:setAttribute,
+            _:setAttribute,
+            text:addText,
+            text2:addText2,
+            append:append,
+            appendChild:appendChild,
+            removeChild:removeChild,
+            hasAttribute:hasAttribute,
+            removeAttribute:removeAttribute,
+            insertBefore:insertBefore,
+            insertBefore2:insertBefore,
+            get innerHTML(){
+                var 
+                    cs=this.childNodes,
+                    data=[],
+                    space=0;
+                if(cs){
+                    for(var i=0;i<cs.length;i++){
+                        data.push(cs[i].toString(space));
+                    }   
+                }
+                return data.join('');
+            },
+            set innerHTML(s){
+                var chds;
+                chds=this.children;
+                for(var i in chds){
+                    delete chds[i];
+                }
+                chds=this.childNodes;
+                for(var i in chds){
+                    delete chds[i];
+                }
+                new VDOM(s,this);
+            },
+            get outerHTML(){
+                return this.toString();
+            },
+            toString:function(){
+                var 
+                    xmlNode=this.toXMLNodeString(),
+                    cs=this.childNodes,
+                    data=[xmlNode[0]];
+                if(cs){
+                    for(var i=0;i<cs.length;i++){
+                        data.push(cs[i].toString());
+                    }   
+                }
+                if(xmlNode.length===2){
+                    data.push(xmlNode[1]);    
+                }
+                return data.join('');
+            },
+            toXMLNodeString:function(){
+                var 
+                    ret=[],
+                    sAttr='',
+                    arrAttr=[],
+                    attr=this.attributes;
+                if(attr){
+                    for(var i in attr){
+                        if(attr[i]){
+                            arrAttr.push(i+'="'+attr[i]+'"');    
+                        }else{
+                            arrAttr.push(i);    
+                        }
+                    }
+                    if(arrAttr.length>0){
+                        sAttr=' '+arrAttr.join(' ');
+                    }
+                }
+                switch(this.nodeType){
+                    case 1:
+                        ret.push('<'+this.nodeName.toLowerCase()+sAttr+'>');
+                        if(this.isClose){
+                            ret.push('</'+this.nodeName.toLowerCase()+'>');
+                        }
+                        break;
+                    case 3:
+                        ret.push(this.data);
+                        break;
+                    case 8:
+                        if(this.dbplus){
+                            ret.push('<!--'+this.data+'-->');
+                        }else{
+                            ret.push('<!'+this.data+'>');
+                        }
+                        break;
+                    case 10:
+                        ret.push('<!DOCTYPE html>');
+                        break;
+                }
+                return ret;
+            },
+            toDOM:function(){
+                var 
+                    elem,
+                    cs=this.children;
+                switch(this.nodeType){
+                    case 1:
+                        elem=document.createElement(this.nodeName);
+                        break;
+                    case 3:
+                        elem=document.createTextNode(this.data);
+                        break;
+                    case 8:
+                        elem=document.createComment(this.data);
+                        break;
+                    case 10:
+                        //elem=document.createTextNode(this.value);
+                        break;
+                }
+                return elem;
+            }
+        }
+        return VNode;
+    })();
     function UITeam(){}
     UITeam.prototype=new function (){
         var t={
@@ -4446,10 +5213,20 @@ var turtle,$t,
     }
     newKeyArrayObject.prototype={
         push:function(key,node){
-            if(!this.hasOwnProperty(key)){
-                (this[key]=[]).last=last;
+            if(isArray(key)){
+                for(var i=0;i<key.length;i++){
+                    if(!this.hasOwnProperty(key[i])){
+                        (this[key[i]]=[]).last=last;
+                    }
+                    this[key[i]].push(node);
+                }
+            }else{
+                if(!this.hasOwnProperty(key)){
+                    (this[key]=[]).last=last;
+                }
+                this[key].push(node);
             }
-            this[key].push(node);
+            
         },
         clear:function(){
             forEach(this,function(data,key,obj){
@@ -4458,6 +5235,12 @@ var turtle,$t,
         },
         getKeyArray:function(){
             return getKeyArray(this);
+        },
+        pop:function(key){
+            var keyObject=this[key];
+            if(keyObject){
+                return keyObject.pop();
+            }
         }
     }
     function makeCompileString(){
@@ -4499,7 +5282,7 @@ var turtle,$t,
             if(getQueryString("turtle_nocompile")!="1"){
                 $t.xhr.get(scriptNode.src+'.setup',false,function(text){
                     try{
-                        eval('compileInfo='+text);    
+                        exec('compileInfo='+text);    
                     }catch(e){
                         _catch(e);
                     }
@@ -4583,7 +5366,7 @@ var turtle,$t,
         }
         function r2(){
             $t.ready(function(){
-                $t.renderDocument();
+                renderDocument();
                 $t.readyByRenderDocument.isReady=true;
                 emitResize();
             });
@@ -4593,12 +5376,22 @@ var turtle,$t,
         if($t.readyByRenderDocument.isReady||(readyRE.test(document.readyState)&&document.body!==null)){
             fn();
         }else{
-            window.addEventListener('DOMContentLoaded',function(){
+            function onLoaded(){
                 if(document.body!==null){
-                    window.removeEventListener('DOMContentLoaded',arguments.callee);
-                    fn();   
+                    window.removeEventListener('DOMContentLoaded',onLoaded);
+                    clearInterval(tid);
+                    fn();
                 }
-            },false);
+            }
+            
+            var tid=setInterval(function(){
+                if($t.readyByRenderDocument.isReady||(readyRE.test(document.readyState)&&document.body!==null)){
+                    clearInterval(tid);
+                    window.removeEventListener('DOMContentLoaded',onLoaded);
+                    fn();
+                }
+            },10);
+            window.addEventListener('DOMContentLoaded',onLoaded,false);
         }
         return this;
     }
@@ -4723,8 +5516,10 @@ var turtle,$t,
     fn.getClosure=getClosure;
     fn.getClosureTry=getOnTry;
     fn.getStep=getStep;
+    fn.exec=eval;
     
-    
+    fn.addStyle=addStyle;
+    fn.addClassName=addClassName;
     fn.addClass=addClass;
     fn.addClasses=addClasses;
     fn.removeClass=removeClass;
@@ -4773,6 +5568,7 @@ var turtle,$t,
     fn.takeChildNodes=takeChildNodes;
     fn.trim=trim;
     fn.trimLine=trimLine;
+    fn.HTMLTrim=HTMLTrim;
     fn.map=map;
     fn.each=each;
     fn.forEach=forEach;
@@ -4810,6 +5606,8 @@ var turtle,$t,
     fn.objectChange=objectChange;
     fn.objectPropertyChange=objectPropertyChange;
     fn.bindProperty=bindProperty;
+    fn.bindNodeByCondition=bindNodeByCondition;
+    fn.bindNode=bindNode;
     fn.bindElementProperty=bindElementProperty;
     fn.getUIInfo=getUIInfo;
     fn.repeatCall=repeatCall;
@@ -4824,6 +5622,7 @@ var turtle,$t,
     fn.newArrayObject=newArrayObject;
     fn.includeJSFiles=includeJSFiles;
     fn.bindElementPropertyByName=bindElementPropertyByName;
+    fn.toVarString=toVarString;
     fn.log=log;
     fn.bp=bp;
     fn.camelCase=camelCase;
@@ -4841,10 +5640,14 @@ var turtle,$t,
     fn.DropRect=DropRect;
     fn.slice=slice;
     fn.push=push;
+    fn.VNode=VNode;
+    fn.VDOM=VDOM;
+    fn.getFunctionComment=getFunctionComment;
+    fn.getFunctionComments=getFunctionComments;
     function Turtle(){
         this.isTemplate=isTemplate;
         this.config=new Config();
-        this.event={onerror:function(e){log(e);alert(e)}};
+        this.event={onerror:function(e){log(e);bp();alert(e);}};
         this.getUI=getUI;
         this.renderIn=renderIn;
         this.renderBefore=renderBefore;
@@ -4861,7 +5664,7 @@ var turtle,$t,
         this.refs=newKeyArrayObject("RefElements");
         this.parts=newKeyArrayObject("Parts");
         this.clsNode=newArrayObject('ClassNode');
-        this.getNode=newHashObject('GetNode');
+        this.store=new Store();
         this.service=new Service();
         this.body='';
         this.uiTeam=new UITeam();
@@ -4891,6 +5694,7 @@ var turtle,$t,
         this.throwError=throwError;
         this.onResize=onResize;
         this.emitResize=emitResize;
+        this.nodeName=new NodeName();
     }
     Turtle.prototype=fn;
     turtle=$t=new Turtle();

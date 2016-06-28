@@ -1,87 +1,121 @@
 <xmp>
-    <div partMain ref="panel" class="full">
-        <div ref='tabs' style="padding-top:5px;">
-            <get name="tabsItem">
-                <div tabitem style="border:1px #808080 solid;border-bottom:0px;display: inline-block;padding:5px 10px 0;cursor:pointer;-webkit-border-top-left-radius:5px;-webkit-border-top-right-radius:5px;border-top-left-radius:5px;border-top-right-radius:5px;"></div>
-            </get>
-        </div>
-        <div ref='content' style="width:100%;" class="shadowless">
+    <div p-main p-ref="panel" class="full" : style.font-size:="16*$t.getDPI()+'px'">
+        <div p-ref='tabs' style="padding-top:5px;" class="ihbgray15 ibblack1 ila2 iinlineBlock ipointer irdipt5 ibdwb0 uof">
             
         </div>
+        <div p-ref='content' style="width:100%;" class="la2 borderbox"></div>
     </div>
+    <get name="tabsItem">
+        <div tabitem style="padding:3px 6px 0;margin-right:-1px;"></div>
+        <span tabitemclose class="valignt mdipl10 fz12 inlineBlock wem1 hem1 pdip3 rem1 hbred15 hfgray15 fgray14 lhem1 ct2"></span>
+        <span tabitemcount class="valignt fz12 inlineBlock mwem1 hem1 pdip3 rem1 bred15 fgray15 lhem1 ct2" style="margin-right: -15px;margin-top:-10px;margin-left:-5px;"></span>
+    </get>
     <script>
-        var content=part.content=$t.refs.content.pop();
-        var tabs=part.tabs=$t.refs.tabs.pop();
-        var panel=part.panel=$t.refs.panel.pop();
-        var tabsItem=$t.getNode.tabsItem.children[0];
-        delete $t.getNode.tabsItem;
+        var tabsItem=$t.store.takeElem('tabsItem');
+        part.$.init(part,outer,part.$content,part.$tabs,part.$panel,tabsItem[0],tabsItem[1],tabsItem[2]);
+    </script>
+</xmp>
+<script xmp ui='tabbox' service='init'>
+    function(part,outer,content,tabs,panel,tabsItem,tabsItemClose,tabsItemCount){
         var tabItems=[];
         part.onresize=function(){
             content.style.height=panel.offsetHeight-tabs.offsetHeight+'px';
         }
-        // part.oninsert=function(){
-            // part.emitResize();
-        // }
-        
-        part.addItem=function addItem(name){
+        function addItem(name,key,canClose,canCount,elem){
+            var 
+                tabItem,
+                item,
+                elemTabItem,
+                elemCount;
+                
             if(!name){
                 return ;
             }
-            var elem=document.createElement('div');
-            elem.setAttribute('tabname',name);
-            var tabItem=tabsItem.cloneNode();
-            tabItem.innerHTML=name;
-            tabs.appendChild(tabItem);
+            if(!key){
+                key=name;
+            }
+            if(!elem){
+                elem=document.createElement('div');
+                elem.setAttribute('tabname',name);
+            }
+            elemTabItem=tabsItem.cloneNode();
+            elemTabItem.innerHTML=name;
+            if(canClose){
+                elemTabItem.appendChild(tabsItemClose.cloneNode()).innerHTML='x';
+            }
+            tabs.appendChild(elemTabItem);
             content.appendChild(elem);
-            tabItems.push([tabItem,elem]);
+            elemTabItem.key=key;
+            tabItem={
+                key:key,
+                tab:elemTabItem,
+                content:elem,
+                count:0
+            }
+            
+            if(canCount){
+                elemCount=tabsItemCount.cloneNode();
+                elemTabItem.appendChild(elemCount);
+                $t.bindNode(elemCount,tabItem,'count');
+            }
+            tabItems.push(tabItem);
+            tabItems[key]=tabItem;
             elem.style.display="none";
-            tabItem.style.backgroundColor="rgba(0,0,0,0.1)";
         }
+        part.addItem=addItem;
         for(var i=0;i<outer.length;i++){
             var elem=outer[i];
             if(elem.nodeType===1){
                 var name=$t.getAttr(elem,'tabname',null);
                 if(name){
-                    var tabItem=tabsItem.cloneNode();
-                    tabItem.innerHTML=name;
-                    tabs.appendChild(tabItem);
-                    content.appendChild(elem);
-                    tabItems.push([tabItem,elem]);
-                    elem.style.display="none";
-                    tabItem.style.backgroundColor="rgba(0,0,0,0.1)";
+                    var canCount=elem.hasAttribute('cancount');
+                    var canClose=elem.hasAttribute('canclose');
+                    var key=elem.getAttribute('tabkey');
+                    addItem(name,key,canClose,canCount,elem);
                 }
             }else if(elem.nodeType===8){
                 content.appendChild(elem);
             }
         }
         part.check=function(idx){
-            part.checkElem(tabItems[idx][0]);
+            part.checkElem(tabItems[idx].tab);
         }
-        part.checkElem=function(t){
-            for(var i=0;i<tabItems.length;i++){
-                if(tabItems[i][0]===t){
-                    tabItems[i][1].style.display='';
-                    tabItems[i][0].style.backgroundColor="";
-                }else{
-                    tabItems[i][1].style.display='none';
-                    tabItems[i][0].style.backgroundColor="rgba(0,0,0,0.1)";
+        part.getItem=function(key){
+            return tabItems[key];
+        }
+        part.checkElem=function(key){
+            if($t.isFunction(part.onCheckBefore)){
+                if(part.onCheckBefore(tabItems[key])){
+                    return;                    
                 }
+            }
+            for(var i=0;i<tabItems.length;i++){
+                if(tabItems[i].key===key){
+                    tabItems[i].content.style.display='';
+                    tabItems[i].tab.style.backgroundColor="#fff";
+                }else{
+                    tabItems[i].content.style.display='none';
+                    tabItems[i].tab.style.backgroundColor="";
+                }
+            }
+            if($t.isFunction(part.onCheck)){
+                part.onCheck(tabItems[key]);
             }
             part.emitResize();
         }
         if(tabItems.length>0){
-            part.checkElem(tabItems[0][0]);
+            part.checkElem(tabItems[0].key);
         }else{
-            part.addItem('default');
-            part.checkElem(tabItems[0][0]);
+            part.addItem('default','default');
+            part.checkElem(tabItems[0].key);
         }
         tabs.onclick=function(e){
             var t=e.target;
             if(t.hasAttribute('tabitem')){
-                part.checkElem(t);
+                part.checkElem(t.key);
             };
         }
         $t.initHTML(content.children,null,null,null,part);
         part.emitResize();
-    </script>
-</xmp>
+    }
+</script>

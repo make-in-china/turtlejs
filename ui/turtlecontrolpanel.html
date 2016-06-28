@@ -4,9 +4,9 @@
             <div class="mdip2">
                 <textarea ref="script" class="fz18 bgray2 w100 hem10 fgray15 bdw0 rdip5 pdip5" style="outline-width:0; resize:none;box-sizing:border-box;"><!= "我是控制台"></textarea>
                 <br/>
-                <a ref="run" href="javascript:;">运行 &gt;:_</a>
+                <a p-ref="run" href="javascript:;">运行 &gt;:_</a>
                 <br/>
-                <div ref="ret" class="rdip5 bgray2 fgray15 fz18 bgray2 hem10 fgray15 bdw0"></div>
+                <div p-ref="ret" class="rdip5 bgray2 fgray15 fz18 bgray2 hem10 fgray15 bdw0"></div>
             </div>
         </ui:growpanel>
     </set>
@@ -15,9 +15,9 @@
             part.max=part.child[0].max;
             return part.max();
         }
-        var script=$t.refs.script.pop();
-        var run=$t.refs.run.pop();
-        var ret=$t.refs.ret.pop();
+        var script=part.$script;
+        var run=part.$run;
+        var ret=part.$ret;
         run.onclick=function(){
             ret.innerHTML='';
             $t.appendNodes($t.parseHTML(script.value),ret);

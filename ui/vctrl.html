@@ -1,10 +1,10 @@
 <xmp>
     <!elements>
-    <script>
-        var minwidth={minwidth!1}.int;
-        var noPersent={nopersent!false!true}.bool;
-        function setWidth(){
-            
+    <!! part.$.init(part,{nopersent!false!true}.bool,{minwidth!1}.int);>
+</xmp>
+<script xmp ui='vctrl' service='init'>
+    (function(){
+        function setWidth(part,noPersent,minWidth){
             var nodes=part.elements;
             var style;
             var width=part.elemParent.offsetWidth;
@@ -28,15 +28,15 @@
             if(!noPersent&&persentWidth>0){
                 width=width*(1-persentWidth);
             }
-            var col=parseInt(width/minwidth);
+            var col=parseInt(width/minWidth);
             if(col>elems.length){
                 col=elems.length;
             }else if(col===0){
                 col=1;
             }
             width=width/col;
-            if(width<minwidth){
-                width=minwidth;
+            if(width<minWidth){
+                width=minWidth;
             }
             for(var i=0;i<elems.length;i++){
                 style=elems[i].style;
@@ -46,11 +46,13 @@
                 style.width=width+"px";
             }
         }
-        part.onresize=function(v){
-            if(part.isInsert){
-                setWidth();
+        return function(part,noPersent,minWidth){
+            part.onresize=function(v){
+                if(part.isInsert){
+                    setWidth(part,noPersent,minWidth);
+                }
             }
+            $t.readyByRenderDocument.on(part.onresize);
         }
-        $t.readyByRenderDocument.on(part.onresize);
-    </script>
-</xmp>
+    })()
+</script>

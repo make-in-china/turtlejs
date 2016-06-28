@@ -1,0 +1,86 @@
+<!-- 供继承 -->
+<xmp>
+    <div p-ref="pt" class="abs borderbox"></div>
+    <script>
+        var size="{size!both}.only(both,width,height;both)";
+        var pt=part.$pt;
+        $t.removeNode(pt);
+        part.onInit=function(finalPart){
+            part.$.init(part,finalPart,size,pt);
+            $t.addStyle(pt,{ptstyle!}.string);
+            $t.addClassName(pt,{ptclass!}.string);
+        }
+    </script>
+</xmp>
+<script xmp ui="resizeui" service="init">
+    function(part,finalPart,size,pt){
+        var panel=finalPart.$resizeMain;
+        if(!panel){
+            $t.throwError('继承'+finalPart.template.name+'的组件需定义ref="resizeMain"的标签！');
+            return;
+        }
+        var content=finalPart.$resizeContent;
+        if(!content){
+            $t.throwError('继承'+finalPart.template.name+'的组件需定义ref="resizeMain"标签！');
+            return;
+        }
+        panel.appendChild(pt);
+        var style=pt.style;
+        $t.addClass(panel,'la');
+        switch(size){
+            case 'width':
+                style.cursor='e-resize';
+                style.top='0';
+                style.height=height+'px';
+                style.width='4px';
+                part.onresize=function(){
+                    style.left=content.offsetWidth-4+'px';
+                }
+                $t.dropMove(pt,pt,1,0,function(){
+                    content.style.width=pt.offsetLeft+4+'px';
+                    part.emitResize();
+                });
+                break;
+            case 'height':
+                style.left='0';
+                style.width=width+'px';
+                style.height='4px';
+                style.cursor='n-resize';
+                part.onresize=function(){
+                    style.top=content.offsetHeight-4+'px';
+                }
+                $t.dropMove(pt,pt,2,0,function(){
+                    content.style.height=pt.offsetTop+4+'px';
+                    part.emitResize();
+                });
+                break;
+            default:
+                style.width='4px';
+                style.height='4px';
+                style.cursor='nwse-resize';
+                style.backgroundColor="#000";
+                part.onresize=function(){
+                    style.left=content.offsetWidth-4+'px';
+                    style.top=content.offsetHeight-4+'px';
+                }
+                $t.dropMove(pt,pt,0,0,function(){
+                    var style=content.style;
+                    style.width=pt.offsetLeft+4+'px';
+                    style.height=pt.offsetTop+4+'px';
+                    var style=panel.style;
+                    style.width=pt.offsetLeft+4+'px';
+                    style.height=pt.offsetTop+4+'px';
+                    part.emitResize();
+                });
+        }
+        part.onSetSize=function(rect){
+            var style=content.style;
+            style.width=rect.width+'px';
+            style.height=rect.height+'px';
+            var style=panel.style;
+            style.width=rect.width+'px';
+            style.height=rect.height+'px';
+            this.emitResize();
+        }
+    }
+</script>

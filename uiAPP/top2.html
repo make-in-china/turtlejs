@@ -1,34 +1,19 @@
-<xmp service="runJS">
-    function(script){
-        $t.refs.script[0].value=script;
-        $t.ui.growpanel.parts[0].max();
-        try{
-            $t.refs.ret[0].innerHTML=eval(script);
-        }catch(e){
-            $t.refs.ret[0].innerHTML=e.stack;
-        }
-    }
-</xmp>
 <xmp>
     <set lazy append class="zidx3">
-            <set lazy append class="bgray15">
-                <ui:movepanel partname="tree" title="组件树">
-                    <set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set>
-                </ui:movepanel>
-            </set>
-            <set lazy append class="bgray15">
-                <ui:movepanel partname="source">
-                    <set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set>
-                </ui:movepanel>
-            </set>
+        <ui:movepanel class="bgray15" p-name="tree" title="组件树">
+            <set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set>
+        </ui:movepanel>
+        <ui:movepanel class="bgray15" p-name="source">
+            <set style="max-width:800px;max-height:400px;overflow-x:scroll;overflow-y:scroll;"></set>
+        </ui:movepanel>
     </set>
-    <div ref="rectmask" class="abs zidx10 noevent" style="background-color:rgba(0,128,192,0.5);"></div>
+    <div p-ref="rectmask" class="abs zidx10 noevent" style="background-color:rgba(0,128,192,0.5);"></div>
     <div id="header_wrap" class="outer">
         <div class="zidx3 fixed right0">
             <set lazy append class="bgray15" style="font-family: 微软雅黑;">
-                <ui:growpanel title="JS控制台" extend="0">
+                <ui:growpanel p-name="control" title="JS控制台" extend="0">
                     <div class="mdip2">
-                        <textarea ref="script" class="fz18 bgray4 wem20 hem10 fgray15 bdw0 rdip5 pdip5" style="outline-width: 0; resize:none;"></textarea>
+                        <textarea p-ref="script" class="fz18 bgray4 wem20 hem10 fgray15 bdw0 rdip5 pdip5" style="outline-width: 0; resize:none;"></textarea>
                         <br/>
                         <a href="javascript:;">运行 >:_
                             <script type="on">
@@ -36,7 +21,7 @@
                             </script>
                         </a>
                         <br/>
-                        <textarea ref="ret" class="rdip5 bgray4 fgray15 fz18 w100 hem10 fgray15 bdw0" style="outline-width: 0; resize:none;"></textarea>
+                        <textarea p-ref="ret" class="rdip5 bgray4 fgray15 fz18 w100 hem10 fgray15 bdw0" style="outline-width: 0; resize:none;"></textarea>
                     </div>
                 </ui:growpanel>
             </set>
@@ -44,21 +29,23 @@
         <header class="inner">
           <h1 id="project_title">Turtlejs（龟计算）</h1>
           <h2 id="project_tagline">make it for fun（预览版）</h2>
-          本教程用turtlejs编写（<a ref="remove" href="javascript:;">删除顶部</a>）<br>
+          本教程用turtlejs编写（<a p-ref="remove" href="javascript:;">删除顶部</a>）<br>
           本页清单（
           <set class="mdip5">
-          <a ref="source" href="javascript:;">源码</a>
-          <a ref="btn" href="javascript:;">组件实例</a>
-          <a ref="uilist" href="javascript:;">组件清单</a>
+          <a p-ref="source" href="javascript:;">源码</a>
+          <a p-ref="btn" href="javascript:;">组件实例</a>
+          <a p-ref="uilist" href="javascript:;">组件清单</a>
           </set>）
           <script>
-               var btn=$t.refs.btn.pop();
-               var uilist=$t.refs.uilist.pop();
-               var source=$t.refs.source.pop();
-               var rectmask=$t.refs.rectmask.pop();
-               var remove=$t.refs.remove.pop();
-               
-               var tree=$t.parts.tree.pop();
+               var 
+                    btn=part.$btn,
+                    uilist=part.$uilist,
+                    source=part.$source,
+                    rectmask=part.$rectmask,
+                    remove=part.$remove,
+                    tree=$t.parts.tree.pop(),
+                    pcontrol=$t.parts.control.pop();
+               debugger;
                remove.onclick=function(){
                    part.remove();
                }
@@ -130,6 +117,15 @@
                     tree.show();
                     tree.setContent(elems);
                 }
+                $t.service.runJS=function(script){
+                    part.$script.value=script;
+                    pcontrol.max();
+                    try{
+                        part.$ret.innerHTML=eval(script);
+                    }catch(e){
+                        part.$ret.innerHTML=e.stack;
+                    }
+                }
                 uilist.onclick=function(){
                     $t.service.runJS('$t.ui.toString()');
                 }
@@ -148,6 +144,7 @@
                 $t.onResize(function(){
                     part.emitResize();
                 });
+                
           </script>
         </header>
     </div>
