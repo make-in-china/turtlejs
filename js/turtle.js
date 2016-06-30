@@ -1,7 +1,9 @@
 
 var turtle,$t,
     $rootScope,
-    $client;
+    $client,
+    $DOM,
+    $node;
 (function(){
     var 
         arrayPrototype          = Array.prototype,
@@ -9,6 +11,7 @@ var turtle,$t,
         hasOwnProperty          = Object.prototype.hasOwnProperty,
         slice                   = arrayPrototype.slice,
         push                    = arrayPrototype.push,
+        splice                  = arrayPrototype.splice,
         getPrototypeOf          = Object.getPrototypeOf,
         appendChild             = Node.prototype.appendChild,
         addStyleRE              = /;\s*$/;
@@ -20,19 +23,24 @@ var turtle,$t,
         operatorRE              = /\!=|==|=|<|>|\|/,
         camelCaseRE             = /-(\w)/g,
         persentRE               = /^\s*([\d.]+)%\s*$/,
-        emptyTextNodeRE         = /^\s*[\r\n]+\s*$/,
+        emptyTextNodeRE         = /^\s*$/,
         functionCommentRE       = /\/\*([\s\S]*?)\*\//g,
+        xmlwordRE               = /[a-zA-Z\/\!]/,
+        classSplitRE            = /s+/g,
+        styleListRE             = /\s*([\w\-]+)\s*\:\s*(.*?)\s*[;$]/g,
+        camelizeRE              = /-+(.)?/g,
+        deCamelizeRE            = /[A-Z]/g,
         isIE                    = (!!window.ActiveXObject||"ActiveXObject" in window),
         exec                    = eval,
         fragment                = document.createDocumentFragment();
-
+    
     var withthis                = 'with(this){return eval($$$$$$$$$$$$$$$$)};'/*eval支持返回最后一个表达式的值*/,
         _execValueByScope       = Function('$$$$$$$$$$$$$$$$,v,node,outer,outerElement,props,part',withthis),
         _execByScope            = Function('$$$$$$$$$$$$$$$$,node,outer,outerElement,props,part',withthis),
         _execExpressionsByScope = Function('$$$$$$$$$$$$$$$$,v,node',withthis);
+        
     
-    var recalNode           = document.createElement('div');
-    recalNode.setAttribute('style',"width:0 !important;height:0 !important;margin-left:0 !important;margin-right:0 !important;");
+    
     var dateFormat=(function(){
         return function(format,d){
             'use strict' 
@@ -59,45 +67,50 @@ var turtle,$t,
     function last(){
         return this[this.length-1];
     }
-    if (!("classList" in document.documentElement)) {
-        Object.defineProperty(HTMLElement.prototype, 'classList', {
-            get: function() {
-                var self = this;
-                function update(fn) {
-                    return function(value) {
-                        var classes = self.className.split(/[\s\n\r]+/g),
-                            index = classes.indexOf(value);
-                        fn(classes, index, value);
-                        self.className = classes.join(" ");
-                    }
+    var _getClassList={
+        get: function() {
+            var self = this;
+            function update(fn) {
+                return function(value) {
+                    var classes = self.className.split(classSplitRE),
+                        index = classes.indexOf(value);
+                    fn(classes, index, value);
+                    self.className = classes.join(" ");
                 }
-                return {                    
-                    add: update(function(classes, index, value) {
-                        if (!~index) classes.push(value);
-                    }),
-                    
-                    remove: update(function(classes, index) {
-                        if (~index) classes.splice(index, 1);
-                    }),
-                    
-                    toggle: update(function(classes, index, value) {
-                        if (~index)
-                            classes.splice(index, 1);
-                        else
-                            classes.push(value);
-                    }),
-                    
-                    contains: function(value) {
-                        return !!~self.className.split(/\s+/g).indexOf(value);
-                    },
-                    
-                    item: function(i) {
-                        return self.className.split(/\s+/g)[i] || null;
-                    }
-                };
             }
-        });
+            return {                    
+                add: update(function(classes, index, value) {
+                    if (!~index) classes.push(value);
+                }),
+                
+                remove: update(function(classes, index) {
+                    if (~index) classes.splice(index, 1);
+                }),
+                
+                toggle: update(function(classes, index, value) {
+                    if (~index)
+                        classes.splice(index, 1);
+                    else
+                        classes.push(value);
+                }),
+                
+                contains: function(value) {
+                    return !!~self.className.split(classSplitRE).indexOf(value);
+                },
+                item: function(i) {
+                    return self.className.split(classSplitRE)[i] || null;
+                }
+            };
+        }
     }
+    if (!("classList" in document.documentElement)){
+        Object.defineProperty(HTMLElement.prototype,'classList',_getClassList);
+    }
+    Object.defineProperty(Node.prototype,"object",{
+        get:function(){
+            return this;
+        }
+    });
     (function(){
         var insertBefore=Node.prototype.insertBefore;
         if(isIE){
@@ -1014,7 +1027,12 @@ var turtle,$t,
     function isArrayLike(a){return typeof a.length=='number'}
     function compact(array) { return array.filter(function(item){ return item !== undefined && item !== null }) }
     function flatten(array) { return array.length > 0 ? [].concat.apply([], array) : array }
-    function camelize(str){ return str.replace(/-+(.)?/g, function(match, chr){ return chr ? chr.toUpperCase() : '' }) }
+    function camelize(str){ return str.replace(camelizeRE, function(match, chr){ return chr ? chr.toUpperCase() : '' }) }
+    function decamelize(str){
+         return str.replace(deCamelizeRE, function(match){ 
+             return '-'+match.toLowerCase();
+         }); 
+    }
     function trim(s){return s.replace(/^\s*|\s*$/g,"");}
     function HTMLTrim(s){return s.replace(/^[\s\r\n]*|[\s\r\n]*$/g,"");}
     function trimLine(s){return s.replace(/^\s*/g,"").replace(/\s*$/g,"").replace(/\s*[\r\n]\s*/g,"");}
@@ -1417,15 +1435,19 @@ var turtle,$t,
         return t;
     }
     function treeEach(array,property,fn,beginIndex){
-        if(!isArrayLike(array))return;
-        var arr=array;
-        var i=beginIndex>=0?beginIndex:0;
-        var stack=[];
-        var obj;
-        var obj2;
-        var state;
-        var step={next:1}
-        while(1){
+        if(!isArrayLike(array)){
+            return;
+        }
+        var 
+            arr=array,
+            i=beginIndex>=0?beginIndex:0,
+            stack=[],
+            obj,
+            obj2,
+            state,
+            step={next:1};
+            
+        while(true){
             if(i<arr.length){
                 obj=arr[i];
                 step.next=1;
@@ -1494,9 +1516,14 @@ var turtle,$t,
             return;
         }
         for(var i=0;i<nodes.length;i++){
-            fragment.appendChild(nodes[i]);
+            //if(nodes[i] instanceof Node){
+                parent.insertBefore2(nodes[i],node);
+                //fragment.appendChild(nodes[i]);
+            //}else{
+                //fragment.appendChild(nodes[i].toDOM());
+            //}
         }
-        parent.insertBefore2(fragment,node);
+        //parent.insertBefore2(fragment,node);
     }
     function insertNodeBefore(node,node2){
         var parent=node.parentNode;
@@ -1510,9 +1537,11 @@ var turtle,$t,
     function appendNodes(nodes,parent){
         var c=slice.call(nodes);
         for(var i=0;i<c.length;i++){
-            fragment.appendChild(c[i]);
+                parent.appendChild(c[i]);
+                //fragment.appendChild(c[i]);   
+                //fragment.appendChild(c[i].toDOM());
         }
-        parent.appendChild(fragment);
+        //parent.appendChild(fragment);
         // for(var i=0;i<c.length;i++){
             // parent.appendChild(c[i]);
         // }
@@ -1575,6 +1604,7 @@ var turtle,$t,
         }
     }
     function execScript(node,outerChildNodes,outerElement,props,part){
+        'use strict'
         var script=node.innerHTML;
         if(script.length>0){
             var fn;
@@ -1626,7 +1656,7 @@ var turtle,$t,
         return _execByScope.call(getScopeBy(scope,node),s,node,outer,outerElement,props,part);
     }
     function execScope(s,node,outerChildNodes,outerElement,props,part){
-        execByScope(node,'extend(this,{'+s+'});',null,outerChildNodes,outerElement,props,part);
+        execByScope(node,'$t.extend(this,{'+s+'});',null,outerChildNodes,outerElement,props,part);
     }
     function parseScript(node,outerChildNodes,outerElement,props,part){
         if(node.type==""||node.type=="on"||node.type=="text/javascript"){
@@ -2837,7 +2867,7 @@ var turtle,$t,
             }
             if(node.hasAttribute('lazy')){
                 parseLazy(node,outerChildNodes,outerElement,props,part);
-                return treeEach.c_repeat;
+                return treeEach.c_noIn|treeEach.c_repeat;
             }
             var uiInfo=getUIInfo(node);
             if(uiInfo){
@@ -2861,7 +2891,6 @@ var turtle,$t,
                 }
             }
         });
-        
     }
     
     function defineClasses(node){
@@ -2878,7 +2907,7 @@ var turtle,$t,
     }
     
     function parseSet(node,outerChildNodes,outerElement,props,part){
-        var attr=node.attributes;
+        
         if(node.hasAttribute('link')){
             /*设置关联子对象*/
             var link=takeAttr(node,'link');
@@ -2902,6 +2931,7 @@ var turtle,$t,
             }
             var isAppend=!node.hasAttribute('append');
             node.removeAttribute('append');
+            var attr=node.attributes;
             for(var j=0;j<ns.length;j++){
                 if(isAppend){
                     for(var i=0;i<attr.length;i++){
@@ -3151,7 +3181,7 @@ var turtle,$t,
             if(!isArray(outerElement)){
                 outerElement=[];
             }
-            uiNode=document.createElement("ui:render");
+            uiNode=$node('ui:render');//document.createElement("ui:render");
             if(elem){
                 elem.appendChild(uiNode);    
             }
@@ -3166,7 +3196,7 @@ var turtle,$t,
             if(!isArray(outerElement)){
                 outerElement=[];
             }
-            uiNode=document.createElement("ui:render");
+            uiNode=$node('ui:render');//document.createElement("ui:render");
             if(elem&&elem.parentNode){
                 elem.parentNode.insertBefore2(uiNode,elem);
             }
@@ -3188,7 +3218,7 @@ var turtle,$t,
             }
             
             if(!uiNode){
-                uiNode=document.createElement("ui:render");
+                uiNode=$node('ui:render');//document.createElement("ui:render");
             }else{
                 setQuestionAtrr(uiNode,outerChildNodes,outerElement,part?part.props:props,part);
             
@@ -3221,8 +3251,8 @@ var turtle,$t,
             
             if(uiNode.parentNode!==null){
                 part.insertBefore(uiNode);
+                removeNode(uiNode);
             }
-            removeNode(uiNode);
             return part;
         },
         /*由props构建html字符串*/
@@ -3365,8 +3395,8 @@ var turtle,$t,
         }
         var name=template.name;
         node.innerHTML=s;
-        var begin=t.begin=document.createComment('<'+name+'>');
-        var end=t.end=document.createComment('</'+name+'>')
+        var begin=t.begin=$node(name,8);// document.createComment('<'+name+'>');
+        var end=t.end=$node('/'+name,8);//document.createComment('</'+name+'>')
         end.part=begin.part=t;
         begin.sign=1;
         end.sign=0;
@@ -3392,9 +3422,11 @@ var turtle,$t,
         if(extPart){
             extPart.to(t);
         }
+        //nodes=vNodesToDOM(nodes);
+        
         t.store.push.apply(t.store,nodes);
-        for(var i=nodes.length;i>0;i--){
-            node.removeChild(nodes[0]);
+        for(var i=0;i<nodes.length;i++){
+            node.removeChild(nodes[i]);
         }
         t.store.unshift(begin);
         t.store.push(end);
@@ -3416,6 +3448,13 @@ var turtle,$t,
             }
             return s;
         },
+        get elementLength(){
+            if(this.isInsert){
+                return this.store.length;
+            }else{
+                return 1;
+            }
+        },
         get elements(){
             if(this.isExtend){
                 return [];
@@ -3423,7 +3462,8 @@ var turtle,$t,
             if(this.isInsert){
                 var elements=[];
                 var node=this.begin.nextSibling;
-                while(node!==this.end){
+                var end=this.end;
+                while(node!==end){
                     elements.push(node);
                     var node=node.nextSibling;                
                 }
@@ -3463,6 +3503,10 @@ var turtle,$t,
             if(this.isInsert){
                 var rects=[];
                 var rt;
+                //var recalNode           = document.createElement('div');
+    
+                //recalNode.setAttribute('style',"width:0 !important;height:0 !important;margin-left:0 !important;margin-right:0 !important;");
+    
                 // insertNodeBefore(this.begin,recalNode);
                 // rt=[recalNode.offsetLeft,recalNode.offsetTop];
                 // insertNodeBefore(this.end,recalNode);
@@ -3586,6 +3630,7 @@ var turtle,$t,
             }  
         },
         insertBefore:function(elem){
+            
             if(this.isInsert){
                 var elems=this.elements;
                 elems.unshift(this.begin);
@@ -3604,6 +3649,7 @@ var turtle,$t,
                     this.onInsert(elem);
                 }
             }else{
+                
                 insertNodesBefore(elem,this.store);
                 /*link scope*/
                 var scopeNodes=this.scopeNodes;
@@ -3768,11 +3814,12 @@ var turtle,$t,
         }
         removeNode(node);
     }
-    function parseUITemplate(uiName,uiSortPath,uiPath,template){
-        var _uiMain=document.createElement('ui:parseUITemplate');
-        _uiMain.innerHTML=template;
+    function parseUITemplate(uiName,uiSortPath,uiPath,sHTML){
+        //var _uiMain=document.createElement('ui:parseUITemplate');
+        //_uiMain.innerHTML=sHTML;
         var 
-            cs=_uiMain.children,
+            vDOM=new $DOM(sHTML),
+            cs=vDOM.children,
             i=0,
             node,
             s,
@@ -3854,7 +3901,7 @@ var turtle,$t,
         
         cpn=ui.render(node, node.parentNode,outerChildNodes,outerElement,null,part,partName,reExtends);
         if(cpn){
-            step.next =cpn.elements.length;    
+            step.next =cpn.elementLength;    
         }
     }
     function getUI(uiName,uiSortPath,outerChildNodes,outerElement,props,part,partName,reExtends){
@@ -3909,10 +3956,14 @@ var turtle,$t,
         return s;
     }
     function parseHTML(sHTML){
-        var _uiMain=document.createElement('ui:parseHTML');
-        _uiMain.innerHTML=sHTML;
-        initHTML(_uiMain.childNodes);
-        return takeChildNodes(_uiMain);
+        //var _uiMain=document.createElement('ui:parseHTML');
+        //_uiMain.innerHTML=sHTML;
+        var vDOM=new $DOM(sHTML);
+        debugger;
+        initHTML(vDOM.childNodes);
+        //initHTML(_uiMain.childNodes);
+        
+        return takeChildNodes(vDOM);
     }
     
     function parseXMP(node){
@@ -4225,13 +4276,11 @@ var turtle,$t,
     }
     function renderDocument(noAppend){
         renderDocument.beginTime=new Date();
-        /*if($t.body.length>0){
-            document.body.innerHTML=$t.body;
-        }*/
         var 
             xmps=findTemplates(document.body.children),
             i,
             templateXMP=[];
+        /*优先处理定义先关的模板*/
         for(i=0;i<xmps.length;i++){
             if(isDefine(xmps[i])){
                 parseDefine(xmps[i]);
@@ -4239,10 +4288,12 @@ var turtle,$t,
                 templateXMP.push(xmps[i]);
             }
         }
+        /*处理逻辑模板*/
         for(i=0;i<templateXMP.length;i++){
             var ret=parseHTML(getTemplate(templateXMP[i]));
-            replaceNodeByNodes(templateXMP[i],ret);
+            replaceNodeByNodes(templateXMP[i],vNodesToDOM(ret));
         }
+        
         replaceCls();
         
         /*initLink();*/
@@ -4598,391 +4649,799 @@ var turtle,$t,
             return s;
         }
     }
-    var stringNode={
-        'script':/^\/script[>\s]/,
-        'template':/^\/template[>\s]/,
-        'style':/^\/style[>\s]/,
-        'title':/^\/title[>\s]/,
-        'textarea':/^\/textarea[>\s]/,
-        'xmp':/^\/xmp[>\s]/
-    }
-    var htmlParse={
-        '':function(html,m){
-            var nodeName=m.node.nodeName;
-            if(nodeName in stringNode){
-                m.action='stringNode';
-                m.stringNodeRegExp=stringNode[nodeName];
-                m.stringNodeKeyLength=nodeName.length+2;
-                m.stringNodeStart=m.index;
-                return;
-            }else{
-                m.action='textNode';
-                m.textNodeStart=m.index;
-            }
-        },
-        textNode:function(html,m){
-            var data;
-            switch(html[m.index]){
-                case '<':
-                    if(m.textNodeStart!==m.index){
-                        
-                        data=html.substring(m.textNodeStart,m.index);
-                        if(!emptyTextNodeRE.test(data)){
-                            m.node(data,3);
-                        }
-                        m.textNodeStart=0;
-                    }
-                    m.xmlNodeStart=m.index;
-                    m.index++;
-                    m.action='xmlNode';
-                    break;
-                default:
-                    m.index++;
-            }
-        },
-        createXMLNode:function(html,m){
-            m.xmlNodeStart=0;
-            if(m.xmlNodeNameStart>0){
-                //无属性标签
-                var nodeName=html.substring(m.xmlNodeNameStart,m.index);
-                m.node=m.node(nodeName);
-                m.xmlNodeNameStart=0;
-                m.index++;
-            }
-            m.action='';
-        },
-        setXMLNodeClose:function(html,m){
-            var n=m.node;
-            var name=trim(html.substring(m.xmlNodeNameStart,m.index));
-            while(n){
-                if(n.nodeType===1&&n.nodeName===name){
-                    n.isClose=true;
-                    m.node=n.parentNode;
-                    m.action='';
-                    m.xmlNodeNameStart=0;
+    var VDOM=(function(){
+        var stringNode={
+            'SCRIPT':/^\/script[>\s]/i,
+            'TEMPLATE':/^\/template[>\s]/i,
+            'STYLE':/^\/style[>\s]/i,
+            'TITLE':/^\/title[>\s]/i,
+            'TEXTAREA':/^\/textarea[>\s]/i,
+            'XMP':/^\/xmp[>\s]/i
+        }
+        var htmlParse={
+            '':function(html,m){
+                var nodeName=m.node.nodeName;
+                if(stringNode.hasOwnProperty(nodeName)){
+                    m.action='stringNode';
+                    m.stringNodeRegExp=stringNode[nodeName];
+                    m.stringNodeKeyLength=nodeName.length+2;
+                    m.stringNodeStart=m.index;
                     return;
+                }else{
+                    m.action='textNode';
+                    m.textNodeStart=m.index;
                 }
-                n=n.parent;
-            }
-            /*当注释*/
-            m.node(name,8);
-        },
-        setAttrStart:function(m){
-            m.action='attributes';
-            m.attrStart=0;
-            m.attrNameEnd=0;
-            m.equlIndex=0;
-            m.stringStart=0;
-            m.stringStartChar='';
-        },
-        xmlNode:function(html,m){
-            switch(html[m.index]){
-                case '>':
-                    this.createXMLNode(html,m);
-                    break;
-                case ' ':
-                    this.createXMLNode(html,m);
-                    m.action='attributes';
-                    break;
-                case '!':
-                    if(m.xmlNodeStart===m.index-1){
-                        m.action='comment';    
-                    }
-                    m.index++;
-                    break;
-                case '/':
-                    if(m.xmlNodeStart===m.index-1){
-                        m.action='endXmlNode';
-                        m.index++;
-                        m.xmlNodeNameStart=m.index;
-                        return;
-                    }else if(m.length>=m.index+1){
-                        if(html.substr(m.index+1,1)==='>'){
-                            this.createXMLNode(html,m);
+            },
+            textNode:function(html,m){
+                var data;
+                switch(html[m.index]){
+                    case '<':
+                        if(m.index<m.length+1&&xmlwordRE.test(html[m.index+1])){
+                          
+                            if(m.textNodeStart!==m.index){
+                                
+                                data=html.substring(m.textNodeStart,m.index);
+                                if(!emptyTextNodeRE.test(data)){
+                                    m.node(data,3);
+                                }
+                                m.textNodeStart=0;
+                            }
+                            m.xmlNodeStart=m.index;
                             m.index++;
-                            return;
-                        }
-                    }
-                    break;
-                default:
-                    if(m.xmlNodeNameStart===0){
-                        m.xmlNodeNameStart=m.index;
-                    }
-                    m.index++;
-            }
-        },
-        endXmlNode:function(html,m){
-            switch(html[m.index]){
-                case '>':
-                    this.setXMLNodeClose(html,m);
-                    m.index++;
-                    break;
-                default:
-                    m.index++;
-            }
-        },
-        comment:function(html,m){
-            switch(html[m.index]){
-                case '>':
-                    m.node('',8);
-                    m.index++;
-                    break;
-                case '-':
-                    if(m.length>=m.index+2){
-                        if(html.substr(m.index+1,1)==='-'){
-                            m.commentStart=m.index+2;
-                            m.action='comment3';
-                            m.index+=2;
+                            m.action='xmlNode';
                         }else{
                             m.index++;
                         }
-                    }else{
+                        break;
+                    default:
                         m.index++;
-                    }
-                    break;
-                case 'd':
-                case 'D':
-                    if(m.length>=m.index+7){
-                        if(html.substr(m.index+1,6).toUpperCase()==='OCTYPE'){
-                            m.node('',10);
-                            m.index+=13;
-                            m.action='';
-                        }
-                    }
-                    break;
-                default:
-                    m.commentStart=m.index;
-                    m.action='comment2';
+                }
+            },
+            createXMLNode:function(html,m){
+                m.xmlNodeStart=0;
+                if(m.xmlNodeNameStart>0){
+                    //无属性标签
+                    var nodeName=html.substring(m.xmlNodeNameStart,m.index);
+                    m.node=m.node(nodeName);
+                    m.xmlNodeNameStart=0;
                     m.index++;
-            }
-        },
-        comment2:function(html,m){
-            if(html[m.index]==='>'){
-                var vNode=m.node(html.substring(m.commentStart,m.index),8);
-                vNode.dbplus=false;
-                m.commentStart=0;
+                }
                 m.action='';
                 
-            }
-            m.index++;
-        },
-        comment3:function(html,m){
-            if(html[m.index]==='-'){
-                if(m.length>=m.index+3){
-                    if(html.substr(m.index+1,2)==='->'){
-                        var vNode=m.node(html.substring(m.commentStart,m.index),8);
-                        vNode.dbplus=true;
-                        m.commentStart=0;
+            },
+            setXMLNodeClose:function(html,m){
+                var n=m.node;
+                var name=trim(html.substring(m.xmlNodeNameStart,m.index)).toUpperCase();
+                while(n){
+                    if(n.nodeName===name){
+                        n.__isClose__=true;
+                        m.node=n.parentNode;
                         m.action='';
-                        m.index+=3;
+                        m.xmlNodeNameStart=0;
                         return;
                     }
+                    n=n.parentNode;
                 }
-            }
-            m.index++;
-        },
-        attributes:function(html,m){
-            switch(html[m.index]){
-                case '/':
-                    if(m.length>=m.index+2){
-                        if(html.substring(m.index+1,1)==='>'){
-                            m.action='';
+                /*当注释*/
+                console.log('变成注释',name);
+                debugger;
+                m.node(name,8);
+            },
+            setAttrStart:function(m){
+                m.action='attributes';
+                m.attrStart=0;
+                m.attrNameEnd=0;
+                m.equlIndex=0;
+                m.stringStart=0;
+                m.stringStartChar='';
+            },
+            xmlNode:function(html,m){
+                switch(html[m.index]){
+                    case '>':
+                        this.createXMLNode(html,m);
+                        break;
+                    case ' ':
+                        this.createXMLNode(html,m);
+                        m.action='attributes';
+                        break;
+                    case '!':
+                        if(m.xmlNodeStart===m.index-1){
+                            m.action='comment';    
                         }
-                    }
-                    m.attrStart=m.attrNameEnd=0;
-                    m.index++;
-                    break;
-                case '>':
-                    m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                        m.index++;
+                        break;
+                    case '/':
+                        if(m.xmlNodeStart===m.index-1){
+                            m.action='endXmlNode';
+                            m.index++;
+                            m.xmlNodeNameStart=m.index;
+                            return;
+                        }else if(m.length>=m.index+1){
+                            if(html.substr(m.index+1,1)==='>'){
+                                this.createXMLNode(html,m);
+                                m.index++;
+                                return;
+                            }
+                        }
+                        break;
+                    default:
+                        if(m.xmlNodeNameStart===0){
+                            m.xmlNodeNameStart=m.index;
+                        }
+                        m.index++;
+                }
+            },
+            endXmlNode:function(html,m){
+                switch(html[m.index]){
+                    case '>':
+                        this.setXMLNodeClose(html,m);
+                        m.index++;
+                        break;
+                    default:
+                        m.index++;
+                }
+            },
+            comment:function(html,m){
+                switch(html[m.index]){
+                    case '>':
+                        m.node('',8);
+                        m.index++;
+                        break;
+                    case '-':
+                        if(m.length>=m.index+2){
+                            if(html.substr(m.index+1,1)==='-'){
+                                m.commentStart=m.index+2;
+                                m.action='comment3';
+                                m.index+=2;
+                            }else{
+                                m.index++;
+                            }
+                        }else{
+                            m.index++;
+                        }
+                        break;
+                    case 'd':
+                    case 'D':
+                        if(m.length>=m.index+7){
+                            if(html.substr(m.index+1,6).toUpperCase()==='OCTYPE'){
+                                m.node('',10);
+                                m.index+=13;
+                                m.action='';
+                            }
+                        }
+                        break;
+                    default:
+                        m.commentStart=m.index;
+                        m.action='comment2';
+                        m.index++;
+                }
+            },
+            comment2:function(html,m){
+                if(html[m.index]==='>'){
+                    var vNode=m.node(html.substring(m.commentStart,m.index),8);
+                    vNode.dbplus=false;
+                    m.commentStart=0;
                     m.action='';
-                    m.index++;
-                    break;
-                case ' ':
-                    if(m.attrStart>0&&m.attrNameEnd===0){
-                        m.attrNameEnd=m.index;
-                    }
-                    m.index++;
-                    break;
-                case '=':
-                    if(m.attrStart>0&&m.attrNameEnd===0){
-                        m.attrNameEnd=m.index;
-                    }
-                    m.equlIndex=m.index;
-                    m.action='attrValue';
-                    m.index++;
-                    break;
-                default:
-                    if(m.attrStart===0){
-                        m.attrStart=m.index;
-                    }else if(m.equlIndex>0){
-                        m.node._(html.substring(m.attrStart,m.attrNameEnd));
-                        this.setAttrStart(m);
-                    }
-                    m.index++;
-            }
-        },
-        attrValue:function(html,m){
-            switch(html[m.index]){
-                case '>':
-                    /*忽略等号*/
-                    m.node._(html.substring(m.attrStart,m.attrNameEnd));
-                    m.action='';
-                    m.index++;
-                    break;
-                case ' ':
-                    m.index++;
-                    break;
-                case '"':
-                    m.stringStartChar='"';
-                    m.action='atvstring';
-                    m.index++;
-                    m.stringStart=m.index;
-                    break;
-                case "'":
-                    m.stringStartChar='\'';
-                    m.action='atvstring';
-                    m.index++;
-                    m.stringStart=m.index;
-                    break;
-                case "/":
-                    if(m.length>=m.index+2){
-                        if(html.substring(m.index+1,1)==='>'){
-                            m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                    
+                }
+                m.index++;
+            },
+            comment3:function(html,m){
+                if(html[m.index]==='-'){
+                    if(m.length>=m.index+3){
+                        if(html.substr(m.index+1,2)==='->'){
+                            var vNode=m.node(html.substring(m.commentStart,m.index),8);
+                            vNode.dbplus=true;
+                            m.commentStart=0;
                             m.action='';
-                            m.index+=2;
+                            m.index+=3;
                             return;
                         }
                     }
-                    m.index++
-                    break;
-                default:
-                    m.action='atvbetweenSpace';
-                    m.betweenSpaceStart=m.index;
-                    m.index++;
-            }
-        },
-        atvbetweenSpace:function(html,m){
-            switch(html[m.index]){
-                case ' ':
-                    m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.stringStart,m.index));
-                    this.setAttrStart(m);
-                    m.index++;
-                    break;
-                default:
-                    m.index++;
-            }
-        },
-        atvstring:function(html,m){
-            switch(html[m.index]){
-                case '\\':
-                    m.index+=2;
-                    break;
-                case m.stringStartChar:
-                    m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.stringStart,m.index));
-                    this.setAttrStart(m);
-                    m.index++;
-                    break;
-                default:
-                    m.index++;
-            }
-        },
-        stringNode:function(html,m){
-            if(html[m.index]==='<'){
-                if(m.length>=m.index+m.stringNodeKeyLength+1){
-                    if(m.stringNodeRegExp.test(html.substr(m.index+1,m.stringNodeKeyLength))){
-                        m.node.text(HTMLTrim(html.substring(m.stringNodeStart,m.index)));
-                        m.stringNodeStart=0;
-                        m.stringNodeRegExp=null;
+                }
+                m.index++;
+            },
+            attributes:function(html,m){
+                switch(html[m.index]){
+                    case '/':
+                        if(m.length>=m.index+2){
+                            if(html.substring(m.index+1,1)==='>'){
+                                m.action='';
+                                if(m.node.__isClose__){
+                                    m.node=m.node.parentNode;
+                                }
+                            }
+                        }
+                        m.attrStart=m.attrNameEnd=0;
+                        m.index++;
+                        break;
+                    case '>':
+                        m.node._(html.substring(m.attrStart,m.attrNameEnd));
                         m.action='';
-                        m.node.isClose=true;
-                        m.node=m.node.parentNode;
-                        m.index+=m.stringNodeKeyLength+1;
-                        m.stringNodeKeyLength=0;
-                        return;        
+                        if(m.node.__isClose__){
+                            m.node=m.node.parentNode;
+                        }
+                        m.index++;
+                        break;
+                    case ' ':
+                        if(m.attrStart>0&&m.attrNameEnd===0){
+                            m.attrNameEnd=m.index;
+                        }
+                        m.index++;
+                        break;
+                    case '=':
+                        if(m.attrStart>0&&m.attrNameEnd===0){
+                            m.attrNameEnd=m.index;
+                        }
+                        m.equlIndex=m.index;
+                        m.action='attrValue';
+                        m.index++;
+                        break;
+                    default:
+                        if(m.attrStart===0){
+                            m.attrStart=m.index;
+                        }else if(m.equlIndex>0){
+                            m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                            this.setAttrStart(m);
+                        }else if(m.attrNameEnd!==0){
+                            m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                            this.setAttrStart(m);
+                            m.attrStart=m.index;
+                        }
+                        m.index++;
+                }
+            },
+            attrValue:function(html,m){
+                switch(html[m.index]){
+                    case '>':
+                        /*忽略等号*/
+                        m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                        m.action='';
+                        m.index++;
+                        break;
+                    case ' ':
+                        m.index++;
+                        break;
+                    case '"':
+                        m.stringStartChar='"';
+                        m.action='atvstring';
+                        m.index++;
+                        m.stringStart=m.index;
+                        break;
+                    case "'":
+                        m.stringStartChar='\'';
+                        m.action='atvstring';
+                        m.index++;
+                        m.stringStart=m.index;
+                        break;
+                    case "/":
+                        if(m.length>=m.index+2){
+                            if(html.substring(m.index+1,1)==='>'){
+                                m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                                m.action='';
+                                m.index+=2;
+                                return;
+                            }
+                        }
+                        m.index++
+                        break;
+                    default:
+                        m.action='atvbetweenSpace';
+                        m.betweenSpaceStart=m.index;
+                        m.index++;
+                }
+            },
+            atvbetweenSpace:function(html,m){
+                switch(html[m.index]){
+                    case ' ':
+                        m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.stringStart,m.index));
+                        this.setAttrStart(m);
+                        m.index++;
+                        break;
+                    default:
+                        m.index++;
+                }
+            },
+            atvstring:function(html,m){
+                switch(html[m.index]){
+                    case '\\':
+                        m.index+=2;
+                        break;
+                    case m.stringStartChar:
+                        m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.stringStart,m.index));
+                        this.setAttrStart(m);
+                        m.index++;
+                        break;
+                    default:
+                        m.index++;
+                }
+            },
+            stringNode:function(html,m){
+                if(html[m.index]==='<'){
+                    if(m.length>=m.index+m.stringNodeKeyLength+1){
+                        if(m.stringNodeRegExp.test(html.substr(m.index+1,m.stringNodeKeyLength))){
+                            m.node.text(HTMLTrim(html.substring(m.stringNodeStart,m.index)));
+                            m.stringNodeStart=0;
+                            m.stringNodeRegExp=null;
+                            m.action='';
+                            m.node.__isClose__=true;
+                            m.node=m.node.parentNode;
+                            m.index+=m.stringNodeKeyLength+1;
+                            m.stringNodeKeyLength=0;
+                            return;        
+                        }
                     }
                 }
+                m.index++;
             }
-            m.index++;
         }
-    }
-    function VDOM(html,vNode){
-        
-        if(!(vNode instanceof VNode)){
-            vNode=new VNode('document');
-            vNode.isClose=true;
+        return function(html,vNode){
+            
+            if(!vNode){
+                vNode=newVNode('document');
+                vNode.__isClose__=true;
+            }
+            var 
+                m={
+                    index:0,
+                    node:vNode,
+                    action:'',
+                    length:html.length,
+                    textNodeStart:0,
+                    xmlNodeStart:0,
+                    xmlNodeNameStart:0,
+                    attrStart:0,
+                    attrNameEnd:0,
+                    equlIndex:0,
+                    stringStart:0,
+                    stringStartChar:'',
+                    betweenSpaceStart:0,
+                    stringNodeStart:0,
+                    stringNodeRegExp:null,
+                    stringNodeKeyLength:0
+                };
+            while(m.index<html.length){
+                htmlParse[m.action](html,m);
+            }
+            return vNode;
         }
-        var 
-            m={
-                index:0,
-                node:vNode,
-                action:'',
-                length:html.length,
-                textNodeStart:0,
-                xmlNodeStart:0,
-                xmlNodeNameStart:0,
-                attrStart:0,
-                attrNameEnd:0,
-                equlIndex:0,
-                stringStart:0,
-                stringStartChar:'',
-                betweenSpaceStart:0,
-                stringNodeStart:0,
-                stringNodeRegExp:null,
-                stringNodeKeyLength:0
-            };
-        while(m.index<html.length){
-            htmlParse[m.action](html,m);
-        }
-        return vNode;
-    }
+    }());
     function NullValueHash(s){
-        var arr=s.split(s);
+        var arr=s.split(',');
         for(var i in arr){
             this[arr[i]]=null;
         }
     }
-    var VNode=(function(){
-        var closeSelf=new NullValueHash(
+    
+    function vNodesToDOM(vNodes){
+        var arr=[];
+        for(var i=0;i<vNodes.length;i++){
+            if(vNodes[i].toDOM){
+                arr.push(vNodes[i].toDOM());    
+            }else{
+                arr.push(vNodes[i]);
+            }
+        }
+        return arr;
+    }
+    var newNode=function(name,nodeType){
+        switch(nodeType){
+            case 3:
+                return document.createTextNode(name);
+                break;
+            case 8:
+                return document.createComment(name);
+                break;
+            case 1:
+            case undefined:
+                return document.createElement(name);
+                break;
+            case 10:
+                return null;
+                break;
+            default:
+                return null;
+        }
+        
+    } 
+    var newVNode=(function(){
+        var styleNode       = document.createElement('用于创建VStyle').style;
+        var VStyleprototype ={};
+        function VStyle(elem,attrs){
+            var t=this;
+            var __={};
+            for(var i in styleNode){
+                __[i]="";
+            }
+            Object.defineProperty(this,'__',{
+                    value: __,
+                    writable: false,
+                    enumerable: false,
+                    configurable: false
+                }
+            );
+            Object.defineProperty(this,'length',{
+                    value: 0,
+                    writable: true,
+                    enumerable: false,
+                    configurable: false
+                }
+            );
+            Object.defineProperty(this,'__elem__',{
+                    value: elem,
+                    writable: false,
+                    enumerable: false,
+                    configurable: false
+                }
+            );
+            var 
+                style="",
+                isLock=0;
+            Object.defineProperty(attrs,"__style__",{
+                    get: function(){
+                        return style;
+                    },
+                    set: function(s){
+                        if(isLock===1||style===s){
+                            return;
+                        }
+                        style=s;
+                        if(isLock===2){
+                            return;
+                        }
+                        isLock=1;
+                        var lst;
+                        var lst2=[];
+                        while((lst=styleListRE.exec(s))!==null){
+                            lst2.push(lst);
+                        }
+                        for(var i=0;i<lst2.length-1;i++){
+                            t[camelize(lst2[i][1])]=lst2[i][2];
+                        }
+                        isLock=2;
+                        t[camelize(lst2[i][1])]=lst2[i][2];
+                        isLock=0;
+                        //styleListRE.lastIndex=0;
+                    }
+                }
+            );
+        }
+        VStyle.prototype=VStyleprototype;
+        function indexOfStyleName(t,name){
+            for(var i=0;i<t.length;i++){
+                if(t[i]===name){
+                    return i;
+                }
+            }
+            return -1;
+        }
+        function updateStyleAttribyte(t){
+            var style="";
+            for(var i=0;i<t.length;i++){
+                style+=decamelize(t[i])+':'+t[t[i]]+';';
+            }
+            t.__elem__.setAttribute('style',style);
+        }
+        function setVStyleGetSet(name){
+            Object.defineProperty(VStyleprototype,name,{
+                get:function(){
+                    return this.__[name];
+                },
+                set:function(s){
+                    if(s===this.__[name]){
+                        return;
+                    }else if(s===""){
+                        if(this.__[name]===s){
+                            return;
+                        }
+                        //删除
+                        this.__[name]=s;
+                        var idx=indexOfStyleName(this,name);
+                        //if(idx!==-1){
+                            for(var i=idx;i<this.length-1;i++){
+                                this[i]=this[i+1];
+                            }
+                            delete this[i];
+                            this.length--;
+                        //}
+                        //更新标签属性
+                        updateStyleAttribyte(this);
+                    }else{
+                        //验证是否有效style
+                        var s2;
+                        styleNode[name]=s;
+                        s2=styleNode[name];
+                        styleNode[name]="";
+                        if(s!==""){
+                            this.__[name]=s;
+                            var style=this.__elem__.getAttribute(style);
+                            var idx=indexOfStyleName(this,name);
+                            if(idx===-1){
+                                this[this.length]=name;
+                                this.length++;
+                            }
+                            //更新标签属性
+                            updateStyleAttribyte(this);
+                        }else{
+                            throwError(name+"不支持"+s);
+                        }
+                        
+                    }
+                }
+            });
+        }
+        for(var i in styleNode){
+            setVStyleGetSet(i);
+        }
+        VStyleprototype=null;
+        
+        var closeSelf       = new NullValueHash(
             'br,input,hr,map,img,area,base,link,meta,frame,param,basefont,col'
         );
-        function VNode(name,nodeType){
+        
+        
+        /*function getOwnGetSets(name){
+            var elem=document.createElement(name);
+            var Elem=elem.constructor.prototype;
+            var ownGetSets=[];
+            if(Elem===HTMLElement.prototype){
+                return ownGetSets;
+            }
+            for(var i in Elem){
+                if(Elem.hasOwnProperty(i)){
+                    var desc=Object.getOwnPropertyDescriptor(Elem,i);
+                    if(desc.hasOwnProperty('get')&&desc.hasOwnProperty('set')){
+                        try{
+                        elem[i]="1";
+                        if(elem.hasAttribute(i)){
+                            ownGetSets.push(i);
+                        }
+                        }catch(e){
+                        }
+                    }
+                }
+            }
+            return ownGetSets;
+        }
+        var name="applet".toUpperCase();
+        var a=name+':["'+getOwnGetSets(name).join('","')+'"],';
+        copy(a);a;*/
+        var htmlNodeInfo={
+            A:["target","download","ping","rel","hreflang","type","coords","charset","name","rev","shape","href"],
+            AREA:["alt","coords","shape","target","ping","noHref","href"],
+            BASE:["href","target"],
+            BLOCKQUOTE:["cite"],
+            BODY:["text","link","vLink","aLink","bgColor","background"],
+            BR:["clear"],
+            CANVAS:["width","height"],
+            CAPTION:["align"],
+            COL:["span","align","vAlign","width"],
+            COLGROUP:["span","align","vAlign","width"],
+            DIALOG:["open"],
+            DIR:["compact"],
+            DIV:["align"],
+            DL:["compact"],
+            FIELDSET:["disabled","name"],
+            H1:["align"],
+            H2:["align"],
+            H3:["align"],
+            H4:["align"],
+            H5:["align"],
+            H6:["align"],
+            HR:["align","color","noShade","size","width"],
+            HTML:["version"],
+            IFRAME:["src","srcdoc","name","sandbox","allowFullscreen","width","height","align","scrolling","frameBorder","longDesc","marginHeight","marginWidth"],
+            IMG:["alt","src","srcset","sizes","crossOrigin","useMap","isMap","width","height","name","lowsrc","align","hspace","vspace","longDesc","border"],
+            INPUT:["accept","alt","autocomplete","autofocus","checked","dirName","disabled","formAction","formEnctype","formMethod","formNoValidate","formTarget","height","max","maxLength","min","minLength","multiple","name","pattern","placeholder","readOnly","required","size","src","step","type","value","width","align","useMap","autocapitalize","webkitdirectory","incremental"],
+            INS:["cite","dateTime"],
+            KEYGEN:["autofocus","challenge","disabled","keytype","name"],
+            LEGEND:["align"],
+            LI:["value","type"],
+            LINK:["disabled","href","crossOrigin","rel","media","hreflang","type","charset","rev","target","integrity"],
+            MAP:["name"],
+            MENU:["compact"],
+            META:["name","content","scheme"],
+            METER:["value","min","max","low","high","optimum"],
+            OL:["reversed","start","type","compact"],
+            OPTGROUP:["disabled","label"],
+            OPTION:["disabled","label","selected","value"],
+            OUTPUT:["name"],
+            P:["align"],
+            PARAM:["name","value","type","valueType"],
+            PRE:["width"],
+            PROGRESS:["value","max"],
+            Q:["cite"],
+            SCRIPT:["src","type","charset","async","defer","crossOrigin","event","integrity"],
+            SELECT:["autofocus","disabled","multiple","name","required","size"],
+            SOURCE:["src","type","srcset","sizes","media"],
+            STYLE:["media","type"],
+            TABLE:["align","border","frame","rules","summary","width","bgColor","cellPadding","cellSpacing"],
+            TBODY:["align","vAlign"],
+            TD:["colSpan","rowSpan","headers","align","axis","height","width","noWrap","vAlign","bgColor","abbr","scope"],
+            TEXTAREA:["autofocus","cols","dirName","disabled","maxLength","minLength","name","placeholder","readOnly","required","rows","wrap","autocapitalize"],
+            TFOOT:["align","vAlign"],
+            TH:["colSpan","rowSpan","headers","align","axis","height","width","noWrap","vAlign","bgColor","abbr","scope"],
+            THEAD:["align","vAlign"],
+            TR:["align","vAlign","bgColor"],
+            TRACK:["kind","src","srclang","label","default"],
+            UL:["compact","type"],
+            VIDEO:["width","height","poster"],
+            XMP:["width"]
+        }
+        function setGetSetPropertyWithAttribute(o,name){
+            var hideValueName='__'+name+'__';
+            Object.defineProperty(o.attributes,hideValueName,{
+                    value: "",
+                    writable: true,
+                    enumerable: false,
+                    configurable: false
+                }
+            )
+            Object.defineProperty(o,name,{
+                get:function(){
+                    return o.attributes[hideValueName];
+                },
+                set:function(s){
+                    o.setAttribute(name,s);
+                }
+            });
+        }
+        function setClassName(o){
+            Object.defineProperty(o.attributes,'__class__',{
+                    value: "",
+                    writable: true,
+                    enumerable: false,
+                    configurable: false
+                }
+            )
+            Object.defineProperty(o,'className',{
+                get:function(){
+                    var v=o.attributes.__class__;
+                    return v===undefined?"":v;
+                },
+                set:function(s){
+                    o.setAttribute('class',s);
+                }
+            });
+        }
+        function newVNode(name,nodeType){
+            //console.log(name);
             var t=function(name,nodeType){
                 if(name!==undefined){
                     return t.append(name,nodeType);
                 }else{
-                    t.isClose=true;
+                    t.__isClose__=true;
                     return t.parentNode;
                 }
             }
-            t.__proto__=VNode.prototype;
+            t.__proto__=prototype;
             if(nodeType===undefined){
                 nodeType=1;
             }
+            
+            t.childNodes=[];
             switch(nodeType){
                 case 1:
                     t.nodeName=name.toUpperCase();
-                    t.attributes=newArrayObject('attributes') ;
+                    t.attributes=new VNamedNodeMap();
                     t.children=[];
-                    t.childNodes=[];
-                    t.isClose=name in closeSelf;
+                    t.__children__=[];
+                    t.__events__=[];
+                    t.__isClose__=t.__closeSelf__=name in closeSelf;
+                    t.style=new VStyle(t,t.attributes);
+                    
+                    setClassName(t);
+                    Object.defineProperty(t,'classList',_getClassList);
+                    if(t.nodeName in htmlNodeInfo){
+                        var proto=htmlNodeInfo[t.nodeName];
+                        for(var i in proto){
+                            setGetSetPropertyWithAttribute(t,proto[i]);
+                        }
+                    }
                     break;
                 case 3:
                     t.data=name;
-                    t.isClose=true;
+                    t.__isClose__=true;
                 case 8:
                     t.data=name;
-                    t.isClose=true;
+                    t.__isClose__=true;
                     break;
                 case 10:
-                    t.isClose=true;
+                    t.__isClose__=true;
                     break;
             }
             t.parentNode=null;
             t.nodeType=nodeType;
             return t;
         }
+        function VNamedNodeMap(){
+            Object.defineProperty(this,"__length__",{
+                    value: 0,
+                    writable: true,
+                    enumerable: false,
+                    configurable: false
+                }
+            );
+        }
+        VNamedNodeMap.prototype={
+            indexOfName:function(name){
+                var l=this.__length__;
+                for(var i=0;i<l;i++){
+                    if(this[i].name===name){
+                        return i;
+                    }
+                }
+                return -1;
+            },
+            indexOf:function(o){
+                var l=this.__length__;
+                for(var i=0;i<l;i++){
+                    if(this[i]===o){
+                        return i;
+                    }
+                }
+                return -1;
+            },
+            getNamedItem: function(name){
+                var idx=this.indexOfName(name);
+                if(idx===-1){
+                    return null;
+                }else{
+                    return this[idx];
+                }
+            },
+            //getNamedItemNS: getNamedItemNS()
+            item: function(index){
+                return this[index];
+            },
+            get length(){
+                return this.__length__;
+            },
+            removeNamedItem: function(name){
+                if(isObject(name)){
+                    var idx=this.indexOf(name);
+                }else{
+                    var idx=this.indexOfName(name); 
+                }
+                
+                if(idx!==-1){
+                    var l=this.__length__;
+                    for(var i=idx;i<l;i++){
+                        this[i]=this[i+1];
+                    }
+                    this.__length__--;
+                    delete this[this.__length__];
+                    var hideValueName='__'+name+'__';
+                    if(hideValueName in this){
+                        this[hideValueName]="";
+                    }
+                }
+            },
+            //removeNamedItemNS: removeNamedItemNS()
+            setNamedItem: function(name,value){
+                if(!isString(value)){
+                    if(isObject(value)){
+                        value=value.toString();
+                    }else if(value===undefined){
+                        value="";
+                    }
+                }
+                var idx=this.indexOfName(name);
+                if(idx===-1){
+                    this[this.__length__]={name:name,value:value};
+                    this.__length__++;
+                }else{
+                    this[idx].value=value;
+                }
+                var hideValueName='__'+name+'__';
+                if(hideValueName in this){
+                    this[hideValueName]=value;
+                }
+            }
+            //setNamedItemNS: setNamedItemNS()
+        }
         function append(name,nodeType){
-            return _appendChild.call(this,new VNode(name,nodeType));
+            return _appendChild.call(this,newVNode(name,nodeType));
         }
         function appendChild(vNode){
             var idx=this.childNodes.indexOf(vNode);
@@ -5010,39 +5469,62 @@ var turtle,$t,
             }
             removeItem(this.childNodes,vNode);
             removeItem(this.children,vNode);
+            vNode.parentNode=null;
             return vNode;
+        }
+        function addText(){
+            var s=Array.prototype.join.call(arguments,'\r\n');
+            var t=newVNode(s,3);
+            this.childNodes.push(t);
+            return this;
+        }
+        function addText2(fn){
+            var t=newVNode($t.getFunctionComment(fn),3);
+            this.childNodes.push(t);
+            return this;
+        }
+        function removeAttribute(name){
+            this.attributes.removeNamedItem(name);
+        }
+        function removeAttributeNode(item){
+            this.attributes.removeNamedItem(item);
+        }
+        function hasAttribute(name){
+            return this.attributes.indexOfName(name)!==-1;
         }
         function setAttribute(name,value){
             if(name){
-                this.attributes[name]=value;
+                this.attributes.setNamedItem(name,value);
                 return $t.getBind(this,setAttribute);
             }else{
                 return this;
             }
         }
-        function removeAttribute(name){
-            delete this[name];
+        function getAttribute(name){
+            var item=this.attributes.getNamedItem(name);
+            if(item){
+                return item.value;
+            }else{
+                return null;
+            }
         }
-        function addText(){
-            var s=Array.prototype.join.call(arguments,'\r\n');
-            var t=new VNode(s,3);
-            this.children.push(t);
-            return this;
-        }
-        function addText2(fn){
-            var t=new VNode($t.getFunctionComment(fn),3);
-            this.children.push(t);
-            return this;
-        }
-        function hasAttribute(name){
-            return this.attributes.hasOwnProperty(name);
+        function cloneNode(){
+            var node=newVNode(this.nodeName,this.nodeType);
+            if(this.nodeType!==1){
+                return node;
+            }
+            var attrs=this.attributes;
+            for(var i=0;i<attrs.length;i++){
+                node.setAttribute(attrs[i].name,attrs[i].value);
+            }
+            return node;
         }
         function insertBefore(newNode,node){
             var p1=node.parentNode;
             if(!p1){
                 return;
             }
-            var chds=p1.childNodes
+            var chds=p1.childNodes;
             var idx=chds.indexOf(node);
             if(idx===-1){
                 return;
@@ -5052,11 +5534,26 @@ var turtle,$t,
                 p2.removeChild(newNode);
             }
             chds.splice(idx,0,newNode);
-            newNode.parentNode=p2;
+            
+            newNode.parentNode=p1;
+            
+            if(newNode.nodeType===1){
+                if(idx>=chds.length){
+                    chds.push(newNode);
+                }else{
+                    var chds=p1.children;
+                    for(var i=idx;i<chds.length;i++){
+                        if(chds[i].nodeType===1){
+                            chds.splice(i,0,newNode);
+                            break;
+                        }
+                    }
+                    chds.push(newNode);
+                }
+            }
         }
-        VNode.prototype={
-            constructor:VNode,
-            attr:setAttribute,
+        var prototype={
+            setAttribute:setAttribute,
             _:setAttribute,
             text:addText,
             text2:addText2,
@@ -5065,19 +5562,41 @@ var turtle,$t,
             removeChild:removeChild,
             hasAttribute:hasAttribute,
             removeAttribute:removeAttribute,
+            removeAttributeNode:removeAttributeNode,
+            getAttribute:getAttribute,
             insertBefore:insertBefore,
             insertBefore2:insertBefore,
+            cloneNode:cloneNode,
             get innerHTML(){
                 var 
                     cs=this.childNodes,
-                    data=[],
-                    space=0;
+                    data=[];
                 if(cs){
                     for(var i=0;i<cs.length;i++){
-                        data.push(cs[i].toString(space));
+                        data.push(cs[i].outerHTML);
                     }   
                 }
                 return data.join('');
+            },
+            get previousSibling(){
+                var p=this.parentNode;
+                if(!p){
+                    return null;
+                }
+                var chds=p.childNodes;
+                var idx=chds.indexOf(this);
+                var node=chds[idx-1];
+                return node?node:null;
+            },
+            get nextSibling(){
+                var p=this.parentNode;
+                if(!p){
+                    return null;
+                }
+                var chds=p.childNodes;
+                var idx=chds.indexOf(this);
+                var node=chds[idx+1];
+                return node?node:null;
             },
             set innerHTML(s){
                 var chds;
@@ -5092,9 +5611,6 @@ var turtle,$t,
                 new VDOM(s,this);
             },
             get outerHTML(){
-                return this.toString();
-            },
-            toString:function(){
                 var 
                     xmlNode=this.toXMLNodeString(),
                     cs=this.childNodes,
@@ -5108,6 +5624,10 @@ var turtle,$t,
                     data.push(xmlNode[1]);    
                 }
                 return data.join('');
+                
+            },
+            toString:function(){
+                return this.outerHTML;
             },
             toXMLNodeString:function(){
                 var 
@@ -5116,11 +5636,11 @@ var turtle,$t,
                     arrAttr=[],
                     attr=this.attributes;
                 if(attr){
-                    for(var i in attr){
-                        if(attr[i]){
-                            arrAttr.push(i+'="'+attr[i]+'"');    
+                    for(var i=0;i<attr.length;i++){
+                        if(attr[i].value){
+                            arrAttr.push(attr[i].name+'="'+attr[i].value+'"');    
                         }else{
-                            arrAttr.push(i);    
+                            arrAttr.push(attr[i].name);    
                         }
                     }
                     if(arrAttr.length>0){
@@ -5130,7 +5650,7 @@ var turtle,$t,
                 switch(this.nodeType){
                     case 1:
                         ret.push('<'+this.nodeName.toLowerCase()+sAttr+'>');
-                        if(this.isClose){
+                        if(!this.__closeSelf__ && this.__isClose__){
                             ret.push('</'+this.nodeName.toLowerCase()+'>');
                         }
                         break;
@@ -5150,28 +5670,249 @@ var turtle,$t,
                 }
                 return ret;
             },
+            get object(){
+                if(this.__domNode__){
+                    return this.__domNode__;
+                }else{
+                    return this;
+                }
+                //return this.toDOM();  
+            },
+            addEventListener:function(name,fn,useCapture){
+                if(this.nodeType!==1){
+                    return;
+                }
+                if(!useCapture){
+                    useCapture=false;
+                }
+                this.__events__.push([name,fn,useCapture]);
+            },
+            removeEventListener:function(name,fn,useCapture){
+                if(this.nodeType!==1){
+                    return;
+                }
+                if(!useCapture){
+                    useCapture=false;
+                }
+                var arr=this.__events__;
+                for(var i in arr){
+                    var e=arr[i];
+                    if(e[0]===name&&e[1]===fn&&e[2]===useCapture){
+                        arr.splice(i,1);
+                        i--;
+                    }
+                }
+            },
             toDOM:function(){
-                var 
-                    elem,
-                    cs=this.children;
+                var elem;
                 switch(this.nodeType){
                     case 1:
+                        if(this.__domNode__){
+                            elem=this.__domNode__;
+                            // var chds=this.childNodes;
+                            // //重设childNodes;
+                            // elem.innerHTML='';
+                            // for(var j=0;j<chds.length;j++){
+                                // elem.appendChild(chds[j].toDOM());
+                            // }
+                            return elem;
+                        }
+                        
                         elem=document.createElement(this.nodeName);
+                        var chds=this.childNodes;
+                        for(var j=0;j<chds.length;j++){
+                            if(chds[j] instanceof Node){
+                                elem.appendChild(chds[j]);    
+                            }else{
+                                elem.appendChild(chds[j].toDOM());
+                            }
+                        }
+                        /*
+                         * 填充属性事件
+                         */
+                        for(var i in this){
+                            switch(i){
+                                case 'attributes':
+                                    var attrs=this.attributes;
+                                    for(var j in attrs){
+                                        if(attrs.hasOwnProperty(j)){
+                                            elem.setAttribute(attrs[j].name,attrs[j].value);    
+                                        }
+                                    }
+                                    break;
+                                
+                                case '__events__':
+                                    var arr=this.__events__;
+                                    for(var j in arr){
+                                        var e=arr[j];
+                                        elem.addEventListener(e[0],e[1],e[2]);
+                                    }
+                                    break;
+                                case 'children':
+                                case 'childNodes':
+                                case '__proto__':
+                                case '__isClose__':
+                                case '__domNode__':
+                                case 'nodeType':
+                                case 'nodeName':
+                                case 'parentNode':
+                                    break;
+                                default:
+                                    if(!this.hasOwnProperty(i)){
+                                        continue;
+                                    }
+                                    var desc=Object.getOwnPropertyDescriptor(this,i);
+                                    if(desc){
+                                        Object.defineProperty(elem,i,desc);
+                                    }else{
+                                        elem[i]=this[i];
+                                    }
+                            }
+                        }
                         break;
                     case 3:
+                        if(this.__domNode__){
+                            return this.__domNode__;
+                        }
                         elem=document.createTextNode(this.data);
                         break;
                     case 8:
+                        if(this.__domNode__){
+                            return this.__domNode__;
+                        }
                         elem=document.createComment(this.data);
                         break;
                     case 10:
+                        if(this.__domNode__){
+                            return this.__domNode__;
+                        }
+                        elem=document.createElement('span');
+                        elem.innerHTML=this.outerHTML;
+                        elem=elem.childNodes[0];
                         //elem=document.createTextNode(this.value);
                         break;
                 }
+                delegateNode(this,elem);
                 return elem;
             }
         }
-        return VNode;
+        
+        var osetAttribute=function(){return this.__domNode__.setAttribute.apply(this.__domNode__,arguments)};
+        var oappendChild=function(){return this.__domNode__.appendChild.apply(this.__domNode__,arguments)};
+        var oremoveChild=function(){return this.__domNode__.removeChild.apply(this.__domNode__,arguments)};
+        var ohasAttribute=function(){return this.__domNode__.hasAttribute.apply(this.__domNode__,arguments)};
+        var oremoveAttribute=function(){return this.__domNode__.removeAttribute.apply(this.__domNode__,arguments)};
+        var oremoveAttributeNode=function(){return this.__domNode__.removeAttributeNode.apply(this.__domNode__,arguments)};
+        var ogetAttribute=function(){return this.__domNode__.getAttribute.apply(this.__domNode__,arguments)};
+        var oinsertBefore=function(){
+            this.__proto__.insertBefore.apply(this,arguments);
+            var objects=[];
+            for(var i=0;i<arguments.length;i++){
+                var o=arguments[i].object;
+                if(o===arguments[i]){
+                    o.parentNode.toDOM();
+                    o=o.object;
+                }
+                objects.push(o);
+            }
+            return this.__domNode__.insertBefore.apply(this.__domNode__,objects);
+        }
+        var oinsertBefore2=function(){
+            this.__proto__.insertBefore2.apply(this,arguments);
+            var objects=[];
+            for(var i=0;i<arguments.length;i++){
+                var o=arguments[i].object;
+                if(o===arguments[i]){
+                    o.parentNode.toDOM();
+                    o=o.object;
+                }
+                objects.push(o);
+            }
+            return this.__domNode__.insertBefore2.apply(this.__domNode__,objects);
+        }
+        
+        var oGetstyle=function(){return this.__domNode__.style};
+        
+        var oGetinnerHTML=function(){return this.__domNode__.innerHTML};
+        var oSetinnerHTML=function(s){return this.__domNode__.innerHTML=s};
+        
+        
+        var oGetoffsetTop=function(){return this.__domNode__.offsetTop};
+        var oGetoffsetLeft=function(){return this.__domNode__.offsetLeft};
+        var oGetoffsetWidth=function(){return this.__domNode__.offsetWidth};
+        var oGetoffsetHeight=function(){return this.__domNode__.offsetHeight};
+        
+        //var oGetpreviousSibling=function(){return this.__domNode__.previousSibling};
+        //var oGetnextSibling=function(){return this.__domNode__.nextSibling};
+        var oGetouterHTML=function(){return this.__domNode__.outerHTML};
+        
+        var oGetattributes=function(){return this.__domNode__.attributes};
+        //var oGetchildNodes=function(){return this.__domNode__.childNodes};
+        //var oGetchildren=function(){return this.__domNode__.children};
+        
+        var otoString=function(){return this.__domNode__.toString.apply(this.__domNode__,arguments)};
+        var oaddEventListener=function(){return this.__domNode__.addEventListener.apply(this.__domNode__,arguments)};
+        var oremoveEventListener=function(){return this.__domNode__.removeEventListener.apply(this.__domNode__,arguments)};
+        
+        function delegateNode(o,domNode){
+            
+            o.__domNode__=domNode;
+            o.setAttribute=osetAttribute;
+            o.appendChild=oappendChild;
+            o.removeChild=oremoveChild;
+            o.hasAttribute=ohasAttribute;
+            o.removeAttribute=oremoveAttribute;
+            o.removeAttributeNode=oremoveAttributeNode;
+            o.getAttribute=ogetAttribute;
+            o.insertBefore=oinsertBefore;
+            o.insertBefore2=oinsertBefore2;
+            
+            Object.defineProperty(o,'style',{
+                get:oGetstyle
+            });
+            Object.defineProperty(o,'offsetTop',{
+                get:oGetoffsetTop
+            });
+            Object.defineProperty(o,'offsetLeft',{
+                get:oGetoffsetLeft
+            });
+            Object.defineProperty(o,'offsetWidth',{
+                get:oGetoffsetWidth
+            });
+            Object.defineProperty(o,'offsetHeight',{
+                get:oGetoffsetHeight
+            });
+            /*
+            Object.defineProperty(o,'innerHTML',{
+                get:oGetinnerHTML,
+                set:oSetinnerHTML
+            });
+            
+            /*Object.defineProperty(o,'previousSibling',{
+                get:oGetpreviousSibling
+            });
+            Object.defineProperty(o,'nextSibling',{
+                get:oGetnextSibling
+            });*/
+            Object.defineProperty(o,'outerHTML',{
+                get:oGetouterHTML
+            });
+            Object.defineProperty(o,'attributes',{
+                get:oGetattributes
+            });
+            /*Object.defineProperty(o,'childNodes',{
+                get:oGetchildNodes
+            });
+            Object.defineProperty(o,'children',{
+                get:oGetchildren
+            });*/
+            
+            
+            o.toString=otoString;
+            o.addEventListener=oaddEventListener;
+            o.removeEventListener=oremoveEventListener;
+        }
+        return newVNode;
     })();
     function UITeam(){}
     UITeam.prototype=new function (){
@@ -5446,7 +6187,7 @@ var turtle,$t,
                 for(var i=0;i<items.length;i++){
                     var elem=items[i].target;
                     var t2=0,l2=0;
-                    while(elem!==elemScroll){
+                    while(elem!==elemScroll&&elem!==null){
                         t2+=elem.offsetTop;
                         l2+=elem.offsetLeft;
                         elem=elem.parentNode;
@@ -5563,6 +6304,7 @@ var turtle,$t,
     fn.compact=compact;
     fn.flatten=flatten;
     fn.camelize=camelize;
+    fn.decamelize=decamelize;
     fn.dasherize=dasherize;
     fn.takeOutChildNodes=takeOutChildNodes;
     fn.takeChildNodes=takeChildNodes;
@@ -5640,10 +6382,11 @@ var turtle,$t,
     fn.DropRect=DropRect;
     fn.slice=slice;
     fn.push=push;
-    fn.VNode=VNode;
-    fn.VDOM=VDOM;
     fn.getFunctionComment=getFunctionComment;
     fn.getFunctionComments=getFunctionComments;
+    
+    fn.VDOM=VDOM;
+    fn.newVNode=newVNode;
     function Turtle(){
         this.isTemplate=isTemplate;
         this.config=new Config();
@@ -5666,7 +6409,7 @@ var turtle,$t,
         this.clsNode=newArrayObject('ClassNode');
         this.store=new Store();
         this.service=new Service();
-        this.body='';
+        //this.body='';
         this.uiTeam=new UITeam();
         this.uiLink=new UILink();
         this.uiScope=new UIScope();
@@ -5700,6 +6443,20 @@ var turtle,$t,
     turtle=$t=new Turtle();
     $rootScope=new RootScope();
     $client=new Client();
+    /*
+     * 虚拟DOM
+     */
+    // $DOM=VDOM;
+    // $node=newVNode;
+    
+    /*
+     * 正常DOM
+     */
+    if(typeof $DOM ==="undefined"){
+        $DOM=function(html){var elem=document.createElement('ui:dom');elem.innerHTML=html;return elem;}
+        $node=newNode;
+    }
+    
     aftertInit();
     
 })();

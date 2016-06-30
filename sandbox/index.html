@@ -327,7 +327,6 @@
             },2));
             
             ifrm.onload=function(){
-                
                 var vdom0=$t.newVNode('document');
                 vdom0.isClose=true;
                 eval($t.toVarString('src,type,href,cheked,baseuipath,rel,tabname'));
@@ -364,7 +363,7 @@
                         ()
                     ();
                 }
-                
+                debugger;
                 "虚拟dom第二种写法，从字符串生成，此例子数据源为第1个写法的innerHTML"
                 var vdom1=new $t.VDOM(vdom0.innerHTML);
                 
