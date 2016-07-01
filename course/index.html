@@ -700,7 +700,7 @@
                 
                 <ui:ahchorpanel title="虚拟dom">
                     <ui:io><title>
-                        <!var path:(function(){var p=location.pathname.split('/');p.pop();p.pop();p.push('blank.html');return location.hostname+p.join('/')})()>
+                        <!var path:(function(){var p=location.pathname.split('/');p.pop();p.pop();p.push('blank.html');return '//'+location.hostname+p.join('/')})()>
                         <iframe ref="ifrm" : src:="path" class="w100 hem10"></iframe>
                         <iframe ref="ifrm" : src:="path" class="w100 hem10"></iframe>
                         <iframe ref="ifrm" : src:="path" class="w100 hem10"></iframe>
