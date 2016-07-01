@@ -327,52 +327,52 @@
             },2));
             
             ifrm.onload=function(){
-                var vdom0=$t.newVNode('document');
-                vdom0.isClose=true;
-                eval($t.toVarString('src,type,href,cheked,baseuipath,rel,tabname'));
-                
-                "龟牌虚拟dom第一种写法，一个节点一个节点添加"
-                with($t.nodeName){
-                    vdom0(null,10)()
-                    (html)
-                        (head)
-                            (link)._(rel,'stylesheet')(href,"../css/turtle.min.css")()
-                            (link)._(rel,'stylesheet')(href,"../css/base.css")()
-                            (link)._(rel,'stylesheet')(href,"../css/fonts/font-awesome.min.css")()
-                            (script)._(src,'../js/turtle.js')(baseuipath,"{name:'ui',path:'../ui'};{name:'app',path:'../uiAPP'}")()
-                                .text2(function(/* 
-                                    var 
-                                        a=1,
-                                        b=2,
-                                        c=3;
-                                    debugger;*/){})
-                            ()
-                            ('注释',8)()
-                        ()
-                        (body)
-                            (xmp)
-                                ('ui:tabbox')
-                                    (div)._(tabname,'AAA')()
-                                        ('AAA',3)()
-                                    ()
-                                    (div)._(tabname,'BBB')()
-                                        ('BBB',3)()
-                                    ()
-                                ()
-                            ()
-                        ()
-                    ();
-                }
-                debugger;
-                "虚拟dom第二种写法，从字符串生成，此例子数据源为第1个写法的innerHTML"
-                var vdom1=new $t.VDOM(vdom0.innerHTML);
-                
-                "虚拟dom第三种写法，设置节点innerHTML，此例子数据源为第2个写法的的innerHTML"
-                var vdom2=$t.newVNode('document');
-                vdom2.innerHTML=vdom1.innerHTML;
-                
-                ifrm.contentDocument.write(vdom2.innerHTML);
-                ifrm.contentDocument.close();
+                // var vdom0=$t.newVNode('document');
+                // vdom0.isClose=true;
+                // eval($t.toVarString('src,type,href,cheked,baseuipath,rel,tabname'));
+//                 
+                // "龟牌虚拟dom第一种写法，一个节点一个节点添加"
+                // with($t.nodeName){
+                    // vdom0(null,10)()
+                    // (html)
+                        // (head)
+                            // (link)._(rel,'stylesheet')(href,"../css/turtle.min.css")()
+                            // (link)._(rel,'stylesheet')(href,"../css/base.css")()
+                            // (link)._(rel,'stylesheet')(href,"../css/fonts/font-awesome.min.css")()
+                            // (script)._(src,'../js/turtle.js')(baseuipath,"{name:'ui',path:'../ui'};{name:'app',path:'../uiAPP'}")()
+                                // .text2(function(/* 
+                                    // var 
+                                        // a=1,
+                                        // b=2,
+                                        // c=3;
+                                    // debugger;*/){})
+                            // ()
+                            // ('注释',8)()
+                        // ()
+                        // (body)
+                            // (xmp)
+                                // ('ui:tabbox')
+                                    // (div)._(tabname,'AAA')()
+                                        // ('AAA',3)()
+                                    // ()
+                                    // (div)._(tabname,'BBB')()
+                                        // ('BBB',3)()
+                                    // ()
+                                // ()
+                            // ()
+                        // ()
+                    // ();
+                // }
+                // debugger;
+                // "虚拟dom第二种写法，从字符串生成，此例子数据源为第1个写法的innerHTML"
+                // var vdom1=new $t.VDOM(vdom0.innerHTML);
+//                 
+                // "虚拟dom第三种写法，设置节点innerHTML，此例子数据源为第2个写法的的innerHTML"
+                // var vdom2=$t.newVNode('document');
+                // vdom2.innerHTML=vdom1.innerHTML;
+//                 
+                // ifrm.contentDocument.write(vdom2.innerHTML);
+                // ifrm.contentDocument.close();
             }
             
         </script>
