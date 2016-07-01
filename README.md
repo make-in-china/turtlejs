@@ -2,9 +2,13 @@
 
 make it for fun
 
-[blog（教程）](http://make-in-china.github.io/turtlejs/course/)
+[（教程）](http://make-in-china.github.io/turtlejs/course/)
 
-[blog（沙盘）](http://make-in-china.github.io/turtlejs/sandbox/)
+[（沙盘）](http://make-in-china.github.io/turtlejs/sandbox/)
+
+[（组件）](http://make-in-china.github.io/turtlejs/part/)
+
+[（API）](http://make-in-china.github.io/turtlejs/api/)
 
 I'm new front-end development engineer, please tender with me（新手写库，轻喷）
 
