@@ -4,7 +4,7 @@ make it for fun
 
 [（教程）](http://make-in-china.github.io/turtlejs/course/)
 
-[（沙盘）](http://make-in-china.github.io/turtlejs/sandbox/)
+[（样式）](http://make-in-china.github.io/turtlejs/style/)
 
 [（样式）](http://make-in-china.github.io/turtlejs/sandbox/)
 
