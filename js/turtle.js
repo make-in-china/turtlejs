@@ -182,8 +182,8 @@ var turtle,$t,
     function requireByScript(s,variable){
         return Function(s+"\r\n;return function(s){return eval('('+s+')');};")()(variable);
     }
-    function NodeName(){
-        s=["xmp","anchor", "area", "audio", "br", "base", "basefont", "body", "button", "canvas", "content", "dlist", "directory", "div", "embed", "fieldset", "font", "form", "frame", "frameset", "hr", "head", "heading", "html", "iframe", "image", "input", "keygen", "li", "label", "legend", "link", "map", "marquee", "media", "menu", "meta", "meter", "mod", "olist", "object", "optgroup", "option", "output", "paragraph", "pre", "progress", "quote", "script", "select", "source", "span", "style", "tablecaption", "tablecell", "tablecol", "table", "tablerow", "tablesection", "textarea", "title", "track", "ulist", "unknown", "video"];
+    function KeyWord(){
+        s=["target","download","ping","rel","hreflang","type","coords","charset","name","rev","shape","href","alt","noHref","cite","text","link","vLink","aLink","bgColor","background","clear","width","height","align","span","vAlign","open","compact","disabled","color","noShade","size","version","src","srcdoc","sandbox","allowFullscreen","scrolling","frameBorder","longDesc","marginHeight","marginWidth","srcset","sizes","crossOrigin","useMap","isMap","lowsrc","hspace","vspace","border","accept","autocomplete","autofocus","checked","dirName","formAction","formEnctype","formMethod","formNoValidate","formTarget","max","maxLength","min","minLength","multiple","pattern","placeholder","readOnly","required","step","value","autocapitalize","webkitdirectory","incremental","dateTime","challenge","keytype","media","integrity","content","scheme","low","high","optimum","reversed","start","label","selected","valueType","async","defer","event","frame","rules","summary","cellPadding","cellSpacing","colSpan","rowSpan","headers","axis","noWrap","abbr","scope","cols","rows","wrap","kind","srclang","default","poster","xmp","anchor", "area", "audio", "br", "base", "basefont", "body", "button", "canvas", "content", "dlist", "directory", "div", "embed", "fieldset", "font", "form", "frame", "frameset", "hr", "head", "heading", "html", "iframe", "image", "input", "keygen", "li", "label", "legend", "link", "map", "marquee", "media", "menu", "meta", "meter", "mod", "olist", "object", "optgroup", "option", "output", "paragraph", "pre", "progress", "quote", "script", "select", "source", "span", "style", "tablecaption", "tablecell", "tablecol", "table", "tablerow", "tablesection", "textarea", "title", "track", "ulist", "unknown", "video"];
         for(var i in s){
             this[s[i]]=s[i];
         }
@@ -6437,7 +6437,7 @@ var turtle,$t,
         this.throwError=throwError;
         this.onResize=onResize;
         this.emitResize=emitResize;
-        this.nodeName=new NodeName();
+        this.keyWord=new KeyWord();
     }
     Turtle.prototype=fn;
     turtle=$t=new Turtle();
