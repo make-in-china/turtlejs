@@ -3,7 +3,9 @@ var turtle,$t,
     $rootScope,
     $client,
     $DOM,
-    $node;
+    $node,
+    $VDOM,
+    $VNode;
 (function(){
     var 
         arrayPrototype          = Array.prototype,
@@ -13,11 +15,13 @@ var turtle,$t,
         push                    = arrayPrototype.push,
         splice                  = arrayPrototype.splice,
         getPrototypeOf          = Object.getPrototypeOf,
-        appendChild             = Node.prototype.appendChild,
-        addStyleRE              = /;\s*$/;
-        addClassNameRE          = /\s+$/;
+        replace                 = String.prototype.replace,
+        parseForOrderRE         = /[a-zA-Z\d] in .*/,
+        parseForOrderRE2        = /^.*;.*;.*$/,
+        addStyleRE              = /;\s*$/,
+        addClassNameRE          = /\s+$/,
         readyRE                 = /complete|loaded|interactive/,
-        memberRE                = /{([a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g,
+        memberRE                = /{([\-a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g,
         orderRE                 = /^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|var|=)(\s|$)/g,
         orderCaseRE             = /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
         operatorRE              = /\!=|==|=|<|>|\|/,
@@ -26,7 +30,7 @@ var turtle,$t,
         emptyTextNodeRE         = /^\s*$/,
         functionCommentRE       = /\/\*([\s\S]*?)\*\//g,
         xmlwordRE               = /[a-zA-Z\/\!]/,
-        classSplitRE            = /s+/g,
+        classSplitRE            = /\s+/g,
         styleListRE             = /\s*([\w\-]+)\s*\:\s*(.*?)\s*[;$]/g,
         camelizeRE              = /-+(.)?/g,
         deCamelizeRE            = /[A-Z]/g,
@@ -34,13 +38,14 @@ var turtle,$t,
         exec                    = eval,
         fragment                = document.createDocumentFragment();
     
-    var withthis                = 'with(this){return eval($$$$$$$$$$$$$$$$)};'/*eval支持返回最后一个表达式的值*/,
-        _execValueByScope       = Function('$$$$$$$$$$$$$$$$,v,node,outer,outerElement,props,part',withthis),
-        _execByScope            = Function('$$$$$$$$$$$$$$$$,node,outer,outerElement,props,part',withthis),
-        _execExpressionsByScope = Function('$$$$$$$$$$$$$$$$,v,node',withthis);
+    var withthis                = 'with(this){return eval($$turtle$$)};'/*eval支持返回最后一个表达式的值*/,
+        _execValueByScope       = Function('$$turtle$$,v,node,outer,outerElement,props,part',withthis),
+        _execByScope            = Function('$$turtle$$,node,outer,outerElement,props,part',withthis),
+        _execExpressionsByScope = Function('$$turtle$$,v,node',withthis);
         
-    
-    
+    // Number.prototype.replace=function(){
+        // return replace.apply(this,arguments);
+    // }
     var dateFormat=(function(){
         return function(format,d){
             'use strict' 
@@ -67,50 +72,72 @@ var turtle,$t,
     function last(){
         return this[this.length-1];
     }
-    var _getClassList={
-        get: function() {
-            var self = this;
-            function update(fn) {
-                return function(value) {
-                    var classes = self.className.split(classSplitRE),
-                        index = classes.indexOf(value);
-                    fn(classes, index, value);
-                    self.className = classes.join(" ");
+    
+    function ClassList(elem){
+        Object.defineProperty(this,'__elem__',{
+            value:elem,
+            writable:false,
+            enumerable: true,
+            configurable: true
+        });
+    }
+    ClassList.prototype={
+        add: function(value) {
+            var classes = this.__elem__.className.split(classSplitRE);
+            var index=classes.indexOf(value);
+            if (!~index){
+                classes.push(value);
+                this.__elem__.className=classes.join(' ');  
+            }
+            
+        },
+        remove: function(value){
+            var classes = this.__elem__.className.split(classSplitRE);
+            var index=classes.indexOf(value);
+            if (~index){
+                classes.splice(index, 1);
+                this.__elem__.className=classes.join(' ');  
+            }
+        },
+        toggle: function(value) {
+            var classes = this.__elem__.className.split(classSplitRE);
+            var index=classes.indexOf(value);
+            if (~index){
+                classes.splice(index, 1);
+            }else{
+                classes.push(value);
+            }
+            this.__elem__.className=classes.join(' '); 
+        },
+        contains: function(value) {
+            return !!~this.__elem__.className.split(classSplitRE).indexOf(value);
+        },
+        item: function(i) {
+            return this.__elem__.className.split(classSplitRE)[i] || null;
+        }
+    }
+    function defineClassList(object){
+        Object.defineProperty(object,'classList',{
+            enumerable: true,
+            configurable: true,
+            get:function(){
+                if(this.__classList__){
+                    return this.__classList__;
+                }else{
+                    Object.defineProperty(this,'__classList__',{
+                        writable:false,
+                        enumerable: false,
+                        configurable: false,
+                        value:new ClassList(this)
+                    });
+                    return this.__classList__;
                 }
             }
-            return {                    
-                add: update(function(classes, index, value) {
-                    if (!~index) classes.push(value);
-                }),
-                
-                remove: update(function(classes, index) {
-                    if (~index) classes.splice(index, 1);
-                }),
-                
-                toggle: update(function(classes, index, value) {
-                    if (~index)
-                        classes.splice(index, 1);
-                    else
-                        classes.push(value);
-                }),
-                
-                contains: function(value) {
-                    return !!~self.className.split(classSplitRE).indexOf(value);
-                },
-                item: function(i) {
-                    return self.className.split(classSplitRE)[i] || null;
-                }
-            };
-        }
+        });
     }
     if (!("classList" in document.documentElement)){
-        Object.defineProperty(HTMLElement.prototype,'classList',_getClassList);
+        defineClassList(HTMLElement.prototype);
     }
-    Object.defineProperty(Node.prototype,"object",{
-        get:function(){
-            return this;
-        }
-    });
     (function(){
         var insertBefore=Node.prototype.insertBefore;
         if(isIE){
@@ -953,11 +980,13 @@ var turtle,$t,
     }
     function removeClass(elem,cls){
         var lst;
-        if(!elem)
+        if(!elem){
             return;
+        }
         lst=elem.classList;
-        if(lst.contains(cls))
+        if(lst.contains(cls)){
             lst.remove(cls);
+        }
     }
     function removeClasses(elem,clses){
         var lst;
@@ -1101,19 +1130,42 @@ var turtle,$t,
             }
         return flatten(values)
     }
-    var _en_decode=document.createElement('div');
-    function encodeHTML(str){
-      _en_decode.innerText=str;
-      var s=_en_decode.innerHTML;
-      _en_decode.innerHTML='';
-      return s;
-    }
-    function decodeHTML(str){
-      _en_decode.innerHTML=str;
-      var s=_en_decode.innerText;
-      _en_decode.innerHTML='';
-      return s;
-    }
+    var encodeHTML=(function(){
+        var 
+            re=/&lt;|&gt;/g,
+            fn=function(s){
+                switch(s){
+                    case "&lt;":
+                        return '<';
+                        break;
+                    case "&gt;":
+                        return '>';
+                        break;
+                }
+                return s;
+            }
+        return function(value){
+            return value.replace(re,fn);
+        }
+    }());
+    var decodeHTML=(function(){
+        var 
+            re=/<|>/g,
+            fn=function(s){
+                switch(s){
+                    case "<":
+                        return '&lt;';
+                        break;
+                    case ">":
+                        return '&gt;';
+                        break;
+                }
+                return s;
+            }
+        return function(value){
+            return value.replace(re,fn);
+        }
+    }());
     function idle(cb){
         var timeid=0;
         return function(delay){
@@ -1280,14 +1332,14 @@ var turtle,$t,
                 var url=files[i];
                 if(isString(url)&&!(url in $t.jsScript)){
                     this.files.push(url);
-                    $t.jsScript[url]=document.createElement("script");
+                    $t.jsScript[url]=$node("script");
                 }
             }
         }else if(files){
             url=files;
             if(isString(url)&&!(url in $t.jsScript)){
                 this.files.push(url);
-                $t.jsScript[url]=document.createElement("script");
+                $t.jsScript[url]=$node("script");
             }
         }
     }
@@ -1516,14 +1568,8 @@ var turtle,$t,
             return;
         }
         for(var i=0;i<nodes.length;i++){
-            //if(nodes[i] instanceof Node){
-                parent.insertBefore2(nodes[i],node);
-                //fragment.appendChild(nodes[i]);
-            //}else{
-                //fragment.appendChild(nodes[i].toDOM());
-            //}
+            parent.insertBefore2(nodes[i],node);
         }
-        //parent.insertBefore2(fragment,node);
     }
     function insertNodeBefore(node,node2){
         var parent=node.parentNode;
@@ -1537,14 +1583,8 @@ var turtle,$t,
     function appendNodes(nodes,parent){
         var c=slice.call(nodes);
         for(var i=0;i<c.length;i++){
-                parent.appendChild(c[i]);
-                //fragment.appendChild(c[i]);   
-                //fragment.appendChild(c[i].toDOM());
+            parent.appendChild(c[i]);
         }
-        //parent.appendChild(fragment);
-        // for(var i=0;i<c.length;i++){
-            // parent.appendChild(c[i]);
-        // }
     }
     function getQueryString(name)
     {
@@ -1759,7 +1799,7 @@ var turtle,$t,
             obj,
             bindVar=cdtn[0],
             exp,
-            textNode=document.createTextNode('');
+            textNode=$node(' ',3);
             
         if(bindVar.indexOf(".")!=-1){
             bindVar=bindVar.split(".");
@@ -2137,7 +2177,7 @@ var turtle,$t,
         var start,offsetLeft,offsetTop;
         
         function setOffset(){
-            var node=elem;
+            var node=elem.valueOf();
             var t=0,l=0;
             var topE=document.documentElement;
             while(node!==topE){
@@ -2385,16 +2425,18 @@ var turtle,$t,
                         delay=0;
                     }
                     removeNode(this.endNode);
-                    var mark=document.createComment('async');
+                    var mark=$node('async',8);
                     replaceNodeByNode(this.node,mark);
                     this.endNode=null;
                     this.node=null;
                     setTimeout(function(){
-                        var elem=document.createElement('div');
+                        var elem=$node('div');
+                        var p=mark.parentNode;
                         replaceNodeByNode(mark,elem);
                         mark=null;
                         appendNodes(ns,elem);
-                        initHTML(elem.childNodes,outerChildNodes,outerElement,props,part);
+                        var chds=elem.childNodes;
+                        initHTML(chds,outerChildNodes,outerElement,props,part);
                         takeOutChildNodes(elem);
                         elem=null;
                         replaceCls();
@@ -2612,8 +2654,8 @@ var turtle,$t,
         
         return addOrderToNode(node,info,outerChildNodes,outerElement,props,part,function(){
             var check;
-            if(/[a-zA-Z\d] in .*/.test(info.condition)){
-                check=new function(){
+            if(parseForOrderRE.test(info.condition)){
+                check=(function(){
                     var s=info.condition.split(' in '),
                         index=0,
                         names=[],
@@ -2639,9 +2681,9 @@ var turtle,$t,
                             return {result:false,params:null}
                         }
                     }
-                }
-            }else if(/^.*;.*;.*$/.test(info.condition)){
-                check=new function(){
+                }());
+            }else if(parseForOrderRE2.test(info.condition)){
+                check=(function(){
                     var isFirst=true;
                     var s=info.condition.split(';');
                     if(s.length==2){
@@ -2658,7 +2700,7 @@ var turtle,$t,
                         }
                         return {result:execByScope(node,s[1],null,outerChildNodes,outerElement,props,part),params:null};
                     }
-                }
+                }());
             }else{
                 check=function(){
                     return {result:false,params:null};
@@ -2687,7 +2729,7 @@ var turtle,$t,
         });
     }
     function createBreakElement(nodes,order){
-        var breakElement=document.createElement('__break__');
+        var breakElement=$node('__break__');
         for(var i=0;i<nodes.length;i++){
             breakElement.appendChild(nodes[i]);
         }
@@ -2745,7 +2787,12 @@ var turtle,$t,
                 break;
             case '=':
                 var v=execByScope(node,info.condition,null,outerChildNodes,outerElement,props,part);
-                replaceNodeByNodes(node,[document.createTextNode(v)]);
+                if(isObject(v)&&v.nodeType){
+                    replaceNodeByNode(node,v);
+                }else{
+                    replaceNodeByNode(node,$node(v,3));
+                }
+                
                 break;
             case 'content':
                 replaceNodeByNodes(node,outerChildNodes);
@@ -2794,7 +2841,7 @@ var turtle,$t,
     function parseAsync(node,outerChildNodes,outerElement,props,part){
         var delay=parseInt(execByScope(node,node.getAttribute('async')),null,outerChildNodes,outerElement,props,part);
         node.removeAttribute('async');
-        var mark=document.createComment('async');
+        var mark=$node('async',8);
         replaceNodeByNode(node,mark);
         if(delay===NaN){
             delay=0;
@@ -3067,7 +3114,7 @@ var turtle,$t,
         });
     }
     function bindAdd(node,s,outer,outerElement,props,part){
-        var placeholder=document.createComment('');
+        var placeholder=$node('',8);
         replaceNodeByNode(node,placeholder);
         var bindInfo=bindEval(node,s,outer,outerElement,props,part,function(v){
             if(!v)return;
@@ -3250,8 +3297,13 @@ var turtle,$t,
             this.parts.push(part);
             
             if(uiNode.parentNode!==null){
+                //var p=uiNode.parentNode.__domNode__;
                 part.insertBefore(uiNode);
                 removeNode(uiNode);
+                /*if(p){
+                    debugger;
+                    vNodesToDOM(part.store);
+                }*/
             }
             return part;
         },
@@ -3360,16 +3412,18 @@ var turtle,$t,
             var t=newObject(template.partName,newPart.prototype);    
         }
         var name=template.name;
-        node.innerHTML=s;
+        
+        var dom=$DOM(s);
+        //node.innerHTML=s;
         t.template=template;
         t.super=extPart;
         t.isExtend=true
-        var nodes=node.childNodes;
+        var nodes=dom.childNodes;
         t.$=new Service(template.service);
         initHTML(nodes,outerChildNodes,outerElement,props,t);
         t.store=[];
         for(var i=nodes.length;i>0;i--){
-            t.store.push(node.removeChild(nodes[0]));
+            t.store.push(dom.removeChild(nodes[0]));
         }
         t.to=function(part){
             var proto=part.$.__proto__;
@@ -3394,7 +3448,9 @@ var turtle,$t,
             $t.parts.push(partName,t);    
         }
         var name=template.name;
-        node.innerHTML=s;
+        
+        var dom=$DOM(s);
+        //node.innerHTML=s;
         var begin=t.begin=$node(name,8);// document.createComment('<'+name+'>');
         var end=t.end=$node('/'+name,8);//document.createComment('</'+name+'>')
         end.part=begin.part=t;
@@ -3415,18 +3471,16 @@ var turtle,$t,
         t.$=new Service(template.service);
         t.store=[];
         
-        var nodes=node.childNodes;
+        var nodes=dom.childNodes;
         
         initHTML(nodes,outerChildNodes,outerElement,props,t);
-        
         if(extPart){
             extPart.to(t);
         }
-        //nodes=vNodesToDOM(nodes);
         
         t.store.push.apply(t.store,nodes);
-        for(var i=0;i<nodes.length;i++){
-            node.removeChild(nodes[i]);
+        for(var i=nodes.length;i>0;i--){
+            dom.removeChild(nodes[0]);
         }
         t.store.unshift(begin);
         t.store.push(end);
@@ -3460,14 +3514,19 @@ var turtle,$t,
                 return [];
             }
             if(this.isInsert){
-                var elements=[];
-                var node=this.begin.nextSibling;
-                var end=this.end;
-                while(node!==end){
-                    elements.push(node);
-                    var node=node.nextSibling;                
+                try{
+                    var elements=[];
+                    var node=this.begin.nextSibling;
+                    var end=this.end;
+                    while(node!==end){
+                        elements.push(node);
+                        var node=node.nextSibling;                
+                    }
+                    return elements;
+                }catch(e){
+                    _catch(e);
+                    return [];
                 }
-                return elements;
             }
             if(isArray(this.store)){
                 return this.store.slice().splice(1,this.store.length-2);    
@@ -3556,18 +3615,21 @@ var turtle,$t,
             }
         },
         emitResize:function(){
-            
-            if(!this.isInsert){
-                return;
-            }
-            if(this.onresize){
-                if(this.onresize()){
+            try{
+                if(!this.isInsert){
                     return;
-                }   
-            }
-            var cs=this.child;
-            for(var i=0;i<cs.length;i++){
-                cs[i].emitResize();
+                }
+                if(this.onresize){
+                    if(this.onresize()){
+                        return;
+                    }   
+                }
+                var cs=this.child;
+                for(var i=0;i<cs.length;i++){
+                    cs[i].emitResize();
+                }
+            }catch(e){
+                _catch(e);
             }
         },
         onSetSize:function(rect){
@@ -3649,7 +3711,6 @@ var turtle,$t,
                     this.onInsert(elem);
                 }
             }else{
-                
                 insertNodesBefore(elem,this.store);
                 /*link scope*/
                 var scopeNodes=this.scopeNodes;
@@ -3904,29 +3965,30 @@ var turtle,$t,
             step.next =cpn.elementLength;    
         }
     }
-    function getUI(uiName,uiSortPath,outerChildNodes,outerElement,props,part,partName,reExtends){
+    
+    function render(fnName,uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part,partName,reExtends){
         var ui=importUIHTML(uiName,uiSortPath);
         if (!ui) {
             console.log(uiName + '组件不存在！');
             return;
         }
-        return ui.renderIn(null,outerChildNodes,outerElement,props,part,partName,reExtends);
+        try{
+            if($node===$VNode&&!isFunction(elem)){
+                elem=elem.__vdomNode__;
+            }
+            return ui[fnName](elem,outerChildNodes,outerElement,props,part,partName,reExtends);  
+        }catch(e){
+            _catch(e);
+        }
+    }
+    function getUI(uiName,uiSortPath,outerChildNodes,outerElement,props,part,partName,reExtends){
+        return render('renderIn',uiName,uiSortPath,null,outerChildNodes,outerElement,props,part,partName,reExtends);
     }
     function renderIn(uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part,partName,reExtends){
-        var ui=importUIHTML(uiName,uiSortPath);
-        if (!ui) {
-            console.log(uiName + '组件不存在！');
-            return;
-        }
-        return ui.renderIn(elem,outerChildNodes,outerElement,props,part,partName,reExtends);
+        return render('renderIn',uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part,partName,reExtends);
     }
     function renderBefore(uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part,partName,reExtends){
-        var ui=importUIHTML(uiName,uiSortPath);
-        if (!ui) {
-            console.log(uiName + '组件不存在！');
-            return;
-        }
-        return ui.renderBefore(elem,outerChildNodes,outerElement,props,part,partName,reExtends);
+        return render('renderBefore',uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part,partName,reExtends);
     }
     function parseXMP2(node){
         var ret=parseXMP(node);
@@ -3956,14 +4018,9 @@ var turtle,$t,
         return s;
     }
     function parseHTML(sHTML){
-        //var _uiMain=document.createElement('ui:parseHTML');
-        //_uiMain.innerHTML=sHTML;
         var vDOM=new $DOM(sHTML);
-        debugger;
         initHTML(vDOM.childNodes);
-        //initHTML(_uiMain.childNodes);
-        
-        return takeChildNodes(vDOM);
+        return takeChildNodes(vDOM.toDOM());
     }
     
     function parseXMP(node){
@@ -4291,7 +4348,7 @@ var turtle,$t,
         /*处理逻辑模板*/
         for(i=0;i<templateXMP.length;i++){
             var ret=parseHTML(getTemplate(templateXMP[i]));
-            replaceNodeByNodes(templateXMP[i],vNodesToDOM(ret));
+            replaceNodeByNodes(templateXMP[i],ret);
         }
         
         replaceCls();
@@ -4512,7 +4569,7 @@ var turtle,$t,
             }
         }
     }
-    function UILink(){}
+    /*function UILink(){}
     UILink.prototype=new function (){
         var onlink='\\"onlink';
         var t={
@@ -4552,7 +4609,7 @@ var turtle,$t,
             uiLinks:{}
         }
         return t;
-    }
+    }*/
     function UI(){
         Object.defineProperty(this,"__defineCallbacks__",{
                 value: [],
@@ -4649,19 +4706,24 @@ var turtle,$t,
             return s;
         }
     }
-    var VDOM=(function(){
-        var stringNode={
-            'SCRIPT':/^\/script[>\s]/i,
-            'TEMPLATE':/^\/template[>\s]/i,
-            'STYLE':/^\/style[>\s]/i,
-            'TITLE':/^\/title[>\s]/i,
-            'TEXTAREA':/^\/textarea[>\s]/i,
-            'XMP':/^\/xmp[>\s]/i
-        }
+    var stringNode={
+        'SCRIPT':/^\/script[>\s]/i,
+        'TEMPLATE':/^\/template[>\s]/i,
+        'STYLE':/^\/style[>\s]/i,
+        'TITLE':/^\/title[>\s]/i,
+        'TEXTAREA':/^\/textarea[>\s]/i,
+        'XMP':/^\/xmp[>\s]/i
+    }
+    var VDOM,VTemplate;
+    (function(){
         var htmlParse={
             '':function(html,m){
                 var nodeName=m.node.nodeName;
-                if(stringNode.hasOwnProperty(nodeName)){
+                if(m.node.__closeSelf__){
+                    m.node=m.node.parentNode;
+                    m.action='textNode';
+                    m.textNodeStart=m.index;
+                }else if(stringNode.hasOwnProperty(nodeName)){
                     m.action='stringNode';
                     m.stringNodeRegExp=stringNode[nodeName];
                     m.stringNodeKeyLength=nodeName.length+2;
@@ -4679,7 +4741,6 @@ var turtle,$t,
                         if(m.index<m.length+1&&xmlwordRE.test(html[m.index+1])){
                           
                             if(m.textNodeStart!==m.index){
-                                
                                 data=html.substring(m.textNodeStart,m.index);
                                 if(!emptyTextNodeRE.test(data)){
                                     m.node(data,3);
@@ -4794,6 +4855,8 @@ var turtle,$t,
                                 m.action='comment3';
                                 m.index+=2;
                             }else{
+                                m.commentStart=m.index;
+                                m.action='comment2';
                                 m.index++;
                             }
                         }else{
@@ -4807,7 +4870,11 @@ var turtle,$t,
                                 m.node('',10);
                                 m.index+=13;
                                 m.action='';
+                            }else{
+                                m.index++;
                             }
+                        }else{
+                            m.index++;
                         }
                         break;
                     default:
@@ -4822,7 +4889,6 @@ var turtle,$t,
                     vNode.dbplus=false;
                     m.commentStart=0;
                     m.action='';
-                    
                 }
                 m.index++;
             },
@@ -4845,28 +4911,31 @@ var turtle,$t,
                 switch(html[m.index]){
                     case '/':
                         if(m.length>=m.index+2){
-                            if(html.substring(m.index+1,1)==='>'){
-                                m.action='';
-                                if(m.node.__isClose__){
-                                    m.node=m.node.parentNode;
+                            if(html.substr(m.index+1,1)==='>'){
+                                if(m.attrStart!==m.attrNameEnd){
+                                    if(m.attrNameEnd===0){
+                                        m.attrNameEnd=m.index;
+                                    }
+                                    m.node._(html.substring(m.attrStart,m.attrNameEnd));    
                                 }
+                                m.action='';
+                                m.index+=2;
+                                break;
                             }
                         }
                         m.attrStart=m.attrNameEnd=0;
+                        m.action='';
                         m.index++;
                         break;
                     case '>':
-                        m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                        if(m.attrStart!==m.attrNameEnd){
+                            if(m.attrNameEnd===0){
+                                m.attrNameEnd=m.index;
+                            }
+                            m.node._(html.substring(m.attrStart,m.attrNameEnd));   
+                        }
+                        m.attrStart=m.attrNameEnd=0;
                         m.action='';
-                        if(m.node.__isClose__){
-                            m.node=m.node.parentNode;
-                        }
-                        m.index++;
-                        break;
-                    case ' ':
-                        if(m.attrStart>0&&m.attrNameEnd===0){
-                            m.attrNameEnd=m.index;
-                        }
                         m.index++;
                         break;
                     case '=':
@@ -4875,6 +4944,14 @@ var turtle,$t,
                         }
                         m.equlIndex=m.index;
                         m.action='attrValue';
+                        m.index++;
+                        break;
+                    case '\r':
+                    case '\n':
+                    case ' ':
+                        if(m.attrStart>0&&m.attrNameEnd===0){
+                            m.attrNameEnd=m.index;
+                        }
                         m.index++;
                         break;
                     default:
@@ -4893,12 +4970,8 @@ var turtle,$t,
             },
             attrValue:function(html,m){
                 switch(html[m.index]){
-                    case '>':
-                        /*忽略等号*/
-                        m.node._(html.substring(m.attrStart,m.attrNameEnd));
-                        m.action='';
-                        m.index++;
-                        break;
+                    case '\r':
+                    case '\n':
                     case ' ':
                         m.index++;
                         break;
@@ -4913,6 +4986,12 @@ var turtle,$t,
                         m.action='atvstring';
                         m.index++;
                         m.stringStart=m.index;
+                        break;
+                    case '>':
+                        /*忽略等号*/
+                        m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                        m.action='';
+                        m.index++;
                         break;
                     case "/":
                         if(m.length>=m.index+2){
@@ -4934,10 +5013,24 @@ var turtle,$t,
             atvbetweenSpace:function(html,m){
                 switch(html[m.index]){
                     case ' ':
-                        m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.stringStart,m.index));
+                        m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.betweenSpaceStart,m.index));
                         this.setAttrStart(m);
                         m.index++;
                         break;
+                    case '>':
+                        m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.betweenSpaceStart,m.index));
+                        this.setAttrStart(m);
+                        break;
+                    case "/":
+                        if(m.length>=m.index+2){
+                            m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.betweenSpaceStart,m.index));
+                            if(html.substring(m.index+1,1)==='>'){
+                                this.setAttrStart(m);
+                                m.index++;
+                                return;
+                            }
+                        }
+                        m.index++
                     default:
                         m.index++;
                 }
@@ -4960,49 +5053,103 @@ var turtle,$t,
                 if(html[m.index]==='<'){
                     if(m.length>=m.index+m.stringNodeKeyLength+1){
                         if(m.stringNodeRegExp.test(html.substr(m.index+1,m.stringNodeKeyLength))){
-                            m.node.text(HTMLTrim(html.substring(m.stringNodeStart,m.index)));
+                            var s=html.substring(m.stringNodeStart,m.index);
+                            if(!emptyTextNodeRE.test(s)){
+                                m.node.text(s);
+                            }
                             m.stringNodeStart=0;
                             m.stringNodeRegExp=null;
-                            m.action='';
+                            m.action='stringNode2';
                             m.node.__isClose__=true;
                             m.node=m.node.parentNode;
-                            m.index+=m.stringNodeKeyLength+1;
+                            m.index+=m.stringNodeKeyLength;
                             m.stringNodeKeyLength=0;
-                            return;        
+                            return;
                         }
                     }
                 }
                 m.index++;
+            },
+            stringNode2:function(html,m){
+                if(html[m.index]==='>'){
+                    m.action='';
+                }
+                m.index++;
+            },
+            checkEnd:function(html,m){
+                if(m.action==='textNode'){
+                    if(m.textNodeStart!==m.index){
+                        data=html.substring(m.textNodeStart,m.index);
+                        if(!emptyTextNodeRE.test(data)){
+                            m.node(data,3);
+                        }
+                        m.textNodeStart=0;
+                    }
+                }else if(m.action!==""){
+                    console.log(m.action)
+                    debugger;
+                }
             }
         }
-        return function(html,vNode){
-            
+        var htmlParseT={
+            __proto__:htmlParse,
+            attributes:function(html,m){
+                /*
+                 * 解析以下语句
+                 * <%%>
+                 * {}
+                 * */
+                switch(html[m.index]){
+                    case '{':
+                        debugger;
+                        break;
+                    case '<':
+                        debugger;
+                        break;
+                }
+                this.__proto__.attributes(html,m);
+            }
+        }
+        function getInitData(vNode,length){
             if(!vNode){
                 vNode=newVNode('document');
                 vNode.__isClose__=true;
             }
-            var 
-                m={
-                    index:0,
-                    node:vNode,
-                    action:'',
-                    length:html.length,
-                    textNodeStart:0,
-                    xmlNodeStart:0,
-                    xmlNodeNameStart:0,
-                    attrStart:0,
-                    attrNameEnd:0,
-                    equlIndex:0,
-                    stringStart:0,
-                    stringStartChar:'',
-                    betweenSpaceStart:0,
-                    stringNodeStart:0,
-                    stringNodeRegExp:null,
-                    stringNodeKeyLength:0
-                };
+            return {
+                index:0,
+                node:vNode,
+                action:'',
+                length:length,
+                textNodeStart:0,
+                xmlNodeStart:0,
+                xmlNodeNameStart:0,
+                attrStart:0,
+                attrNameEnd:0,
+                equlIndex:0,
+                stringStart:0,
+                stringStartChar:'',
+                betweenSpaceStart:0,
+                stringNodeStart:0,
+                stringNodeRegExp:null,
+                stringNodeKeyLength:0
+            };
+        }
+        VTemplate=function(html,vNode){
+            var m=getInitData(vNode,html.length);
+            vNode=m.node;
+            while(m.index<html.length){
+                htmlParseT[m.action](html,m);
+            }
+            htmlParseT.checkEnd(html,m);
+            return vNode;
+        }
+        VDOM=function(html,vNode){
+            var m=getInitData(vNode,html.length);
+            vNode=m.node;
             while(m.index<html.length){
                 htmlParse[m.action](html,m);
             }
+            htmlParse.checkEnd(html,m);
             return vNode;
         }
     }());
@@ -5013,43 +5160,17 @@ var turtle,$t,
         }
     }
     
-    function vNodesToDOM(vNodes){
-        var arr=[];
-        for(var i=0;i<vNodes.length;i++){
-            if(vNodes[i].toDOM){
-                arr.push(vNodes[i].toDOM());    
-            }else{
-                arr.push(vNodes[i]);
-            }
-        }
-        return arr;
-    }
-    var newNode=function(name,nodeType){
-        switch(nodeType){
-            case 3:
-                return document.createTextNode(name);
-                break;
-            case 8:
-                return document.createComment(name);
-                break;
-            case 1:
-            case undefined:
-                return document.createElement(name);
-                break;
-            case 10:
-                return null;
-                break;
-            default:
-                return null;
-        }
-        
-    } 
+    
     var newVNode=(function(){
-        var styleNode       = document.createElement('用于创建VStyle').style;
+        var toHelp          = document.createElement('用于创建VStyle和toDom支持');
+        var styleNode       = toHelp.style;
         var VStyleprototype ={};
         function VStyle(elem,attrs){
-            var t=this;
-            var __={};
+            var 
+                style="",
+                isLock=0,
+                __={},
+                t=this;
             for(var i in styleNode){
                 __[i]="";
             }
@@ -5074,9 +5195,6 @@ var turtle,$t,
                     configurable: false
                 }
             );
-            var 
-                style="",
-                isLock=0;
             Object.defineProperty(attrs,"__style__",{
                     get: function(){
                         return style;
@@ -5095,11 +5213,13 @@ var turtle,$t,
                         while((lst=styleListRE.exec(s))!==null){
                             lst2.push(lst);
                         }
-                        for(var i=0;i<lst2.length-1;i++){
+                        if(lst2.length>0){
+                            for(var i=0;i<lst2.length-1;i++){
+                                t[camelize(lst2[i][1])]=lst2[i][2];
+                            }
+                            isLock=2;
                             t[camelize(lst2[i][1])]=lst2[i][2];
                         }
-                        isLock=2;
-                        t[camelize(lst2[i][1])]=lst2[i][2];
                         isLock=0;
                         //styleListRE.lastIndex=0;
                     }
@@ -5268,9 +5388,10 @@ var turtle,$t,
             VIDEO:["width","height","poster"],
             XMP:["width"]
         }
-        function setGetSetPropertyWithAttribute(o,name){
+        
+        function setGetSetPropertyWithAttribute(o,attributes,name){
             var hideValueName='__'+name+'__';
-            Object.defineProperty(o.attributes,hideValueName,{
+            Object.defineProperty(attributes,hideValueName,{
                     value: "",
                     writable: true,
                     enumerable: false,
@@ -5279,12 +5400,23 @@ var turtle,$t,
             )
             Object.defineProperty(o,name,{
                 get:function(){
-                    return o.attributes[hideValueName];
+                    return attributes[hideValueName];
                 },
                 set:function(s){
-                    o.setAttribute(name,s);
+                    this.setAttribute(name,s);
                 }
             });
+        }
+        function setProto(t){
+            var proto=htmlNodeInfo[t.nodeName];
+            if(isArray(proto)){
+                (htmlNodeInfo[t.nodeName]=t.__proto__=newObject(t.nodeName[0]+t.nodeName.substring(1))).__proto__=prototype;
+                for(var i in proto){
+                    setGetSetPropertyWithAttribute(t.__proto__,t.attributes,proto[i]);
+                }
+            }else{
+                t.__proto__=htmlNodeInfo[t.nodeName];
+            }
         }
         function setClassName(o){
             Object.defineProperty(o.attributes,'__class__',{
@@ -5314,39 +5446,47 @@ var turtle,$t,
                     return t.parentNode;
                 }
             }
-            t.__proto__=prototype;
             if(nodeType===undefined){
                 nodeType=1;
             }
-            
+            t.__={};
             t.childNodes=[];
             switch(nodeType){
                 case 1:
                     t.nodeName=name.toUpperCase();
                     t.attributes=new VNamedNodeMap();
                     t.children=[];
-                    t.__children__=[];
                     t.__events__=[];
                     t.__isClose__=t.__closeSelf__=name in closeSelf;
                     t.style=new VStyle(t,t.attributes);
                     
                     setClassName(t);
-                    Object.defineProperty(t,'classList',_getClassList);
+                    defineClassList(t);
                     if(t.nodeName in htmlNodeInfo){
-                        var proto=htmlNodeInfo[t.nodeName];
-                        for(var i in proto){
-                            setGetSetPropertyWithAttribute(t,proto[i]);
-                        }
+                        setProto(t);
+                    }else{
+                        t.__proto__=prototype;
                     }
                     break;
                 case 3:
-                    t.data=name;
+                    t.__proto__=textNodePrototype;
+                    t.nodeName='#text';
+                    if(isString(name)){
+                        t.value=name//decodeHTML(name);    
+                    }else{
+                        t.value=name.toString();
+                    }
                     t.__isClose__=true;
+                    break;
                 case 8:
-                    t.data=name;
+                    t.nodeName='#comment';
+                    t.value=t.data=name;
+                    t.__proto__=prototype;
                     t.__isClose__=true;
                     break;
                 case 10:
+                    t.nodeName='html';
+                    t.__proto__=prototype;
                     t.__isClose__=true;
                     break;
             }
@@ -5452,6 +5592,10 @@ var turtle,$t,
             }
         }
         function _appendChild(vNode){
+            if(vNode instanceof Node){
+                throwError('虚拟DOM只能插入虚拟节点！');
+                return;
+            }
             this.childNodes.push(vNode);
             if(vNode.nodeType===1){
                 this.children.push(vNode);
@@ -5475,12 +5619,12 @@ var turtle,$t,
         function addText(){
             var s=Array.prototype.join.call(arguments,'\r\n');
             var t=newVNode(s,3);
-            this.childNodes.push(t);
+            this.appendChild(t);
             return this;
         }
         function addText2(fn){
-            var t=newVNode($t.getFunctionComment(fn),3);
-            this.childNodes.push(t);
+            var t=newVNode($t.getFunctionComment(fn),3,this.nodeName==='PRE');
+            this.appendChild(t);
             return this;
         }
         function removeAttribute(name){
@@ -5493,11 +5637,18 @@ var turtle,$t,
             return this.attributes.indexOfName(name)!==-1;
         }
         function setAttribute(name,value){
-            if(name){
+            if(name&&!emptyTextNodeRE.test(name)){
                 this.attributes.setNamedItem(name,value);
                 return $t.getBind(this,setAttribute);
             }else{
                 return this;
+            }
+        }
+        function _(name,value){
+            if(name){
+                return setAttribute.call(this,name,value);
+            }else{
+                return this.parentNode;
             }
         }
         function getAttribute(name){
@@ -5508,18 +5659,31 @@ var turtle,$t,
                 return null;
             }
         }
-        function cloneNode(){
-            var node=newVNode(this.nodeName,this.nodeType);
-            if(this.nodeType!==1){
-                return node;
+        function valueOf(){
+            if(this.__domNode__){
+                return this.__domNode__;
+            }else{
+                return this;
             }
+        }
+        function cloneNode(){
+            if(this.nodeType!==1){
+                return newVNode(this.data,this.nodeType);
+            }
+            var node=newVNode(this.nodeName,this.nodeType);
             var attrs=this.attributes;
             for(var i=0;i<attrs.length;i++){
                 node.setAttribute(attrs[i].name,attrs[i].value);
             }
+            node.__isClose__=this.__isClose__;
+            node.__closeSelf__=this.__closeSelf__;
             return node;
         }
         function insertBefore(newNode,node){
+            if(newNode instanceof Node){
+                throwError('虚拟DOM只能插入虚拟节点！');
+                return;
+            }
             var p1=node.parentNode;
             if(!p1){
                 return;
@@ -5545,91 +5709,136 @@ var turtle,$t,
                     for(var i=idx;i<chds.length;i++){
                         if(chds[i].nodeType===1){
                             chds.splice(i,0,newNode);
-                            break;
+                            return;
                         }
                     }
                     chds.push(newNode);
                 }
             }
         }
-        var prototype={
-            setAttribute:setAttribute,
-            _:setAttribute,
-            text:addText,
-            text2:addText2,
-            append:append,
-            appendChild:appendChild,
-            removeChild:removeChild,
-            hasAttribute:hasAttribute,
-            removeAttribute:removeAttribute,
-            removeAttributeNode:removeAttributeNode,
-            getAttribute:getAttribute,
-            insertBefore:insertBefore,
-            insertBefore2:insertBefore,
-            cloneNode:cloneNode,
-            get innerHTML(){
-                var 
-                    cs=this.childNodes,
-                    data=[];
-                if(cs){
-                    for(var i=0;i<cs.length;i++){
-                        data.push(cs[i].outerHTML);
-                    }   
-                }
-                return data.join('');
-            },
-            get previousSibling(){
-                var p=this.parentNode;
-                if(!p){
-                    return null;
-                }
-                var chds=p.childNodes;
-                var idx=chds.indexOf(this);
-                var node=chds[idx-1];
-                return node?node:null;
-            },
-            get nextSibling(){
-                var p=this.parentNode;
-                if(!p){
-                    return null;
-                }
-                var chds=p.childNodes;
-                var idx=chds.indexOf(this);
-                var node=chds[idx+1];
-                return node?node:null;
-            },
-            set innerHTML(s){
-                var chds;
-                chds=this.children;
-                for(var i in chds){
-                    delete chds[i];
-                }
-                chds=this.childNodes;
-                for(var i in chds){
-                    delete chds[i];
-                }
+        
+        function getinnerText(){
+            var s="";
+            switch(this.nodeType){
+                case 3:
+                    s+=this.data;
+                    break;
+                case 1:
+                    var chdns=this.childNodes;
+                    for(var i=0;i<chdns.length;i++){
+                        s+=encodeHTML(chdns[i].innerText);
+                    }
+            }
+            return s;
+        }
+        function setinnerText(s){
+            var chds;
+            chds=this.children;
+            for(var i in chds){
+                delete chds[i];
+            }
+            chds=this.childNodes;
+            for(var i in chds){
+                delete chds[i];
+            }
+            this.appendChild(newVNode(decodeHTML(s),3));
+        }
+        function setinnerHTML(s){
+            this.children.length=0;
+            this.childNodes.length=0;
+            if(!isString(s)){
+                s=s.toString();
+            }
+            if(this.nodeName in stringNode){
+                this.appendChild($node(s,3));    
+            }else{
                 new VDOM(s,this);
-            },
-            get outerHTML(){
-                var 
-                    xmlNode=this.toXMLNodeString(),
-                    cs=this.childNodes,
-                    data=[xmlNode[0]];
-                if(cs){
-                    for(var i=0;i<cs.length;i++){
-                        data.push(cs[i].toString());
-                    }   
+            }
+        }
+        function getinnerHTML(){
+            var 
+                cs=this.childNodes,
+                data=[];
+            if(cs){
+                for(var i=0;i<cs.length;i++){
+                    data.push(cs[i].outerHTML);
+                }   
+            }
+            return data.join('');
+        }
+        function connectParent(self,elem){
+            var p=self.parentNode;
+            if(p&&p.__domNode__){
+                var pE=p.__domNode__;
+                if(pE.childNodes.length===0){
+                    pE.appendChild(elem);
+                }else{
+                    var node=self;
+                    while(true){
+                        /*
+                         * 向前找
+                         */
+                        node=node.previousSibling;
+                        if(node){
+                            var elem2=node.__domNode__;
+                            if(elem2){
+                                if(elem2.parentNode){
+                                    pE.insertBefore2(elem,elem2);
+                                    pE.insertBefore2(elem2,elem);
+                                    break;
+                                }
+                            }
+                         }else{
+                             node=self;
+                             while(true){
+                                /*
+                                 * 向后找
+                                 */
+                                 node=node.nextSibling;
+                                 if(node){
+                                     var elem2=node.__domNode__;
+                                     if(elem2){
+                                         if(elem2.parentNode){
+                                             pE.insertBefore2(elem,elem2);
+                                             break;
+                                         }else{
+                                             console.log(elem2.innerHTML);
+                                             debugger;
+                                             /*这里怎么处理好呢*/
+                                         }
+                                     }
+                                 }else{
+                                     pE.appendChild(elem);
+                                     break;
+                                 }
+                             
+                             }
+                             break;
+                         }
+                    }
                 }
-                if(xmlNode.length===2){
-                    data.push(xmlNode[1]);    
-                }
-                return data.join('');
-                
-            },
-            toString:function(){
-                return this.outerHTML;
-            },
-            toXMLNodeString:function(){
+            }
+        }
+        function VNode(){
+            this.setAttribute=setAttribute;
+            this._=_;
+            this.text=addText;
+            this.text2=addText2;
+            this.append=append;
+            this.appendChild=appendChild;
+            this.removeChild=removeChild;
+            this.hasAttribute=hasAttribute;
+            this.removeAttribute=removeAttribute;
+            this.removeAttributeNode=removeAttributeNode;
+            this.getAttribute=getAttribute;
+            this.insertBefore=insertBefore;
+            this.insertBefore2=insertBefore;
+            this.cloneNode=cloneNode;
+            this.valueOf=valueOf;
+            this.toString=function(){
+                return "[object HTML"+this.nodeName[0]+this.nodeName.substring(1).toLowerCase()+"Element]";
+            }
+            this.toXMLNodeString=function(){
                 var 
                     ret=[],
                     sAttr='',
@@ -5669,16 +5878,8 @@ var turtle,$t,
                         break;
                 }
                 return ret;
-            },
-            get object(){
-                if(this.__domNode__){
-                    return this.__domNode__;
-                }else{
-                    return this;
-                }
-                //return this.toDOM();  
-            },
-            addEventListener:function(name,fn,useCapture){
+            }
+            this.addEventListener=function(name,fn,useCapture){
                 if(this.nodeType!==1){
                     return;
                 }
@@ -5686,8 +5887,8 @@ var turtle,$t,
                     useCapture=false;
                 }
                 this.__events__.push([name,fn,useCapture]);
-            },
-            removeEventListener:function(name,fn,useCapture){
+            }
+            this.removeEventListener=function(name,fn,useCapture){
                 if(this.nodeType!==1){
                     return;
                 }
@@ -5702,219 +5903,410 @@ var turtle,$t,
                         i--;
                     }
                 }
-            },
-            toDOM:function(){
+            }
+            this.toJS=function(){
+                var 
+                    sBegin='',
+                    sAttr='',
+                    sInner='',
+                    sEnd='',
+                    s;
+                if(this.parentNode!==null&&this.__isClose__){
+                    sEnd='()';
+                }
+                if(this.parentNode===null){
+                    sBegin='$VNode';
+                }
+                if(this.nodeType===1){
+                    sBegin+='("'+this.nodeName+'")';
+                    if(this.attributes.length>0){
+                        sAttr='._';
+                        var attrs=this.attributes;
+                        for(var i=0;i<attrs.length;i++){
+                            sAttr+='("'+attrs[i].name;
+                            if(attrs[i].value){
+                                sAttr+='","'+attrs[i].value+'")';    
+                            }else{
+                                sAttr+='")';
+                            }
+                        }
+                        sAttr+='()';
+                    }
+                    var chds=this.childNodes;
+                    if(chds.length>0){
+                        for(var i=0;i<chds.length;i++){
+                            sInner+=chds[i].toJS();
+                        }
+                    }
+                }else{
+                    s=this.data;
+                    s=s.replace(/[\'\"\r\n]/g,function(s){
+                        switch(s){
+                            case '\'':
+                            case '\"':
+                                return '\\'+s;
+                            case '\r':
+                                return '\\r';
+                            case '\n':
+                                return '\\n';
+                        }
+                    });
+                    sBegin+='("'+s+'",'+this.nodeType+')';
+                }
+                return sBegin+sAttr+sInner+sEnd;
+            }
+            this.toDOM=function(){
                 var elem;
                 switch(this.nodeType){
                     case 1:
                         if(this.__domNode__){
                             elem=this.__domNode__;
-                            // var chds=this.childNodes;
-                            // //重设childNodes;
-                            // elem.innerHTML='';
-                            // for(var j=0;j<chds.length;j++){
-                                // elem.appendChild(chds[j].toDOM());
-                            // }
                             return elem;
                         }
-                        
                         elem=document.createElement(this.nodeName);
-                        var chds=this.childNodes;
-                        for(var j=0;j<chds.length;j++){
-                            if(chds[j] instanceof Node){
-                                elem.appendChild(chds[j]);    
-                            }else{
-                                elem.appendChild(chds[j].toDOM());
-                            }
-                        }
-                        /*
-                         * 填充属性事件
-                         */
-                        for(var i in this){
-                            switch(i){
-                                case 'attributes':
-                                    var attrs=this.attributes;
-                                    for(var j in attrs){
-                                        if(attrs.hasOwnProperty(j)){
-                                            elem.setAttribute(attrs[j].name,attrs[j].value);    
-                                        }
-                                    }
-                                    break;
-                                
-                                case '__events__':
-                                    var arr=this.__events__;
-                                    for(var j in arr){
-                                        var e=arr[j];
-                                        elem.addEventListener(e[0],e[1],e[2]);
-                                    }
-                                    break;
-                                case 'children':
-                                case 'childNodes':
-                                case '__proto__':
-                                case '__isClose__':
-                                case '__domNode__':
-                                case 'nodeType':
-                                case 'nodeName':
-                                case 'parentNode':
-                                    break;
-                                default:
-                                    if(!this.hasOwnProperty(i)){
-                                        continue;
-                                    }
-                                    var desc=Object.getOwnPropertyDescriptor(this,i);
-                                    if(desc){
-                                        Object.defineProperty(elem,i,desc);
-                                    }else{
-                                        elem[i]=this[i];
-                                    }
-                            }
-                        }
+                        this.__domNode__=elem;
                         break;
                     case 3:
                         if(this.__domNode__){
                             return this.__domNode__;
                         }
-                        elem=document.createTextNode(this.data);
+                        if(this.data!==""){
+                            toHelp.innerHTML=this.data;
+                            elem=toHelp.removeChild(toHelp.childNodes[0]);
+                            //elem=document.createTextNode(this.data);不用这句的原因是为了转码
+                        }else{
+                            elem=document.createTextNode('');
+                        }
+                        this.__domNode__=elem;
                         break;
                     case 8:
                         if(this.__domNode__){
                             return this.__domNode__;
                         }
                         elem=document.createComment(this.data);
+                        this.__domNode__=elem;
                         break;
                     case 10:
+                    default:
                         if(this.__domNode__){
                             return this.__domNode__;
                         }
-                        elem=document.createElement('span');
-                        elem.innerHTML=this.outerHTML;
-                        elem=elem.childNodes[0];
-                        //elem=document.createTextNode(this.value);
-                        break;
+                        toHelp.innerHTML=this.outerHTML;
+                        elem=toHelp.removeChild(toHelp.childNodes[0]);
+                        this.__domNode__=elem;
                 }
-                delegateNode(this,elem);
+                for(var i in this){
+                    switch(i){
+                        case 'attributes':
+                            var attrs=this.attributes;
+                            for(var j=0;j<attrs.length;j++){
+                                elem.setAttribute(attrs[j].name,attrs[j].value);
+                            }
+                            break;
+                        
+                        case '__events__':
+                            var arr=this.__events__;
+                            for(var j in arr){
+                                var e=arr[j];
+                                elem.addEventListener(e[0],e[1],e[2]);
+                            }
+                            break;
+                        case '__':
+                            var arr=this.__;
+                            for(var j in arr){
+                                elem[j]=arr[j];
+                            }
+                            break;
+                        case 'children':
+                        case 'childNodes':
+                        case '__proto__':
+                        case '__isClose__':
+                        case '__domNode__':
+                        case 'nodeType':
+                        case 'nodeName':
+                        case 'parentNode':
+                        case "__closeSelf__":
+                        case "style":
+                        case "classList":
+                        case "className":
+                            break;
+                        default:
+                            if(!this.hasOwnProperty(i)){
+                                continue;
+                            }
+                            var desc=Object.getOwnPropertyDescriptor(this,i);
+                            if(desc){
+                                if(!(i in elem)){
+                                    Object.defineProperty(elem,i,desc);    
+                                }else{
+                                    elem[i]=this[i];
+                                }
+                            }else{
+                                elem[i]=this[i];
+                            }
+                    }
+                }
+                connectParent(this,elem);
+                if(this.nodeType===1){
+                    if(this.nodeName==='PRE'){
+                        if(this.childNodes.length>0){
+                            elem.innerHTML=decodeHTML(this.childNodes[0].data);    
+                        }
+                    }else{
+                        var chds=this.childNodes;
+                        for(var j=0;j<chds.length;j++){
+                            chds[j].toDOM();
+                        }
+                    }
+                }
+                delegateNode(this);
+                elem.__vdomNode__=this;
                 return elem;
             }
-        }
-        
-        var osetAttribute=function(){return this.__domNode__.setAttribute.apply(this.__domNode__,arguments)};
-        var oappendChild=function(){return this.__domNode__.appendChild.apply(this.__domNode__,arguments)};
-        var oremoveChild=function(){return this.__domNode__.removeChild.apply(this.__domNode__,arguments)};
-        var ohasAttribute=function(){return this.__domNode__.hasAttribute.apply(this.__domNode__,arguments)};
-        var oremoveAttribute=function(){return this.__domNode__.removeAttribute.apply(this.__domNode__,arguments)};
-        var oremoveAttributeNode=function(){return this.__domNode__.removeAttributeNode.apply(this.__domNode__,arguments)};
-        var ogetAttribute=function(){return this.__domNode__.getAttribute.apply(this.__domNode__,arguments)};
-        var oinsertBefore=function(){
-            this.__proto__.insertBefore.apply(this,arguments);
-            var objects=[];
-            for(var i=0;i<arguments.length;i++){
-                var o=arguments[i].object;
-                if(o===arguments[i]){
-                    o.parentNode.toDOM();
-                    o=o.object;
+            Object.defineProperty(this,'outerHTML',{
+                get:function(){
+                    var 
+                        xmlNode=this.toXMLNodeString(),
+                        cs=this.childNodes,
+                        data=[xmlNode[0]];
+                    if(cs){
+                        for(var i=0;i<cs.length;i++){
+                            data.push(cs[i].outerHTML);
+                        }
+                    }
+                    if(xmlNode.length===2){
+                        data.push(xmlNode[1]);    
+                    }
+                    return data.join('');
                 }
-                objects.push(o);
-            }
-            return this.__domNode__.insertBefore.apply(this.__domNode__,objects);
-        }
-        var oinsertBefore2=function(){
-            this.__proto__.insertBefore2.apply(this,arguments);
-            var objects=[];
-            for(var i=0;i<arguments.length;i++){
-                var o=arguments[i].object;
-                if(o===arguments[i]){
-                    o.parentNode.toDOM();
-                    o=o.object;
+            });
+            Object.defineProperty(this,'previousSibling',{
+                get:function(){
+                    var p=this.parentNode;
+                    if(!p){
+                        return null;
+                    }
+                    var chds=p.childNodes;
+                    var idx=chds.indexOf(this);
+                    var node=chds[idx-1];
+                    return node?node:null;
                 }
-                objects.push(o);
+            });
+            Object.defineProperty(this,'nextSibling',{
+                get:function(){
+                    var p=this.parentNode;
+                    if(!p){
+                        return null;
+                    }
+                    var chds=p.childNodes;
+                    var idx=chds.indexOf(this);
+                    var node=chds[idx+1];
+                    return node?node:null;
+                }
+            });
+            var arrGetSetEvents=["onabort","onblur","oncancel","oncanplay","oncanplaythrough","onchange","onclick","onclose","oncontextmenu","oncuechange","ondblclick","ondrag","ondragend","ondragenter","ondragleave","ondragover","ondragstart","ondrop","ondurationchange","onemptied","onended","onerror","onfocus","oninput","oninvalid","onkeydown","onkeypress","onkeyup","onload","onloadeddata","onloadedmetadata","onloadstart","onmousedown","onmouseenter","onmouseleave","onmousemove","onmouseout","onmouseover","onmouseup","onmousewheel","onpause","onplay","onplaying","onprogress","onratechange","onreset","onresize","onscroll","onseeked","onseeking","onselect","onshow","onstalled","onsubmit","onsuspend","ontimeupdate","ontoggle","onvolumechange","onwaiting","onautocomplete","onautocompleteerror","onbeforecopy","onbeforecut","onbeforepaste","oncopy","oncut","onpaste","onsearch","onselectstart","onwheel","onwebkitfullscreenchange","onwebkitfullscreenerror"];
+            function defineProtoGetSet(proto,name){
+                Object.defineProperty(proto,name,{
+                    get:function(){
+                        if(this.__domNode__){
+                            return this.__domNode__[name];
+                        }else{
+                            return this.__[name];
+                        }
+                    },
+                    set:function(v){
+                        if(this.__domNode__){
+                            this.__domNode__[name]=v;
+                        }else{
+                            this.__[name]=v;
+                        }
+                        return v;
+                    }
+                });
             }
-            return this.__domNode__.insertBefore2.apply(this.__domNode__,objects);
+            Object.defineProperty(this,'innerHTML',{
+                get:getinnerHTML,
+                set:setinnerHTML
+            });
+            Object.defineProperty(this,'innerText',{
+                get:getinnerText,
+                set:setinnerText
+            });
+            for(var i in arrGetSetEvents){
+                defineProtoGetSet(this,arrGetSetEvents[i]);
+            }
         }
-        
+        function VtextNode(){
+            this.__proto__=prototype;
+            this.__value__='';
+            var defineDesc={
+                get:function(){
+                    return this.__value__;
+                },
+                set:function(s){
+                    this.__value__=s;
+                }
+            }
+            Object.defineProperty(this,'data',defineDesc);
+            Object.defineProperty(this,'value',defineDesc);
+        }
+        var prototype=new VNode();
+        var textNodePrototype=new VtextNode();
+        function getHomology(name){
+            return function(){
+                this.__proto__[name].apply(this,arguments);
+                return this.__domNode__[name].apply(this.__domNode__,arguments);
+            }
+        }
+        function getDOMHomology(name){
+            return function(){
+                var objects=[],toDOMs=[];
+                for(var i=0;i<arguments.length;i++){
+                    var o=arguments[i].valueOf();
+                    if(o===arguments[i]){
+                        toDOMs.push(o);
+                        o=o.toDOM();
+                    }
+                    objects.push(o);
+                    
+                }
+                this.__proto__[name].apply(this,arguments);
+                var ret=this.__domNode__[name].apply(this.__domNode__,objects);
+                for(var i=0;i<toDOMs.length;i++){
+                    var chds=toDOMs[i].childNodes;
+                    for(var j=0;j<chds.length;j++){
+                        var chds2=chds[j].childNodes;
+                        if(chds2.length!==chds[j].__domNode__.childNodes.length){
+                            for(var k=0;k<chds2.length;k++){
+                                if(chds2[k].__domNode__.parentNode===null){
+                                    connectParent(chds2[k],chds2[k].__domNode__);
+                                }
+                            }
+                        }
+                    }
+                }
+                return ret;
+            }
+        }
+        function getBridge(name){
+            return function(){
+                return this.__domNode__[name].apply(this.__domNode__,arguments);
+            }
+        }
+        var osetAttribute=getBridge('setAttribute');
+        var ohasAttribute=getBridge('hasAttribute');
+        var oremoveAttribute=getBridge('removeAttribute');
+        var oremoveAttributeNode=getBridge('removeAttributeNode');
+        var oappendChild=getDOMHomology('appendChild');
+        var oremoveChild=(function(){
+            return function(node){
+                if(node.parentNode){
+                    if(node.__domNode__){
+                        try{
+                            this.__domNode__.removeChild.call(this.__domNode__,node.__domNode__);
+                        }catch(e){
+                            
+                        }     
+                    }
+                }
+                return this.__proto__.removeChild.call(this,node);
+            }
+        }());
+        var oinsertBefore=getDOMHomology('insertBefore');
+        var oinsertBefore2=getDOMHomology('insertBefore2');
+        var oaddEventListener=getHomology('addEventListener');
+        var oremoveEventListener=getHomology('removeEventListener');
         var oGetstyle=function(){return this.__domNode__.style};
-        
-        var oGetinnerHTML=function(){return this.__domNode__.innerHTML};
-        var oSetinnerHTML=function(s){return this.__domNode__.innerHTML=s};
-        
-        
+        var oGetclassList=function(){return this.__domNode__.classList};
         var oGetoffsetTop=function(){return this.__domNode__.offsetTop};
         var oGetoffsetLeft=function(){return this.__domNode__.offsetLeft};
         var oGetoffsetWidth=function(){return this.__domNode__.offsetWidth};
         var oGetoffsetHeight=function(){return this.__domNode__.offsetHeight};
-        
-        //var oGetpreviousSibling=function(){return this.__domNode__.previousSibling};
-        //var oGetnextSibling=function(){return this.__domNode__.nextSibling};
-        var oGetouterHTML=function(){return this.__domNode__.outerHTML};
-        
+        //var oGetouterHTML=function(){return this.__domNode__.outerHTML};
         var oGetattributes=function(){return this.__domNode__.attributes};
-        //var oGetchildNodes=function(){return this.__domNode__.childNodes};
-        //var oGetchildren=function(){return this.__domNode__.children};
-        
         var otoString=function(){return this.__domNode__.toString.apply(this.__domNode__,arguments)};
-        var oaddEventListener=function(){return this.__domNode__.addEventListener.apply(this.__domNode__,arguments)};
-        var oremoveEventListener=function(){return this.__domNode__.removeEventListener.apply(this.__domNode__,arguments)};
-        
-        function delegateNode(o,domNode){
+        function delegateNode(o){
+            if(o.nodeType===1){
+                o.setAttribute=osetAttribute;
+                o.hasAttribute=ohasAttribute;
+                o.appendChild=oappendChild;
+                o.removeChild=oremoveChild;
+                o.removeAttribute=oremoveAttribute;
+                o.removeAttributeNode=oremoveAttributeNode;
+                o.insertBefore=oinsertBefore;
+                o.insertBefore2=oinsertBefore2;
+                o.toString=otoString;
+                o.addEventListener=oaddEventListener;
+                o.removeEventListener=oremoveEventListener;
+                Object.defineProperty(o,'style',{
+                    get:oGetstyle
+                });
+                Object.defineProperty(o,'classList',{
+                    get:oGetclassList
+                });
+                Object.defineProperty(o,'offsetTop',{
+                    get:oGetoffsetTop
+                });
+                Object.defineProperty(o,'offsetLeft',{
+                    get:oGetoffsetLeft
+                });
+                Object.defineProperty(o,'offsetWidth',{
+                    get:oGetoffsetWidth
+                });
+                Object.defineProperty(o,'offsetHeight',{
+                    get:oGetoffsetHeight
+                });
+                Object.defineProperty(o,'attributes',{
+                    get:oGetattributes
+                });
+                switch(o.nodeName){
+                    case "INPUT":
+                    case "SELECT":
+                    case "TEXTAREA":
+                        Object.defineProperty(o,'value',{
+                            get:function(){
+                                return this.__domNode__.value;
+                            },
+                            set:function(s){
+                                this.__domNode__.value=s;
+                            }
+                        });
+                    case "INPUT":
+                        Object.defineProperty(o,'checked',{
+                            get:function(){
+                                return this.__domNode__.checked;
+                            },
+                            set:function(s){
+                                this.__domNode__.checked=s;
+                            }
+                        });
+                        break;
+                }
+            }else if(o.nodeType===3){
+                Object.defineProperty(o,'data',{
+                    get:function(){
+                        return this.__value__;
+                    },
+                    set:function(s){
+                        this.__value__=s;
+                        this.__domNode__.data=s;
+                    }
+                });
+                Object.defineProperty(o,'value',{
+                    get:function(){
+                        return this.__value__;
+                    },
+                    set:function(s){
+                        this.__value__=s;
+                        this.__domNode__.value=s;
+                    }
+                });
+            }
             
-            o.__domNode__=domNode;
-            o.setAttribute=osetAttribute;
-            o.appendChild=oappendChild;
-            o.removeChild=oremoveChild;
-            o.hasAttribute=ohasAttribute;
-            o.removeAttribute=oremoveAttribute;
-            o.removeAttributeNode=oremoveAttributeNode;
-            o.getAttribute=ogetAttribute;
-            o.insertBefore=oinsertBefore;
-            o.insertBefore2=oinsertBefore2;
-            
-            Object.defineProperty(o,'style',{
-                get:oGetstyle
-            });
-            Object.defineProperty(o,'offsetTop',{
-                get:oGetoffsetTop
-            });
-            Object.defineProperty(o,'offsetLeft',{
-                get:oGetoffsetLeft
-            });
-            Object.defineProperty(o,'offsetWidth',{
-                get:oGetoffsetWidth
-            });
-            Object.defineProperty(o,'offsetHeight',{
-                get:oGetoffsetHeight
-            });
-            /*
-            Object.defineProperty(o,'innerHTML',{
-                get:oGetinnerHTML,
-                set:oSetinnerHTML
-            });
-            
-            /*Object.defineProperty(o,'previousSibling',{
-                get:oGetpreviousSibling
-            });
-            Object.defineProperty(o,'nextSibling',{
-                get:oGetnextSibling
-            });*/
-            Object.defineProperty(o,'outerHTML',{
-                get:oGetouterHTML
-            });
-            Object.defineProperty(o,'attributes',{
-                get:oGetattributes
-            });
-            /*Object.defineProperty(o,'childNodes',{
-                get:oGetchildNodes
-            });
-            Object.defineProperty(o,'children',{
-                get:oGetchildren
-            });*/
-            
-            
-            o.toString=otoString;
-            o.addEventListener=oaddEventListener;
-            o.removeEventListener=oremoveEventListener;
         }
         return newVNode;
     })();
-    function UITeam(){}
+    /*function UITeam(){}
     UITeam.prototype=new function (){
         var t={
             push:function(name,group,check,missingCheck){
@@ -5948,7 +6340,7 @@ var turtle,$t,
             }
         }
         return t;
-    }
+    }*/
     function newKeyArrayObject(type){
         return newObject(type,newKeyArrayObject.prototype);
     }
@@ -5998,6 +6390,51 @@ var turtle,$t,
         script.setAttribute('compileuilist',arr.join(','));
         
         return script.outerHTML;
+    }
+    var vNodesToDOM;
+    function setParseMode(mode){
+        $VDOM=VDOM;
+        $VNode=newVNode;
+        if(mode===1){
+            /*
+             * 虚拟DOM
+             */
+            $DOM=VDOM;
+            $node=newVNode;
+            vNodesToDOM=function(vNodes){
+                var arr=[];
+                for(var i=0;i<vNodes.length;i++){
+                    arr.push(vNodes[i].toDOM());    
+                }
+                return arr;
+            }
+        }else{
+            /*
+             * DOM
+             */
+            $DOM=function(html){var elem=document.createElement('ui:dom');elem.innerHTML=html;return elem;}
+            $node=function(name,nodeType){
+                switch(nodeType){
+                    case 3:
+                        return document.createTextNode(name);
+                        break;
+                    case 8:
+                        return document.createComment(name);
+                        break;
+                    case 1:
+                    case undefined:
+                        return document.createElement(name);
+                        break;
+                    case 10:
+                        return null;
+                        break;
+                    default:
+                        return null;
+                }
+            };
+            Node.prototype.toDOM=Node.prototype.valueOf=function(){return this}
+            vNodesToDOM=function(nodes){return nodes}
+        }
     }
     function aftertInit(){
         var 
@@ -6410,8 +6847,8 @@ var turtle,$t,
         this.store=new Store();
         this.service=new Service();
         //this.body='';
-        this.uiTeam=new UITeam();
-        this.uiLink=new UILink();
+        //this.uiTeam=new UITeam();
+        //this.uiLink=new UILink();
         this.uiScope=new UIScope();
         this.xhr=new XHR();
         Object.defineProperty(this,"rootParts",{get:function(){return new RootParts();}});
@@ -6443,19 +6880,7 @@ var turtle,$t,
     turtle=$t=new Turtle();
     $rootScope=new RootScope();
     $client=new Client();
-    /*
-     * 虚拟DOM
-     */
-    // $DOM=VDOM;
-    // $node=newVNode;
-    
-    /*
-     * 正常DOM
-     */
-    if(typeof $DOM ==="undefined"){
-        $DOM=function(html){var elem=document.createElement('ui:dom');elem.innerHTML=html;return elem;}
-        $node=newNode;
-    }
+    setParseMode(1);
     
     aftertInit();
     

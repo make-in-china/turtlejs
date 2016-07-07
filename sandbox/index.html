@@ -52,11 +52,9 @@
     </xmp>
     
     <xmp ui='toolbar'>
-        <div p-main class="imdip2 ihbgray15 ifloat ipdip5 irdip10 ibblue15 ict2 ifgray15 ihfgray0 ishadowless pdip5 uof">
-            <set lazy append style="cursor: pointer;">
+        <div p-main class="imdip2 ihbgray15 ifloat ipdip5 irdip10 ibblue15 ict2 ifgray15 ihfgray0 ishadowless pdip5 uof ipointer">
             <!scope m|data:props.data.split(','),i:0>
             <!for ;i<data.length;i++><div><!= data[i]></div><!end>
-            </set>
         </div>
     </xmp>
     <xmp ui="procedureitem">
@@ -234,16 +232,16 @@
                 rect.top+=body.scrollTop;
                 $t.removeClass(elemRect,'uhide');
                 $t.parts.pib.last().show(name,ui.getParamsHelp(),rect,function(props,iHTML,useRect,useLeft,useTop,useWidth,useHeight){
-                    var div=document.createElement('div');
+                    var div=$node('div');
                     div.innerHTML=iHTML;
                     var outer=$t.slice.call(div.childNodes);
                     var outerElement=$t.slice.call(div.children);
                     if(elems.length>1){
-                        var pos=$t.getOffsetPos(begin.parentNode,panel);
+                        var pos=$t.getOffsetPos(begin.parentNode,panel.valueOf());
                         var render=$t.renderBefore;
                         $t.parts.procedure.last().push(name,sortPath,begin,outer,outerElement,props,'renderBefore');
                     }else{
-                        var pos=$t.getOffsetPos(begin,panel);
+                        var pos=$t.getOffsetPos(begin,panel.valueOf());
                         var render=$t.renderIn;
                         $t.parts.procedure.last().push(name,sortPath,begin,outer,outerElement,props,'renderIn');
                     }
@@ -327,52 +325,7 @@
             },2));
             
             ifrm.onload=function(){
-                // var vdom0=$t.newVNode('document');
-                // vdom0.isClose=true;
-                // eval($t.toVarString('baseuipath,tabname'));
-//                 
-                // "龟牌虚拟dom第一种写法，一个节点一个节点添加"
-                // with($t.keyWord){
-                    // vdom0(null,10)()
-                    // (html)
-                        // (head)
-                            // (link)._(rel,'stylesheet')(href,"../css/turtle.min.css")()
-                            // (link)._(rel,'stylesheet')(href,"../css/base.css")()
-                            // (link)._(rel,'stylesheet')(href,"../css/fonts/font-awesome.min.css")()
-                            // (script)._(src,'../js/turtle.js')(baseuipath,"{name:'ui',path:'../ui'};{name:'app',path:'../uiAPP'}")()
-                                // .text2(function(/* 
-                                    // var 
-                                        // a=1,
-                                        // b=2,
-                                        // c=3;
-                                    // debugger;*/){})
-                            // ()
-                            // ('注释',8)()
-                        // ()
-                        // (body)
-                            // (xmp)
-                                // ('ui:tabbox')
-                                    // (div)._(tabname,'AAA')()
-                                        // ('AAA',3)()
-                                    // ()
-                                    // (div)._(tabname,'BBB')()
-                                        // ('BBB',3)()
-                                    // ()
-                                // ()
-                            // ()
-                        // ()
-                    // ();
-                // }
-                // debugger;
-                // "虚拟dom第二种写法，从字符串生成，此例子数据源为第1个写法的innerHTML"
-                // var vdom1=new $t.VDOM(vdom0.innerHTML);
-//                 
-                // "虚拟dom第三种写法，设置节点innerHTML，此例子数据源为第2个写法的的innerHTML"
-                // var vdom2=$t.newVNode('document');
-                // vdom2.innerHTML=vdom1.innerHTML;
-//                 
-                // ifrm.contentDocument.write(vdom2.innerHTML);
-                // ifrm.contentDocument.close();
+                
             }
             
         </script>
@@ -381,29 +334,29 @@
         <!var toolName:'',sortPath:'',toolicon:'',desc:'',rect:{left:0,top:0,width:0,height:0}>
         <app:content key="Sandbox">
             <ui:button skin="fround" text='沙盘配置：官方组件'></ui:button>
-            <input ref="highlight" type="checkbox" />鼠标高亮<span class="fgray8">（绘制组件时按住ctrl可多次绘制）</span>
+            <input ref="highlight" type="checkbox">鼠标高亮<span class="fgray8">（绘制组件时按住ctrl可多次绘制）</span>
             <ui:toolbar p-name="drawtoolbar" data="审查节点,审查组件,审查属性,审查API,前移,后移,上移,复制,剪切,粘贴,删除"></ui:toolbar>
-
             <set style="max-width:100%;"></set>
-                <ui:splitbox height="768px" minwidth="150">
-                    <div style="width:150px;">
-                        <ui:tabbox lazy p-name="tool1">
-                            <div tabname="组件" tabkey="part">
-                                <div class="mdip5 fz14 hem4 shadowless rem1">
-                                    <div show="toolName=''" class="ipdip15 ipointer ihbgray15 ihfgray0 fz14 uof irem1 ibblue15 ict2 imdip5 ifloat ifgray15 ishadowless iwem2 ilhem1">
-                                        <div>新建组件</div>
-                                        <div>编辑组件</div>
-                                    </div>
-                                    <div show="toolName!=''" class="pdipl10 pdip5"
-                                        ><img : :src="toolicon" class="fz18 wem1 hem1 bblue12 rdip5 pdip2"
-                                        /><span style="vertical-align: top;"><!- sortPath>:<!- toolName></span><span style="display:inline-block;cursor: pointer;font-size:16px;" class="abs right5 mdipl5 wem1 hem1 ct2 lhem1 pdip2 rem1 bred12 fgray15 hbred15">x
-                                        <script type="on">click:function(){  
-                                        $t.ui.toolbtn.service.clearCheck();                                          
-                                    }</script></span><div><!- desc></div></div>
+            <ui:splitbox height="768px" minwidth="150">
+                <div style="width:150px;">
+                    <ui:tabbox lazy p-name="tool1">
+                        <div tabname="组件" tabkey="part">
+                            <div class="mdip5 fz14 hem4 shadowless rem1">
+                                <div show="toolName=''" class="ipdip15 ipointer ihbgray15 ihfgray0 fz14 uof irem1 ibblue15 ict2 imdip5 ifloat ifgray15 ishadowless iwem2 ilhem1">
+                                    <div>新建组件</div>
+                                    <div>编辑组件</div>
                                 </div>
-                                <!async>
-                                <!! $rootScope.partsInfo=$t.require('partsInfo.js','partsInfo');>
-                                <!var i:0,j:0>
+                                <div show="toolName!=''" class="pdipl10 pdip5"
+                                ><img : :src="toolicon" class="fz18 wem1 hem1 bblue12 rdip5 pdip2"
+                                ><span style="vertical-align: top;"><!- sortPath>:<!- toolName></span
+                                ><span style="display:inline-block;cursor: pointer;font-size:16px;" class="abs right5 mdipl5 wem1 hem1 ct2 lhem1 pdip2 rem1 bred12 fgray15 hbred15">x
+                                <script type="on">click:function(){  
+                                    $t.ui.toolbtn.service.clearCheck();                                          
+                                }</script></span><div><!- desc></div></div>
+                            </div>
+                            <!async>
+                            <!! $rootScope.partsInfo=$t.require('partsInfo.js','partsInfo');>
+                            <!var i:0,j:0>
                                 <!for ;i<partsInfo.length;i++>
                                     <ui:growpanel extend="1" : title:="partsInfo[i].name">
                                         <ui:vctrl lazy minwidth="35">
@@ -413,40 +366,35 @@
                                         </ui:vctrl>
                                     </ui:growpanel>
                                 <!end>
-                                <!! part.emitResize()>
-                                <!end>
-                            </div>
-                            <div tabname="模板"></div>
-                            <div tabname="标签">
-                            </div>
-                        </ui:tabbox>
-                    </div>
-                    <div>
-                        <ui:tabbox lazy>
-                            <set lazy canclose tabname='index.html'>
-                                <ui:tabbox lazy>
-                                    <ui:disignbox></ui:disignbox>
-                                    <div tabname="DOM树">DOM树</div>
-                                    <ui:source></ui:source>
-                                    <ui:procedure p-name="procedure"></ui:procedure>
-                                </ui:tabbox>
-                            </set>
-                            <set lazy canclose tabname='content.html'>
-                                <ui:tabbox lazy>
-                                </ui:tabbox>
-                            </set>
-                        </ui:tabbox>
-                    </div>
-                    
-                    <div style="width:200px;" noresize>
-                        <ui:tabbox lazy>
-                            <div tabname="标签属性">
-                                
-                            </div>
-                        </ui:tabbox>
-                        <app:paraminputbox p-name="pib"></app:paraminputbox>
-                    </div>
-                </ui:splitbox>
+                            <!! part.emitResize()>
+                            <!end>
+                        </div>
+                        <div tabname="模板">123</div>
+                        <div tabname="标签">456</div>
+                    </ui:tabbox>
+                </div>
+                <div>
+                    <ui:tabbox lazy>
+                        <set lazy canclose tabname='index.html'>
+                            <ui:tabbox lazy>
+                                <ui:disignbox></ui:disignbox>
+                                <div tabname="DOM树">DOM树</div>
+                                <ui:source></ui:source>
+                                <ui:procedure p-name="procedure"></ui:procedure>
+                            </ui:tabbox>
+                        </set>
+                    </ui:tabbox>
+                </div>
+                
+                <div style="width:200px;" noresize>
+                    <ui:tabbox lazy>
+                        <div tabname="标签属性">
+                            
+                        </div>
+                    </ui:tabbox>
+                    <app:paraminputbox p-name="pib"></app:paraminputbox>
+                </div>
+            </ui:splitbox>
         </app:content>
         <ui:droprect p-name="droprect"></ui:droprect>
     </xmp>

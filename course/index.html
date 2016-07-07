@@ -282,9 +282,9 @@
                     有返回的语法为：<br>= xxx<br>
                     注:xxx表示任意js语句;<br>
                     <ui:io><title>
-                        <!scope run|v:1>
-                        <div>无返回的运算"<!! v++>"</div>
-                        <div>有返回的运算"<!= v>"</div>
+                        <!var v:1>
+                        <div>无返回的运算（" <!! v++> "）</div>
+                        <div>有返回的运算（" <!= v> "）</div>
                     </title></ui:io>
                 </ui:ahchorpanel>
                 
@@ -293,14 +293,13 @@
                 标签绑定（双向绑定）的语法为：<br>
                     bind="scope变量名"<br>
                     <ui:io><title>
-                        <!var bind2:"我们绑定啦">
-                        <input bind="bind2"/>
-                        <br/>
-                        <textarea bind="bind2"></textarea>
+                        <!var bind:"我们绑定啦">
+                        <input bind="bind"><input bind="bind">
+                        <br>
+                        <textarea bind="bind"></textarea>
                     </title></ui:io>
                 </ui:ahchorpanel>
                 
-                <!-- 标签运算和绑定-->
                 <ui:ahchorpanel title="标签运算和绑定">
                     标签运算的语法为：<br>&lt;div :>启动运算（不写冒号则表示不检测标签内的运算）<br>
                     &lt;div :="xxx">启动并运算
@@ -314,14 +313,14 @@
                         "node.onclick=function(){alert('值：'+data)}">
                         <br>点我</a>冒号自身，一次性运行<br><br>
                         
-                        <input : value:="data"/>
+                        <input : value:="data">
                         <br>运算xxx并返回值到属性名<br><br>
                         
-                        <input : :value="data"/>编辑我
+                        <input : :value="data">编辑我
                         <br>运算xxx并返回值到属性名，数据发生变化时，
                         此属性同时更新（单向绑定）<br><br>
                         
-                        <input : bind="data"/>编辑我
+                        <input : bind="data">编辑我
                         <br>绑定input的value为变量值，
                         并在input的oninput事件通知变量更新
                     </title></ui:io>
@@ -339,10 +338,12 @@
                     
                     <ui:io><title>
                         <!var color:"#00f">
-                        <input bind="color"/>
-                        <div : :style.background-color="color"
-                        style="display:inline-block;">
-                        背景色绑定为color变量的值</div>
+                        <input bind="color" : :style.border-color="color"
+                        style="display:inline-block;
+                        border-width:3px;
+                        padding:5px;
+                        outline-width:0;"><br>
+                        边框颜色绑定为color变量的值
                     </title></ui:io>
                 </ui:ahchorpanel>
                 
@@ -354,9 +355,9 @@
                     注:xxx表示任意js语句,构造为function(v){return eval('('+xxx+')')}形式<br>
                     <ui:io><title>
                         <!var vxv:2>
-                        <input bind="vxv"/>
-                        <br/><!- vxv>
-                        <br/><!- vxv|v+"的3次方为:"+v*v*v>
+                        <input bind="vxv">
+                        <br><!- vxv>
+                        <br><!- vxv|v+"的3次方为:"+v*v*v>
                     </title></ui:io>
                 </ui:ahchorpanel>
                 
@@ -374,26 +375,22 @@
                             </div>
                           </div>
                         </style></title><title>
-                        <!scope x|vvvv:"turtle绑定测试",vv:0,vvv:0>
+                        <!var vvvv:"turtle绑定测试",vv:0,vvv:0>
                         <div>
                             <div class="iub">
                               <ui:tl name="checkbox属性 “checked” " way=1>
-                                <set lazy bind="vvvv">
-                                  <input type="checkbox" bind="vv" : :checked="vvv"/>
-                                  双向A+双向B
+                                <set lazy bind="vvvv"><!--多次执行bind的写法-->
+                                  <input type="checkbox" bind="vv" : :checked="vvv">双向A+双向B
                                 </set>
                               </ui:tl>
                               <ui:tl name="checkbox内置" way=2>
-                                <input type="checkbox" bind="vvvv" : :checked="vvv"/>
-                                双向A
+                                <input type="checkbox" bind="vvvv" : :checked="vvv">双向A
                               </ui:tl>
                               <ui:tl name="checkbox属性 “checked” " way=1>
-                                <input type="checkbox" : :checked="vvvv"/>
-                                单向A
+                                <input type="checkbox" : :checked="vvvv">单向A
                               </ui:tl>
                               <ui:tl name="checkbox属性 “checked” " way=2>
-                                <input type="checkbox" bind="vv" : :checked="vvv"/>
-                                双向B
+                                <input type="checkbox" bind="vv" : :checked="vvv">双向B
                               </ui:tl>
                               <ui:tl name="按钮属性 “disabled” " way=1>
                                 <button : :disabled="vvvv">
@@ -409,7 +406,7 @@
                                 </div>
                               </ui:tl>
                               <ui:tl name="input内置" way=2>
-                                <input bind="vvvv"/>
+                                <input bind="vvvv">
                                 <!- vvvv|v.length==0?'不能为空':''>
                               </ui:tl>
                               <ui:tl name="textArea内置" way=2>
@@ -473,13 +470,13 @@
                             <div><div><!content></div></div>
                         </style>
                                             </title><title>
-                        <set append style="background-image: url(123/一二三/xx.png);background-color:#00f ; border:1px #FFFFFF solid;">
+                        <set append style="border:1px #00f solid;">
                             <set lazy style="display:block;">
                                 <ui:testset>1</ui:testset>
                                 可获得颜色，display:block;没被替换
                             </set>
                         </set>
-                        <set style="background-color:#00f ; border:1px #FFFFFF solid;">
+                        <set style="border:1px #00f solid;">
                             <set lazy style="display:block;">
                                 <ui:testset>1</ui:testset>
                                 可获得颜色，display:block;被替换
@@ -501,7 +498,7 @@
                     <ui:io><title>
                         <get name="get">我会在这里出现</get>
                         <set link="get">
-                            <a></a>
+                            <textarea style="color:#f00;"></textarea>
                         </set>
                     </title></ui:io>
                     <b>3.</b>.不包围任何DOM元素时：<br>
@@ -517,7 +514,7 @@
                         </style>
                                             </title><title>
                         <ui:testset>
-                        <set style="background-color:#00f;border:1px #FFFFFF solid;"></set>
+                        <set style="border:1px #00f solid;"></set>
                         从内层往上层加特效
                         </ui:testset>
                     </title></ui:io>
@@ -725,7 +722,6 @@
                                                     c=3;
                                                 debugger;*/){})
                                         ()
-                                        ('注释',8)()
                                     ()
                                     (body)
                                         (xmp)
@@ -743,21 +739,27 @@
                             }
                             ifrm[0].onload=function(){
                                 "龟牌虚拟dom第一种写法，一个节点一个节点添加（如上）"
-                                ifrm[0].contentDocument.write(vdom0.innerHTML);
-                                ifrm[0].contentDocument.close();
+                                with(ifrm[0].valueOf()){
+                                    contentDocument.write(vdom0.innerHTML);
+                                    contentDocument.close();   
+                                }
                             }
                             ifrm[1].onload=function(){
                                 "虚拟dom第二种写法，从字符串生成，此例子数据源为第1个写法的innerHTML"
                                 var vdom1=new $t.VDOM(vdom0.innerHTML);
-                                ifrm[1].contentDocument.write(vdom1.innerHTML);
-                                ifrm[1].contentDocument.close();
+                                with(ifrm[1].valueOf()){
+                                    contentDocument.write(vdom1.innerHTML);
+                                    contentDocument.close();   
+                                }
                             }
                             ifrm[2].onload=function(){
                                 "虚拟dom第三种写法，设置节点innerHTML，此例子数据源为第2个写法的的innerHTML"
                                 var vdom2=$t.newVNode('document');
                                 vdom2.innerHTML=vdom0.innerHTML;
-                                ifrm[2].contentDocument.write(vdom2.innerHTML);
-                                ifrm[2].contentDocument.close();
+                                with(ifrm[2].valueOf()){
+                                    contentDocument.write(vdom2.innerHTML);
+                                    contentDocument.close();   
+                                }
                             }
                         </script>
                     </title></ui:io>
