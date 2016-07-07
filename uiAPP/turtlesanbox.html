@@ -9,17 +9,20 @@
         var ret=part.$ret;
         part.ready=new $t.ReadyObject();
         ret.onload=function(){
-            var scriptInject=ret.contentDocument.createElement("script");
+            ret=ret.valueOf();
+            var dom=ret.contentDocument;
+            var win=ret.contentWindow;
+            var scriptInject=dom.createElement("script");
             scriptInject.setAttribute("src","{turtlejspath}");
             scriptInject.setAttribute("baseuipath",$t.config.baseUIPath);
             scriptInject.innerHTML=ret.childNodes[0].data;
-            ret.contentDocument.body.appendChild(scriptInject);
+            dom.body.appendChild(scriptInject);
             part.runHTML=function(html){
-                ret.contentWindow.pushUI(html);
-                ret.style.height=ret.contentDocument.documentElement.scrollHeight+30+"px";
+                win.pushUI(html);
+                ret.style.height=dom.documentElement.scrollHeight+30+"px";
             }
             var tid=setInterval(function(){
-                if(ret.contentWindow.hasOwnProperty("$t")){
+                if(win.hasOwnProperty("$t")){
                     clearInterval(tid);
                     part.ready.isReady=true;    
                 }    

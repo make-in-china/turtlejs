@@ -2,7 +2,7 @@
     <!scope m|i:0,datas:props.data>
     <!for ;i<props.data.length;i++>
     <div>
-        <span : style.color:="props.data[i].necessary?'#f00':''" class="lhem1"><!= props.data[i].name+(props.data[i].necessary?'*':'')></span>：<br><input : bind:="'datas.'+i+'.value'"/></div>
+        <span : style.color:="props.data[i].necessary?'#f00':''" class="lhem1"><!= props.data[i].name+(props.data[i].necessary?'*':'')></span>：<br><input : bind:="'datas.'+i+'.value'">
     </div>
     <!end>
     

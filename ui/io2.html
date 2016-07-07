@@ -1,14 +1,14 @@
 <xmp>
-    <a ref="try" href="javascript:;">试一试<br></a>
-    <div ref="runbox" class="uhide">
-        <textarea ref="script" class="fz18 w100 hem10 rdip5 pdip5" style="outline-width:0; resize:none;box-sizing:border-box;"></textarea>
-        <a ref="run" href="javascript:;">运行：</a>
+    <a p-ref="try" href="javascript:;">试一试<br></a>
+    <div p-ref="runbox" class="uhide">
+        <textarea p-ref="script" class="fz18 w100 hem10 rdip5 pdip5" style="outline-width:0; resize:none;box-sizing:border-box;"></textarea>
+        <a p-ref="run" href="javascript:;">运行：</a>
     </div>
     <script>
-        var btnTry=$t.refs.try.pop();/*弹出注册*/
-        var script=$t.refs.script.pop();/*弹出注册*/
-        var run=$t.refs.run.pop();/*弹出注册*/
-        var runbox=$t.refs.runbox.pop();/*弹出注册*/
+        var btnTry=part.$try;
+        var script=part.$script;
+        var run=part.$run;
+        var runbox=part.$runbox;
         var isRun={run!true}.bool;
         var isTry={try!true}.bool;
         $t.renderBefore("highlightcode",'ui',btnTry,outerElement);

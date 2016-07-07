@@ -1,15 +1,13 @@
 <xmp>
-    <set lazy append style="box-sizing:border-box;" class="w100">
-        <ui:growpanel title="Turtle控制台">
-            <div class="mdip2">
-                <textarea p-ref="script" class="fz18 bgray2 w100 hem10 fgray15 bdw0 rdip5 pdip5" style="outline-width:0; resize:none;box-sizing:border-box;"><!= "我是控制台"></textarea>
-                <br/>
-                <a p-ref="run" href="javascript:;">运行 &gt;:_</a>
-                <br/>
-                <div p-ref="ret" class="rdip5 bgray2 fgray15 fz18 bgray2 hem10 fgray15 bdw0"></div>
-            </div>
-        </ui:growpanel>
-    </set>
+    <ui:growpanel title="Turtle控制台" style="box-sizing:border-box;" class="w100">
+        <div class="mdip2">
+            <textarea p-ref="script" class="fz18 bgray2 w100 hem10 fgray15 bdw0 rdip5 pdip5" style="outline-width:0; resize:none;box-sizing:border-box;"><!= "我是控制台"></textarea>
+            <br/>
+            <a p-ref="run" href="javascript:;">运行 &gt;:_</a>
+            <br/>
+            <div p-ref="ret" class="rdip5 bgray2 fgray15 fz18 bgray2 hem10 fgray15 bdw0"></div>
+        </div>
+    </ui:growpanel>
     <script>
         part.max=function(){
             part.max=part.child[0].max;

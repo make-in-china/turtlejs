@@ -1,6 +1,6 @@
 
 <xmp ui="highlightcode.style">
-    <style :='document.head.appendChild(node)'>
+    <style :='document.head.appendChild(node.toDOM())'>
         /**
          * SyntaxHighlighter
          * http://alexgorbatchev.com/SyntaxHighlighter
@@ -388,25 +388,26 @@
             var t=this;
             $t.renderBefore("highlightcode.style",part.template.sortPath,t.childNodes[0],outer,outerElement);
         }
-        var code;
-        for(var i=outer.length-1;i>-1;i--){
-            code=$t.refs.code.pop();
-            if(outer[i].nodeName==='TITLE'){
-                code.appendChild(document.createTextNode(outer[i].childNodes[0].data));    
-            }else{
-                code.appendChild(outer[i]);
-            }
-            
-        }
         if(outer.length>0){
-            $t.service.SyntaxHighlighter.highlight(code);
+            var code;
+            for(var i=outer.length-1;i>-1;i--){
+                code=$t.refs.code.pop();
+                if(outer[i].nodeName==='TITLE'){
+                    code.innerHTML=$t.decodeHTML(outer[i].childNodes[0].data);    
+                }else{
+                    code.appendChild(outer[i]);
+                }
+            }
+            setTimeout(function(){
+                $t.service.SyntaxHighlighter.highlight(code.valueOf());    
+            },0);
         }
-        part.highlight=function(str){
-            $t.removeBlockBetween(part.begin,part.end);
-            $t.renderBefore('highlightcodebox',part.template.sortPath,part.end);
-            var code=$t.refs.code.pop();
-            code.appendChild(document.createTextNode(str));
-            $t.service.SyntaxHighlighter.highlight(code);
-        }
+        // part.highlight=function(str){
+            // $t.removeBlockBetween(part.begin,part.end);
+            // $t.renderBefore('highlightcodebox',part.template.sortPath,part.end);
+            // var code=$t.refs.code.pop();
+            // code.innerText=str;
+            // $t.service.SyntaxHighlighter.highlight(code.valueOf());
+        // }
     </script>
 </xmp>

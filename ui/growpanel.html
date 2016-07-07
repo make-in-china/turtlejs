@@ -1,19 +1,15 @@
 <xmp extends='base'>
     <div p-main p-ref="panel" class="shadowless pdip5 mdip5 rdip5">
         <div class="ub ct">
-            <div class="ub-f1 fb {%switch({align!}.only(0,1,2;0)){case 2:'ct';break;case 1:'right';}%} pdip5">{title!}</div>
-            <set lazy append class="fz24" p-ref="sub">
-                <ui:button skin="sub"></ui:button>
-            </set>
-            <set lazy append class="fz24 uhide" p-ref="add">
-                <ui:button skin="add"></ui:button>
-            </set>
+            <div class="ub-f1 fb{%switch({align!}.only(0,1,2;0)){case 2:' ct';break;case 1:' right';break;default:''}%} pdip5">{title!}</div>
+            <ui:button skin="sub" class="fz24" ref="sub"></ui:button>
+            <ui:button skin="add" class="fz24 uhide" ref="add"></ui:button>
         </div>
         <div class="ub-f1 zidx2" p-ref="content"><!content></div>
         <script>
             var panel=part.$panel;
-            var add=part.$add;
-            var sub=part.$sub;
+            var add=$t.refs.add.pop();
+            var sub=$t.refs.sub.pop();
             var content=part.$content;
             var isInline={inline!false}.bool();
             if(isInline){

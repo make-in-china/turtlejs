@@ -1,14 +1,18 @@
 <xmp extends='base'>
     <div p-main class="uof iborderbox" style="width:{width!100%};height:{height!100%};background-color:{bgcolor!}.color;"></div>
-    <get name="pt"><div style="z-index:2;" class="abs borderbox"></div></get>
+    <div :="$t.removeNode(node)" p-ref="pt" style="z-index:2;" class="abs borderbox"></div>
     <script>
         var size="{size!}.only(width,height;width)";
-        var content=part.partMain;
         var minWidth={minwidth!}.intmin(4);
-        var pt=$t.store.pt.children[0];
-        delete $t.store.pt;
         var width={width!50}.string;
         var height={height!50}.string;
+        part.$.init(part,props,size,outerElement,minWidth,width,height);
+    </script>
+</xmp>
+<script xmp ui="splitbox" service="init">
+    function(part,props,size,outerElement,minWidth,width,height){
+        var content=part.partMain;
+        var pt=part.$pt;
         var style;
         var clonePt;
         if(size==='width'){
@@ -136,5 +140,5 @@
         $t.readyByRenderDocument.on(function(){
             setContent(outerElement);    
         });
-    </script>
-</xmp>
+    }
+</script>

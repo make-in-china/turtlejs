@@ -2,13 +2,13 @@
     <div p-main class="pointer animated fadeIn ct click2 pdipt5 pdipb5 rdip30 bfrdip30 " style="background-image:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#29c3e9), to(#09a3c9));-webkit-box-shadow: inset 0 0 0.25em #000,0 0 .25em #eee;box-shadow:inset 0 0 0.25em #000,0 0 .25em #eee;">{text!}<!content></div></xmp>
 
 <xmp ui="skin.btn.close" extends='base'>
-    <div p-main class="pointer rem1 bfrem1 click2 fa ct2 lhem1 wem1 hem1 bred15 fgray15">&#xf00d;<!content></div></xmp>
+    <div p-main class="pointer rem1 bfrem1 click2 fa ct2 lhem1 wem1 hem1 bred15 fgray15">&#xf00d;</div></xmp>
     
 <xmp ui="skin.btn.sub" extends='base'>
-    <div p-main class="pointer fa ct wem1 hem1">&#xf068;<!content></div></xmp>
+    <div p-main class="pointer fa ct wem1 hem1">&#xf068;</div></xmp>
     
 <xmp ui="skin.btn.add" extends='base'>
-    <div p-main class="pointer fa ct wem1 hem1">&#xf067;<!content></div></xmp>
+    <div p-main class="pointer fa ct wem1 hem1">&#xf067;</div></xmp>
     
 <xmp ui="skinbutton"></xmp>
 
@@ -19,7 +19,7 @@
         if(skin){
             $t.renderIn('skinbutton',part.template.sortPath,that,outer,outerElement,part.props,part,'','skin.btn.'+skin);
         }else{
-            var elem=document.createElement('div');
+            var elem=$node('div');
             $t.appendNodes(elem,outer);
             this.appendChild(elem);
         }

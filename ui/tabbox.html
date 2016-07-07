@@ -26,7 +26,8 @@
                 tabItem,
                 item,
                 elemTabItem,
-                elemCount;
+                elemCount,
+                elemClose;
                 
             if(!name){
                 return ;
@@ -35,13 +36,15 @@
                 key=name;
             }
             if(!elem){
-                elem=document.createElement('div');
+                elem=$node('div');
                 elem.setAttribute('tabname',name);
             }
             elemTabItem=tabsItem.cloneNode();
             elemTabItem.innerHTML=name;
             if(canClose){
-                elemTabItem.appendChild(tabsItemClose.cloneNode()).innerHTML='x';
+                var elemClose=tabsItemClose.cloneNode();
+                elemClose.innerHTML='x';
+                elemTabItem.appendChild(elemClose);
             }
             tabs.appendChild(elemTabItem);
             content.appendChild(elem);
@@ -56,7 +59,8 @@
             if(canCount){
                 elemCount=tabsItemCount.cloneNode();
                 elemTabItem.appendChild(elemCount);
-                $t.bindNode(elemCount,tabItem,'count');
+                elemCount.appendChild($node("0",3));
+                $t.bindNode(elemCount.childNodes[0],tabItem,'count');
             }
             tabItems.push(tabItem);
             tabItems[key]=tabItem;
