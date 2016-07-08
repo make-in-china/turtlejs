@@ -353,10 +353,14 @@
                     - 名字|xxx<br>
                     注:xxx表示任意js语句,构造为function(v){return eval('('+xxx+')')}形式<br>
                     <ui:io><title>
-                        <!var vxv:2>
-                        <input bind="vxv">
-                        <br><!- vxv>
-                        <br><!- vxv|v+"的3次方为:"+v*v*v>
+                        <!var v1:1,v2:2,v3:3,v4:0>
+                        <input bind="v1"><br>
+                        <input bind="v2"><br>
+                        <input bind="v3"><br>
+                        <!- v1|v4=v1*v2*v3,v> x 
+                        <!- v2|v4=v1*v2*v3,v> x 
+                        <!- v3|v4=v1*v2*v3,v> = 
+                        <!- v4|v>
                     </title></ui:io>
                 </ui:ahchorpanel>
                 
