@@ -3576,7 +3576,7 @@ var turtle,$t,
                 var elem;
                 var dom=document.documentElement;
                 for(var i=0;i<cs.length;i++){
-                    elem=cs[i];
+                    elem=cs[i].valueOf();
                     if(elem.nodeType===1){
                         var l=0,t=0;
                         var elem2=elem;
@@ -3879,7 +3879,7 @@ var turtle,$t,
         //var _uiMain=document.createElement('ui:parseUITemplate');
         //_uiMain.innerHTML=sHTML;
         var 
-            vDOM=new $DOM(sHTML),
+            vDOM=$DOM(sHTML),
             cs=vDOM.children,
             i=0,
             node,
@@ -4018,7 +4018,7 @@ var turtle,$t,
         return s;
     }
     function parseHTML(sHTML){
-        var vDOM=new $DOM(sHTML);
+        var vDOM=$DOM(sHTML);
         initHTML(vDOM.childNodes);
         return takeChildNodes(vDOM.toDOM());
     }
@@ -4331,6 +4331,20 @@ var turtle,$t,
         s=s.substring(6,s.length-1);
         return s;
     }
+    function renderTemplate(tp){
+        var sHTML=getTemplate(tp);
+        var vDOM=$DOM(sHTML);
+        initHTML(vDOM.childNodes);
+        
+        if(isFunction(vDOM)){
+            var p=tp.parentNode;
+            replaceNodeByNodes(tp,takeChildNodes(vDOM.toDOM()));
+            vDOM.__domNode__=p;
+            return;   
+        }
+        replaceNodeByNodes(tp,takeChildNodes(vDOM.toDOM()));
+        //vDOM.innerHTML='';
+    }
     function renderDocument(noAppend){
         renderDocument.beginTime=new Date();
         var 
@@ -4347,8 +4361,7 @@ var turtle,$t,
         }
         /*处理逻辑模板*/
         for(i=0;i<templateXMP.length;i++){
-            var ret=parseHTML(getTemplate(templateXMP[i]));
-            replaceNodeByNodes(templateXMP[i],ret);
+            renderTemplate(templateXMP[i]);
         }
         
         replaceCls();
@@ -6202,12 +6215,15 @@ var turtle,$t,
             return function(node){
                 if(node.parentNode){
                     if(node.__domNode__){
-                        try{
-                            this.__domNode__.removeChild.call(this.__domNode__,node.__domNode__);
-                        }catch(e){
+                        //try{
+                            //
+                        this.__domNode__.removeChild(node.__domNode__);
+                        //}catch(e){
                             
-                        }     
+                        //}
                     }
+                }else{
+                    debugger;
                 }
                 return this.__proto__.removeChild.call(this,node);
             }
@@ -6834,6 +6850,7 @@ var turtle,$t,
         this.parseHTML=parseHTML;
         this.parseXMP=parseXMP;
         this.renderDocument=renderDocument;
+        this.renderTemplate=renderTemplate;
         // this.compileUI=compileUI;
         this.compileDocument=compileDocument;
         this.replaceCls=replaceCls;
