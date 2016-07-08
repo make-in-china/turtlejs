@@ -72,7 +72,8 @@
                 }); 
             });
         };
-        swiper=$t.require(part.template.path+"/swiper-3.3.1.min.js","Swiper");
+        var path=part.template.path+'/'+part.template.name+'.res/';
+        swiper=$t.require(path+"swiper-3.3.1.min.js","Swiper");
         ready.isReady=true;
         /*$t.includeJSFiles("js/swiper-3.3.1.min.js",function(){
             swiper=Swiper;

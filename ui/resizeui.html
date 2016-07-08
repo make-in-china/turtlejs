@@ -55,21 +55,22 @@
                 });
                 break;
             default:
-                style.width='4px';
-                style.height='4px';
+                style.width='10px';
+                style.height='10px';
                 style.cursor='nwse-resize';
-                style.backgroundColor="#000";
+                //style.backgroundColor="#000";
+                style.backgroundImage='url('+part.template.path+'/resizeui.res/size.png)';
                 part.onresize=function(){
-                    style.left=content.offsetWidth-4+'px';
-                    style.top=content.offsetHeight-4+'px';
+                    style.left=content.offsetWidth-14+'px';
+                    style.top=content.offsetHeight-14+'px';
                 }
                 $t.dropMove(pt,pt,0,0,function(){
                     var style=content.style;
-                    style.width=pt.offsetLeft+4+'px';
-                    style.height=pt.offsetTop+4+'px';
+                    style.width=pt.offsetLeft+14+'px';
+                    style.height=pt.offsetTop+14+'px';
                     var style=panel.style;
-                    style.width=pt.offsetLeft+4+'px';
-                    style.height=pt.offsetTop+4+'px';
+                    style.width=pt.offsetLeft+14+'px';
+                    style.height=pt.offsetTop+14+'px';
                     part.emitResize();
                 });
         }

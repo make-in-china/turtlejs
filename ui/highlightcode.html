@@ -370,7 +370,8 @@
         }
     </style>
     <script>
-        $t.service.SyntaxHighlighter=$t.require([part.template.path+"/shCore.js",part.template.path+"/shBrushXml.js"],"SyntaxHighlighter");
+        var path=part.template.path+'/'+part.template.name+'.res/';
+        $t.service.SyntaxHighlighter=$t.require([path+'shCore.js',path+'shBrushXml.js'],"SyntaxHighlighter");
     </script>
 </xmp>
 <xmp ui="highlightcodebox">
