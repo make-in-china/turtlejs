@@ -143,53 +143,54 @@ function decamelize(str:string){
         return '-'+match.toLowerCase();
     }); 
 }
-class HashObject{
+class HashObject<T>{
+    [index:string]:T|T[]|Fun;
     clean(){
         for(var i in this){
             delete this[i];
         }
     }
 }
-class KeyArrayObject extends HashObject{
-    [index:string]:ArrayEx<any>|Fun;
-    push(key:string,value:any){
+class KeyArrayObject<T> extends HashObject<T>{
+    [index:string]:ArrayEx<T>|Fun;
+    push(key:string,value:T){
         if(isArray(key)){
             for(var i=0;i<key.length;i++){
                 if(!this.hasOwnProperty(key[i])){
-                    this[key[i]]=new ArrayEx;
+                    this[key[i]]=new ArrayEx<T>();
                 }
-                (<ArrayEx<any>>this[key[i]]).push(value);
+                (<ArrayEx<T>>this[key[i]]).push(value);
             }
         }else{
             if(!this.hasOwnProperty(key)){
-                this[key]=new ArrayEx;
+                this[key]=new ArrayEx<T>();
             }
-            (<ArrayEx<any>>this[key]).push(value);
+            (<ArrayEx<T>>this[key]).push(value);
         }
     }
-    getKeyArray():ArrayEx<any>{
-        let arr:ArrayEx<any>=new ArrayEx;
+    getKeyArray():ArrayEx<ArrayEx<T>>{
+        let arr:ArrayEx<ArrayEx<T>>=new ArrayEx<ArrayEx<T>>();
         for(var i in this){
             if(!this.hasOwnProperty(i)){
-                arr.push(i);
+                arr.push(<ArrayEx<T>>this[i]);
             }
         }
         return arr;
     }
     pop(key:string){
-        var keyObject:ArrayEx<any>=<ArrayEx<any>>this[key];
+        var keyObject:ArrayEx<T>=<ArrayEx<T>>this[key];
         if(keyObject){
             return keyObject.pop();
         }
     }
 }
-function newKeyArrayObject(type:string):KeyArrayObject{
-    return newObject(type,KeyArrayObject);
+function newKeyArrayObject<T>(type:string):KeyArrayObject<T>{
+    return create(type,KeyArrayObject);
 }
-function newHashObject(type:string):HashObject{
-    return newObject(type,HashObject);
+function newHashObject(type:string):HashObject<any>{
+    return create(type,HashObject);
 }
-function newObject(type:string,tsClass?:Constructor):any{
+function create(type:string,tsClass?:Constructor):any{
     let s='let '+type+'=function(){};';
     if(isObject((tsClass).prototype)){
         s+=type+'.prototype=proto;';
@@ -199,7 +200,7 @@ function newObject(type:string,tsClass?:Constructor):any{
 }
 let newArrayObject=(function(){
     return function(type:string):ArrayEx<any>{
-        return newObject(type,ArrayEx);
+        return create(type,ArrayEx);
     }
 }());
 
@@ -332,7 +333,7 @@ function camelCase(s){
         return s1.toUpperCase();
     })
 }
-function insertNodesBefore(node:INode,nodes:Array<INode>){
+function insertNodesBefore(node:INode,nodes:INodeArray){
     let parent=node.parentNode;
     if(parent==null){
         return;
@@ -349,7 +350,7 @@ function removeNode(node:INode){
         return null;
     }
 }
-function replaceNodeByNodes(node:INode,nodes:Array<INode>){
+function replaceNodeByNodes(node:INode,nodes:INodeArray){
     insertNodesBefore(node,nodes)
     removeNode(node);
 }
@@ -393,13 +394,13 @@ function replaceNodeByNode(node:INode,node2:INode){
     insertNode(node,node2);
     parent.removeChild(node);
 }
-function appendNodes(nodes:Array<INode>,parent:INode){
-    let c:Array<INode>=slice.call(nodes);
+function appendNodes(nodes:INodeArray,parent:INode){
+    let c:INodeArray=slice.call(nodes);
     for(let i=0;i<c.length;i++){
         parent.appendChild(c[i]);
     }
 }
-function takeChildNodes(node:INode):Array<INode>{
+function takeChildNodes(node:INode):INodeArray{
     let c=node.childNodes;
     let length=c.length;
     let ret=[];
@@ -421,7 +422,7 @@ function takeOutChildNodes(node:INode):number{
     parent.removeChild(node);
     return i;
 }
-function takeBlockBetween(node1:INode,node2:INode):Array<INode>{
+function takeBlockBetween(node1:INode,node2:INode):INodeArray{
     let p1=node1.parentNode;
     let ns1=p1.childNodes;
     let l1=getNodeIndex2(node1)+1;

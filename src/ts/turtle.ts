@@ -51,8 +51,33 @@ class Config{
     baseServicePath='service';
     debugMode=2;
 }
+class Store extends HashObject<IHTMLElement>{
+    take(name):INode|INodeArray{
+        if(this.hasOwnProperty(name)){
+            var ret:IHTMLElement=<IHTMLElement>this[name];
+            delete this[name];
+            if(ret.childNodes.length>1){
+                return ret.childNodes;
+            }else{
+                return ret.childNodes[0];
+            }
+        }
+    }
+    takeElem(name):IHTMLElement|INodeArray{
+        if(this.hasOwnProperty(name)){
+            var ret:IHTMLElement=<IHTMLElement>this[name];
+            delete this[name];
+            if(ret.children.length>1){
+                return ret.children;
+            }else{
+                return ret.children[0];
+            }
+        }
+    }
+}
 interface ITurtle{
     config: Config;
+    store:Store;
 }
 class Turtle implements ITurtle{
     constructor(){
@@ -63,6 +88,11 @@ class Turtle implements ITurtle{
     domScope=new DOMScope;
     replaceClassStore:IHTMLElement[];
     defineClassNames:string[];
-    partTemplates:{};
-    parts:KeyArrayObject=newKeyArrayObject('Parts');
+    T:TemplateList=new TemplateList;
+    parts:KeyArrayObject<Part>=newKeyArrayObject<Part>('Parts');
+    xhr=new XHR;
+    service=new Service;
+    store=new Store;
+    refs=newKeyArrayObject<IHTMLElement>("RefElements");
+    
 }

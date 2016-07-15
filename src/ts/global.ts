@@ -11,10 +11,17 @@ let $t:ITurtle,
 interface ITurtle{
     
 }
+
+interface INodeList {
+    length: number;
+    item(index: number): INode;
+    [index: number]: INode;
+}
+type INodeArray=INodeList|ArrayEx<INode>|INode[];
 interface INode extends EventTarget {
     attributes?: NamedNodeMap;
     baseURI?: string;
-    childNodes?: NodeList;
+    childNodes?: INodeList;
     firstChild?: INode;
     lastChild?: INode;
     localName?: string;
@@ -384,9 +391,24 @@ interface IText extends ICharacterData {
 interface IComment extends ICharacterData {
     text?: string;
 }
+interface IHTMLCollection {
+    /**
+      * Sets or retrieves the number of objects in a collection.
+      */
+    length: number;
+    /**
+      * Retrieves an object from various collections.
+      */
+    item(nameOrIndex?: any, optionalIndex?: any): IElement;
+    /**
+      * Retrieves a select object or an object from an options collection.
+      */
+    namedItem(name: string): IElement;
+    [index: number]: IElement;
+}
 interface IHTMLElement extends IElement {
     accessKey?: string;
-    children?: HTMLCollection;
+    children?: IHTMLCollection;
     contentEditable?: string;
     dataset?: DOMStringMap;
     dir?: string;

@@ -232,7 +232,7 @@ function bindNodeProperty(node:INode,proName:string,condition:string){
         arrBindVar=[bindVar];
     }
     name=bindVar[bindVar.length-1];
-    scope=$t.uiScope.get(node);
+    scope=$t.domScope.get(node);
     obj=_getBindObject(scope,arrBindVar);
     if(obj===null){
         throwError('不能获取绑定属性:'+cdtn[0]);
@@ -261,7 +261,7 @@ function bindElementPropertyByName(node:IHTMLElement,elementValueName:string,con
         exp,
         obj;
     if(!name)return;
-    scope=$t.uiScope.get(node);
+    scope=$t.domScope.get(node);
     if(name.indexOf(".")!=-1){
         arrName=name.split(".");
         obj=_getBindObject(scope,arrName);
@@ -306,7 +306,7 @@ function bindPropertyByOrder(node,condition){
         arrBindVar=[bindVar];
     }
     name=bindVar[bindVar.length-1];
-    scope=$t.uiScope.get(node);
+    scope=$t.domScope.get(node);
     obj=_getBindObject(scope,arrBindVar);
     
     if(bindVar2.indexOf(".")!=-1){
@@ -315,7 +315,7 @@ function bindPropertyByOrder(node,condition){
         arrBindVar2=[bindVar2];
     }
     name2=bindVar2[bindVar2.length-1];
-    scope2=$t.uiScope.get(node);
+    scope2=$t.domScope.get(node);
     obj2=_getBindObject(scope2,arrBindVar2);
     
     bindProperty(obj,name,obj2,name2);
@@ -340,7 +340,7 @@ function bindExpressionsByOrder(node,condition){
         arrBindVar=[bindVar];
     }
     name=bindVar[bindVar.length-1];
-    scope=$t.uiScope.get(node);
+    scope=$t.domScope.get(node);
     obj=_getBindObject(scope,arrBindVar);
     if(obj===null){
         throwError('不能获取绑定属性:'+cdtn[0]);
@@ -352,7 +352,7 @@ function bindExpressionsByOrder(node,condition){
         }catch(e){_catch(e)}
     }
     exp.__me__=exp;
-    $t.bindProperty(obj,name,exp,'__me__');
+    bindProperty(obj,name,exp,'__me__');
     replaceNodeByNode(node,textNode);
     bindElementProperty(exp,'__me__',textNode,'data');
     textNode['data']=exp.__me__;

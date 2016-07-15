@@ -1,14 +1,17 @@
 
+/// <reference path="global.ts"/>
 /// <reference path="core.ts"/>
 /// <reference path="Execute.ts"/>
 /// <reference path="bind.ts"/>
 /// <reference path='TemplateConfig.ts'/>
 /// <reference path='PartOrderCore.ts'/>
+/// <reference path='XHR.ts'/>
 let
         operatorRE              = /\!=|==|=|<|>|\|/;
 
 interface ITurtle{
-    partTemplates:Object
+    xhr:XHR;
+    refs:KeyArrayObject<IHTMLElement>;
 }
 function getScopeBy(scope,node:INode){
     if(!scope)
@@ -68,13 +71,13 @@ function getTemplate(node:IHTMLElement):string{
 function defineServiceByNode(node:IHTMLElement){
     let name:string=node.getAttribute('service');
     if(name){
-        let nodeName:string=node.getAttribute('ui');
-        if(nodeName){
-            if($t.ui.hasOwnProperty(nodeName)){
+        let partType:string=node.getAttribute('ui');
+        if(partType){
+            if($t.T.hasOwnProperty(partType)){
                 /*把服务定义到组件*/
-                $t.ui[nodeName].service.define(name,getTemplate(node));
+                $t.T[partType].service.define(name,getTemplate(node));
             }else{
-                throwError('不能定义service：'+name+'到'+nodeName+'上');
+                throwError('不能定义service：'+name+'到'+partType+'上');
             }
         }else{
             if(!$t.service.hasOwnProperty(name)){
@@ -96,12 +99,12 @@ function defineUIByNode(node:IHTMLElement){
     let name=getAttr(node,'ui');
     let ext=getExtendsByNode(node,'ui');
     if(name){
-        $t.ui.define(name,'','',getTemplate(node),ext);
+        $t.T.define(name,'','',getTemplate(node),ext);
     }
     removeNode(node);
 }
 function defineClasses(node:IHTMLElement){
-    $t.styleClasses.push(getAttr(node,'class'),trimLine(getTemplate(node)));
+    $t.defineClassNames.push(getAttr(node,'class'),trimLine(getTemplate(node)));
     removeNode(node);
 }
 function parseDefine(node:IHTMLElement){
@@ -167,9 +170,9 @@ function parseUITemplate(uiName:string,uiSortPath:string,uiPath:string,sHTML:str
         }else{
             nodeName=node.getAttribute('ui');
             if(!nodeName)nodeName=uiName;
-            if(!$t.ui.hasOwnProperty(nodeName)){
+            if(!$t.T.hasOwnProperty(nodeName)){
                 s=getTemplate(node);
-                $t.ui.define(nodeName,uiSortPath,uiPath,s,getExtendsByNode(node,uiSortPath));
+                $t.T.define(nodeName,uiSortPath,uiPath,s,getExtendsByNode(node,uiSortPath));
             }else{
                 alert('不能重复定义ui：'+nodeName);
             }
@@ -177,13 +180,13 @@ function parseUITemplate(uiName:string,uiSortPath:string,uiPath:string,sHTML:str
     }
 }
 function importUIHTML(uiName:string,uiSortPath:string){
-    if(!$t.ui.hasOwnProperty(uiName)){
+    if(!$t.T.hasOwnProperty(uiName)){
         let uiPath=baseUIPath.getPathBySortPath(uiSortPath);
-        $t.xhr.get(uiPath + '/' + (uiName + '.html').toLowerCase(),false,function(text){
+        $t.xhr.get(uiPath + '/' + (uiName + '.html').toLowerCase(),false,function(text:string){
             parseUITemplate(uiName,uiSortPath,uiPath,text);
         });
     }
-    return $t.ui[uiName];
+    return $t.T[uiName];
 }
 
 function getExtends(extName,sortPath){
@@ -196,7 +199,7 @@ function getExtends(extName,sortPath){
     if(!isObject(importUIHTML(extName,sortPath))){
         throwError('找不到可继承的模板：'+extName);
     }
-    ext=$t.ui[extName];
+    ext=$t.T[extName];
     return ext;
 }
 
@@ -253,9 +256,9 @@ function parseUI(node:IHTMLElement,uiInfo,step,part){
     
     outerChildNodes= slice.call(node.childNodes);
     outerElement = slice.call(node.children);
-    
-    for(let i=node.childNodes.length;i>0;i--){
-        node.removeChild(node.childNodes[0]);    
+    let chds=node.childNodes;
+    for(let i=chds.length;i>0;i--){
+        node.removeChild(chds[0]);    
     }
     
     cpn=ui.render(node, node.parentNode,outerChildNodes,outerElement,null,part,partName,reExtends);
@@ -283,12 +286,19 @@ function parseGet(node,outerChildNodes,outerElement,props,part){
     }
 }
 function parseSet(node,outerChildNodes,outerElement,props,part){
-        
+    
     if(node.hasAttribute('link')){
         /*设置关联子对象*/
         let link=takeAttr(node,'link');
-        if($t.store.hasOwnProperty(link)&&node.children.length==1){
-            appendNodes($t.store[link].childNodes,node.children[0]);
+        let chds=$t.store.takeElem(link);
+
+        if(chds!==null){
+            if(typeof chds ==='IHTMLElement'){
+                node.appendChild(chds);
+            }else{
+                appendNodes(<INodeArray>chds,node.children[0]);
+            }
+            
             takeOutChildNodes(node);
         }else{
             removeNode(node);
@@ -349,15 +359,14 @@ let includeJSFiles=(function(){
             if(parent){
                 parent.child=this;      
             }
-            
             let arr:Array<string>
             if(isArray(files)){
                 arr=<Array<string>>files;
                 for(let i in arr){
                     let url=files[i];
-                    if(isString(url)&&!(url in $t.jsScript)){
+                    if(isString(url)&&!(url in IncludeTask.jsScript)){
                         arr.push(url);
-                        $t.jsScript[url]=$node("script");
+                        IncludeTask.jsScript[url]=$node("script");
                     }
                 }
             }else if(files){
@@ -365,7 +374,7 @@ let includeJSFiles=(function(){
                 let url:string=<string>files;
                 if(isString(url)&&!(url in IncludeTask.jsScript)){
                     arr.push(url);
-                    $t.jsScript[url]=$node("script");
+                    IncludeTask.jsScript[url]=$node("script");
                 }
             }
             this.files=arr;
@@ -401,7 +410,7 @@ let includeJSFiles=(function(){
     function includeJSFile(task:IncludeTask){
         if(task.files.length>0){
             let url=task.files.shift();
-            let scriptNode=$t.jsScript[url];
+            let scriptNode=IncludeTask.jsScript[url];
             scriptNode.src=url;
             task.count++;
             scriptNode.onload=function(){
@@ -543,7 +552,7 @@ function bindNodeByCondition(node:INode,condition:string){
     if(!name){
         return;
     }
-    scope=$t.uiScope.get(node);
+    scope=$t.domScope.get(node);
     if(name.indexOf(".")!=-1){
         arrName=name.split(".");
         obj=_getBindObject(scope,arrName);
@@ -576,7 +585,7 @@ function bindNodeFunction(node,bindVar,fn){
         bindVar=[bindVar];
     }
     name=bindVar[bindVar.length-1];
-    scope=$t.uiScope.get(node);
+    scope=$t.domScope.get(node);
     obj=_getBindObject(scope,bindVar);
     fn.__me__=fn;
     bindProperty(obj,name,fn,"__me__");
@@ -671,7 +680,7 @@ class AttributeParser{
         bindShowHide(node,takeAttr(node,'hide'),false,outerChildNodes,outerElement,props,part);
     }
     cls(node,outerChildNodes,outerElement,props,part){
-        $t.clsNode.push(node);
+        $t.replaceClassStore.push(node);
         /*不要删node.removeAttribute('cls');*/
     }
     'p-main'(node,outerChildNodes,outerElement,props,part){
@@ -745,7 +754,14 @@ function getParts(childNodes:INode[]){
     });
     return child;
 }
-
+function getService(serviceName){
+    if(!$t.service.hasOwnProperty(serviceName)){
+        $t.xhr.get($t.config.baseServicePath + '/' + (serviceName + '.js').toLowerCase(),false,function(text){
+            $t.service.define(serviceName,text);
+        });
+    } 
+    return $t.service[serviceName];
+}
 function nodesToString(nodes:INode[]){
     var s='';
     for(var i=0;i<nodes.length;i++){

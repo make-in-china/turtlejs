@@ -5,7 +5,9 @@ const memberRE = /{([\-a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[\-a-zA-Z\d\.\
 const colorRE=/^\s*((#[\dabcdefABCDEF]{3,6})|(rgba\(.*\)))\s*$/
 
 interface ITurtle{
-    parts:KeyArrayObject
+    parts:KeyArrayObject<any>;
+    service:Service;
+    T:TemplateList;
 }
 interface IComment{
     __part__?:Part;
@@ -113,7 +115,7 @@ class Part{
     template:PartTemplate;
     props:Object;
     isInsert:boolean;
-    store:Array<INode>;
+    store:INode[];
     isExtend:boolean;
     begin:IComment;
     end:IComment;
@@ -125,7 +127,7 @@ class Part{
     oninit:(final:Part)=>void;
     onremove:()=>void;
     constructor(){
-
+        this.store=new ArrayEx<INode>();
     }
     toString(){
         return this.template.partName+":"+JSON.stringify(this.props);
@@ -148,13 +150,13 @@ class Part{
             return 1;
         }
     }
-    get elements(){
+    get elements():INode[]{
         if(this.isExtend){
-            return [];
+            return new ArrayEx<INode>();
         }
         if(this.isInsert){
             try{
-                let elements=[];
+                let elements=new ArrayEx<INode>();
                 let node=this.begin.nextSibling;
                 let end=this.end;
                 while(node!==end){
@@ -164,13 +166,13 @@ class Part{
                 return elements;
             }catch(e){
                 _catch(e);
-                return [];
+                return new ArrayEx<INode>();
             }
         }
         if(isArray(this.store)){
             return this.store.slice().splice(1,this.store.length-2);    
         }else{
-            return [];
+            return new ArrayEx<INode>();
         }
     }
     get child(){
@@ -453,10 +455,11 @@ function newExtendsPart(template,node,extPart,s,outerChildNodes,outerElement,pro
     return t;
 }
 function newPart(template,node,extPart,s,outerChildNodes,outerElement,props,part,partName){
+    let t
     if(extPart){
-        let t=newObject(template.partName,extPart);
+        t=newObject(template.partName,extPart);
     }else{
-        let t=newObject(template.partName,newPart.prototype);    
+        t=newObject(template.partName,newPart.prototype);    
     }
     
     if(partName){
@@ -509,7 +512,7 @@ interface IPartTemplate{
     extends:IPartTemplate;
     partName:string;
     service:Service;
-    beExtends:(node:INode,that,outerChildNodes:INode[],outerElement:IHTMLElement[],props,part)=>IPartTemplate;
+    beExtends:(node:INode,that,outerChildNodes:INodeArray,outerElement:IHTMLElement[],props,part)=>IPartTemplate;
     parseParamsHelp:(p)=>void;
 }
 class PartTemplate implements IPartTemplate{
@@ -707,7 +710,7 @@ class PartTemplate implements IPartTemplate{
         return d.join('');
     }
     /*变成别人的扩展*/
-    beExtends(node:INode,that,outerChildNodes:INode[],outerElement:IHTMLElement[],props,part):IPartTemplate{
+    beExtends(node:INode,that,outerChildNodes:INodeArray,outerElement:IHTMLElement[],props,part):IPartTemplate{
         let ext;
         if(this.extends instanceof PartTemplate){
             ext=this.extends.beExtends(node,that,outerChildNodes,outerElement,props,part);

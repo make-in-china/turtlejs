@@ -195,23 +195,23 @@ var KeyArrayObject = (function (_super) {
         if (isArray(key)) {
             for (var i = 0; i < key.length; i++) {
                 if (!this.hasOwnProperty(key[i])) {
-                    this[key[i]] = new ArrayEx;
+                    this[key[i]] = new ArrayEx();
                 }
                 this[key[i]].push(value);
             }
         }
         else {
             if (!this.hasOwnProperty(key)) {
-                this[key] = new ArrayEx;
+                this[key] = new ArrayEx();
             }
             this[key].push(value);
         }
     };
     KeyArrayObject.prototype.getKeyArray = function () {
-        var arr = new ArrayEx;
+        var arr = new ArrayEx();
         for (var i in this) {
             if (!this.hasOwnProperty(i)) {
-                arr.push(i);
+                arr.push(this[i]);
             }
         }
         return arr;
@@ -225,12 +225,12 @@ var KeyArrayObject = (function (_super) {
     return KeyArrayObject;
 }(HashObject));
 function newKeyArrayObject(type) {
-    return newObject(type, KeyArrayObject);
+    return create(type, KeyArrayObject);
 }
 function newHashObject(type) {
-    return newObject(type, HashObject);
+    return create(type, HashObject);
 }
-function newObject(type, tsClass) {
+function create(type, tsClass) {
     var s = 'let ' + type + '=function(){};';
     if (isObject((tsClass).prototype)) {
         s += type + '.prototype=proto;';
@@ -240,7 +240,7 @@ function newObject(type, tsClass) {
 }
 var newArrayObject = (function () {
     return function (type) {
-        return newObject(type, ArrayEx);
+        return create(type, ArrayEx);
     };
 }());
 function NullValueHash(s) {
@@ -869,7 +869,7 @@ function bindNodeProperty(node, proName, condition) {
         arrBindVar = [bindVar];
     }
     name = bindVar[bindVar.length - 1];
-    scope = $t.uiScope.get(node);
+    scope = $t.domScope.get(node);
     obj = _getBindObject(scope, arrBindVar);
     if (obj === null) {
         throwError('不能获取绑定属性:' + cdtn[0]);
@@ -894,7 +894,7 @@ function bindElementPropertyByName(node, elementValueName, condition) {
     var cdtn = splitByOnce(condition, "|"), name = cdtn[0], arrName, scope, exp, obj;
     if (!name)
         return;
-    scope = $t.uiScope.get(node);
+    scope = $t.domScope.get(node);
     if (name.indexOf(".") != -1) {
         arrName = name.split(".");
         obj = _getBindObject(scope, arrName);
@@ -932,7 +932,7 @@ function bindPropertyByOrder(node, condition) {
         arrBindVar = [bindVar];
     }
     name = bindVar[bindVar.length - 1];
-    scope = $t.uiScope.get(node);
+    scope = $t.domScope.get(node);
     obj = _getBindObject(scope, arrBindVar);
     if (bindVar2.indexOf(".") != -1) {
         arrBindVar2 = bindVar2.split(".");
@@ -941,7 +941,7 @@ function bindPropertyByOrder(node, condition) {
         arrBindVar2 = [bindVar2];
     }
     name2 = bindVar2[bindVar2.length - 1];
-    scope2 = $t.uiScope.get(node);
+    scope2 = $t.domScope.get(node);
     obj2 = _getBindObject(scope2, arrBindVar2);
     bindProperty(obj, name, obj2, name2);
     obj2[name2] = obj[name];
@@ -958,7 +958,7 @@ function bindExpressionsByOrder(node, condition) {
         arrBindVar = [bindVar];
     }
     name = bindVar[bindVar.length - 1];
-    scope = $t.uiScope.get(node);
+    scope = $t.domScope.get(node);
     obj = _getBindObject(scope, arrBindVar);
     if (obj === null) {
         throwError('不能获取绑定属性:' + cdtn[0]);
@@ -973,7 +973,7 @@ function bindExpressionsByOrder(node, condition) {
         }
     };
     exp.__me__ = exp;
-    $t.bindProperty(obj, name, exp, '__me__');
+    bindProperty(obj, name, exp, '__me__');
     replaceNodeByNode(node, textNode);
     bindElementProperty(exp, '__me__', textNode, 'data');
     textNode['data'] = exp.__me__;
@@ -1603,11 +1603,40 @@ function parseComment(node, outerChildNodes, outerElement, props, part) {
         }
     }
 }
+var XHR = (function () {
+    function XHR() {
+    }
+    XHR.prototype.send = function (type, url, data, async, fn, fnerror) {
+        var xhr = new XMLHttpRequest();
+        xhr.open(type, url, !!async);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                if (xhr.status === 200 || xhr.status === 0) {
+                    if (xhr.responseText.length > 0) {
+                        fn(xhr.responseText);
+                    }
+                }
+            }
+        };
+        type == 'POST' && xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhr.onerror = fnerror;
+        xhr.send(data);
+    };
+    XHR.prototype.get = function (url, async, fn, fnerror) {
+        this.send('GET', url, undefined, async, fn, fnerror);
+    };
+    XHR.prototype.post = function (url, data, async, fn, fnerror) {
+        this.send('POST', url, data, async, fn, fnerror);
+    };
+    return XHR;
+}());
+/// <reference path="global.ts"/>
 /// <reference path="core.ts"/>
 /// <reference path="Execute.ts"/>
 /// <reference path="bind.ts"/>
 /// <reference path='TemplateConfig.ts'/>
 /// <reference path='PartOrderCore.ts'/>
+/// <reference path='XHR.ts'/>
 var operatorRE = /\!=|==|=|<|>|\|/;
 function getScopeBy(scope, node) {
     if (!scope)
@@ -1667,14 +1696,14 @@ function getTemplate(node) {
 function defineServiceByNode(node) {
     var name = node.getAttribute('service');
     if (name) {
-        var nodeName = node.getAttribute('ui');
-        if (nodeName) {
-            if ($t.ui.hasOwnProperty(nodeName)) {
+        var partType = node.getAttribute('ui');
+        if (partType) {
+            if ($t.T.hasOwnProperty(partType)) {
                 /*把服务定义到组件*/
-                $t.ui[nodeName].service.define(name, getTemplate(node));
+                $t.T[partType].service.define(name, getTemplate(node));
             }
             else {
-                throwError('不能定义service：' + name + '到' + nodeName + '上');
+                throwError('不能定义service：' + name + '到' + partType + '上');
             }
         }
         else {
@@ -1698,12 +1727,12 @@ function defineUIByNode(node) {
     var name = getAttr(node, 'ui');
     var ext = getExtendsByNode(node, 'ui');
     if (name) {
-        $t.ui.define(name, '', '', getTemplate(node), ext);
+        $t.T.define(name, '', '', getTemplate(node), ext);
     }
     removeNode(node);
 }
 function defineClasses(node) {
-    $t.styleClasses.push(getAttr(node, 'class'), trimLine(getTemplate(node)));
+    $t.defineClassNames.push(getAttr(node, 'class'), trimLine(getTemplate(node)));
     removeNode(node);
 }
 function parseDefine(node) {
@@ -1765,9 +1794,9 @@ function parseUITemplate(uiName, uiSortPath, uiPath, sHTML) {
             nodeName = node.getAttribute('ui');
             if (!nodeName)
                 nodeName = uiName;
-            if (!$t.ui.hasOwnProperty(nodeName)) {
+            if (!$t.T.hasOwnProperty(nodeName)) {
                 s = getTemplate(node);
-                $t.ui.define(nodeName, uiSortPath, uiPath, s, getExtendsByNode(node, uiSortPath));
+                $t.T.define(nodeName, uiSortPath, uiPath, s, getExtendsByNode(node, uiSortPath));
             }
             else {
                 alert('不能重复定义ui：' + nodeName);
@@ -1776,13 +1805,13 @@ function parseUITemplate(uiName, uiSortPath, uiPath, sHTML) {
     }
 }
 function importUIHTML(uiName, uiSortPath) {
-    if (!$t.ui.hasOwnProperty(uiName)) {
+    if (!$t.T.hasOwnProperty(uiName)) {
         var uiPath_1 = baseUIPath.getPathBySortPath(uiSortPath);
         $t.xhr.get(uiPath_1 + '/' + (uiName + '.html').toLowerCase(), false, function (text) {
             parseUITemplate(uiName, uiSortPath, uiPath_1, text);
         });
     }
-    return $t.ui[uiName];
+    return $t.T[uiName];
 }
 function getExtends(extName, sortPath) {
     var ext;
@@ -1794,7 +1823,7 @@ function getExtends(extName, sortPath) {
     if (!isObject(importUIHTML(extName, sortPath))) {
         throwError('找不到可继承的模板：' + extName);
     }
-    ext = $t.ui[extName];
+    ext = $t.T[extName];
     return ext;
 }
 function parseAsync(node, outerChildNodes, outerElement, props, part) {
@@ -1840,8 +1869,9 @@ function parseUI(node, uiInfo, step, part) {
     reExtends = takeAttr(node, 're-extends');
     outerChildNodes = slice.call(node.childNodes);
     outerElement = slice.call(node.children);
-    for (var i = node.childNodes.length; i > 0; i--) {
-        node.removeChild(node.childNodes[0]);
+    var chds = node.childNodes;
+    for (var i = chds.length; i > 0; i--) {
+        node.removeChild(chds[0]);
     }
     cpn = ui.render(node, node.parentNode, outerChildNodes, outerElement, null, part, partName, reExtends);
     if (cpn) {
@@ -1870,8 +1900,14 @@ function parseSet(node, outerChildNodes, outerElement, props, part) {
     if (node.hasAttribute('link')) {
         /*设置关联子对象*/
         var link = takeAttr(node, 'link');
-        if ($t.store.hasOwnProperty(link) && node.children.length == 1) {
-            appendNodes($t.store[link].childNodes, node.children[0]);
+        var chds = $t.store.takeElem(link);
+        if (chds !== null) {
+            if (typeof chds === 'IHTMLElement') {
+                node.appendChild(chds);
+            }
+            else {
+                appendNodes(chds, node.children[0]);
+            }
             takeOutChildNodes(node);
         }
         else {
@@ -1943,9 +1979,9 @@ var includeJSFiles = (function () {
                 arr = files;
                 for (var i in arr) {
                     var url = files[i];
-                    if (isString(url) && !(url in $t.jsScript)) {
+                    if (isString(url) && !(url in IncludeTask.jsScript)) {
                         arr.push(url);
-                        $t.jsScript[url] = $node("script");
+                        IncludeTask.jsScript[url] = $node("script");
                     }
                 }
             }
@@ -1954,7 +1990,7 @@ var includeJSFiles = (function () {
                 var url = files;
                 if (isString(url) && !(url in IncludeTask.jsScript)) {
                     arr.push(url);
-                    $t.jsScript[url] = $node("script");
+                    IncludeTask.jsScript[url] = $node("script");
                 }
             }
             this.files = arr;
@@ -1991,7 +2027,7 @@ var includeJSFiles = (function () {
     function includeJSFile(task) {
         if (task.files.length > 0) {
             var url = task.files.shift();
-            var scriptNode = $t.jsScript[url];
+            var scriptNode = IncludeTask.jsScript[url];
             scriptNode.src = url;
             task.count++;
             scriptNode.onload = function () {
@@ -2127,7 +2163,7 @@ function bindNodeByCondition(node, condition) {
     if (!name) {
         return;
     }
-    scope = $t.uiScope.get(node);
+    scope = $t.domScope.get(node);
     if (name.indexOf(".") != -1) {
         arrName = name.split(".");
         obj = _getBindObject(scope, arrName);
@@ -2160,7 +2196,7 @@ function bindNodeFunction(node, bindVar, fn) {
         bindVar = [bindVar];
     }
     name = bindVar[bindVar.length - 1];
-    scope = $t.uiScope.get(node);
+    scope = $t.domScope.get(node);
     obj = _getBindObject(scope, bindVar);
     fn.__me__ = fn;
     bindProperty(obj, name, fn, "__me__");
@@ -2263,7 +2299,7 @@ var AttributeParser = (function () {
         bindShowHide(node, takeAttr(node, 'hide'), false, outerChildNodes, outerElement, props, part);
     };
     AttributeParser.prototype.cls = function (node, outerChildNodes, outerElement, props, part) {
-        $t.clsNode.push(node);
+        $t.replaceClassStore.push(node);
         /*不要删node.removeAttribute('cls');*/
     };
     AttributeParser.prototype['p-main'] = function (node, outerChildNodes, outerElement, props, part) {
@@ -2339,6 +2375,14 @@ function getParts(childNodes) {
         }
     });
     return child;
+}
+function getService(serviceName) {
+    if (!$t.service.hasOwnProperty(serviceName)) {
+        $t.xhr.get($t.config.baseServicePath + '/' + (serviceName + '.js').toLowerCase(), false, function (text) {
+            $t.service.define(serviceName, text);
+        });
+    }
+    return $t.service[serviceName];
 }
 function nodesToString(nodes) {
     var s = '';
@@ -2472,6 +2516,7 @@ var PartParam = (function () {
 }());
 var Part = (function () {
     function Part() {
+        this.store = new ArrayEx();
     }
     Part.prototype.toString = function () {
         return this.template.partName + ":" + JSON.stringify(this.props);
@@ -2502,11 +2547,11 @@ var Part = (function () {
     Object.defineProperty(Part.prototype, "elements", {
         get: function () {
             if (this.isExtend) {
-                return [];
+                return new ArrayEx();
             }
             if (this.isInsert) {
                 try {
-                    var elements = [];
+                    var elements = new ArrayEx();
                     var node = this.begin.nextSibling;
                     var end = this.end;
                     while (node !== end) {
@@ -2517,14 +2562,14 @@ var Part = (function () {
                 }
                 catch (e) {
                     _catch(e);
-                    return [];
+                    return new ArrayEx();
                 }
             }
             if (isArray(this.store)) {
                 return this.store.slice().splice(1, this.store.length - 2);
             }
             else {
-                return [];
+                return new ArrayEx();
             }
         },
         enumerable: true,
@@ -2828,11 +2873,12 @@ function newExtendsPart(template, node, extPart, s, outerChildNodes, outerElemen
     return t;
 }
 function newPart(template, node, extPart, s, outerChildNodes, outerElement, props, part, partName) {
+    var t;
     if (extPart) {
-        var t = newObject(template.partName, extPart);
+        t = newObject(template.partName, extPart);
     }
     else {
-        var t = newObject(template.partName, newPart.prototype);
+        t = newObject(template.partName, newPart.prototype);
     }
     if (partName) {
         $t.parts.push(partName, t);
@@ -3307,12 +3353,48 @@ var Config = (function () {
     }
     return Config;
 }());
+var Store = (function (_super) {
+    __extends(Store, _super);
+    function Store() {
+        _super.apply(this, arguments);
+    }
+    Store.prototype.take = function (name) {
+        if (this.hasOwnProperty(name)) {
+            var ret = this[name];
+            delete this[name];
+            if (ret.childNodes.length > 1) {
+                return ret.childNodes;
+            }
+            else {
+                return ret.childNodes[0];
+            }
+        }
+    };
+    Store.prototype.takeElem = function (name) {
+        if (this.hasOwnProperty(name)) {
+            var ret = this[name];
+            delete this[name];
+            if (ret.children.length > 1) {
+                return ret.children;
+            }
+            else {
+                return ret.children[0];
+            }
+        }
+    };
+    return Store;
+}(HashObject));
 var Turtle = (function () {
     function Turtle() {
         this.isTemplate = isTemplate;
         this.config = new Config;
         this.domScope = new DOMScope;
+        this.T = new TemplateList;
         this.parts = newKeyArrayObject('Parts');
+        this.xhr = new XHR;
+        this.service = new Service;
+        this.store = new Store;
+        this.refs = newKeyArrayObject("RefElements");
         rte.on("error", function (e) { log(e); bp(); alert(e); });
     }
     return Turtle;
