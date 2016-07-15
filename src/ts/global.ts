@@ -1,16 +1,14 @@
 
-type Fun=(...arg)=>void
-let $t:ITurtle,
-    $client,
-    $DOM,
-    $INode,
-    $VDOM,
-    $VNode,
-    $node,
-    VTemplate;
+type Fun=(...arg)=>void;
+
+let 
+    $t:ITurtle;
 interface ITurtle{
     
 }
+
+
+
 
 interface INodeList {
     length: number;
@@ -31,7 +29,7 @@ interface INode extends EventTarget {
     nodeType?: number;
     nodeValue?: string;
     ownerDocument?: Document;
-    parentElement?: HTMLElement;
+    parentElement?: IHTMLElement;
     parentNode?: INode;
     prefix?: string;
     previousSibling?: INode;
@@ -72,14 +70,21 @@ interface INode extends EventTarget {
 }
 interface IElementTraversal {
     childElementCount?: number;
-    firstElementChild?: Element;
-    lastElementChild?: Element;
-    nextElementSibling?: Element;
-    previousElementSibling?: Element;
+    firstElementChild?: IElement;
+    lastElementChild?: IElement;
+    nextElementSibling?: IElement;
+    previousElementSibling?: IElement;
 }
+
+interface INodeListOf<ITNode extends INode> extends INodeList {
+    length: number;
+    item(index: number): ITNode;
+    [index: number]: ITNode;
+}
+
 interface INodeSelector {
-    querySelector?(selectors: string): Element;
-    querySelectorAll?(selectors: string): NodeListOf<Element>;
+    querySelector?(selectors: string): IElement;
+    querySelectorAll?(selectors: string): INodeListOf<IElement>;
 }
 
 interface IChildNode {
@@ -713,6 +718,43 @@ interface IHTMLTextAreaElement extends IHTMLElement {
     setSelectionRange?(start: number, end: number): void;
 }
 
+interface IHTMLTitleElement extends IHTMLElement {
+    /**
+      * Retrieves or sets the text of the object as a string.
+      */
+    text?: string;
+}
+interface IHTMLScriptElement extends IHTMLElement {
+    async?: boolean;
+    /**
+      * Sets or retrieves the character set used to encode the object.
+      */
+    charset?: string;
+    /**
+      * Sets or retrieves the status of the script.
+      */
+    defer?: boolean;
+    /**
+      * Sets or retrieves the event for which the script is written.
+      */
+    event?: string;
+    /**
+      * Sets or retrieves the object that is bound to the event script.
+      */
+    htmlFor?: string;
+    /**
+      * Retrieves the URL to an external file that contains the source code or data.
+      */
+    src?: string;
+    /**
+      * Retrieves or sets the text of the object as a string.
+      */
+    text?: string;
+    /**
+      * Sets or retrieves the MIME type for the associated scripting engine.
+      */
+    type?: string;
+}
 interface Object {
     __proto__?:Object
 }

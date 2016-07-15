@@ -3,7 +3,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var $t, $client, $DOM, $INode, $VDOM, $VNode, $node, VTemplate;
+var $t;
 /// <reference path="global.ts" />
 var $Event = (function () {
     function $Event() {
@@ -50,6 +50,37 @@ var $Event = (function () {
         }
     };
     return $Event;
+}());
+var ReadyObject = (function () {
+    function ReadyObject() {
+        this._isReady = false;
+        this.readyFunctions = [];
+    }
+    ReadyObject.prototype.on = function (fn) {
+        if (!isFunction(fn)) {
+            return;
+        }
+        if (this._isReady) {
+            fn();
+        }
+        else {
+            this.readyFunctions.push(fn);
+        }
+    };
+    Object.defineProperty(ReadyObject.prototype, "isReady", {
+        get: function () {
+            return this._isReady;
+        },
+        set: function (v) {
+            this._isReady = v;
+            while (this.readyFunctions.length > 0) {
+                this.readyFunctions.shift()();
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return ReadyObject;
 }());
 /// <reference path="global.ts" />
 /// <reference path="$Event.ts"/>
@@ -694,8 +725,9 @@ function addBindInfo(obj, name, target, targetName, event) {
     bindInfoHash.push({ name: name, target: target, targetName: targetName, event: event });
 }
 function removeBind(obj, name, targetName) {
-    if (!obj.__bind__)
+    if (!obj.__bind__) {
         return false;
+    }
     var bindInfoHash = obj.__bind__;
     for (var i in bindInfoHash) {
         if (bindInfoHash[i].name === name && bindInfoHash[i].targetName === targetName) {
@@ -915,8 +947,9 @@ function bindElementPropertyByName(node, elementValueName, condition) {
         bindProperty(obj, name, exp, "__me__");
     }
     else {
-        if (!node.__bind__)
+        if (!node.__bind__) {
             node[elementValueName] = obj[name];
+        }
         bindProperty(obj, name, node, elementValueName);
     }
 }
@@ -1637,7 +1670,7 @@ var XHR = (function () {
 /// <reference path='TemplateConfig.ts'/>
 /// <reference path='PartOrderCore.ts'/>
 /// <reference path='XHR.ts'/>
-var operatorRE = /\!=|==|=|<|>|\|/;
+var $DOM, $node, operatorRE = /\!=|==|=|<|>|\|/;
 function getScopeBy(scope, node) {
     if (!scope)
         return $t.domScope.get(node);
@@ -1778,7 +1811,6 @@ function findTemplates(nodes) {
     return temps;
 }
 function parseUITemplate(uiName, uiSortPath, uiPath, sHTML) {
-    VTemplate(sHTML);
     var vDOM = $DOM(sHTML), cs = vDOM.children, i = 0, node, s, name, nodeName;
     for (; i < cs.length; i++) {
         node = cs[i];
@@ -2514,9 +2546,39 @@ var PartParam = (function () {
     }
     return PartParam;
 }());
-var Part = (function () {
-    function Part() {
-        this.store = new ArrayEx();
+var Part = (function (_super) {
+    __extends(Part, _super);
+    function Part(template, extPart, props, html, outerChildNodes, outerElement) {
+        _super.call(this, template, extPart, props, html, outerChildNodes, outerElement);
+        this.props = props;
+        var name = template.name;
+        var dom = $DOM(html);
+        var begin = this.begin = $node(name, 8); // document.createComment('<'+name+'>');
+        var end = this.end = $node('/' + name, 8); //document.createComment('</'+name+'>')
+        end.__part__ = begin.__part__ = this;
+        begin.__sign__ = 1;
+        end.__sign__ = 0;
+        this.super = extPart;
+        this.resPath = template.path + '/' + template.name + '.res';
+        var sp = this;
+        while (sp.super) {
+            sp = sp.super;
+        }
+        this.basePart = sp ? sp : this;
+        this.basePart.isInsert = false;
+        var nodes = dom.childNodes;
+        initHTML(nodes, outerChildNodes, outerElement, props, this);
+        if (extPart) {
+            extPart.to(this);
+        }
+        var store = this.store;
+        store.push.apply(store, nodes);
+        for (var i = nodes.length; i > 0; i--) {
+            dom.removeChild(nodes[0]);
+        }
+        store.unshift(begin);
+        store.push(end);
+        this.emitInit(this);
     }
     Part.prototype.toString = function () {
         return this.template.partName + ":" + JSON.stringify(this.props);
@@ -2546,7 +2608,7 @@ var Part = (function () {
     });
     Object.defineProperty(Part.prototype, "elements", {
         get: function () {
-            if (this.isExtend) {
+            if (this.isExtends) {
                 return new ArrayEx();
             }
             if (this.isInsert) {
@@ -2571,13 +2633,6 @@ var Part = (function () {
             else {
                 return new ArrayEx();
             }
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Part.prototype, "child", {
-        get: function () {
-            return getParts(this.elements);
         },
         enumerable: true,
         configurable: true
@@ -2664,44 +2719,6 @@ var Part = (function () {
             return { left: 0, top: 0, width: 0, height: 0, right: 0, bottom: 0 };
         }
     };
-    Part.prototype.emitResize = function () {
-        try {
-            if (!this.isInsert) {
-                return;
-            }
-            if (this.onresize) {
-                if (this.onresize()) {
-                    return;
-                }
-            }
-            var cs = this.child;
-            for (var i = 0; i < cs.length; i++) {
-                cs[i].emitResize();
-            }
-        }
-        catch (e) {
-            _catch(e);
-        }
-    };
-    Part.prototype.onSetSize = function (rect) {
-        if (this.partMain) {
-            var style = this.partMain.style;
-            style.left = rect.left + 'px';
-            style.top = rect.top + 'px';
-            style.width = rect.width + 'px';
-            style.height = rect.height + 'px';
-            style.boxSizing = 'border-box';
-            this.emitResize();
-        }
-    };
-    Part.prototype.setSize = function (rect) {
-        if (this.onSetSize) {
-            return this.onSetSize(rect);
-        }
-        if (this.super) {
-            this.super.setSize(rect);
-        }
-    };
     Object.defineProperty(Part.prototype, "innerHTML", {
         get: function () {
             return nodesToString(this.elements);
@@ -2780,24 +2797,6 @@ var Part = (function () {
             this.basePart.isInsert = true;
         }
     };
-    Part.prototype.getSuper = function (name) {
-        if (this.super) {
-            if (this.super.template.name === name) {
-                return this.super;
-            }
-            else {
-                return this.super.getSuper(name);
-            }
-        }
-    };
-    Part.prototype.emitInit = function (finalPart) {
-        if (this.super) {
-            this.super.emitInit(finalPart);
-        }
-        if (isFunction(this.oninit)) {
-            this.oninit(finalPart);
-        }
-    };
     Part.prototype.remove = function () {
         if (this.isInsert) {
             var elems = this.elements;
@@ -2839,86 +2838,114 @@ var Part = (function () {
         configurable: true
     });
     return Part;
-}());
-function newExtendsPart(template, node, extPart, s, outerChildNodes, outerElement, props, part) {
-    var t;
-    if (extPart) {
-        t = newObject(template.partName, extPart);
-    }
-    else {
-        t = newObject(template.partName, newPart.prototype);
-    }
-    var name = template.name;
-    var dom = $DOM(s);
-    //node.innerHTML=s;
-    t.template = template;
-    t.super = extPart;
-    t.isExtend = true;
-    var nodes = dom.childNodes;
-    t.$ = new Service(template.service);
-    initHTML(nodes, outerChildNodes, outerElement, props, t);
-    t.store = [];
-    for (var i = nodes.length; i > 0; i--) {
-        t.store.push(dom.removeChild(nodes[0]));
-    }
-    t.to = function (part) {
-        var proto = part.$.__proto__;
-        t.$.__proto__ = proto;
-        part.$.__proto__ = t.$;
+}(PartBase));
+var PartBase = (function () {
+    function PartBase(template, extPart, props, html, outerChildNodes, outerElement) {
+        this.template = template;
+        this.props = props;
+        this.$ = new Service(template.service);
+        this.partName = template.partName;
         if (extPart) {
-            extPart.to(part);
+            /**继承 */
+            this.__proto__ = extPart;
         }
-        push.apply(part.store, t.store);
+        this.super = extPart;
+        var dom = $DOM(html);
+        var nodes = dom.childNodes;
+        initHTML(nodes, outerChildNodes, outerElement, props, this);
+        for (var i = nodes.length; i > 0; i--) {
+            this.store.push(dom.removeChild(nodes[0]));
+        }
+    }
+    Object.defineProperty(PartBase.prototype, "child", {
+        get: function () {
+            return getParts(this.elements);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PartBase.prototype, "elements", {
+        get: function () { return []; },
+        enumerable: true,
+        configurable: true
+    });
+    PartBase.prototype.emitResize = function () {
+        try {
+            if (!this.isInsert) {
+                return;
+            }
+            if (this.onresize) {
+                if (this.onresize()) {
+                    return;
+                }
+            }
+            var cs = this.child;
+            for (var i = 0; i < cs.length; i++) {
+                cs[i].emitResize();
+            }
+        }
+        catch (e) {
+            _catch(e);
+        }
     };
-    return t;
-}
-function newPart(template, node, extPart, s, outerChildNodes, outerElement, props, part, partName) {
-    var t;
-    if (extPart) {
-        t = newObject(template.partName, extPart);
+    PartBase.prototype.onSetSize = function (rect) {
+        if (this.partMain) {
+            var style = this.partMain.style;
+            style.left = rect.left + 'px';
+            style.top = rect.top + 'px';
+            style.width = rect.width + 'px';
+            style.height = rect.height + 'px';
+            style.boxSizing = 'border-box';
+            this.emitResize();
+        }
+    };
+    PartBase.prototype.getSuper = function (name) {
+        if (this.super) {
+            if (this.super.template.name === name) {
+                return this.super;
+            }
+            else {
+                return this.super.getSuper(name);
+            }
+        }
+    };
+    PartBase.prototype.emitInit = function (finalPart) {
+        if (this.super) {
+            this.super.emitInit(finalPart);
+        }
+        if (isFunction(this.oninit)) {
+            this.oninit(finalPart);
+        }
+    };
+    PartBase.prototype.setSize = function (rect) {
+        if (this.onSetSize) {
+            return this.onSetSize(rect);
+        }
+        if (this.super) {
+            this.super.setSize(rect);
+        }
+    };
+    return PartBase;
+}());
+var ExtendsPart = (function (_super) {
+    __extends(ExtendsPart, _super);
+    function ExtendsPart(template, extPart, props, html, outerChildNodes, outerElement) {
+        _super.call(this, template, extPart, props, html, outerChildNodes, outerElement);
+        this.props = props;
+        this.isExtends = true;
     }
-    else {
-        t = newObject(template.partName, newPart.prototype);
-    }
-    if (partName) {
-        $t.parts.push(partName, t);
-    }
-    var name = template.name;
-    var dom = $DOM(s);
-    //node.innerHTML=s;
-    var begin = t.begin = $node(name, 8); // document.createComment('<'+name+'>');
-    var end = t.end = $node('/' + name, 8); //document.createComment('</'+name+'>')
-    end.part = begin.part = t;
-    begin.sign = 1;
-    end.sign = 0;
-    t.props = props;
-    t.template = template;
-    t.onInsert = null;
-    t.super = extPart;
-    t.isExtend = false;
-    t.resPath = template.path + '/' + template.name + '.res';
-    var sp = t;
-    while (sp.super) {
-        sp = sp.super;
-    }
-    t.basePart = sp ? sp : t;
-    t.basePart.isInsert = false;
-    t.$ = new Service(template.service);
-    t.store = [];
-    var nodes = dom.childNodes;
-    initHTML(nodes, outerChildNodes, outerElement, props, t);
-    if (extPart) {
-        extPart.to(t);
-    }
-    t.store.push.apply(t.store, nodes);
-    for (var i = nodes.length; i > 0; i--) {
-        dom.removeChild(nodes[0]);
-    }
-    t.store.unshift(begin);
-    t.store.push(end);
-    t.emitInit(t);
-    return t;
-}
+    ExtendsPart.prototype.to = function (part) {
+        /**剪切厡型链 */
+        var proto = part.$.__proto__;
+        this.$.__proto__ = proto;
+        part.$.__proto__ = this.$;
+        if (this.super) {
+            this.super.to(part);
+        }
+        push.apply(part.store, this.store);
+    };
+    return ExtendsPart;
+}(PartBase));
 var PartTemplate = (function () {
     function PartTemplate(name, sortPath, path, s, ext) {
         this.name = name;
@@ -3022,7 +3049,7 @@ var PartTemplate = (function () {
         return this.render(uiNode, elem, outerChildNodes, outerElement, props, part, partName, reExtends);
     };
     /*渲染dom*/
-    PartTemplate.prototype.render = function (uiNode, that, outerChildNodes, outerElement, props, part, partName, reExtends) {
+    PartTemplate.prototype.render = function (uiNode, that, outerChildNodes, outerElement, props, part, refPartName, reExtends) {
         var ext, attrs, len, html;
         if (!isObject(props)) {
             props = {};
@@ -3055,14 +3082,18 @@ var PartTemplate = (function () {
         if (ext instanceof PartTemplate) {
             ext = ext.beExtends(uiNode, that, outerChildNodes, outerElement, props, part);
         }
-        part = newPart(this, uiNode, ext, execTemplateScript(html, that, outerChildNodes, outerElement, props, part), outerChildNodes, outerElement, props, part, partName);
-        this.parts.push(part);
+        var newPart = new Part(this, ext, props, html, outerChildNodes, outerElement);
+        if (refPartName) {
+            /**放置到全局引用 */
+            $t.parts.push(refPartName, newPart);
+        }
+        this.parts.push(newPart);
         if (uiNode.parentNode !== null) {
             //let p=uiNode.parentNode.__domNode__;
-            part.insertBefore(uiNode);
+            newPart.insertBefore(uiNode);
             removeNode(uiNode);
         }
-        return part;
+        return newPart;
     };
     /*由props构建html字符串*/
     PartTemplate.prototype.joinDatasByProps = function (props) {
@@ -3108,7 +3139,7 @@ var PartTemplate = (function () {
             ext = this.extends.beExtends(node, that, outerChildNodes, outerElement, props, part);
         }
         var html = this.joinDatasByProps(props);
-        return newExtendsPart(this, node, ext, execTemplateScript(html, that, outerChildNodes, outerElement, props, part), outerChildNodes, outerElement, props, part);
+        return new ExtendsPart(this, ext, props, execTemplateScript(html, that, outerChildNodes, outerElement, props, part), outerChildNodes, outerElement);
     };
     PartTemplate.prototype.toDefineString = function () {
         var s = '$this.ui.define("' + this.name + '","' + this.sortPath + '","' + this.path + '",{datas:';
@@ -3203,13 +3234,15 @@ var TemplateList = (function () {
     };
     return TemplateList;
 }());
-var Service = (function () {
+var Service = (function (_super) {
+    __extends(Service, _super);
     function Service(serv) {
+        _super.call(this);
         this.__defineCallbacks__ = new ArrayEx();
         if (isObject(serv)) {
             for (var i in serv) {
                 this[i] = serv[i];
-                this.emitOnDefine(i, this[i]);
+                this.event.emit(i, this[i]);
             }
         }
     }
@@ -3226,7 +3259,7 @@ var Service = (function () {
         catch (e) {
             _catch(e);
         }
-        this.emitOnDefine(name, this[name]);
+        this.event.emit(name, this[name]);
     };
     Service.prototype.toDefineString = function () {
         var s = 'new $t.Service(';
@@ -3245,9 +3278,17 @@ var Service = (function () {
         return s;
     };
     return Service;
-}());
+}(TemplateList));
 /// <reference path="core.ts" />
 var $rootScope;
+var RootScope = (function () {
+    function RootScope() {
+        this.__actionNode__ = document.documentElement;
+        this.__children__ = [];
+        document['scope'] = this;
+    }
+    return RootScope;
+}());
 var Scope = (function () {
     function Scope(__commentNode__, parent, __name__) {
         this.__commentNode__ = __commentNode__;
@@ -3309,9 +3350,71 @@ var DOMScope = (function () {
     };
     return DOMScope;
 }());
+var $client = new Client;
+var Client = (function () {
+    function Client() {
+        this.data = {};
+        this.isListen = false;
+        this.events = [];
+        this.setSizeProperty('onResize', function () {
+            return {
+                width: document.documentElement.clientWidth,
+                height: document.documentElement.clientHeight
+            };
+        });
+        this.setSizeProperty('width', function () {
+            return document.documentElement.clientWidth;
+        });
+        this.setSizeProperty('height', function () {
+            return document.documentElement.clientHeight;
+        });
+        this.setSizeProperty('left', function () {
+            return document.documentElement.clientLeft;
+        });
+        this.setSizeProperty('top', function () {
+            return document.documentElement.clientTop;
+        });
+        this.setSizeProperty('right', function () {
+            return document.documentElement.clientLeft + document.documentElement.clientWidth;
+        });
+        this.setSizeProperty('bottom', function () {
+            return document.documentElement.clientTop + document.documentElement.clientHeight;
+        });
+    }
+    Client.prototype.emit = function () {
+        for (var i = 0; i < this.events.length; i++) {
+            this.events[i]();
+        }
+    };
+    Client.prototype.setSizeProperty = function (name, fn) {
+        this.data[name] = undefined;
+        this[name] = function (v) {
+            /*此属性用于被绑定*/
+            if (this.data[name] === undefined && this.__bind__) {
+                if (this.isListen === false) {
+                    this.isListen = true;
+                    window.addEventListener('resize', this.emit);
+                }
+                var bind = this.__bind__;
+                var getV = function () {
+                    this[name] = fn();
+                };
+                this.data[name] = fn();
+                this.events.push(getV);
+            }
+            if (v) {
+                this.data[name] = v;
+            }
+            return this.data[name];
+        };
+    };
+    return Client;
+}());
 /// <reference path='core.ts'/>
 /// <reference path='Template.ts'/>
 /// <reference path='scope.ts'/>
+/// <reference path='Client.ts'/>
+var readyRE = /complete|loaded|interactive/;
 function renderTemplate(tp) {
     var sHTML = getTemplate(tp);
     var vDOM = $DOM(sHTML);
@@ -3325,26 +3428,6 @@ function renderTemplate(tp) {
     replaceNodeByNodes(tp, takeChildNodes(vDOM.toDOM()));
     //vDOM.innerHTML='';
 }
-var renderDocument = function (noAppend) {
-    renderDocument.beginTime = new Date();
-    var xmps = findTemplates(document.body.children), i, templateXMP = [];
-    /*优先处理定义先关的模板*/
-    for (i = 0; i < xmps.length; i++) {
-        if (isDefine(xmps[i])) {
-            parseDefine(xmps[i]);
-        }
-        else {
-            templateXMP.push(xmps[i]);
-        }
-    }
-    /*处理逻辑模板*/
-    for (i = 0; i < templateXMP.length; i++) {
-        renderTemplate(templateXMP[i]);
-    }
-    replaceCls();
-    /*initLink();*/
-    renderDocument.endTime = new Date();
-};
 var Config = (function () {
     function Config() {
         this.baseUIPath = baseUIPath;
@@ -3369,6 +3452,7 @@ var Store = (function (_super) {
                 return ret.childNodes[0];
             }
         }
+        return null;
     };
     Store.prototype.takeElem = function (name) {
         if (this.hasOwnProperty(name)) {
@@ -3381,24 +3465,259 @@ var Store = (function (_super) {
                 return ret.children[0];
             }
         }
+        return null;
     };
     return Store;
 }(HashObject));
+function getQueryString(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+    var r = location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}
+var getNameByURL = (function () {
+    var RE1 = /[a-zA-Z\d\._]+\.[a-zA-Z\d]+$/;
+    var RE2 = /\.[a-zA-Z\d]+$/;
+    return function (url) {
+        return url.match(RE1)[0].replace(RE2, '');
+    };
+}());
+var getFileNameByURL = (function () {
+    var RE1 = /[a-zA-Z\d\._]+\.[a-zA-Z\d]+$/;
+    return function (url) {
+        return url.match(RE1)[0];
+    };
+}());
+function appendQueryString(name, value) {
+    if (location.search) {
+        return location.href + '&' + name + '=' + value;
+    }
+    else {
+        return location.href + '?' + name + '=' + value;
+    }
+}
 var Turtle = (function () {
     function Turtle() {
-        this.isTemplate = isTemplate;
-        this.config = new Config;
+        var _this = this;
         this.domScope = new DOMScope;
+        this.rootScope = new RootScope;
+        this.config = new Config;
         this.T = new TemplateList;
         this.parts = newKeyArrayObject('Parts');
         this.xhr = new XHR;
         this.service = new Service;
         this.store = new Store;
         this.refs = newKeyArrayObject("RefElements");
+        this.fn = {};
+        this.readyByRenderDocument = new ReadyObject;
+        this.renderDocument = function () {
+            _this.renderDocument.beginTime = new Date();
+            var xmps = findTemplates(document.body.children), i, templateXMP = [];
+            /*优先处理定义相关的模板*/
+            for (i = 0; i < xmps.length; i++) {
+                if (isDefine(xmps[i])) {
+                    parseDefine(xmps[i]);
+                }
+                else {
+                    templateXMP.push(xmps[i]);
+                }
+            }
+            /*处理逻辑模板*/
+            for (i = 0; i < templateXMP.length; i++) {
+                renderTemplate(templateXMP[i]);
+            }
+            replaceCls();
+            /*initLink();*/
+            _this.renderDocument.endTime = new Date();
+        };
         rte.on("error", function (e) { log(e); bp(); alert(e); });
+        var scriptNode = this.turtleScriptElement = document.scripts[document.scripts.length - 1], compile = getAttr(scriptNode, 'compile', null), load = getAttr(scriptNode, 'load', null), script = scriptNode.innerHTML, baseuipath = getAttr(scriptNode, 'baseuipath', null), isExtend = getAttr(scriptNode, 'extend', null), compilename = getAttr(scriptNode, 'compilename', null), compileuilist = getAttr(scriptNode, 'compileuilist', null), compileInfo;
+        if (baseuipath) {
+            baseUIPath.push(baseuipath.split(";"));
+        }
+        else {
+            baseUIPath.push('{path:"ui",name:"ui"}');
+        }
+        if (isExtend) {
+            extend(window, this.fn);
+        }
+        this.url = scriptNode.getAttribute("src");
+        if (compile !== null) {
+            if (getQueryString("turtle_nocompile") != "1") {
+                this.xhr.get(scriptNode.src + '.setup', false, function (text) {
+                    try {
+                        exec('compileInfo=' + text);
+                    }
+                    catch (e) {
+                        _catch(e);
+                    }
+                });
+            }
+            this.isCompile = true;
+        }
+        if (load) {
+            var loads_1 = load.split(",");
+            var i_1 = 0;
+            var fnLoad_1 = function () {
+                i_1++;
+                if (i_1 < loads_1.length) {
+                    includeJSFiles(loads_1[i_1], fnLoad_1);
+                }
+                else {
+                    if (compileInfo && compileInfo.isOn && compileInfo.url) {
+                        _this.r1(scriptNode, compileuilist, compilename, compileInfo, compile);
+                    }
+                    else {
+                        _this.r2();
+                    }
+                }
+            };
+            includeJSFiles(loads_1[0], fnLoad_1);
+        }
+        else {
+            if (compileInfo && compileInfo.isOn && compileInfo.url) {
+                this.r1(scriptNode, compileuilist, compilename, compileInfo, compile);
+            }
+            else {
+                this.r2();
+            }
+        }
+        if (script.length > 0) {
+            execScript(scriptNode);
+        }
     }
+    Object.defineProperty(Turtle.prototype, "RootParts", {
+        get: function () {
+            var t = getParts(document.body.childNodes);
+            Object.defineProperty(t, "treeDiagram", {
+                get: function () {
+                    var tabSpace = 0;
+                    var s = "";
+                    for (var i = 0; i < t.length; i++) {
+                        s += t[i].treeDiagram(tabSpace + 2);
+                    }
+                    return s;
+                }
+            });
+            return t;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Turtle.prototype.emitResize = function () {
+        var parts = this.RootParts;
+        for (var i = 0; i < parts.length; i++) {
+            parts[i].emitResize();
+        }
+    };
+    Turtle.prototype.r1 = function (scriptNode, compileuilist, compilename, compileInfo, compile) {
+        this.ready(function () {
+            this.compileDocument(scriptNode, compileuilist, function (html, compileJS, importScripts) {
+                if (!compilename) {
+                    compilename = getNameByURL(getFileNameByURL(location.href));
+                    if (/\./.test(compilename)) {
+                        compilename = compilename.split('.')[0];
+                    }
+                    console.log('未提供compilename，自动设置为“' + compilename + '”');
+                }
+                var url = compileInfo.url + "?htmlName=" + compilename;
+                var b = document.body;
+                b.innerHTML = '<div style="background-color:#fff;position:absolute;left:0;right:0;bottom:0;top:0;">开始编译页面</div>';
+                var c = b.children[0];
+                switch (compile) {
+                    case 'onlyBody':
+                        html = '<xmp><script>' + importScripts + '</script></xmp>' + html.match(/(<body[\s\S]*?>)([\s\S]*?)(<\/body>)/)[2];
+                        break;
+                }
+                this.xhr.post(url, html, false, function (text) {
+                    var br = document.createElement('br');
+                    var sec = document.createElement('span');
+                    var timeout = 1000;
+                    sec.innerHTML = "?";
+                    sec.style.color = "#f00";
+                    c.appendChild(br);
+                    c.appendChild(br.cloneNode());
+                    c.appendChild(document.createTextNode('刷新页面剩余时间：'));
+                    c.appendChild(sec);
+                    c.appendChild(br.cloneNode());
+                    c.appendChild(br.cloneNode());
+                    c.appendChild(document.createTextNode(text));
+                    for (var i = 0; i < compileJS.length; i++) {
+                        var url_1 = compileInfo.url + "?uiName=" + compileJS[i].name + "&uiPath=" + compileJS[i].path;
+                        this.xhr.post(url_1, compileJS[i].script, false, function (text) {
+                            c.appendChild(br.cloneNode());
+                            c.appendChild(document.createTextNode(text));
+                        });
+                    }
+                    setTimeout(function () {
+                        window.location.href = appendQueryString("turtle_nocompile", "1");
+                    }, timeout);
+                    setInterval(function () {
+                        timeout = timeout - 100;
+                        sec.innerHTML = '' + timeout / 1000;
+                    }, 100);
+                });
+            });
+        });
+    };
+    Turtle.prototype.r2 = function () {
+        var _this = this;
+        this.ready(function () {
+            _this.renderDocument();
+            _this.readyByRenderDocument.isReady = true;
+            _this.emitResize();
+        });
+    };
+    Turtle.prototype.ready = function (fn) {
+        var _this = this;
+        if (this.readyByRenderDocument.isReady || (readyRE.test(document.readyState) && document.body !== null)) {
+            fn();
+        }
+        else {
+            function onLoaded() {
+                if (document.body !== null) {
+                    window.removeEventListener('DOMContentLoaded', onLoaded);
+                    clearInterval(tid);
+                    fn();
+                }
+            }
+            var tid = setInterval(function () {
+                if (_this.readyByRenderDocument.isReady || (readyRE.test(document.readyState) && document.body !== null)) {
+                    clearInterval(tid);
+                    window.removeEventListener('DOMContentLoaded', onLoaded);
+                    fn();
+                }
+            }, 10);
+            window.addEventListener('DOMContentLoaded', onLoaded, false);
+        }
+        return this;
+    };
     return Turtle;
 }());
 /// <reference path='turtle.ts'/>
-var turtle = new Turtle();
-$t = turtle;
+/// <reference path='plugin/index.ts'/>
+if (!$DOM) {
+    $DOM = function (html) {
+        var elem = document.createElement('ui:dom');
+        elem.innerHTML = html;
+        return elem;
+    };
+    $node = function (name, nodeType) {
+        switch (nodeType) {
+            case 3:
+                return document.createTextNode(name);
+            case 8:
+                return document.createComment(name);
+            case 1:
+            case undefined:
+                return document.createElement(name);
+            case 10:
+                return null;
+            default:
+                return null;
+        }
+    };
+}
+var turtle = $t = new Turtle();

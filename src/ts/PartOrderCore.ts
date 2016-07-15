@@ -446,8 +446,11 @@ function parseForOrder(info,node,outerChildNodes,outerElement,props,part){
         }
     });
 }
-function createBreakElement(nodes,order){
-    let breakElement=$node('__break__');
+interface IHTMLBreakElement extends IComment{
+    source?:{run}
+}
+function createBreakElement(nodes,order:{run}){
+    let breakElement:IHTMLBreakElement=$node('__break__');
     for(let i=0;i<nodes.length;i++){
         breakElement.appendChild(nodes[i]);
     }

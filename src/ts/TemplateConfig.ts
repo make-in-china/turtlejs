@@ -56,10 +56,10 @@ class TemplateConfig{
     
     XMP={};
     TEMPLATE={};
-    TITLE={getData:function(node:INode):string{return node.innerText;}};
+    TITLE={getData:function(node:IHTMLTitleElement):string{return node.innerText;}};
     STYLE={xmp:undefined};
     SCRIPT={xmp:undefined};
-    TEXTAREA={xmp:undefined,getData:function(node:ITextAreaElement):string{return node.defaultValue;}};
+    TEXTAREA={xmp:undefined,getData:function(node:IHTMLTextAreaElement):string{return node.defaultValue;}};
 
 }
 

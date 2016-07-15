@@ -3,11 +3,20 @@
 let 
     $rootScope:Scope;
 interface INode{
-    __scope__:Scope;
+    __scope__?:Scope;
 }
 
 interface ITurtle{
     domScope:DOMScope;
+    rootScope:RootScope;
+}
+
+class RootScope{
+    __actionNode__=document.documentElement;
+    __children__:Scope[]=[];
+    constructor(){
+        document['scope']=this;
+    }
 }
 class Scope {
     constructor(public __commentNode__:INode,parent,public __name__:string){

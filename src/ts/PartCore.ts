@@ -7,6 +7,8 @@
 /// <reference path='PartOrderCore.ts'/>
 /// <reference path='XHR.ts'/>
 let
+        $DOM,
+        $node:(name:string,nodeType?:number)=>INode,
         operatorRE              = /\!=|==|=|<|>|\|/;
 
 interface ITurtle{
@@ -149,7 +151,6 @@ function findTemplates(nodes){
     return temps;
 }
 function parseUITemplate(uiName:string,uiSortPath:string,uiPath:string,sHTML:string){
-    VTemplate(sHTML);
     let 
         vDOM=$DOM(sHTML),
         cs=vDOM.children,
@@ -443,7 +444,7 @@ function execOnScript(node,outerChildNodes,outerElement,props,part){
         }
     }
 }
-function execScript(node,outerChildNodes,outerElement,props,part){
+function execScript(node,outerChildNodes?,outerElement?,props?,part?){
     var script=node.innerHTML;
     if(script.length>0){
         var fn;
@@ -691,7 +692,7 @@ class AttributeParser{
 };
 let elementParser=new ElementParser;
 let attributeParser=new AttributeParser;
-function initHTML(arr:Array<IHTMLElement>,outerChildNodes?,outerElement?,props?,part?){
+function initHTML(arr:INodeArray,outerChildNodes?,outerElement?,props?,part?){
     treeEach(arr,'childNodes',function(node:IHTMLElement,step){
         if(node.nodeType===8){
             try{
@@ -733,7 +734,7 @@ function initHTML(arr:Array<IHTMLElement>,outerChildNodes?,outerElement?,props?,
         }
     });
 }
-function getParts(childNodes:INode[]){
+function getParts(childNodes:INodeArray){
     var child=[];
     var cpn=null;
     treeEach(childNodes,"childNodes",function(node:INode){

@@ -2,9 +2,6 @@
 /// <reference path="core.ts"/>
 /// <reference path="Execute.ts"/>
 
-interface Object {
-    __bind__?:Object
-}
 function _getBindObject(scope,arrNames:Array<string>){
     let i,obj,length=arrNames.length;;
     while(scope){
@@ -37,8 +34,13 @@ function _getBindObject(scope,arrNames:Array<string>){
     }
     return null;
 }
-
-function addBindInfo(obj,name,target,targetName,event){
+interface IBindInfo{
+    name:string
+    target:IBindObject
+    targetName:string
+    event:IBindFunction
+}
+function addBindInfo(obj:IBindObject,name:string,target:IBindObject,targetName:string,event:IBindFunction){
     let bindInfoHash=obj.__bind__;
     if(!bindInfoHash){
         bindInfoHash=[];
@@ -46,8 +48,10 @@ function addBindInfo(obj,name,target,targetName,event){
     }
     bindInfoHash.push({name:name,target:target,targetName:targetName,event:event});
 }
-function removeBind(obj,name,targetName){
-    if(!obj.__bind__)return false;
+function removeBind(obj,name,targetName):boolean{
+    if(!obj.__bind__){
+        return false;
+    }
     let bindInfoHash=obj.__bind__;
     for(let i in bindInfoHash){
         if(bindInfoHash[i].name===name&&bindInfoHash[i].targetName===targetName){
@@ -116,15 +120,15 @@ function objectPropertyChange(obj,name,fnOnSet){
     }
 }
 interface IBindObject{
-    __bind__?:Object
+    __bind__?:IBindInfo[]
 }
 interface IBindFunction{
     (name:string)
     isBinding?:boolean;
     removeObject?:Fun;
-    list?:Array<IBindObject>;
+    list?:IBindObject[];
 }
-function bindPropertyByName(obj,name,obj2,name2):IBindFunction{
+function bindPropertyByName(obj:IBindObject,name:string,obj2:IBindObject,name2:string):IBindFunction{
     let t:IBindFunction=function(name){
         if(!t.isBinding){
             t.isBinding=true;
@@ -155,7 +159,7 @@ function bindPropertyByName(obj,name,obj2,name2):IBindFunction{
 }
 
 let bindProperty=(function(){
-    function getBindInfo(obj,name,targetName){
+    function getBindInfo(obj:IBindObject,name:string,targetName:string){
         if(!obj.__bind__)return;
         let bindInfoHash=obj.__bind__;
         for(let i in bindInfoHash){
@@ -164,7 +168,7 @@ let bindProperty=(function(){
             }
         }
     }
-    return function (obj:Object,name:string,obj2:Object,name2:string,type?:number){
+    return function (obj:IBindObject,name:string,obj2:IBindObject,name2:string,type?:number){
         let bindInfo1=getBindInfo(obj,name,name2);
         let bindInfo2=getBindInfo(obj2,name2,name);
         if(bindInfo1 && bindInfo2 && bindInfo1.event!==bindInfo2.event){
@@ -281,7 +285,9 @@ function bindElementPropertyByName(node:IHTMLElement,elementValueName:string,con
         exp.__me__=exp;
         bindProperty(obj,name,exp,"__me__");
     }else{
-        if(!node.__bind__)node[elementValueName]=obj[name];
+        if(!(<IBindObject>node).__bind__){
+            node[elementValueName]=obj[name];
+        }
         bindProperty(obj,name,node,elementValueName);
     }
 }
