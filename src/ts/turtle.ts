@@ -1,5 +1,7 @@
+
 /// <reference path='core.ts'/>
 /// <reference path='Template.ts'/>
+/// <reference path='scope.ts'/>
 function renderTemplate(tp){
     var sHTML=getTemplate(tp);
     var vDOM=$DOM(sHTML);
@@ -49,11 +51,18 @@ class Config{
     baseServicePath='service';
     debugMode=2;
 }
-
-class Turtle{
+interface ITurtle{
+    config: Config;
+}
+class Turtle implements ITurtle{
     constructor(){
         rte.on("error",function(e:Event){log(e);bp();alert(e);});
     }
-    isTemplate=isTemplate
+    isTemplate=isTemplate;
     config=new Config;
+    domScope=new DOMScope;
+    replaceClassStore:IHTMLElement[];
+    defineClassNames:string[];
+    partTemplates:{};
+    parts:KeyArrayObject=newKeyArrayObject('Parts');
 }

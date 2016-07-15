@@ -1,63 +1,142 @@
 
-var turtle,$t;
+var turtle,$t,
+    $rootScope,
+    $client,
+    $DOM,
+    $node,
+    $VDOM,
+    $VNode;
 (function(){
-    document.write("<style>xmp,[type=xmp]{display:none}</style>");/* 这里隐藏我们的模板，防止闪一下*/
     var 
-        Arrayprototype      = Array.prototype,
-        Objectprototype     = Object.prototype,
-        hasOwnProperty      = Object.prototype.hasOwnProperty,
-        slice               = Arrayprototype.slice,
-        getPrototypeOf      = Object.getPrototypeOf,
-        appendChild         = Node.prototype.appendChild,
-        readyRE = /complete|loaded|interactive/,
-        memberRE=/{[a-zA-Z\d\.\%\u4e00-\u9fa5]+\!?(['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\1\!?(['"]?)-?[a-zA-Z\d\.\%\u4e00-\u9fa5]*?\2}/g,
-        orderRE=/^\s?(if|while|for|switch|break|-|scope|content|bind|!|var|=)(\s|$)/g,
-        orderCaseRE=/^\s?(else if|else|case break|case|default|end)(\s|$)/g,
-        operatorRE=/\!=|==|=|<|>|\|/,
-        camelCaseRE=/-(\w)/g,
-        _OrderBlockStack=newArrayObject('OrderBlockStack'),
-        isIE=(!!window.ActiveXObject||"ActiveXObject" in window);
-
-   if (!("classList" in document.documentElement)) {
-        Object.defineProperty(HTMLElement.prototype, 'classList', {
-            get: function() {
-                var self = this;
-                function update(fn) {
-                    return function(value) {
-                        var classes = self.className.split(/\s+/g),
-                            index = classes.indexOf(value);
-                        
-                        fn(classes, index, value);
-                        self.className = classes.join(" ");
-                    }
+        arrayPrototype          = Array.prototype,
+        Objectprototype         = Object.prototype,
+        hasOwnProperty          = Object.prototype.hasOwnProperty,
+        slice                   = arrayPrototype.slice,
+        push                    = arrayPrototype.push,
+        splice                  = arrayPrototype.splice,
+        getPrototypeOf          = Object.getPrototypeOf,
+        replace                 = String.prototype.replace,
+        parseForOrderRE         = /[a-zA-Z\d] in .*/,
+        parseForOrderRE2        = /^.*;.*;.*$/,
+        addStyleRE              = /;\s*$/,
+        addClassNameRE          = /\s+$/,
+        readyRE                 = /complete|loaded|interactive/,
+        memberRE                = /{([\-a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g,
+        orderRE                 = /^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|var|=)(\s|$)/g,
+        orderCaseRE             = /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
+        operatorRE              = /\!=|==|=|<|>|\|/,
+        camelCaseRE             = /-(\w)/g,
+        persentRE               = /^\s*([\d.]+)%\s*$/,
+        emptyTextNodeRE         = /^\s*$/,
+        functionCommentRE       = /\/\*([\s\S]*?)\*\//g,
+        xmlwordRE               = /[a-zA-Z\/\!]/,
+        classSplitRE            = /\s+/g,
+        styleListRE             = /\s*([\w\-]+)\s*\:\s*(.*?)\s*[;$]/g,
+        camelizeRE              = /-+(.)?/g,
+        deCamelizeRE            = /[A-Z]/g,
+        isIE                    = (!!window.ActiveXObject||"ActiveXObject" in window),
+        exec                    = eval,
+        fragment                = document.createDocumentFragment();
+    
+    var withthis                = 'with(this){return eval($$turtle$$)};'/*eval支持返回最后一个表达式的值*/,
+        _execValueByScope       = Function('$$turtle$$,v,node,outer,outerElement,props,part',withthis),
+        _execByScope            = Function('$$turtle$$,node,outer,outerElement,props,part',withthis),
+        _execExpressionsByScope = Function('$$turtle$$,v,node',withthis);
+        
+    // Number.prototype.replace=function(){
+        // return replace.apply(this,arguments);
+    // }
+    var dateFormat=(function(){
+        return function(format,d){
+            'use strict' 
+            var o = {
+                "M+" : d.getMonth() + 1, //month
+                "d+" : d.getDate(), //day
+                "h+" : d.getHours(), //hour
+                "m+" : d.getMinutes(), //minute
+                "s+" : d.getSeconds(), //second
+                "q+" : Math.floor((d.getMonth() + 3) / 3), //quarter
+                "S" : d.getMilliseconds() //millisecond
+            }
+            if (/(y+)/.test(format)) {
+                format = format.replace(RegExp.$1, (d.getFullYear() + "").substr(4 - RegExp.$1.length));
+            }
+            for (var k in o) {
+                if (new RegExp("(" + k + ")").test(format)) {
+                    format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
                 }
-                
-                return {                    
-                    add: update(function(classes, index, value) {
-                        if (!~index) classes.push(value);
-                    }),
-                    
-                    remove: update(function(classes, index) {
-                        if (~index) classes.splice(index, 1);
-                    }),
-                    
-                    toggle: update(function(classes, index, value) {
-                        if (~index)
-                            classes.splice(index, 1);
-                        else
-                            classes.push(value);
-                    }),
-                    
-                    contains: function(value) {
-                        return !!~self.className.split(/\s+/g).indexOf(value);
-                    },
-                    
-                    item: function(i) {
-                        return self.className.split(/\s+/g)[i] || null;
-                    }
-                };
+            }
+            return format;
+        }
+    })();
+    function last(){
+        return this[this.length-1];
+    }
+    
+    function ClassList(elem){
+        Object.defineProperty(this,'__elem__',{
+            value:elem,
+            writable:false,
+            enumerable: true,
+            configurable: true
+        });
+    }
+    ClassList.prototype={
+        add: function(value) {
+            var classes = this.__elem__.className.split(classSplitRE);
+            var index=classes.indexOf(value);
+            if (!~index){
+                classes.push(value);
+                this.__elem__.className=classes.join(' ');  
+            }
+            
+        },
+        remove: function(value){
+            var classes = this.__elem__.className.split(classSplitRE);
+            var index=classes.indexOf(value);
+            if (~index){
+                classes.splice(index, 1);
+                this.__elem__.className=classes.join(' ');  
+            }
+        },
+        toggle: function(value) {
+            var classes = this.__elem__.className.split(classSplitRE);
+            var index=classes.indexOf(value);
+            if (~index){
+                classes.splice(index, 1);
+            }else{
+                classes.push(value);
+            }
+            this.__elem__.className=classes.join(' '); 
+        },
+        contains: function(value) {
+            return !!~this.__elem__.className.split(classSplitRE).indexOf(value);
+        },
+        item: function(i) {
+            return this.__elem__.className.split(classSplitRE)[i] || null;
+        }
+    }
+    function defineClassList(object){
+        Object.defineProperty(object,'classList',{
+            enumerable: true,
+            configurable: true,
+            get:function(){
+                if(this.__classList__){
+                    return this.__classList__;
+                }else{
+                    Object.defineProperty(this,'__classList__',{
+                        writable:false,
+                        enumerable: false,
+                        configurable: false,
+                        value:new ClassList(this)
+                    });
+                    return this.__classList__;
+                }
             }
         });
+    }
+    if (!("classList" in document.documentElement)){
+        defineClassList(HTMLElement.prototype);
     }
     (function(){
         var insertBefore=Node.prototype.insertBefore;
@@ -130,12 +209,22 @@ var turtle,$t;
     function requireByScript(s,variable){
         return Function(s+"\r\n;return function(s){return eval('('+s+')');};")()(variable);
     }
-    function log(s){
-        eval("console.log(s)");
+    function KeyWord(){
+        s=["target","download","ping","rel","hreflang","type","coords","charset","name","rev","shape","href","alt","noHref","cite","text","link","vLink","aLink","bgColor","background","clear","width","height","align","span","vAlign","open","compact","disabled","color","noShade","size","version","src","srcdoc","sandbox","allowFullscreen","scrolling","frameBorder","longDesc","marginHeight","marginWidth","srcset","sizes","crossOrigin","useMap","isMap","lowsrc","hspace","vspace","border","accept","autocomplete","autofocus","checked","dirName","formAction","formEnctype","formMethod","formNoValidate","formTarget","max","maxLength","min","minLength","multiple","pattern","placeholder","readOnly","required","step","value","autocapitalize","webkitdirectory","incremental","dateTime","challenge","keytype","media","integrity","content","scheme","low","high","optimum","reversed","start","label","selected","valueType","async","defer","event","frame","rules","summary","cellPadding","cellSpacing","colSpan","rowSpan","headers","axis","noWrap","abbr","scope","cols","rows","wrap","kind","srclang","default","poster","xmp","anchor", "area", "audio", "br", "base", "basefont", "body", "button", "canvas", "content", "dlist", "directory", "div", "embed", "fieldset", "font", "form", "frame", "frameset", "hr", "head", "heading", "html", "iframe", "image", "input", "keygen", "li", "label", "legend", "link", "map", "marquee", "media", "menu", "meta", "meter", "mod", "olist", "object", "optgroup", "option", "output", "paragraph", "pre", "progress", "quote", "script", "select", "source", "span", "style", "tablecaption", "tablecell", "tablecol", "table", "tablerow", "tablesection", "textarea", "title", "track", "ulist", "unknown", "video"];
+        for(var i in s){
+            this[s[i]]=s[i];
+        }
     }
-    function bp(){
-        eval("debugger;");
+    function toVarString(s){
+        s=s.split(',');
+        for(var i in s){
+            s[i]=s[i]+'="'+s[i]+'"';
+        }
+        s='var '+s.join(',')+';';
+        return s;
     }
+    var log=Function('s','console.log(s)');
+    var bp=Function('debugger');
     var lowercase,uppercase;
     if ('i'!=='I'.toLowerCase()) {
         lowercase= function(s) {
@@ -151,6 +240,26 @@ var turtle,$t;
     }else{
         lowercase = function(string) {return isString(string) ? string.toLowerCase() : string;};
         uppercase = function(string) {return isString(string) ? string.toUpperCase() : string;};
+    }
+    function sort(arr,key,fn){
+        var hash={};
+        for(var i in a){
+            var obj=a[i];
+            var keyv=fn?fn(obj[key]):obj[key];
+            if(hash[keyv]){
+                hash[keyv].push(obj);
+            }else{
+                hash[keyv]=[obj];
+            }
+        }
+        var newarr=[];
+        for(var i in hash){
+            var obj=hash[i];
+            for(var j in obj){
+                newarr.push(obj[j]);
+            }
+        }
+        return newarr;
     }
     function FatFunction(s){
         var condition=s.split('=>');
@@ -211,7 +320,7 @@ var turtle,$t;
     function removeNode(node){
         var p=node.parentNode;
         if(p){
-            return node.parentNode.removeChild(node);
+            return p.removeChild(node);
         }else{
             return null;
         }
@@ -236,14 +345,14 @@ var turtle,$t;
         (length >= 0 && ((length - 1) in obj || obj instanceof Array) || typeof obj.item == 'function');
     
     }
+    
     function forEachSorted(obj, iterator, context) {
-      var keys = Object.keys(obj).sort();
-      for (var i = 0; i < keys.length; i++) {
-        iterator.call(context, obj[keys[i]], keys[i]);
-      }
-      return keys;
+        var keys = Object.keys(obj).sort();
+        for (var i = 0; i < keys.length; i++) {
+            iterator.call(context, obj[keys[i]], keys[i]);
+        }
+        return keys;
     }
-
     function _catch(e,onerror){
         if(isFunction(onerror)){
             onerror(e);
@@ -297,10 +406,10 @@ var turtle,$t;
         return stacks.join("\r\n");
     }
     function getFileNameByURL(url){
-        return url.match(/[a-zA-Z\d\.]+\.[a-zA-Z\d]+$/)[0];
+        return url.match(/[a-zA-Z\d\._]+\.[a-zA-Z\d]+$/)[0];
     }
     function getNameByURL(url){
-        return url.match(/[a-zA-Z\d\.]+\.[a-zA-Z\d]+$/)[0].replace(/\.[a-zA-Z\d]+$/,'');
+        return url.match(/[a-zA-Z\d\._]+\.[a-zA-Z\d]+$/)[0].replace(/\.[a-zA-Z\d]+$/,'');
     }
     function getNameByLocation(){
         return getFileNameByURL(window.location.href);
@@ -325,6 +434,21 @@ var turtle,$t;
             return fn.apply(obj, arguments);
         };
     }
+    function getStep(fn,count){
+        if(!isNumber(count)){
+            return fn;
+        }
+        var step=count;
+        var _fn=function(){
+            if(step===count){
+                step=1
+                fn.apply(this,arguments);
+            }else{
+                step++;
+            }
+        }
+        return _fn;
+    }
     function getBindTry(obj, fn){
         return function (){
             try{
@@ -343,19 +467,231 @@ var turtle,$t;
         _fn.enable=true;
         return _fn;
     }
+    function getReTimeout(fn){
+        var timeid=0;
+        return function(delay){
+            if(timeid>0){
+                clearTimeout(timeid);
+            }
+            if(!delay){
+                delay=0;
+            }
+            var t=this;
+            var arg=slice.call(arguments,1);
+            timeid=setTimeout(function(){
+                timeid=0;
+                fn.apply(t,arg);
+            },delay);
+        }
+    }
+    function Empty(){}
+    function getDebounce(fn){
+        if(!isFunction(fn)){
+            return Empty;
+        }
+        var timeid=0;
+        return function(delay){
+            if(timeid>0){
+                return;
+            }
+            if(!delay){
+                delay=0;
+            }
+            var t=this;
+            var arg=slice.call(arguments,1);
+            timeid=setTimeout(function(){
+                timeid=0;
+                fn.apply(t,arg);
+            },delay);
+        }
+    }
+    var locStorage=(function(){
+        var storage = window.localStorage,
+                i=0,
+                len=0;
+        /*
+        从本地存储获取值
+        @param String key 设置localstorage的key
+        @param String value 设置localstorage的val
+    
+        */
+        function setValue(key,val){
+            try{
+                if(storage){
+                    if(!appcan.isString(val)){
+                        val = JSON.stringify(val);
+                    }
+                    storage.setItem(key,val);
+                }else{
+    
+                }
+            }catch(e){
+                _catch(e);
+            }
+        }
+        /*
+            批量设置localstorage
+    
+        */
+        function setValues(key){
+            if(appcan.isPlainObject(key)){
+                for(var k in key){
+                    if(key.hasOwnPropery(k)){
+                        setValue(k,key[k]);
+                    }
+                }
+            }else if(appcan.isArray(key)){
+                for(i=0,len=key.length;i<len;i++){
+                    if(key[i]){
+                        setValue.apply(this,key[i]);
+                    }
+                }
+            }else{
+                setValue.apply(this,arguments);
+            }
+        }
+    
+        /*
+        从localStorage拿出对应的值
+        @param String key 获取值的key
+    
+        */
+        function popValue(key){
+            if(!key){
+                return;
+            }
+            try{
+                if(storage){
+                    var v=storage.getItem(key);
+                    storage.removeItem(key);
+                    return v;
+                }
+            }catch(e){
+                _catch(e);
+            }
+        }
+        /*
+        从localStorage获取对应的值
+        @param String key 获取值的key
+    
+        */
+        function getValue(key){
+            if(!key){
+                return;
+            }
+            try{
+                if(storage){
+                    return storage.getItem(key);
+                }
+            }catch(e){
+                _catch(e);
+            }
+        }
+        /*
+        从localStorage获取所有的keys
+    
+        */
+        function getKeys(){
+            var res = [];
+            var key = '';
+            for (var i=0,len=storage.length; i< len; i++){
+                key = storage.key(i);
+                if(key){
+                    res.push(key);
+                }
+            }
+            return res;
+        }
+    
+        /*
+        青春对应的key
+        @param String key
+    
+    
+        */
+        function clear(key){
+            try{
+                if(key && isString(key)){
+                    storage.removeItem(key);
+                }else{
+                    storage.clear();
+                }
+            }catch(e){
+                _catch(e);
+            }
+        }
+    
+        /*
+        localStorage剩余空间大小
+    
+        */
+        function leaveSpace(){
+            var space = 1024 * 1024 * 5 - unescape(encodeURIComponent(JSON.stringify(storage))).length;
+            return space;
+        }
+        
+        /*
+            获取或者设置localStorage的值
+            @param String key
+            @param String val
+            
+        */
+        function val(key,value){
+            if(arguments.length === 1){
+                return getValue(key);
+            }
+            setValue(key,value);
+        }
+        
+        
+        function contains(key){
+            return storage.hasOwnProperty(key);
+        }
+        
+        
+        return {
+            getVal:getValue,
+            setVal:setValues,
+            leaveSpace:leaveSpace,
+            remove:clear,
+            keys:getKeys,
+            val:val,
+            contains:contains,
+            popVal:popValue
+        };
+    
+    })();
     function hasCustomToString(obj) {
       return isFunction(obj.toString) && obj.toString !== toString;
     }
     function getDPI(){
-        var edpi=document.createElement('div');
-        var dpi;
-        edpi.style.height="1em";
-        document.body.appendChild(edpi);
-        dpi=edpi.scrollHeight;
-        edpi.style.height="16px";
-        dpi=dpi/edpi.scrollHeight;
-        document.body.removeChild(edpi);
-        return dpi;
+        if(getDPI.DPI){
+            return getDPI.DPI;
+        }
+        var x,y;
+        if (window.screen.deviceXDPI != undefined) {
+            x = window.screen.deviceXDPI;
+            y = window.screen.deviceYDPI;
+        }
+        else {
+            var tmpNode = document.createElement("div");
+            tmpNode.style.cssText = "width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden";
+            document.body.appendChild(tmpNode);
+            x = parseInt(tmpNode.offsetWidth);
+            y = parseInt(tmpNode.offsetHeight);
+            tmpNode.parentNode.removeChild(tmpNode);    
+        }
+        getDPI.DPI=(x>y?y:x)/96
+        return getDPI.DPI;
+        // var edpi=document.createElement('div');
+        // var dpi;
+        // edpi.style.height="1em";
+        // document.body.appendChild(edpi);
+        // dpi=edpi.scrollHeight;
+        // edpi.style.height="16px";
+        // dpi=dpi/edpi.scrollHeight;
+        // document.body.removeChild(edpi);
+        // return dpi;
     }
     function getClosure(fn) {
         var _args=arguments;
@@ -437,7 +773,6 @@ var turtle,$t;
                     return _value.call(this, value);
                 };
                 newProperty.set=function(newValue) {
-                    if(value == newValue)return;
                     value = newValue;
                     _value.call(this, value);
                     fnOnSet.call(obj,name);
@@ -447,7 +782,6 @@ var turtle,$t;
                     return _value;
                 };
                 newProperty.set=function(newValue) {
-                    if(_value == newValue)return;
                     _value = newValue;
                     fnOnSet.call(obj,name);
                 };
@@ -471,13 +805,15 @@ var turtle,$t;
         desc=null;
     }
     function objectPropertyChange(obj,name,fnOnSet){
-        if(obj.hasOwnProperty(name))
+        if(obj.hasOwnProperty(name)){
             onPropertyChange(obj,name,fnOnSet);
+        }
     }
     function removeItem(arr,obj){
         var index=arr.indexOf(obj);
-        if(index!=-1)
+        if(index!=-1){
             arr.splice(index, 1);
+        }
     }
     function addBindInfo(obj,name,target,targetName,event){
         var bindInfoHash=obj.__bind__;
@@ -513,7 +849,9 @@ var turtle,$t;
                         var o=obj.__bind__;
                         for(var j in o){
                             if(o[j].targetName===name){
-                                obj[o[j].name]=this[name];
+                                if(obj[o[j].name]!=this[name]){/*相同则不重置*/
+                                    obj[o[j].name]=this[name];
+                                }
                             }
                         }
                     }
@@ -599,14 +937,36 @@ var turtle,$t;
         }
         return !!v;
     }
-    function addClass(elem,cls){
-        var lst;
-        if(!elem)
+    function addStyle(elem,style){
+        if(!style){
             return;
-        lst=elem.classList;
-        if(lst.contains(cls))
+        }
+        var oldStyle=elem.getAttribute('style');
+        if(oldStyle){
+            if(addStyleRE.test(oldStyle)){
+                style=oldStyle+style;
+            }else{
+                style=oldStyle+';'+style;
+            }
+        }
+        elem.setAttribute('style',style);
+    }
+    function addClassName(elem,className){
+        if(!className){
             return;
-        lst.add(cls);
+        }
+        var oldClass=elem.getAttribute('class');
+        if(oldClass){
+            if(addClassNameRE.test(oldClass)){
+                className=oldClass+className;
+            }else{
+                className=oldClass+' '+className;
+            }
+        }
+        elem.setAttribute('class',className);
+    }
+    function addClass(elem){
+        addClasses(elem,slice.call(arguments,1));
     }
     function addClasses(elem,clses){
         var lst;
@@ -620,11 +980,13 @@ var turtle,$t;
     }
     function removeClass(elem,cls){
         var lst;
-        if(!elem)
+        if(!elem){
             return;
+        }
         lst=elem.classList;
-        if(lst.contains(cls))
+        if(lst.contains(cls)){
             lst.remove(cls);
+        }
     }
     function removeClasses(elem,clses){
         var lst;
@@ -682,11 +1044,26 @@ var turtle,$t;
     var isArray = Array.isArray || function(a) {
         return "[object Array]"===_toString.call(a)
     }
+    function isPersent(s){
+        return persentRE.test(s);
+    }
+    function persentToFloat(s){
+        var v=persentRE.exec(s);
+        if(v){
+            return v[1]/100;
+        }
+    }
     function isArrayLike(a){return typeof a.length=='number'}
     function compact(array) { return array.filter(function(item){ return item !== undefined && item !== null }) }
     function flatten(array) { return array.length > 0 ? [].concat.apply([], array) : array }
-    function camelize(str){ return str.replace(/-+(.)?/g, function(match, chr){ return chr ? chr.toUpperCase() : '' }) }
-    function trim(s){return s.replace(/^\s*/g,"").replace(/\s*$/g,"");}
+    function camelize(str){ return str.replace(camelizeRE, function(match, chr){ return chr ? chr.toUpperCase() : '' }) }
+    function decamelize(str){
+         return str.replace(deCamelizeRE, function(match){ 
+             return '-'+match.toLowerCase();
+         }); 
+    }
+    function trim(s){return s.replace(/^\s*|\s*$/g,"");}
+    function HTMLTrim(s){return s.replace(/^[\s\r\n]*|[\s\r\n]*$/g,"");}
     function trimLine(s){return s.replace(/^\s*/g,"").replace(/\s*$/g,"").replace(/\s*[\r\n]\s*/g,"");}
     function isRepeat(arr) {
         var hash = {};
@@ -710,6 +1087,15 @@ var turtle,$t;
         rect.right=rect.left+e.offsetWidth;
         rect.bottom=rect.top+e.offsetHeight;
         return rect;
+    }
+    function getOffsetPos(elem1,elem2){
+        var pos={x:0,y:0};
+        while(elem1&&elem1!=elem2){
+            pos.x+=elem1.offsetLeft;
+            pos.y+=elem1.offsetTop;
+            elem1=elem1.parentNode;
+        }
+        return pos;
     }
     function each(elements, callback) {
         var i,
@@ -744,19 +1130,38 @@ var turtle,$t;
             }
         return flatten(values)
     }
-    var _en_decode=document.createElement('div');
-    function encodeHTML(str){
-      _en_decode.innerText=str;
-      var s=_en_decode.innerHTML;
-      _en_decode.innerHTML='';
-      return s;
-    }
-    function decodeHTML(str){
-      _en_decode.innerHTML=str;
-      var s=_en_decode.innerText;
-      _en_decode.innerHTML='';
-      return s;
-    }
+    var encodeHTML=(function(){
+        var 
+            re=/&lt;|&gt;/g,
+            fn=function(s){
+                switch(s){
+                    case "&lt;":
+                        return '<';
+                    case "&gt;":
+                        return '>';
+                }
+                return s;
+            }
+        return function(value){
+            return value.replace(re,fn);
+        }
+    }());
+    var decodeHTML=(function(){
+        var 
+            re=/<|>/g,
+            fn=function(s){
+                switch(s){
+                    case "<":
+                        return '&lt;';
+                    case ">":
+                        return '&gt;';
+                }
+                return s;
+            }
+        return function(value){
+            return value.replace(re,fn);
+        }
+    }());
     function idle(cb){
         var timeid=0;
         return function(delay){
@@ -780,7 +1185,7 @@ var turtle,$t;
     
     function repeatCall(delay,repeat,fn){
         var i=0;
-        id=setInterval(function(){
+        var id=setInterval(function(){
             i++;
             if(repeat!=-1&&i>=repeat){
                 clearInterval(id);
@@ -839,20 +1244,7 @@ var turtle,$t;
         }
         return false;
     }
-    function debounce(cb){
-        var timeid=0;
-        return function(delay){
-            if(timeid>0){
-                return;
-            }
-            if(!delay)
-                delay=0;
-            timeid=setTimeout(function(){
-                timeid=0;
-                biz.trycall(cb);
-            },delay);
-        }
-    }
+    
     function takeAttr(node,attrName,defaultValue){
         if(!node.hasAttribute(attrName)){
             return defaultValue;
@@ -886,7 +1278,14 @@ var turtle,$t;
         }
         return elem;
     }
-    
+    function merge(elem,elemEx){
+        for(var e in elemEx){
+            if(!elem.hasOwnProperty(e)){
+                elem[e]=elemEx[e];
+            }
+        }
+        return elem;
+    }
     /**
      *
      * 以下为turtle逻辑 
@@ -927,16 +1326,16 @@ var turtle,$t;
         if(isArray(files)){
             for(i in files){
                 var url=files[i];
-                if(isString(url)&&!(url in $t.jsScript)){
+                if(isString(url)&&!(url in jsScript)){
                     this.files.push(url);
-                    $t.jsScript[url]=document.createElement("script");
+                    jsScript[url]=$node("script");
                 }
             }
         }else if(files){
             url=files;
-            if(isString(url)&&!(url in $t.jsScript)){
+            if(isString(url)&&!(url in jsScript)){
                 this.files.push(url);
-                $t.jsScript[url]=document.createElement("script");
+                jsScript[url]=$node("script");
             }
         }
     }
@@ -961,16 +1360,54 @@ var turtle,$t;
         }
     }
     function newObject(type,prototype){
-        var t;
-        eval('var '+type+'=function(){};t='+type);
+        var s='var '+type+'=function(){};';
         if(isObject(prototype)){
-            t.prototype=prototype;
+            s+=type+'.prototype=proto;';
         }
-        return new t();
+        s+='return new '+type+'();';
+        return Function('proto',s)(prototype);
     }
-    function newArrayObject(type){
-        return eval('var '+type+'=function(){};'+type+'.prototype=Array.prototype;new '+type+'();');
+    function newArrayObject(type,prototype){
+        if(prototype){
+            return newObject(type,merge(prototype,newArrayObject.prototype));
+        }
+        return newObject(type,newArrayObject.prototype);
     }
+    newArrayObject.prototype={
+            clear:function(){
+                var l=this.length;
+                for(var i=0;i<l;i++){
+                    this.pop();
+                }
+            },
+            concat: arrayPrototype.concat,
+            // copyWithin: arrayPrototype.copyWithin,
+            // entries: arrayPrototype.entries,
+            every: arrayPrototype.every,
+            // fill: arrayPrototype.fill,
+            filter: arrayPrototype.filter,
+            // find: arrayPrototype.find,
+            // findIndex: arrayPrototype.findIndex,
+            forEach: arrayPrototype.forEach,
+            indexOf: arrayPrototype.indexOf,
+            join: arrayPrototype.join,
+            // keys: arrayPrototype.keys,
+            lastIndexOf: arrayPrototype.lastIndexOf,
+            map: arrayPrototype.map,
+            pop: arrayPrototype.pop,
+            push: arrayPrototype.push,
+            reduce: arrayPrototype.reduce,
+            reduceRight: arrayPrototype.reduceRight,
+            reverse: arrayPrototype.reverse,
+            shift: arrayPrototype.shift,
+            slice: arrayPrototype.slice,
+            some: arrayPrototype.some,
+            sort: arrayPrototype.sort,
+            splice: arrayPrototype.splice,
+            toLocaleString: arrayPrototype.toLocaleString,
+            toString: arrayPrototype.toString,
+            unshift: arrayPrototype.unshift
+        }
     function newHashObject(type){
         return newObject(type,newHashObject.prototype);
     }
@@ -993,7 +1430,31 @@ var turtle,$t;
             }catch(e){}
         }
     }*/
-    
+    function Store(){}
+    Store.prototype=extend({
+            take:function(name){
+                if(this.hasOwnProperty(name)){
+                    var ret=this[name];
+                    delete this[name];
+                    if(ret.childNodes.length>1){
+                        return ret.childNodes;
+                    }else{
+                        return ret.childNodes[0];
+                    }
+                }
+            },
+            takeElem:function(name){
+                if(this.hasOwnProperty(name)){
+                    var ret=this[name];
+                    delete this[name];
+                    if(ret.children.length>1){
+                        return ret.children;
+                    }else{
+                        return ret.children[0];
+                    }
+                }
+            }
+        },newHashObject.prototype);
     function XHR(){
         function send(type,url,data,async,fn,fnerror){
             var xhr=new XMLHttpRequest();
@@ -1022,15 +1483,19 @@ var turtle,$t;
         return t;
     }
     function treeEach(array,property,fn,beginIndex){
-        if(!isArrayLike(array))return;
-        var arr=array;
-        var i=beginIndex>=0?beginIndex:0;
-        var stack=[];
-        var obj;
-        var obj2;
-        var state;
-        var step={next:1}
-        while(1){
+        if(!isArrayLike(array)){
+            return;
+        }
+        var 
+            arr=array,
+            i=beginIndex>=0?beginIndex:0,
+            stack=[],
+            obj,
+            obj2,
+            state,
+            step={next:1};
+            
+        while(true){
             if(i<arr.length){
                 obj=arr[i];
                 step.next=1;
@@ -1087,19 +1552,32 @@ var turtle,$t;
     }
     function replaceNodeByNode(node,node2){
         var parent=node.parentNode;
-        if(parent==null)return;
+        if(parent==null){
+            return;
+        }
         insertNode(node,node2);
         parent.removeChild(node);
     }
     function insertNodesBefore(node,nodes){
         var parent=node.parentNode;
-        if(parent==null)return;
+        if(parent==null){
+            return;
+        }
         for(var i=0;i<nodes.length;i++){
             parent.insertBefore2(nodes[i],node);
         }
     }
+    function insertNodeBefore(node,node2){
+        var parent=node.parentNode;
+        if(parent==null)return;
+        parent.insertBefore2(node2,node);
+    }
+    /*
+    @param String nodes 节点数组
+    @param Function parent 父节点
+     */
     function appendNodes(nodes,parent){
-        var c=toArray(nodes);
+        var c=slice.call(nodes);
         for(var i=0;i<c.length;i++){
             parent.appendChild(c[i]);
         }
@@ -1124,28 +1602,35 @@ var turtle,$t;
         node.insertAdjacentText('beforeBegin',s)
         parent.removeChild(node);
     }
-    function parseBreak(node,outerChildNodes,outerElement,props,component){
-        initHTML(node.childNodes,outerChildNodes,outerElement,props,component);
+    function parseBreak(node,outerChildNodes,outerElement,props,part){
+        initHTML(node.childNodes,outerChildNodes,outerElement,props,part);
         takeOutChildNodes(node);
     }
-    function parseGet(node,outerChildNodes,outerElement,props,component){
+    function parseGet(node,outerChildNodes,outerElement,props,part){
+        removeNode(node);
         var name=getAttr(node,'name');
         if(name){
-            name=name;
-            initHTML(node.childNodes,outerChildNodes,outerElement,props,component)
-            $t.getNode[name]=node;    
+            initHTML(node.childNodes,outerChildNodes,outerElement,props,part);
+            $t.store[name]=node;    
+            return treeEach.c_noIn;
         }
-        removeNode(node);
-        return treeEach.c_noIn;
+        var toRef=getAttr(node,'to-p-ref');
+        if(toRef&&part){
+            toRef='$'+toRef;
+            if(part[toRef]){
+                appendNodes(node.childNodes,part[toRef]);
+                initHTML(part[toRef].childNodes,outerChildNodes,outerElement,props,part);
+                node.innerHTML='';
+            }
+        }
     }
-    function execOnScript(node,outerChildNodes,outerElement,props,component){
+    function execOnScript(node,outerChildNodes,outerElement,props,part){
         var p=node.parentNode;
         if(p){
             var script=node.innerHTML;
             if(script.length>0){
                 /*设置父对象事件*/
-                var events;
-                eval('events={'+script+'}');
+                var events=exec('({'+script+'})');
                 for(var i in events){
                     if(isFunction(events[i])){
                         p.addEventListener(i,events[i]);
@@ -1154,23 +1639,20 @@ var turtle,$t;
             }
         }
     }
-    function execScript(node,outerChildNodes,outerElement,props,component){
+    function execScript(node,outerChildNodes,outerElement,props,part){
+        'use strict'
         var script=node.innerHTML;
         if(script.length>0){
             var fn;
-            var name=getAttr(node,'name',null);
-            var key=getUIName(node.parentNode);
-            if(name)
-                key+='.'+name;
             var keyVar=String(getAttr(node,'var',''));
             
-            fn=Function('outer,outerElement,props,component'+(keyVar?',':'')+keyVar,script);
+            fn=Function('outer,outerElement,props,part'+(keyVar?',':'')+keyVar,script);
             
-            var args=[outerChildNodes,outerElement,props,component];
+            var args=[outerChildNodes,outerElement,props,part];
             if(keyVar.length>0){
                 keyVar=keyVar.split(',');
                 for(var i=0;i<keyVar.length;i++){
-                    var ui=$t.refNode[keyVar[i]];
+                    var ui=$t.refs[keyVar[i]];
                     if(ui){
                         args.push(ui[ui.length-1]);
                     }else{
@@ -1186,17 +1668,17 @@ var turtle,$t;
             fn=null;
         }
     }
-    function execTurtleScript(node,outerChildNodes,outerElement,props,component){
+    function execTurtleScript(node,outerChildNodes,outerElement,props,part){
         var type=getAttr(node,'type',null);
         if(type=='on'){
-            execOnScript(node,outerChildNodes,outerElement,props,component)
+            execOnScript(node,outerChildNodes,outerElement,props,part)
         }else{
-            execScript(node,outerChildNodes,outerElement,props,component);
+            execScript(node,outerChildNodes,outerElement,props,part);
         }
     }
-    function execTemplateScript(s,node,outerChildNodes,outerElement,props,component){
+    function execTemplateScript(s,node,outerChildNodes,outerElement,props,part){
         s=s.replace(/{%.+?%}/g,function(s){
-            return execByScope(node,s.substring(2,s.length-2),null,outerChildNodes,outerElement,props,component);
+            return execByScope(node,s.substring(2,s.length-2),null,outerChildNodes,outerElement,props,part);
         })
         return s;
     }
@@ -1206,31 +1688,29 @@ var turtle,$t;
         else
             return scope;
     }
-    function execByScope(node,s,scope,outer,outerElement,props,component){
-        return _execByScope.call(getScopeBy(scope,node),s,node,outer,outerElement,props,component);
+    function execByScope(node,s,scope,outer,outerElement,props,part){
+        return _execByScope.call(getScopeBy(scope,node),s,node,outer,outerElement,props,part);
     }
-    function _execByScope(s,node,outer,outerElement,props,component){
-        with(this){return eval(arguments[0])};
+    function execScope(s,node,outerChildNodes,outerElement,props,part){
+        execByScope(node,'$t.extend(this,{'+s+'});',null,outerChildNodes,outerElement,props,part);
     }
-    function execScope(s,node,outerChildNodes,outerElement,props,component){
-        execByScope(node,'extend(this,{'+s+'});',null,outerChildNodes,outerElement,props,component);
-    }
-    function parseScript(node,outerChildNodes,outerElement,props,component){
+    function parseScript(node,outerChildNodes,outerElement,props,part){
         if(node.type==""||node.type=="on"||node.type=="text/javascript"){
             var src=getAttr(node,'src','');
             if(src){
                 includeJSFiles(src);
             }else{
-                execTurtleScript(node,outerChildNodes,outerElement,props,component);
+                execTurtleScript(node,outerChildNodes,outerElement,props,part);
             }
             removeNode(node);
         }
     }
     function _getBindObject(scope,name){
-        var length=name.length;
+        'use strict'
+        var i,obj,length=name.length;;
         while(scope){
-            var obj=scope;
-            for(var i=0;i<length;i++){
+            obj=scope;
+            for(i=0;i<length;i++){
                 if(obj.hasOwnProperty(name[i])){
                     if(i<length-1){
                         obj=obj[name[i]];
@@ -1241,6 +1721,20 @@ var turtle,$t;
                 }
             }   
             scope=scope.__parent__;
+        }
+        
+        obj=window[name[0]];
+        if(obj){
+            for(i=1;i<length;i++){
+                if(obj.hasOwnProperty(name[i])){
+                    if(i<length-1){
+                        obj=obj[name[i]];
+                        continue;
+                    }else{
+                        return obj;    
+                    }
+                }
+            }
         }
         return null;
     }
@@ -1291,12 +1785,6 @@ var turtle,$t;
         obj2[name2]=obj[name];
     }
     
-    function _execExpressionsByScope(s,v,node){
-        var arg={v:v,node:node};
-        with(this){
-            return eval(arguments[0])
-        };
-    }
     function bindExpressionsByOrder(node,condition){
         var cdtn=splitByOnce(condition,'|');
         if(cdtn.length<2)
@@ -1307,7 +1795,7 @@ var turtle,$t;
             obj,
             bindVar=cdtn[0],
             exp,
-            textNode=document.createTextNode('');
+            textNode=$node(' ',3);
             
         if(bindVar.indexOf(".")!=-1){
             bindVar=bindVar.split(".");
@@ -1317,17 +1805,22 @@ var turtle,$t;
         name=bindVar[bindVar.length-1];
         scope=$t.uiScope.get(node);
         obj=_getBindObject(scope,bindVar);
+        if(obj===null){
+            throwError('不能获取绑定属性:'+cdtn[0]);
+            return;
+        }
         exp=function(v){
             try{
                 return _execExpressionsByScope.call(scope,cdtn[1],v,node);
             }catch(e){_catch(e)}
         }
-        exp.__that__=exp;
-        $t.bindProperty(obj,name,exp,'__that__');
+        exp.__me__=exp;
+        $t.bindProperty(obj,name,exp,'__me__');
         replaceNodeByNode(node,textNode);
-        bindElementProperty(exp,'__that__',textNode,'data');
-        textNode['data']=exp.__that__;
+        bindElementProperty(exp,'__me__',textNode,'data');
+        textNode['data']=exp.__me__;
     }
+    /*绑定属性与描述*/
     function bindNodeProperty(node,proName,condition){
         var 
             cdtn=splitByOnce(condition,"|"),
@@ -1354,27 +1847,31 @@ var turtle,$t;
         name=bindVar[bindVar.length-1];
         scope=$t.uiScope.get(node);
         obj=_getBindObject(scope,bindVar);
+        if(obj===null){
+            throwError('不能获取绑定属性:'+cdtn[0]);
+            return;
+        }
         if(cdtn.length==2){
             exp=function(v){
-                obj2[name2]=execNodeValueEval(v,node,cdtn[1]);
+                obj2[name2]=_execExpressionsByScope(cdtn[1],v,node);
             }
-            exp.__that__=exp;
-            bindProperty(obj,name,exp,'__that__');
+            exp.__me__=exp;
+            bindProperty(obj,name,exp,'__me__');
         }else{
             bindElementProperty(obj,name,obj2,name2);
             obj2[name2]=obj[name];
         }
     }
-    function execNodeValueEval(v,node,s){
-        with(this){return eval(s)}
-    }
-    
+    /*
+     * 绑定标签属性
+     */ 
     function bindElementPropertyByName(node,elementValueName,condition){
         var 
             cdtn=splitByOnce(condition,"|"),
             name=cdtn[0],
             scope,
-            exp;
+            exp,
+            obj;
         if(!name)return;
         scope=$t.uiScope.get(node);
         if(name.indexOf(".")!=-1){
@@ -1384,29 +1881,41 @@ var turtle,$t;
         }else{
             obj=_getBindObject(scope,[name]);
         }
-        if(!obj)return;
+        if(obj===null){
+            throwError('不能获取绑定属性:'+cdtn[0]);
+            return;
+        }
         
         if(cdtn.length==2){
             exp=function(v){
-                execNodeValueEval(v,node,cdtn[1]);
+                _execExpressionsByScope(cdtn[1],v,node);
             }
-            exp.__that__=exp;
-            bindProperty(obj,name,exp,"__that__");
+            exp.__me__=exp;
+            bindProperty(obj,name,exp,"__me__");
         }else{
             if(!node.__bind__)node[elementValueName]=obj[name];
             bindProperty(obj,name,node,elementValueName);
         }
     }
-    function bindNode(node,condition){
+    function pref(node,part,refName){
+        if(part&&refName){
+            refName=refName.split(',');
+            for(var i=0;i<refName.length;i++){
+                part['$'+refName[i]]=node;    
+            }
+        }
+    }
+    function bindNodeByCondition(node,condition){
         var 
             cdtn=splitByOnce(condition,"|"),
             name=cdtn[0],
             scope,
             obj,
-            exp,
-            elementValueName,
-            eventName;
-        if(!name)return;
+            exp;
+            
+        if(!name){
+            return;
+        }
         scope=$t.uiScope.get(node);
         if(name.indexOf(".")!=-1){
             name=name.split(".");
@@ -1415,71 +1924,81 @@ var turtle,$t;
         }else{
             obj=_getBindObject(scope,[name]);
         }
-        if(!obj)return;
-        
-        if(cdtn.length==2){
+        if(obj===null){
+            throwError('不能获取绑定属性:'+cdtn[0]);
+            return;
+        }
+        if(cdtn.length===2){
             exp=function(v){
-                execNodeValueEval(v,node,cdtn[1]);
+                _execExpressionsByScope(cdtn[1],v,node);
             }
-            exp.__that__=exp;
-            bindProperty(obj,name,exp,"__that__");
+            exp.__me__=exp;
+            bindProperty(obj,name,exp,"__me__");
         }else{
-            switch(node.nodeName){
-                case "SELECT":
-                    elementValueName="value";
-                    eventName="change";
-                    break;
-                case "TEXTAREA":
-                    elementValueName="value";
-                    eventName="input";
-                    break;
-                case "INPUT":
-                    switch(node.type){
-                        case "checkbox":
-                            elementValueName="checked";
-                            eventName="click";
-                            break;
-                        default:
-                            elementValueName="value";
-                            eventName="input";
-                            break;
-                    }
-                    break;
-                case "#text":
-                    elementValueName="data";
-                    break;
-                case "BUTTON":
-                case "DIV":
-                default:
-                    elementValueName="innerHTML";
-                    break;
-            }
-            if(!node.__bind__)node[elementValueName]=obj[name];
-            bindElementProperty(obj,name,node,elementValueName);
-            if(eventName){
-                node.addEventListener(eventName,function(){
-                    obj[name]=node[elementValueName];
-                });
-            }
+            bindNode(node,obj,name);
+        }
+    }
+    function bindNode(node,obj,name){
+        var 
+            elementValueName,
+            eventName;
+        switch(node.nodeName){
+            case "SELECT":
+                elementValueName="value";
+                eventName="change";
+                break;
+            case "TEXTAREA":
+                elementValueName="value";
+                eventName="input";
+                break;
+            case "INPUT":
+                switch(node.type){
+                    case "checkbox":
+                        elementValueName="checked";
+                        eventName="click";
+                        break;
+                    default:
+                        elementValueName="value";
+                        eventName="input";
+                        break;
+                }
+                break;
+            case "#text":
+                elementValueName="data";
+                break;
+            case "BUTTON":
+            case "DIV":
+            default:
+                elementValueName="innerHTML";
+                break;
+        }
+        if(!node.__bind__){
+            node[elementValueName]=obj[name];
+        }
+        bindElementProperty(obj,name,node,elementValueName);
+        if(eventName){
+            node.addEventListener(eventName,function(){
+                obj[name]=node[elementValueName];
+            });
         }
     }
     function throwError(err){
         try{
-            throw new Error(err);
+            throw new Error('turtle:\n'+err);
         }catch(e){
             _catch(e);
         }
     }
-    function replaceByObjectAttr(s,obj){
+    /*function replaceByObjectAttr(s,obj){
         var err=[];
         s=s.replace(memberRE,
             function(s){
-                var isDefault;
+                var hasDefault;
                 var dft;
                 var limitValue;
                 s=s.substring(1,s.length-1);
-                isDefault=/\!/.test(s);
-                if(isDefault){
+                hasDefault=/\!/.test(s);
+                if(hasDefault){
                     s=s.split('!');
                     dft=s[1];
                     if(s.length>2)
@@ -1492,7 +2011,7 @@ var turtle,$t;
                     }else{
                         return obj[s];
                     }
-                }else if(isDefault){
+                }else if(hasDefault){
                     return dft;
                 }else{
                     err.push('不可缺少'+s+'属性');
@@ -1512,12 +2031,12 @@ var turtle,$t;
         var err=[];
         s=s.replace(memberRE,
             function(s){
-                var isDefault;
+                var hasDefault;
                 var dft;
                 var limitValue;
                 s=s.substring(1,s.length-1);
-                isDefault=/\!/.test(s);
-                if(isDefault){
+                hasDefault=/\!/.test(s);
+                if(hasDefault){
                     s=s.split('!');
                     dft=s[1];
                     if(s.length>2)
@@ -1530,10 +2049,10 @@ var turtle,$t;
                     }else{
                         return node.getAttribute(s);
                     }   
-                }else if(isDefault){
+                }else if(hasDefault){
                     return dft;
                 }else{
-                     err.push(getUIName(node)+'不可缺少'+s+'参数');
+                     err.push(getUIInfo(node).name+'不可缺少'+s+'参数');
                     return undefined;
                 }
             }
@@ -1545,31 +2064,24 @@ var turtle,$t;
             console.log(err.join('\r\n'));
         }
         return s;
-    }
-    function parseDefine(node){
-        switch(true){
-            case node.hasAttribute('service'):
-                defineServiceByNode(node);
-                break;
-            case node.hasAttribute('ui'):
-                defineUIByNode(node);
-                break;
-            case node.hasAttribute('class'):
-                defineClasses(node);
-                break;
-        }
-    }
-    function getUIName(node){
-        if(/UI:[A-Z\d]+/.test(node.nodeName)){
-            var n=node.nodeName.toLowerCase();
-            return n.substring(3,n.length);
-        }else if(node.nodeName=='SCRIPT'&&getAttr(node,'type')=='ui'){
-            return node.getAttribute('name').toLowerCase();
-        }
-    }
-    /*function parseText(node,outerChildNodes,outerElement,props,component){
-        node.data=execTemplateScript(node.data,node.parentNode,outerChildNodes,outerElement,props,component);
     }*/
+    /*function parseText(node,outerChildNodes,outerElement,props,part){
+        node.data=execTemplateScript(node.data,node.parentNode,outerChildNodes,outerElement,props,part);
+    }*/
+    function getFunctionComment(fn){
+        var s=functionCommentRE.exec(fn.toString());
+        return s[1];
+    }
+    function getFunctionComments(fn){
+        var str=fn.toString();
+        var s;
+        var arr=[];
+        while((s=functionCommentRE.exec(str))!==null){
+            arr.push(s[1]);
+        }
+        functionCommentRE.lastIndex=0;
+        return arr;
+    }
     var getCommentText;
     
     if(Comment.prototype.hasOwnProperty("text")){
@@ -1580,7 +2092,7 @@ var turtle,$t;
            }else if(/^<!([\s\S]*?)>$/.test(s)){
                return s.substring(2,s.length-1);
            }
-            return node.text.replace(/^!-?|-?&/);
+            return node.text.replace(/^!-?|-?&/,'');
         }
     }else{
         getCommentText=function(node){
@@ -1598,7 +2110,8 @@ var turtle,$t;
             }
         } 
     }
-    function parseCommentOrderBlock(node,outerChildNodes,outerElement,props,component){
+    var orderStack= newArrayObject('OrderStack');
+    function parseCommentOrderBlock(node,outerChildNodes,outerElement,props,part){
         var i=getNodeIndex2(node);
         var isError=false;
         var error=function(msg){
@@ -1611,15 +2124,15 @@ var turtle,$t;
             var info=getCommentStringInfo(getCommentText(node));
             if(!info)return;
             if(info.order){
-                var ret=parseCommentOrderNoScript(info,node,outerChildNodes,outerElement,props,component);
+                var ret=parseCommentOrderNoScript(info,node,outerChildNodes,outerElement,props,part);
                 if(ret){
                     step.next=ret.index-getNodeIndex2(node)+1;
                 }
                 return treeEach.c_noRepeat+treeEach.c_noIn;
             }
             if(info.orderCase=='end'){
-                if(_OrderBlockStack.length>0){
-                    _OrderBlockStack.pop().endNode=node;
+                if(orderStack.length>0){
+                    orderStack.pop().endNode=node;
                     
                     return treeEach.c_stopEach;
                 }else{
@@ -1638,14 +2151,229 @@ var turtle,$t;
         }
         return n;
     }
-    function cloneBewtween(node1,node2){
-        var nodes=[];
+    function DropRect(elem,fnbegin,fn,fnend){
+        this.on=function(){
+            elem.addEventListener("mousedown",md);
+            elem.addEventListener("touchstart",td);
+            with(document.body){
+                addEventListener("mouseup",mu);
+                addEventListener("touchend",tu);
+                addEventListener("touchcancel",tu);
+            }
+        }
+        this.off=function(){
+            elem.removeEventListener("mousedown",md);
+            elem.removeEventListener("touchstart",td);
+            with(document.body){
+                removeEventListener("mouseup",mu);
+                removeEventListener("touchend",tu);
+                removeEventListener("touchcancel",tu);
+            }
+        }
         
+        var start,offsetLeft,offsetTop;
+        
+        function setOffset(){
+            var node=elem.valueOf();
+            var t=0,l=0;
+            var topE=document.documentElement;
+            while(node!==topE){
+                t+=node.offsetTop;
+                l+=node.offsetLeft;
+                node=node.parentNode;
+            }
+            offsetLeft=l;
+            offsetTop=t;
+        }
+        function md(e){
+            start=e;
+            setOffset();
+            document.body.addEventListener("mousemove",mm);
+            fnbegin(offsetLeft,offsetTop);
+        }
+        function td(e){
+            start=e.changedTouches[0];
+            setOffset();
+            fnbegin(offsetLeft,offsetTop);
+            document.body.addEventListener("touchmove",tm);
+        }
+        function getRectByPoint(x1,y1,x2,y2){
+            var rect={}
+            if(x1>x2){
+                rect.left=x2;
+                rect.width=x1-x2;
+            }else{
+                rect.left=x1;
+                rect.width=x2-x1;
+            }
+            if(y1>y2){
+                rect.top=y2;
+                rect.height=y1-y2;
+            }else{
+                rect.top=y1;
+                rect.height=y2-y1;
+            }
+            rect.screenLeft=rect.left;
+            rect.screenTop=rect.top;
+            rect.left-=offsetLeft;
+            rect.top-=offsetTop;
+            return rect;
+        }
+        function mm(e){
+            if(start){
+                fn(getRectByPoint(start.x,start.y,e.clientX,e.clientY));
+            }
+        }
+        function tm(e){
+            if(start){
+                fn(getRectByPoint(start.changedTouches[0].clientX,start.changedTouches[0].clientY,e.changedTouches[0].clientX,e.changedTouches[0].clientY));
+            }
+        }
+        function mu(e){
+            if(start){
+                fnend(getRectByPoint(start.x,start.y,e.clientX,e.clientY));
+                start=null;
+                document.body.removeEventListener("mousemove",mm);
+            }
+        }
+        function tu(e){
+            if(start){
+                fnend(getRectByPoint(start.changedTouches[0].clientX,start.changedTouches[0].clientY,e.changedTouches[0].clientX,e.changedTouches[0].clientY));
+                start=null;
+                document.body.removeEventListener("touchmove",tm);
+            }
+        }
+    }
+    function dropMove(elemTarget,elemMove,arrow,noOut,fn){
+        fn=getDebounce(fn);
+        elemTarget.addEventListener("mousedown",md);
+        elemTarget.addEventListener("touchstart",td);
+        with(document.body){
+            addEventListener("mouseup",mu);
+            addEventListener("touchend",tu);
+            addEventListener("touchcancel",tu);
+        }
+        var start,startLeft,startTop;
+        function md(e){
+            e.stopPropagation();
+            startLeft=elemMove.offsetLeft;
+            startTop=elemMove.offsetTop;
+            start=e;
+            document.body.addEventListener("mousemove",mm);
+        }
+        function td(e){
+            e.stopPropagation();
+            startLeft=elemMove.offsetLeft;
+            startTop=elemMove.offsetTop;
+            start=e.changedTouches[0];
+            document.body.addEventListener("touchmove",tm);
+        }
+        function mmove(e){
+            switch(arrow){
+                case 1:
+                    setLeft(startLeft+e.x-start.x);
+                    break;
+                case 2:
+                    setTop(startTop+e.y-start.y);
+                    break;
+                case 3:
+                    setLeft(startLeft+e.clientX-start.x);
+                    setTop(startTop+e.clientX-start.x);
+                    break;
+                case 4:
+                    setLeft(startLeft+e.clientY-start.y);
+                    setTop(startTop+e.clientY-start.y);
+                    break;
+                default:
+                    setLeft(startLeft+e.x-start.x);
+                    setTop(startTop+e.y-start.y);
+            }
+            fn(30);
+        }
+        function mm(e){
+            if(start){
+                mmove(e);
+            }
+        }
+        function setLeft(v){
+            if(noOut){
+                if(v<0){
+                    v=0;
+                }else if(v+elemMove.offsetWidth>elemMove.parentNode.offsetWidth){
+                    v=elemMove.parentNode.offsetWidth-elemMove.offsetWidth;
+                }
+            }
+            elemMove.style.left=v+'px';
+        }
+        function setTop(v){
+            if(noOut){
+                if(v<0){
+                    v=0;
+                }else if(v+elemMove.offsetHeight>elemMove.parentNode.scrollHeight){
+                    v=elemMove.parentNode.offsetHeight-elemMove.offsetHeight;
+                }
+            }
+            elemMove.style.top=v+'px';
+        }
+        function tmove(e){
+            switch(arrow){
+                case 1:
+                    setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
+                    break;
+                case 2:
+                    setTop(startTop+e.changedTouches[0].clientY-start.changedTouches[0].clientY);
+                    break;
+                case 3:
+                    setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
+                    setTop(startTop+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
+                    break;
+                case 4:
+                    setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientY);
+                    setTop(startTop+e.changedTouches[0].clientY-start.changedTouches[0].clientY);
+                    break;
+                default:
+                    setLeft(startLeft+e.changedTouches[0].clientX-start.changedTouches[0].clientX);
+                    setTop(startTop+e.changedTouches[0].clientY-start.changedTouches[0].clientY);
+            }
+            fn(30);
+        }
+        function tm(e){
+            if(start){
+                tmove(e);
+            }
+        }
+        function mu(e){
+            if(start){
+                mmove(e);
+                start=null;
+                document.body.removeEventListener("mousemove",mm);
+            }
+        }
+        function tu(e){
+            if(start){
+                tmove(e);
+                start=null;
+                document.body.removeEventListener("touchmove",tm);
+            }
+        }
+    }
+    function cloneBetween(node1,node2){
+        var nodes=[];
         var l1=getNodeIndex2(node1);
         var l2=getNodeIndex2(node2);
         var p1=node1.parentNode;
         for(var i=l1+1;i<l2;i++){
             nodes.push(deepClone(p1.childNodes[i]));
+        }
+        return nodes;
+    }
+    function getElementsBetween(node1,node2){
+        var nodes=[];
+        var l1=getNodeIndex2(node1);
+        var l2=getNodeIndex2(node2);
+        var p1=node1.parentNode;
+        for(var i=l1+1;i<l2;i++){
+            nodes.push(p1.childNodes[i]);
         }
         return nodes;
     }
@@ -1668,14 +2396,14 @@ var turtle,$t;
             p1.removeChild(p1.childNodes[l1]);
         }
     }
-    function parseComment(node,outerChildNodes,outerElement,props,component){
+    function parseComment(node,outerChildNodes,outerElement,props,part){
         var info=getCommentStringInfo(getCommentText(node));
         if(!info)return;
         if(!info.order){
             alert("语法错误：不恰当的"+info.orderCase);
             return ;
         }
-        parseCommentOrder(info,node,outerChildNodes,outerElement,props,component);
+        parseCommentOrder(info,node,outerChildNodes,outerElement,props,part);
         if(node.order){
             if(node.order.endNode){
                 node.order.run();
@@ -1683,12 +2411,43 @@ var turtle,$t;
             }
         }
     }
-    function parseSwitchOrder(info,node,outerChildNodes,outerElement,props,component){
+    function parseAsyncOrder(info,node,outerChildNodes,outerElement,props,part){
+        return addOrderToNode(node,info,outerChildNodes,outerElement,props,part,function(){
+            return {
+                run:function(){
+                    var order=this;
+                    var ns=takeBlockBetween(this.node,this.endNode);
+                    var delay=parseInt(this.condition);
+                    if(delay===NaN){
+                        delay=0;
+                    }
+                    removeNode(this.endNode);
+                    var mark=$node('async',8);
+                    replaceNodeByNode(this.node,mark);
+                    this.endNode=null;
+                    this.node=null;
+                    setTimeout(function(){
+                        var elem=$node('div');
+                        var p=mark.parentNode;
+                        replaceNodeByNode(mark,elem);
+                        mark=null;
+                        appendNodes(ns,elem);
+                        var chds=elem.childNodes;
+                        initHTML(chds,outerChildNodes,outerElement,props,part);
+                        takeOutChildNodes(elem);
+                        elem=null;
+                        replaceCls();
+                    },delay);
+                }
+            }
+        });
+    }
+    function parseSwitchOrder(info,node,outerChildNodes,outerElement,props,part){
         
-        return addOrderToNode(node,info,outerChildNodes,outerElement,props,component,function(){
+        return addOrderToNode(node,info,outerChildNodes,outerElement,props,part,function(){
             
             return {
-                value:execByScope(node,info.condition,null,outerChildNodes,outerElement,props,component),
+                value:execByScope(node,info.condition,null,outerChildNodes,outerElement,props,part),
                 hit:null,
                 needBreak:false,
                 endHit:null,
@@ -1710,7 +2469,7 @@ var turtle,$t;
                                 if(order.hasDefault){
                                     return error('语法错误：default后不应出现case/case break');
                                 }else if(!order.hit){
-                                    var isPass=order.value==execByScope(node,info.condition,scope,outerChildNodes,outerElement,props,component);
+                                    var isPass=order.value==execByScope(node,info.condition,scope,outerChildNodes,outerElement,props,part);
                                     if(isPass){
                                         order.hit=node;
                                         node.order=info.orderCase;
@@ -1764,7 +2523,7 @@ var turtle,$t;
             }
         });
     }
-    function parseBreakOrder(info,node,outerChildNodes,outerElement,props,component){
+    function parseBreakOrder(info,node,outerChildNodes,outerElement,props,part){
         /*删除后面节点,父节点后面节点,父父节点后面节点直至__break__*/
         var _node=node.previousSibling;
         if(!_node)
@@ -1783,8 +2542,8 @@ var turtle,$t;
         }
         _node.source.onBreak();
     }
-    function parseIfOrder(info,node,outerChildNodes,outerElement,props,component){
-        return addOrderToNode(node,info,outerChildNodes,outerElement,props,component,function(){
+    function parseIfOrder(info,node,outerChildNodes,outerElement,props,part){
+        return addOrderToNode(node,info,outerChildNodes,outerElement,props,part,function(){
             var scope=$t.uiScope.get(node);
             return {
                 endHit:null,
@@ -1792,7 +2551,7 @@ var turtle,$t;
                 hasElse:false,
                 run:function(){
                     var order=this;
-                    order.hit=parseBool(execByScope(node,this.condition,scope,outerChildNodes,outerElement,props,component))?this.node:null;
+                    order.hit=parseBool(execByScope(node,this.condition,scope,outerChildNodes,outerElement,props,part))?this.node:null;
                     treeEach(node.parentNode.childNodes,'childNodes',function(node,step){
                         if(node.nodeType!=8)return;
                         var info=getCommentStringInfo(getCommentText(node));
@@ -1812,7 +2571,7 @@ var turtle,$t;
                                         if(order.hit){
                                             order.endHit=node;
                                         }else{
-                                            if(info.orderCase=='else'||parseBool(execByScope(node,this.condition,scope,outerChildNodes,outerElement,props,component))){
+                                            if(info.orderCase=='else'||parseBool(execByScope(node,this.condition,scope,outerChildNodes,outerElement,props,part))){
                                                 order.hit=node;
                                             }else{
                                                 /*删除else if*/
@@ -1849,7 +2608,7 @@ var turtle,$t;
             }
         });
     }
-    function addOrderToNode(node,info,outerChildNodes,outerElement,props,component,fnGetOrder){
+    function addOrderToNode(node,info,outerChildNodes,outerElement,props,part,fnGetOrder){
         var order;
         if(!node.order){
             order=fnGetOrder();
@@ -1858,26 +2617,26 @@ var turtle,$t;
             order.node=node;
             order.endNode=null;
             order.condition=info.condition;
-            _OrderBlockStack.push(order);
-            order.parseCommentOrderBlockReturnValue=parseCommentOrderBlock(node,outerChildNodes,outerElement,props,component);
+            orderStack.push(order);
+            order.parseCommentOrderBlockReturnValue=parseCommentOrderBlock(node,outerChildNodes,outerElement,props,part);
         }else{
             order=node.order;
         }
         return order.parseCommentOrderBlockReturnValue;
     }
-    function parseWhileOrder(info,node,outerChildNodes,outerElement,props,component){
+    function parseWhileOrder(info,node,outerChildNodes,outerElement,props,part){
         
-        return addOrderToNode(node,info,outerChildNodes,outerElement,props,component,function(){
+        return addOrderToNode(node,info,outerChildNodes,outerElement,props,part,function(){
             return {
                 run:function(){
                     var p=this.node.parentNode;
-                    if(this.isBreak||!parseBool(execByScope(this.node,this.condition,null,outerChildNodes,outerElement,props,component))){
+                    if(this.isBreak||!parseBool(execByScope(this.node,this.condition,null,outerChildNodes,outerElement,props,part))){
                         //全部删除
                         removeBlockBetween(this.node,this.endNode);
                         p.removeChild(this.node);
                         p.removeChild(this.endNode);
                     }else{
-                        var nodes=cloneBewtween(this.node,this.endNode);
+                        var nodes=cloneBetween(this.node,this.endNode);
                         this.node.parentNode.insertBefore2(createBreakElement(nodes,this),this.node);
                     }
                 },
@@ -1888,19 +2647,19 @@ var turtle,$t;
             }
         });
     }
-    function parseForOrder(info,node,outerChildNodes,outerElement,props,component){
+    function parseForOrder(info,node,outerChildNodes,outerElement,props,part){
         
-        return addOrderToNode(node,info,outerChildNodes,outerElement,props,component,function(){
+        return addOrderToNode(node,info,outerChildNodes,outerElement,props,part,function(){
             var check;
-            if(/[a-zA-Z\d] in .*/.test(info.condition)){
-                check=new function(){
+            if(parseForOrderRE.test(info.condition)){
+                check=(function(){
                     var s=info.condition.split(' in '),
                         index=0,
                         names=[],
                         source;
                     return function(){
                         if(!source){
-                            source=execByScope(node,s[1],null,outerChildNodes,outerElement,props,component)
+                            source=execByScope(node,s[1],null,outerChildNodes,outerElement,props,part)
                             if(!source){
                                 return {result:false,params:null}
                             }
@@ -1912,16 +2671,16 @@ var turtle,$t;
                             }
                         }
                         if(index<names.length){
-                            execByScope(node,s[0]+'=\''+names[index]+'\';',null,outerChildNodes,outerElement,props,component)
+                            execByScope(node,s[0]+'=\''+names[index]+'\';',null,outerChildNodes,outerElement,props,part)
                             index++;
                             return {result:true,params:null}
                         }else{
                             return {result:false,params:null}
                         }
                     }
-                }
-            }else if(/^.*;.*;.*$/.test(info.condition)){
-                check=new function(){
+                }());
+            }else if(parseForOrderRE2.test(info.condition)){
+                check=(function(){
                     var isFirst=true;
                     var s=info.condition.split(';');
                     if(s.length==2){
@@ -1932,13 +2691,13 @@ var turtle,$t;
                     return function(){
                         if(isFirst){
                             isFirst=false;
-                            execByScope(node,s[0],null,outerChildNodes,outerElement,props,component);
+                            execByScope(node,s[0],null,outerChildNodes,outerElement,props,part);
                         }else{
-                            execByScope(node,s[2],null,outerChildNodes,outerElement,props,component);
+                            execByScope(node,s[2],null,outerChildNodes,outerElement,props,part);
                         }
-                        return {result:execByScope(node,s[1],null,outerChildNodes,outerElement,props,component),params:null};
+                        return {result:execByScope(node,s[1],null,outerChildNodes,outerElement,props,part),params:null};
                     }
-                }
+                }());
             }else{
                 check=function(){
                     return {result:false,params:null};
@@ -1955,7 +2714,7 @@ var turtle,$t;
                         p.removeChild(this.node);
                         p.removeChild(this.endNode);
                     }else{
-                        var nodes=cloneBewtween(this.node,this.endNode);
+                        var nodes=cloneBetween(this.node,this.endNode);
                         this.node.parentNode.insertBefore2(createBreakElement(nodes,this),this.node);
                     }
                 },
@@ -1967,46 +2726,45 @@ var turtle,$t;
         });
     }
     function createBreakElement(nodes,order){
-        var breakElement=document.createElement('__break__');
+        var breakElement=$node('__break__');
         for(var i=0;i<nodes.length;i++){
             breakElement.appendChild(nodes[i]);
         }
         breakElement.source=order;
         return breakElement;
     }
-    function parseCommentOrderNoScript(info,node,outerChildNodes,outerElement,props,component){
+    function parseCommentOrderNoScript(info,node,outerChildNodes,outerElement,props,part){
+        /*不渲染，纯找结构*/
         switch(info.order){
             case 'while':
-                return parseWhileOrder(info,node,outerChildNodes,outerElement,props,component);
-                break;
+                return parseWhileOrder(info,node,outerChildNodes,outerElement,props,part);
             case 'if':
-                return parseIfOrder(info,node,outerChildNodes,outerElement,props,component);
-                break;
+                return parseIfOrder(info,node,outerChildNodes,outerElement,props,part);
             case 'for':
-                return parseForOrder(info,node,outerChildNodes,outerElement,props,component);
-                break;
+                return parseForOrder(info,node,outerChildNodes,outerElement,props,part);
             case 'switch':
-                return parseSwitchOrder(info,node,outerChildNodes,outerElement,props,component);
-                break;
+                return parseSwitchOrder(info,node,outerChildNodes,outerElement,props,part);
+            case 'async':
+                return parseAsyncOrder(info,node,outerChildNodes,outerElement,props,part);
         }
     }
-    function parseScopeOrder(info,node,outerChildNodes,outerElement,props,component){
+    function parseScopeOrder(info,node,outerChildNodes,outerElement,props,part){
         var condition=splitByOnce(info.condition,"|");
         if(condition.length==2){
             $t.uiScope.create(node,condition[0]);
-            execScope(condition[1],node,outerChildNodes,outerElement,props,component);
+            execScope(condition[1],node,outerChildNodes,outerElement,props,part);
         }else{
             $t.uiScope.create(node,condition[0]);
         }
         removeNode(node);
     }
-    function parseCommentOrder(info,node,outerChildNodes,outerElement,props,component){
+    function parseCommentOrder(info,node,outerChildNodes,outerElement,props,part){
         switch(info.order){
             case 'scope':
-                parseScopeOrder(info,node,outerChildNodes,outerElement,props,component);
+                parseScopeOrder(info,node,outerChildNodes,outerElement,props,part);
                 break;
             case 'var':
-                execScope(info.condition,node,outerChildNodes,outerElement,props,component);
+                execScope(info.condition,node,outerChildNodes,outerElement,props,part);
                 removeNode(node);
                 break;
             case 'bind':
@@ -2016,35 +2774,40 @@ var turtle,$t;
                 bindExpressionsByOrder(node,info.condition);
                 break;
             case '!':
-                execByScope(node,info.condition,null,outerChildNodes,outerElement,props,component);
+                execByScope(node,info.condition,null,outerChildNodes,outerElement,props,part);
                 removeNode(node);
                 break;
             case '=':
-                var v=execByScope(node,info.condition,null,outerChildNodes,outerElement,props,component);
-                replaceNodeByNodes(node,[document.createTextNode(v)]);
+                var v=execByScope(node,info.condition,null,outerChildNodes,outerElement,props,part);
+                if(isObject(v)&&v.nodeType){
+                    replaceNodeByNode(node,v);
+                }else{
+                    replaceNodeByNode(node,$node(v,3));
+                }
+                
                 break;
             case 'content':
                 replaceNodeByNodes(node,outerChildNodes);
                 break;
+            case 'elements':
+                replaceNodeByNodes(node,outerElement);
+                break;
             case 'while':
-                return parseWhileOrder(info,node,outerChildNodes,outerElement,props,component);
-                break;
+                return parseWhileOrder(info,node,outerChildNodes,outerElement,props,part);
             case 'if':
-                return parseIfOrder(info,node,outerChildNodes,outerElement,props,component);
-                break;
+                return parseIfOrder(info,node,outerChildNodes,outerElement,props,part);
             case 'break':
-                return parseBreakOrder(info,node,outerChildNodes,outerElement,props,component);
-                break;
+                return parseBreakOrder(info,node,outerChildNodes,outerElement,props,part);
             case 'for':
-                return parseForOrder(info,node,outerChildNodes,outerElement,props,component);
-                break;
+                return parseForOrder(info,node,outerChildNodes,outerElement,props,part);
             case 'switch':
-                return parseSwitchOrder(info,node,outerChildNodes,outerElement,props,component);
-                break;
+                return parseSwitchOrder(info,node,outerChildNodes,outerElement,props,part);
+            case 'async':
+                return parseAsyncOrder(info,node,outerChildNodes,outerElement,props,part);
         }
     }
     function getLastOrder(name){
-        var arr=_OrderBlockStack;
+        var arr=orderStack;
         if(arr.length==0)return null;
         var order=arr[arr.length-1];
         if(order.name==name){
@@ -2057,9 +2820,24 @@ var turtle,$t;
         var ret=parseXMP(node);
         replaceNodeByNodes(node,ret);
     }
-    function parseLazy(node,outerChildNodes,outerElement,props,component){
+    function parseLazy(node,outerChildNodes,outerElement,props,part){
         node.removeAttribute('lazy');
-        initHTML(node.childNodes,outerChildNodes,outerElement,props,component);
+        initHTML(node.childNodes,outerChildNodes,outerElement,props,part);
+    }
+    function parseAsync(node,outerChildNodes,outerElement,props,part){
+        var delay=parseInt(execByScope(node,node.getAttribute('async')),null,outerChildNodes,outerElement,props,part);
+        node.removeAttribute('async');
+        var mark=$node('async',8);
+        replaceNodeByNode(node,mark);
+        if(delay===NaN){
+            delay=0;
+        }
+        setTimeout(function(){
+            replaceNodeByNode(mark,node);
+            mark=null;
+            initHTML([node],outerChildNodes,outerElement,props,part);
+            replaceCls();
+        },delay);
     }
     var elementParser={
                 GET:parseGet,
@@ -2068,51 +2846,65 @@ var turtle,$t;
                 SCRIPT:parseScript
             }
         ,attributeParser={
-            ref:function(node,outerChildNodes,outerElement,props,component){
-                $t.refNode.push(node.getAttribute('ref'),node);
+            ref:function(node,outerChildNodes,outerElement,props,part){
+                var refName=node.getAttribute('ref')
                 node.removeAttribute('ref');
+                $t.refs.push(refName.split(','),node);
             }
-            ,":":function(node,outerChildNodes,outerElement,props,component){
-                execNodeQuestion(node,outerChildNodes,outerElement,props,component);
-                setQuestionAtrr(node,outerChildNodes,outerElement,props,component);
+            ,":":function(node,outerChildNodes,outerElement,props,part){
+                execNodeQuestion(node,outerChildNodes,outerElement,props,part);
+                setQuestionAtrr(node,outerChildNodes,outerElement,props,part);
             }
-            ,bind:function(node,outerChildNodes,outerElement,props,component){
-                bindNode(node,takeAttr(node,'bind'));
+            ,'p-ref':function(node,outerChildNodes,outerElement,props,part){
+                pref(node,part,takeAttr(node,'p-ref'));
             }
-            ,remove:function(node,outerChildNodes,outerElement,props,component){
-                bindRemove(node,takeAttr(node,'remove'),outerChildNodes,outerElement,props,component);
+            ,bind:function(node,outerChildNodes,outerElement,props,part){
+                bindNodeByCondition(node,takeAttr(node,'bind'));
             }
-            ,add:function(node,outerChildNodes,outerElement,props,component){
-                bindAdd(node,takeAttr(node,'add'),outerChildNodes,outerElement,props,component);
+            ,remove:function(node,outerChildNodes,outerElement,props,part){
+                bindRemove(node,takeAttr(node,'remove'),outerChildNodes,outerElement,props,part);
             }
-            ,show:function(node,outerChildNodes,outerElement,props,component){
-                bindShowHide(node,takeAttr(node,'show'),true,outerChildNodes,outerElement,props,component);
+            ,add:function(node,outerChildNodes,outerElement,props,part){
+                bindAdd(node,takeAttr(node,'add'),outerChildNodes,outerElement,props,part);
             }
-            ,hide:function(node,outerChildNodes,outerElement,props,component){
-                bindShowHide(node,takeAttr(node,'hide'),false,outerChildNodes,outerElement,props,component);
+            ,show:function(node,outerChildNodes,outerElement,props,part){
+                bindShowHide(node,takeAttr(node,'show'),true,outerChildNodes,outerElement,props,part);
             }
-            ,cls:function(node,outerChildNodes,outerElement,props,component){
+            ,hide:function(node,outerChildNodes,outerElement,props,part){
+                bindShowHide(node,takeAttr(node,'hide'),false,outerChildNodes,outerElement,props,part);
+            }
+            ,cls:function(node,outerChildNodes,outerElement,props,part){
                 $t.clsNode.push(node);
                 /*不要删node.removeAttribute('cls');*/
             }
+            ,'p-main':function(node,outerChildNodes,outerElement,props,part){
+                if(part&&!part.partMain){
+                    part.partMain=node;
+                }
+            }
         };
-    function initHTML(c,outerChildNodes,outerElement,props,component){
+    function initHTML(c,outerChildNodes,outerElement,props,part){
         treeEach(c,'childNodes',function(node,step){
             if(node.nodeType===8){
                 try{
-                    parseComment(node,outerChildNodes,outerElement,props,component);    
+                    parseComment(node,outerChildNodes,outerElement,props,part);    
                 }catch(e){_catch(e)}
-                return;
+                return treeEach.c_noIn;
             }
             if(node.nodeType!==1){
                 return;
             }
-            if(node.hasAttribute('lazy')){
-                parseLazy(node,outerChildNodes,outerElement,props,component);
+            if(node.hasAttribute('async')){
+                parseAsync(node,outerChildNodes,outerElement,props,part);
                 return treeEach.c_repeat;
             }
-            if(isUI(node)){
-                parseUI(node,step,component);
+            if(node.hasAttribute('lazy')){
+                parseLazy(node,outerChildNodes,outerElement,props,part);
+                return treeEach.c_noIn|treeEach.c_repeat;
+            }
+            var uiInfo=getUIInfo(node);
+            if(uiInfo){
+                parseUI(node,uiInfo,step,part);
                 return treeEach.c_noIn|treeEach.c_noRepeat;
             }
             /*if(isTemplate(node)){
@@ -2120,19 +2912,18 @@ var turtle,$t;
                 return;
             }*/
             if(elementParser.hasOwnProperty(node.nodeName)){
-                var ret=elementParser[node.nodeName](node,outerChildNodes,outerElement,props,component);
-                if(ret){
+                /* var ret=*/return elementParser[node.nodeName](node,outerChildNodes,outerElement,props,part);
+                /* if(ret){
                     return ret;
-                };
+                 };*/
             }
             var attrs=slice.call(node.attributes);
             for(var i=0;i<attrs.length;i++){
                 if(attributeParser.hasOwnProperty(attrs[i].name)){
-                    attributeParser[attrs[i].name](node,outerChildNodes,outerElement,props,component);
+                    attributeParser[attrs[i].name](node,outerChildNodes,outerElement,props,part);
                 }
             }
         });
-        
     }
     
     function defineClasses(node){
@@ -2148,13 +2939,13 @@ var turtle,$t;
         return false;
     }
     
-    function parseSet(node,outerChildNodes,outerElement,props,component){
-        var attr=node.attributes;
+    function parseSet(node,outerChildNodes,outerElement,props,part){
+        
         if(node.hasAttribute('link')){
             /*设置关联子对象*/
             var link=takeAttr(node,'link');
-            if($t.getNode.hasOwnProperty(link)&&node.children.length==1){
-                appendNodes($t.getNode[link].childNodes,node.children[0]);
+            if($t.store.hasOwnProperty(link)&&node.children.length==1){
+                appendNodes($t.store[link].childNodes,node.children[0]);
                 takeOutChildNodes(node);
             }else{
                 removeNode(node);
@@ -2173,6 +2964,7 @@ var turtle,$t;
             }
             var isAppend=!node.hasAttribute('append');
             node.removeAttribute('append');
+            var attr=node.attributes;
             for(var j=0;j<ns.length;j++){
                 if(isAppend){
                     for(var i=0;i<attr.length;i++){
@@ -2184,8 +2976,16 @@ var turtle,$t;
                         switch(attr[i].name){
                             case 'class':
                                 var value2=ns[j].getAttribute(attr[i].name);
-                                if(value2)
-                                    value=value2+' '+value;
+                                if(value2){
+                                    value+=(/ $/.test(value)?'':' ')+value2;
+                                }
+                                break;
+                            case 'style':
+                                var value2=ns[j].getAttribute(attr[i].name);
+                                if(value2){
+                                    value+=(/; *$/.test(value)?'':';')+value2;
+                                }
+                                    
                                 break;
                         }
                         ns[j].setAttribute(attr[i].name,value);
@@ -2196,8 +2996,8 @@ var turtle,$t;
         }
         return treeEach.c_noIn;
     }
-    function setNodeProperty(node,proName,condition,outerChildNodes,outerElement,props,component){
-        var v=execByScope(node,condition,null,outerChildNodes,outerElement,props,component);
+    function setNodeProperty(node,proName,condition,outerChildNodes,outerElement,props,part){
+        var v=execByScope(node,condition,null,outerChildNodes,outerElement,props,part);
         var name=camelCase(proName.substr(0,proName.length-1));
         
         if(name.indexOf(".")!=-1){
@@ -2213,12 +3013,33 @@ var turtle,$t;
             node.setAttribute(name,v);
         }
     }
+    function getObjectValue(obj,vars){
+        for(var i in vars){
+            if(vars[i] in obj){
+                obj=obj[vars[i]];
+            }else{
+                return null;
+            }
+        }
+        return obj;
+    }
+    function bindFunction(obj,bindVar,fn){
+        var vars=bindVar.split('.');
+        var propertyName;
+        if(vars.length>0){
+            propertyName=vars.pop();
+            obj=getObjectValue(obj,vars);
+        }else{
+            propertyName=bindVar;
+        }
+        fn.__me__=fn;
+        bindProperty(obj,propertyName,fn,"__me__");
+    }
     function bindNodeFunction(node,bindVar,fn){
         var 
             name,
             scope,
-            obj,
-            obj2;
+            obj;
         if(bindVar.indexOf(".")!=-1){
             bindVar=bindVar.split(".");
         }else{
@@ -2227,18 +3048,14 @@ var turtle,$t;
         name=bindVar[bindVar.length-1];
         scope=$t.uiScope.get(node);
         obj=_getBindObject(scope,bindVar);
-        obj2={fn:fn};
-        bindProperty(obj,name,obj2,"fn");
-        return {object:obj,name:name,targetObject:obj2,targetName:"fn"};
+        fn.__me__=fn;
+        bindProperty(obj,name,fn,"__me__");
+        return {object:obj,name:name,targetObject:fn,targetName:"__me__"};
     }
-    function execValueByScope(node,s,v,scope,outer,outerElement,props,component){
-        return _execValueByScope.call(getScopeBy(scope,node),s,v,node,outer,outerElement,props,component);
+    function execValueByScope(node,s,v,scope,outer,outerElement,props,part){
+        return _execValueByScope.call(getScopeBy(scope,node),s,v,node,outer,outerElement,props,part);
     }
-    function _execValueByScope(s,v,node,outer,outerElement,props,component){
-        var arg={node:node,v:v,outer:outer,outerElement:outerElement,props:props,component:component}
-        with(this){return eval(arguments[0])};
-    }
-    function bindEval(node,s,outer,outerElement,props,component,fn){
+    function bindEval(node,s,outer,outerElement,props,part,fn){
         var 
             operator=s.match(operatorRE)[0],
             bindVar=splitByOnce(s,operator),
@@ -2255,11 +3072,11 @@ var turtle,$t;
                 break;
         }
         return bindNodeFunction(node,bindVar[0],function(v){
-            fn.call(this,execValueByScope(node,sfn,v,this,outer,outerElement,props,component));
+            fn.call(this,execValueByScope(node,sfn,v,this,outer,outerElement,props,part));
         });
     }
-    function bindShowHide(node,s,isBindShow,outer,outerElement,props,component){
-        bindEval(node,s,outer,outerElement,props,component,function(v){
+    function bindShowHide(node,s,isBindShow,outer,outerElement,props,part){
+        bindEval(node,s,outer,outerElement,props,part,function(v){
             if(v){
                 if(isBindShow){
                     removeClass(node,'uhide');
@@ -2275,134 +3092,212 @@ var turtle,$t;
             }
         });
     }
-    function bindRemove(node,s,outer,outerElement,props,component){
-        var bindInfo=bindEval(node,s,outer,outerElement,props,component,function(v){
+    function bindRemove(node,s,outer,outerElement,props,part){
+        var bindInfo=bindEval(node,s,outer,outerElement,props,part,function(v){
             if(!v)return;
             removeBind(this,bindInfo.targetName,bindInfo.name);
             removeNode(node);
         });
     }
-    function bindAdd(node,s,outer,outerElement,props,component){
-        var placeholder=document.createComment('');
+    function bindAdd(node,s,outer,outerElement,props,part){
+        var placeholder=$node('',8);
         replaceNodeByNode(node,placeholder);
-        var bindInfo=bindEval(node,s,outer,outerElement,props,component,function(v){
+        var bindInfo=bindEval(node,s,outer,outerElement,props,part,function(v){
             if(!v)return;
             removeBind(this,bindInfo.targetName,bindInfo.name);
             replaceNodeByNode(placeholder,node);
         });
     }
-    function execNodeQuestion(node,outerChildNodes,outerElement,props,component){
+    function execNodeQuestion(node,outerChildNodes,outerElement,props,part){
         var v=takeAttr(node,':');
         if(v.length>0){
-            execByScope(node,v,null,outerChildNodes,outerElement,props,component);
+            execByScope(node,v,null,outerChildNodes,outerElement,props,part);
         }
     }
-    function setQuestionAtrr(node,outerChildNodes,outerElement,props,component){
+    function setQuestionAtrr(node,outerChildNodes,outerElement,props,part){
         var attrs=slice.call(node.attributes);
         for(var i=0;i<attrs.length;i++){
             var name=attrs[i].name;
             if(name.length>1){
                 if(name[name.length-1]===':'){
-                    setNodeProperty(node,name,takeAttr(node,name),outerChildNodes,outerElement,props,component);
+                    setNodeProperty(node,name,takeAttr(node,name),outerChildNodes,outerElement,props,part);
                 }else if(name[0]===':'){
                     bindNodeProperty(node,name.substring(1,name.length),takeAttr(node,name));
                 }
             }
         }
     }
-    function UIParam(name,isDefault,defaultValue,limitValue){
+    function UIParam(name,hasDefault,filter,filterParam,defaultValue,limitValue){
         this.name=name;
-        this.isDefault=isDefault;
+        this.hasDefault=hasDefault;
         this.defaultValue=defaultValue;
         this.limitValue=limitValue;
+        this.filter=filter;
+        this.filterParam=filterParam;
     }
-    function UITemplate(name,s,isInnerUI){
+    function UITemplate(name,sortPath,path,s,ext){
         var t=this;
-        t.params=[];
-        t.datas=[];
-        t.components=[];
-        t.isInnerUI=parseBool(isInnerUI);
-        if(isObject(s)){
-            extend(t,s);
-            return;
-        }
-        var start=0;
-        var idx=0;
-        s.replace(memberRE,function(s0,s1,s2,index,sSource){
-            var isDefault;
-            var dft;
-            var limitValue;
-            var name;
-            var s;
-            s=s0.substring(1,s0.length-1);
-            isDefault=/\!/.test(s);
-            if(isDefault){
-                s=s.split('!');
-                dft=s[1];
-                if(s.length>2)
-                    limitValue=s[2];
-                name=s[0];
-            }else{
-                name=s;
-            }
-            idx++;
-            t.params.push(new UIParam(name,isDefault,dft,limitValue));
-            t.datas.push(sSource.substring(start,index));
-            start=index+s0.length;
-            return '';
-        });
-        t.datas.push(s.substring(start,s.length));
-        t.service=new Service();
         t.name=name;
-        t.componentName=t.name.replace(/[\.]/g,"_");
+        t.sortPath=sortPath;
+        t.path=path;
+        t.partName=t.name.replace(/[\.]/g,"_");
+        (t.parts=[]).last=last;
+        if(isObject(s)){
+            if(!isArray(s.params)){
+                t.params=[];    
+            }else{
+                t.params=s.params;
+            }
+            
+            if(!isArray(s.datas)){
+                t.datas=[];
+            }else{
+                t.datas=s.datas;
+            }
+            
+            if(isObject(s.extends)){
+                t.extends=s.extends;
+            }
+            
+            t.isJSDefine=true;
+            
+            if(isObject(s.service)){
+                if(!(s.service instanceof Service)){
+                    t.service=new Service(s.service);
+                }else{
+                    t.service=s.service;
+                }
+            }else{
+                t.service=new Service();
+            }
+        }else{
+                
+            t.params=[];
+            t.datas=[];
+            t.isJSDefine=false;
+            t.service=new Service();
+            if(ext){
+                t.extends=ext;    
+            }
+            var start=0;
+            var idx=0;
+            s.replace(memberRE,function(s0,name,s1,dft,s2,s3,limit,s4,s5,s6,filter,filterParam,index,sSource){
+                var hasDefault;
+                if(s1==="!"){
+                    if(s1!==s3){
+                        dft=limit;
+                        limit="";
+                    }
+                    hasDefault=true;
+                }else{
+                    hasDefault=false;
+                }
+                if(filterParam){
+                    filterParam=filterParam.substring(1,filterParam.length-1);
+                }
+                idx++;
+                t.params.push(new UIParam(name,hasDefault,filter,filterParam,dft,limit));
+                t.datas.push(sSource.substring(start,index));
+                start=index+s0.length;
+                return '';
+            });
+            t.datas.push(s.substring(start,s.length));
+        }
     }
     UITemplate.prototype={
-        renderIn:function(elem,outerChildNodes,outerElement,props,component){
+        /*调用render*/
+        renderIn:function(elem,outerChildNodes,outerElement,props,part,partName,reExtends){
+            var uiNode;
             if(!isArray(outerChildNodes)){
                 outerChildNodes=[];
             }
             if(!isArray(outerElement)){
                 outerElement=[];
             }
-            var uiNode=document.createElement("ui:render");
+            uiNode=$node('ui:render');//document.createElement("ui:render");
             if(elem){
                 elem.appendChild(uiNode);    
             }
-            return this.render(uiNode,elem,outerChildNodes,outerElement,props,component);
+            return this.render(uiNode,elem,outerChildNodes,outerElement,props,part,partName,reExtends);
         },
-        renderBefore:function(elem,outerChildNodes,outerElement,props,component){
+        /*调用render*/
+        renderBefore:function(elem,outerChildNodes,outerElement,props,part,partName,reExtends){
+            var uiNode;
             if(!isArray(outerChildNodes)){
                 outerChildNodes=[];
             }
             if(!isArray(outerElement)){
                 outerElement=[];
             }
-            var uiNode=document.createElement("ui:render");
+            uiNode=$node('ui:render');//document.createElement("ui:render");
             if(elem&&elem.parentNode){
                 elem.parentNode.insertBefore2(uiNode,elem);
             }
-            return this.render(uiNode,elem,outerChildNodes,outerElement,props,component);
+            return this.render(uiNode,elem,outerChildNodes,outerElement,props,part,partName,reExtends);
         },
-        render:function(uiNode,that,outerChildNodes,outerElement,props,component){
-            var d=slice.call(this.datas);
-            var err=[];
-            if(!uiNode){
-                uiNode=document.createElement("ui:render");
-            }
-            setQuestionAtrr(uiNode,outerChildNodes,outerElement,props,component);
+        /*渲染dom*/
+        render:function(uiNode,that,outerChildNodes,outerElement,props,part,partName,reExtends){
+            
+            var 
+                ext,
+                attrs,
+                len,
+                html,
+                part;
+                
             
             if(!isObject(props)){
                 props={};
             }
-            var attrs=uiNode.attributes;
-            var len=attrs.length;
-            for(var i=0;i<len;i++){
-                var name=attrs[0].name;
-                if(!props.hasOwnProperty(name)){
-                    props[name]=attrs[0].value;    
+            
+            if(!uiNode){
+                uiNode=$node('ui:render');//document.createElement("ui:render");
+            }else{
+                setQuestionAtrr(uiNode,outerChildNodes,outerElement,part?part.props:props,part);
+            
+                attrs=uiNode.attributes;
+                len=attrs.length;
+                for(var i=0;i<len;i++){
+                    var name=attrs[0].name;
+                    if(!props.hasOwnProperty(name)){
+                        props[name]=attrs[0].value;    
+                    }
+                    uiNode.removeAttributeNode(attrs[0]);
                 }
-                uiNode.removeAttributeNode(attrs[0]);
             }
+            html=this.joinDatasByProps(props);
+            if(html===undefined){
+                return;
+            }
+            
+            if(reExtends){
+                ext=getExtends(reExtends,this.sortPath);
+            }
+            if(!ext){
+                ext=this.extends;
+            }
+            if(ext instanceof UITemplate){
+                ext=ext.beExtends(uiNode,that,outerChildNodes,outerElement,props,part);
+            }
+            part=newPart(this,uiNode,ext,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part,partName)
+            this.parts.push(part);
+            
+            if(uiNode.parentNode!==null){
+                //var p=uiNode.parentNode.__domNode__;
+                part.insertBefore(uiNode);
+                removeNode(uiNode);
+                /*if(p){
+                    debugger;
+                    vNodesToDOM(part.store);
+                }*/
+            }
+            return part;
+        },
+        /*由props构建html字符串*/
+        joinDatasByProps:function(props){
+            
+            var err=[];
+            var d=slice.call(this.datas);
             for(var i=0;i<d.length-1;i+=2){
                 var v;
                 var p=this.params[i/2];
@@ -2412,11 +3307,14 @@ var turtle,$t;
                     }else{
                         v=props[p.name];
                     }
-                }else if(p.isDefault){
+                }else if(p.hasDefault){
                     v=p.defaultValue;
                 }else{
                     err.push(this.name+'不可缺少'+p.name+'参数');
                     v=undefined;
+                }
+                if(p.filter&&paramFilter.hasOwnProperty(p.filter)){
+                    v=paramFilter[p.filter](v,p.filterParam);
                 }
                 d.splice(i+1, 0, v);  
             }
@@ -2424,48 +3322,161 @@ var turtle,$t;
                 if($t.config.debugMode==2){
                     alert(err.join('\r\n'));
                 }
-                console.log(err.join('\r\n'));
+                log(err.join('\r\n'));
+                bp();
                 return;
             }
-            var component=newComponent(this,uiNode,execTemplateScript(d.join(''),that,outerChildNodes,outerElement,props,component),outerChildNodes,outerElement,props,component)
-            this.components.push(component);
-            if(uiNode.parentNode!==null){
-                component.insertBefore(uiNode);
+            return d.join('');
+        },
+        /*变成别人的扩展*/
+        beExtends:function(uiNode,that,outerChildNodes,outerElement,props,part){
+            if(this.extends instanceof UITemplate){
+                var ext=this.extends.beExtends(uiNode,that,outerChildNodes,outerElement,props,part);
             }
-            removeNode(uiNode);
-        
-            return component;
+            var html;
+            html=this.joinDatasByProps(props);
+            return newExtendsPart(this,uiNode,ext,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part);
+        },
+        toDefineString:function(){
+            var s='$t.ui.define("'+this.name+'","'+this.sortPath+'","'+this.path+'",{datas:';
+            s+=JSON.stringify(this.datas).replace(/<\/script>/g,'</scr"+"ipt>');
+            s+=',params:[';
+            var params=[];
+            var ps=this.params;
+            for(var i=0;i<ps.length;i++){
+                var dft=JSON.stringify(ps[i].defaultValue);
+                var limitValue=JSON.stringify(ps[i].limitValue);
+                
+                if(limitValue===undefined){
+                    limitValue="";
+                }else{
+                    limitValue=','+limitValue;
+                }
+                if(dft===undefined){
+                    if(limitValue!==""){
+                        dft=",undefined";
+                    }else{
+                        dft="";
+                    }
+                }else{
+                    dft=','+dft;
+                }
+                params.push('new $t.UIParam("'+ps[i].name+'",'+ps[i].hasDefault+',"'+ps[i].filter+'","'+ps[i].filterParam+'"'+dft+limitValue+')')
+            }
+            s+=params.join(',');
+            s+='],service:'+this.service.toDefineString();
+            s+="});";
+            return s;
+        },
+        parseParamsHelp:function(p){
+            var params=this.params;
+            for(var i=0;i<params.length;i++){
+                if(p.hasOwnProperty(params[i].name)){
+                    p[params[i].name]|=!params[i].hasDefault;
+                }else{
+                    p[params[i].name]=!params[i].hasDefault;
+                }
+            }
+            if(this.extends){
+                this.extends.parseParamsHelp(p);
+            }
+        },
+        getParamsHelp:function(){
+            var p={};
+            this.parseParamsHelp(p);
+            var arr=[];
+            for(var i in p){
+                arr.push({name:i,necessary:p[i]});
+            }
+            return arr;
         }
     }
-    
-    function newComponent(template,node,s,outerChildNodes,outerElement,props,component){
-        var t=newObject(template.componentName,newComponent.prototype);
+    function newExtendsPart(template,node,extPart,s,outerChildNodes,outerElement,props,part){
+        if(extPart){
+            var t=newObject(template.partName,extPart);
+        }else{
+            var t=newObject(template.partName,newPart.prototype);    
+        }
         var name=template.name;
-        node.innerHTML=s;
-        var begin=t.begin=document.createComment('<'+name+'>');
-        var end=t.end=document.createComment('</'+name+'>')
-        end.component=begin.component=t;
-        begin.sign=1;
-        end.sign=0;
-        t.props=props;
-        t.template=template;
-        t.onInsert=null;
-        t.isInsert=false;
-        var nodes=node.childNodes;
         
+        var dom=$DOM(s);
+        //node.innerHTML=s;
+        t.template=template;
+        t.super=extPart;
+        t.isExtend=true
+        var nodes=dom.childNodes;
+        t.$=new Service(template.service);
         initHTML(nodes,outerChildNodes,outerElement,props,t);
-        t.store=slice.call(nodes);
-        t.store.unshift(begin);
-        t.store.push(end);
-        debugger;
+        t.store=[];
         for(var i=nodes.length;i>0;i--){
-            node.removeChild(nodes[0]);
+            t.store.push(dom.removeChild(nodes[0]));
+        }
+        t.to=function(part){
+            var proto=part.$.__proto__;
+            t.$.__proto__=proto;
+            part.$.__proto__=t.$;
+            if(extPart){
+                extPart.to(part);
+            }
+            
+            push.apply(part.store,t.store);
         }
         return t;
     }
-    newComponent.prototype={
+    function newPart(template,node,extPart,s,outerChildNodes,outerElement,props,part,partName){
+        if(extPart){
+            var t=newObject(template.partName,extPart);
+        }else{
+            var t=newObject(template.partName,newPart.prototype);    
+        }
+        
+        if(partName){
+            $t.parts.push(partName,t);    
+        }
+        var name=template.name;
+        
+        var dom=$DOM(s);
+        //node.innerHTML=s;
+        var begin=t.begin=$node(name,8);// document.createComment('<'+name+'>');
+        var end=t.end=$node('/'+name,8);//document.createComment('</'+name+'>')
+        end.part=begin.part=t;
+        begin.sign=1;
+        end.sign=0;
+        
+        t.props=props;
+        t.template=template;
+        t.onInsert=null;
+        t.super=extPart;
+        t.isExtend=false;
+        t.resPath=template.path+'/'+template.name+'.res';
+        var sp=t;
+        while(sp.super){
+            sp=sp.super
+        }
+        t.basePart=sp?sp:t;
+        t.basePart.isInsert=false;
+        t.$=new Service(template.service);
+        t.store=[];
+        
+        var nodes=dom.childNodes;
+        
+        initHTML(nodes,outerChildNodes,outerElement,props,t);
+        if(extPart){
+            extPart.to(t);
+        }
+        
+        t.store.push.apply(t.store,nodes);
+        for(var i=nodes.length;i>0;i--){
+            dom.removeChild(nodes[0]);
+        }
+        t.store.unshift(begin);
+        t.store.push(end);
+        t.emitInit(t);
+        return t;
+    }
+    newPart.prototype={
         toString:function(){
-            return this.template.componentName+":"+JSON.stringify(this.props);
+            return this.template.partName+":"+JSON.stringify(this.props);
         },
         treeDiagram:function(tabSpace){
             if(tabSpace===undefined){
@@ -2478,23 +3489,42 @@ var turtle,$t;
             }
             return s;
         },
-        get elements(){
+        get elementLength(){
             if(this.isInsert){
-                var elements=[];
-                var node=this.begin.nextSibling;
-                while(node!==this.end){
-                    elements.push(node);
-                    var node=node.nextSibling;                
-                }
-                return elements;
+                return this.store.length;
+            }else{
+                return 1;
             }
-            return this.store.slice().splice(1,this.store.length-2);
+        },
+        get elements(){
+            if(this.isExtend){
+                return [];
+            }
+            if(this.isInsert){
+                try{
+                    var elements=[];
+                    var node=this.begin.nextSibling;
+                    var end=this.end;
+                    while(node!==end){
+                        elements.push(node);
+                        var node=node.nextSibling;                
+                    }
+                    return elements;
+                }catch(e){
+                    _catch(e);
+                    return [];
+                }
+            }
+            if(isArray(this.store)){
+                return this.store.slice().splice(1,this.store.length-2);    
+            }else{
+                return [];
+            }
         },
         get child(){
-            return getComponents(this.elements);
+            return getParts(this.elements);
         },
-        get parent(){
-            var node=this.begin;
+        getParentPart:function(node){
             while(1){
                 if(node.previousSibling!==null){
                     node=node.previousSibling;
@@ -2503,16 +3533,153 @@ var turtle,$t;
                 }else{
                     return null;
                 }
-                if(node.nodeType===8&&node.component){
+                if(node.nodeType===8&&node.part){
                     if(node.sign===0){
-                        node=node.component.begin;
+                        node=node.part.begin;
                     }else{
-                        return node.component;
+                        return node.part;
                     }
                 }
+            } 
+        },
+        get parent(){
+            return this.getParentPart(this.begin);
+        },
+        getRect:function(){
+            if(this.isInsert){
+                var rects=[];
+                var rt;
+                //var recalNode           = document.createElement('div');
+    
+                //recalNode.setAttribute('style',"width:0 !important;height:0 !important;margin-left:0 !important;margin-right:0 !important;");
+    
+                // insertNodeBefore(this.begin,recalNode);
+                // rt=[recalNode.offsetLeft,recalNode.offsetTop];
+                // insertNodeBefore(this.end,recalNode);
+                // rt.push(recalNode.offsetLeft,recalNode.offsetTop);
+                // removeNode(recalNode);
+                // rects.push(rt);
+                var cs=this.elements;
+                var elem;
+                var dom=document.documentElement;
+                for(var i=0;i<cs.length;i++){
+                    elem=cs[i].valueOf();
+                    if(elem.nodeType===1){
+                        var l=0,t=0;
+                        var elem2=elem;
+                        while(elem2!==dom){
+                            t+=elem2.offsetTop;
+                            l+=elem2.offsetLeft;
+                            elem2=elem2.parentNode;
+                        }
+                        rects.push([l,t,elem.offsetWidth,elem.offsetHeight]);
+                    }
+                }
+                
+                var rect={left:0x7fffffff,top:0x7fffffff,width:0,height:0,right:0,bottom:0}
+                for(var i=0;i<rects.length;i++){
+                    rt=rects[i];
+                    if(rt[0]<rect.left){
+                        rect.left=rt[0];
+                    }
+                    if(rt[1]<rect.top){
+                        rect.top=rt[1];
+                    }
+                    var right=rt[0]+rt[2];
+                    var bottom=rt[1]+rt[3];
+                    if(right>rect.right){
+                        rect.right=right;
+                    }
+                    if(bottom>rect.bottom){
+                        rect.bottom=bottom;
+                    }
+                }
+                rect.width=rect.right-rect.left;
+                rect.height=rect.bottom-rect.top;
+                return rect;
+            }else{
+                return {left:0,top:0,width:0,height:0,right:0,bottom:0};
             }
         },
+        emitResize:function(){
+            try{
+                if(!this.isInsert){
+                    return;
+                }
+                if(this.onresize){
+                    if(this.onresize()){
+                        return;
+                    }   
+                }
+                var cs=this.child;
+                for(var i=0;i<cs.length;i++){
+                    cs[i].emitResize();
+                }
+            }catch(e){
+                _catch(e);
+            }
+        },
+        onSetSize:function(rect){
+            if(this.partMain){
+                var style=this.partMain.style;
+                style.left=rect.left+'px';
+                style.top=rect.top+'px';
+                style.width=rect.width+'px';
+                style.height=rect.height+'px';
+                style.boxSizing='border-box';
+                this.emitResize();
+            }
+        },
+        setSize:function(rect){
+            if(this.onSetSize){
+                return this.onSetSize(rect);
+            }
+            if(this.super){
+                this.super.setSize(rect);
+            }
+        },
+        get innerHTML(){
+            return nodesToString(this.elements);
+        },
+        get elemParent(){
+            return this.begin.parentNode;
+        },
+        insertTo:function(elem){
+            if(this.isInsert){
+                var elems=this.elements;
+                elems.unshift(this.begin);
+                elems.push(this.end);
+                /*cut scope*/
+                var scopeNodes=this.scopeNodes;
+                for(var i=0;i<scopeNodes.length;i++){
+                    $t.uiScope.cut(scopeNodes[i].scope);
+                }
+                appendNodes(elems,elem);
+                /*link scope*/
+                for(var i=0;i<scopeNodes.length;i++){
+                    $t.uiScope.link(scopeNodes[i].scope,elem);
+                }
+                if(isFunction(this.onInsert)){
+                    this.onInsert(elem);
+                }
+            }else{
+                appendNodes(this.store,elem);
+                /*link scope*/
+                var scopeNodes=this.scopeNodes;
+                for(var i=0;i<scopeNodes.length;i++){
+                    $t.uiScope.link(scopeNodes[i].scope,elem);
+                }
+                if(isFunction(this.onInsert)){
+                    this.onInsert(elem);
+                }
+                this.isInsert=true;
+                if(isFunction(this.oninsert)){
+                    this.oninsert();
+                }
+            }  
+        },
         insertBefore:function(elem){
+            
             if(this.isInsert){
                 var elems=this.elements;
                 elems.unshift(this.begin);
@@ -2540,7 +3707,27 @@ var turtle,$t;
                 if(isFunction(this.onInsert)){
                     this.onInsert(elem);
                 }
-                this.isInsert=true;
+                this.basePart.isInsert=true;
+                if(isFunction(this.oninsert)){
+                    this.oninsert();
+                }
+            }
+        },
+        getSuper:function(name){
+            if(this.super){
+                if(this.super.template.name===name){
+                    return this.super;    
+                }else{
+                    return this.super.getSuper(name);
+                }
+            }
+        },
+        emitInit:function(finalPart){
+            if(this.super){
+                this.super.emitInit(finalPart);
+            }
+            if(this.hasOwnProperty('onInit')&&isFunction(this.onInit)){
+                this.onInit(finalPart);
             }
         },
         remove:function(){
@@ -2560,7 +3747,14 @@ var turtle,$t;
                     }
                 }
                 this.store=elems;
-                this.isInsert=false;
+                this.basePart.isInsert=false;
+                if(isFunction(this.onremove)){
+                    this.onremove();
+                }
+                var p=this.parent;
+                if(p){
+                    p.emitResize();    
+                }
             }
         },
         get scopeNodes(){
@@ -2574,8 +3768,19 @@ var turtle,$t;
              return scopeNodes;
         }
     }
-    function RootComponents(){
-        var t=getComponents(document.body.childNodes);
+    var emitResize=function(){
+        var parts=RootParts;
+        for(var i=0;i<parts.length;i++){
+            parts[i].emitResize();
+        }
+    }
+    var onResize=function(fn){
+        bindFunction($client,'onResize',getStep(function(v){
+           fn(v);
+        }),2);
+    }
+    function RootParts(){
+        var t=getParts(document.body.childNodes);
         Object.defineProperty(t,"treeDiagram",{
             get :function(){
                 var tabSpace=0;
@@ -2588,18 +3793,18 @@ var turtle,$t;
         });
         return t;
     }
-    function getComponents(childNodes){
+    function getParts(childNodes){
         var child=[];
         var cpn=null;
         treeEach(childNodes,"childNodes",function(node){
-            if(node.nodeType===8&&node.component){
+            if(node.nodeType===8&&node.part){
                 if(cpn!==null){
-                    if(node.component===cpn&&node.sign===0){
-                        child.push(node.component);
+                    if(node.part===cpn&&node.sign===0){
+                        child.push(node.part);
                         cpn=null;
                     }
                 }else{
-                    cpn=node.component;
+                    cpn=node.part;
                 }
                 return;
             }
@@ -2610,9 +3815,9 @@ var turtle,$t;
         return child;
     }
     function defineServiceByNode(node){
-        name=node.getAttribute('service');
+        var name=node.getAttribute('service');
         if(name){
-            nodeName=node.getAttribute('ui');
+            var nodeName=node.getAttribute('ui');
             if(nodeName){
                 if($t.ui.hasOwnProperty(nodeName)){
                     /*把服务定义到组件*/
@@ -2630,56 +3835,70 @@ var turtle,$t;
         }
         removeNode(node);
     }
+    function getExtendsByNode(node,sortPath){
+        var ext=getAttr(node,'extends',null);
+        if(isString(ext)){
+            return getExtends(ext,sortPath);
+        }
+    }
+    function getExtends(extName,sortPath){
+        var ext;
+        if(extName.indexOf(':')!==-1){
+            extName=extName.split(':');
+            sortPath=extName[0]?extName[0]:sortPath;
+            extName=extName[1];
+        }
+        if(!isObject(importUIHTML(extName,sortPath))){
+            throwError('找不到可继承的模板：'+extName);
+        }
+        ext=$t.ui[extName];
+        return ext;
+    }
     function defineUIByNode(node){
         var name=getAttr(node,'ui');
+        var ext=getExtendsByNode(node,'ui');
         if(name){
-            $t.ui.define(name,getTemplate(node),true);
+            $t.ui.define(name,'','',getTemplate(node),ext);
         }
         removeNode(node);
     }
-    function parseUITemplate(uiName,template){
-        var _uiMain=document.createElement('ui:parseUITemplate');
-        _uiMain.innerHTML=template;
-        var cs=_uiMain.children;
-        var i=0;
-        var node;
-        var s;
-        var name;
-        var nodeName;
+    function parseUITemplate(uiName,uiSortPath,uiPath,sHTML){
+        VTemplate(sHTML);
+        var 
+            vDOM=$DOM(sHTML),
+            cs=vDOM.children,
+            i=0,
+            node,
+            s,
+            name,
+            nodeName;
         for(;i<cs.length;i++){
             node=cs[i];
             if(!isTemplate(node)){
-                alert('最上层必须是ui/service模板标签，\r\n模板标签包含（xmp,template,title和含type="xmp"的script,style,textarea）');
+                alert('最上层必须是ui/service模板标签');
                 return;
             }
             if(node.hasAttribute('service')){
                 defineServiceByNode(node);
                 i--;
             }else{
-                s=getTemplate(node);
                 nodeName=node.getAttribute('ui');
                 if(!nodeName)nodeName=uiName;
                 if(!$t.ui.hasOwnProperty(nodeName)){
-                    $t.ui.define(nodeName,s);
+                    s=getTemplate(node);
+                    $t.ui.define(nodeName,uiSortPath,uiPath,s,getExtendsByNode(node,uiSortPath));
                 }else{
                     alert('不能重复定义ui：'+nodeName);
                 }
             }
         }
     }
-    function importUIJS(uiName){
+    function importUIJS(uiName,uiSortPath){
         if(!$t.ui.hasOwnProperty(uiName)){
-            var paths=$t.config.baseUIPath;
-            var data=null;
-            for(var i=0;i<paths.length;i++){
-                $t.xhr.get(paths[i] + '/' + (uiName + '.js').toLowerCase(),false,function(text){
-                    data=text;
-                });
-                if(data!==null){
-                    eval(data);
-                    break;
-                }
-            }
+            var uiPath=baseUIPath.getPathBySortPath(uiSortPath);
+            $t.xhr.get(uiPath + '/' + (uiName + '.js').toLowerCase(),false,function(text){
+                exec(text);
+            });
         }
         return $t.ui[uiName];
     }
@@ -2691,62 +3910,71 @@ var turtle,$t;
         } 
         return $t.service[serviceName];
     }
-    function importUIHTML(uiName){
+    function importUIHTML(uiName,uiSortPath){
         if(!$t.ui.hasOwnProperty(uiName)){
-            var paths=$t.config.baseUIPath;
-            var data=null;
-            for(var i=0;i<paths.length;i++){
-                $t.xhr.get(paths[i] + '/' + (uiName + '.html').toLowerCase(),false,function(text){
-                    data=text;
-                });
-                if(data!==null){
-                    parseUITemplate(uiName,data);
-                    break;
-                }
-            }
+            var uiPath=baseUIPath.getPathBySortPath(uiSortPath);
+            $t.xhr.get(uiPath + '/' + (uiName + '.html').toLowerCase(),false,function(text){
+                parseUITemplate(uiName,uiSortPath,uiPath,text);
+            });
         }
         return $t.ui[uiName];
     }
-
-    function parseUI(node,step,component){
-        var uiName = getUIName(node);
-        var ui=importUIHTML(uiName);
+    function parseUI(node,uiInfo,step,part){
+        var 
+            partName,
+            reExtends,
+            outerChildNodes,
+            outerElement,
+            cpn,
+            ui=importUIHTML(uiInfo.name,uiInfo.sortPath);
+            
         if (!ui) {
             removeNode(node);
-            console.log(uiName + '组件不存在！');
+            throwError(uiInfo.name + '组件不存在！');
             return;
         }
-        var outerChildNodes = slice.call(node.childNodes);
-        var outerElement = slice.call(node.children);
+        
+        partName=takeAttr(node,'p-name');
+        
+        
+        reExtends=takeAttr(node,'re-extends');
+        
+        outerChildNodes= slice.call(node.childNodes);
+        outerElement = slice.call(node.children);
+        
         for(var i=node.childNodes.length;i>0;i--){
             node.removeChild(node.childNodes[0]);    
         }
-        var cpn=ui.render(node, node.parentNode,outerChildNodes,outerElement,null,component);
-        step.next =cpn.elements.length;
+        
+        cpn=ui.render(node, node.parentNode,outerChildNodes,outerElement,null,part,partName,reExtends);
+        if(cpn){
+            step.next =cpn.elementLength;    
+        }
     }
-    function getUI(uiName,outerChildNodes,outerElement,props,component){
-        var ui=importUIHTML(uiName);
+    
+    function render(fnName,uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part,partName,reExtends){
+        var ui=importUIHTML(uiName,uiSortPath);
         if (!ui) {
             console.log(uiName + '组件不存在！');
             return;
         }
-        return ui.renderIn(null,outerChildNodes,outerElement,props,component);
-    }
-    function renderIn(uiName,elem,outerChildNodes,outerElement,props,component){
-        var ui=importUIHTML(uiName);
-        if (!ui) {
-            console.log(uiName + '组件不存在！');
-            return;
+        try{
+            if($node===$VNode&&!isFunction(elem)){
+                elem=elem.__vdomNode__;
+            }
+            return ui[fnName](elem,outerChildNodes,outerElement,props,part,partName,reExtends);  
+        }catch(e){
+            _catch(e);
         }
-        return ui.renderIn(elem,outerChildNodes,outerElement,props,component);
     }
-    function renderBefore(uiName,elem,outerChildNodes,outerElement,props,component){
-        var ui=importUIHTML(uiName);
-        if (!ui) {
-            console.log(uiName + '组件不存在！');
-            return;
-        }
-        return ui.renderBefore(elem,outerChildNodes,outerElement,props,component);
+    function getUI(uiName,uiSortPath,outerChildNodes,outerElement,props,part,partName,reExtends){
+        return render('renderIn',uiName,uiSortPath,null,outerChildNodes,outerElement,props,part,partName,reExtends);
+    }
+    function renderIn(uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part,partName,reExtends){
+        return render('renderIn',uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part,partName,reExtends);
+    }
+    function renderBefore(uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part,partName,reExtends){
+        return render('renderBefore',uiName,uiSortPath,elem,outerChildNodes,outerElement,props,part,partName,reExtends);
     }
     function parseXMP2(node){
         var ret=parseXMP(node);
@@ -2755,7 +3983,7 @@ var turtle,$t;
         else
             removeNode(node);
     }
-    function initCls(){
+    function replaceCls(){
         var arr=$t.clsNode;
         for(i=0;i<arr.length;i++){
             var cls=arr[i].getAttribute('cls');
@@ -2775,11 +4003,178 @@ var turtle,$t;
         });
         return s;
     }
-    function parseHTML(uiHTML){
-        var _uiMain=document.createElement('ui:parseHTML');
-        _uiMain.innerHTML=uiHTML;
-        initHTML(_uiMain.childNodes);
-        return takeChildNodes(_uiMain);
+    function parseHTML(sHTML){
+        var vDOM=$DOM(sHTML);
+        initHTML(vDOM.childNodes);
+        return takeChildNodes(vDOM.toDOM());
+    }
+    
+    function parseXMP(node){
+        if(isDefine(node)){
+            parseDefine(node);
+        }else{
+            return parseHTML(getTemplate(node));    
+        }
+    }
+    var paramFilter=newObject("ParamFilter");
+    paramFilter.bool=function(v){
+        return parseBool(v);
+    }
+    paramFilter.intmin=function(v,p){
+        v=parseInt(v);
+        p=parseInt(p);
+        if(v<p||isNaN(v)){
+            v=p;
+        }
+        return v;
+    }
+    paramFilter.string=function(v){
+        return '"'+v+'"';
+    }
+    paramFilter.floatmin=function(v,p){
+        v=parseFloat(v);
+        p=parseFloat(p);
+        if(v<p||isNaN(v)){
+            v=p;
+        }
+        return v;
+    }
+    paramFilter.int=function(v){
+        return parseInt(v);
+    }
+    paramFilter.float=function(v){
+        return parseFloat(v);
+    }
+    paramFilter.pxtoem=function(v,p){
+        p=parseFloat(p);
+        if(isNaN(p)){
+            p=0;
+        }
+        return (parseFloat(v)/16+p)+'em';
+    }
+    paramFilter.color=function(v){
+        
+        if(/^\s*((#[\dabcdefABCDEF]{3,6})|(rgba\(.*\)))\s*$/.test(v)){
+            return v;
+        }else{
+            return 'transparent';    
+        }
+    }
+    paramFilter.date=function(v,p){
+        var d=new Date(v);
+        if(d.toDateString()==='Invalid Date'){
+            d=new Date();
+        }
+        return dateFormat(p,d);
+    }
+    paramFilter.only=function(v,p){
+        if(p.indexOf(';')===-1){
+            return v;
+        }
+        var arr=p.split(';');
+        var datas=arr[0].split(',');
+        if(arr.length>0){
+            var filter=arr[1];
+        }else{
+            var filter='';
+        }
+        if(datas.indexOf(v)!==-1){
+            return v;
+        }else{
+            return filter;
+        }
+    }
+    paramFilter.udftotrue=function(v){
+        return v===undefined?true:v;
+    }
+    paramFilter.anytotrue=function(v){
+        return v!==undefined?true:v;
+    }
+    paramFilter.udftofalse=function(v){
+        return v===undefined?false:v;
+    }
+    paramFilter.anytofalse=function(v){
+        return v!==undefined?false:v;
+    }
+    paramFilter.udftonull=function(v){
+        return v===undefined?null:v;
+    }
+    paramFilter.anytonull=function(v){
+        return v!==undefined?null:v;
+    }
+    paramFilter.udftoemptystr=function(v){
+        return v===undefined?"":v;
+    }
+    paramFilter.anytoemptystr=function(v){
+        return v!==undefined?"":v;
+    }
+    var templates=newObject("Templates",
+        {
+            toString:function(){
+                var s=[];
+                var desc;
+                for(var i in this){
+                    if(!this.hasOwnProperty(i)){
+                        continue;
+                    }
+                    desc='<'+i.toLowerCase();
+                    if(this[i].hasOwnProperty("xmp")){
+                        desc+=' xmp';
+                    }
+                    desc+='>';
+                    s.push(desc);
+                }
+                return s.join("\n");
+            },get items(){
+                var items=[];
+                
+                for(var i in this){
+                    if(!this.hasOwnProperty(i)){
+                        continue;
+                    }
+                    var item={name:i.toLowerCase()};
+                    items.push(extend(item,this[i]));
+                }
+                return items;
+            },findByString:function(str){
+                if(str.length===0){
+                    return ;
+                }
+                
+                var ts=this.items;
+                var regExes=[];
+                for(var i=0;i<ts.length;i++){
+                    var s='(<'+ts[i].name;
+                    if(ts[i].hasOwnProperty('xmp')){
+                        s+='[\\s\\S]*? +xmp';
+                    }
+                    s+='([\\s\\S]*?)>([\\s\\S]*?)<\\/'+ts[i].name+'>';
+                    s+=')';
+                    regExes.push(s);
+                }
+                var re=exec('(/'+regExes.join("|")+'/g)');
+                return str.match(re);
+            }
+        }
+    );
+    templates.XMP={};
+    templates.TEMPLATE={};
+    templates.TITLE={getData:function(node){return node.innerText;}};
+    templates.STYLE={xmp:undefined};
+    templates.SCRIPT={xmp:undefined};
+    templates.TEXTAREA={xmp:undefined,getData:function(node){return node.defaultValue;}};
+    function parseDefine(node){
+        switch(true){
+            case node.hasAttribute('service'):
+                defineServiceByNode(node);
+                break;
+            case node.hasAttribute('ui'):
+                defineUIByNode(node);
+                break;
+            case node.hasAttribute('class'):
+                defineClasses(node);
+                break;
+        }
     }
     function isDefine(node){
         switch(true){
@@ -2790,45 +4185,27 @@ var turtle,$t;
         }
         return false;
     }
-    function parseXMP(node){
-        if(isDefine(node)){
-            parseDefine(node);
-        }else{
-            return parseHTML(getTemplate(node));    
-        }
-    }
-    function getTemplate(node){
-        switch(node.nodeName){
-            case "TEMPLATE":
-            case "XMP":
-            case "SCRIPT":
-            case "STYLE":
-                return node.innerHTML;
-            case "TITLE":
-                return node.innerText;
-            case "TEXTAREA":
-                return node.defaultValue;
-        }
-    }
-    function isUI(node){
-        if(/UI:[A-Z\d]+/.test(node.nodeName)){
-            return true;
-        }
-        return node.nodeName=="SCRIPT"&&getAttr(node,'type')=='ui';
-    }
+    
     function isTemplate(node){
-        switch(node.nodeName){
-            case "TEMPLATE":
-            case "XMP":
-            case "TITLE":
+        var nodeName=node.nodeName;
+        if(templates.hasOwnProperty(nodeName)){
+            if(templates[nodeName].hasOwnProperty('type')){
+                return getAttr(node,'type')==='xmp';
+            }else{
                 return true;
-            case "SCRIPT":
-            case "STYLE":
-            case "TEXTAREA":
-                if(getAttr(node,'type')=='xmp')
-                    return true;
+            }
         }
         return false;
+    }
+    function getTemplate(node){
+        var nodeName=node.nodeName;
+        if(templates.hasOwnProperty(nodeName)){
+            if(templates[nodeName].hasOwnProperty('getData')){
+                return templates[nodeName].getData(node);
+            }else{
+                return node.innerHTML;
+            }
+        }
     }
     function findTemplates(nodes){
         var temps=[];
@@ -2838,18 +4215,71 @@ var turtle,$t;
         });
         return temps;
     }
-    function compileDocument(scriptNode,uiList,fn){
-        var appends=[];
-        
-        document.head.appendChild=function(e){
-            appends.push(e);
-            Node.prototype.appendChild.call(this,e);
+     
+    var baseUIPath;
+    (function(){
+        var _paths={};
+        baseUIPath=newArrayObject('BaseUIPath',{
+            push:function(v){
+                if(isString(v)){
+                    this.parseUIPath(v)    
+                }else if(isArray(v)){
+                    this.clear();
+                    _paths={};
+                    for(var i=0;i<v.length;i++){
+                        if(isString(v[i])){
+                            this.parseUIPath(v[i])
+                        }
+                    }
+                }
+            },
+            parseUIPath:function(s){
+                try{
+                    var o=exec('('+s+')');
+                    if(isObject(o)&&o.hasOwnProperty('name')&&o.hasOwnProperty('path')){
+                        _paths[o.name]=o;
+                        this.push(o);
+                    }
+                }catch(e){_catch(e);}
+            },
+            getPathBySortPath:function(sortPath){
+                return _paths[sortPath].path;
+            },
+            hasSortPath:function(sortPath){
+                return _paths.hasOwnProperty(sortPath);
+            },
+            toString:function(){
+                var arr=[];
+                for(var i in _paths){
+                    arr.push("{name:'"+_paths[i].name+"',path:'"+_paths[i].path+"'}")
+                }
+                return arr.join(';');
+            }
+        });
+        lockObject(baseUIPath);
+    })();
+    
+    function getUIInfo(node){
+        var nodeName=node.nodeName;
+        if(nodeName==='SCRIPT'&&getAttr(node,'type')==='ui'){
+            return node.getAttribute('name').toLowerCase();
+        }else if(nodeName.indexOf(':')){
+             var c=nodeName.split(':');
+             var sortPath=c[0].toLowerCase();
+             if(baseUIPath.hasSortPath(sortPath)){
+                 return {sortPath:sortPath,name:c[1].toLowerCase()};
+             }
         }
+    }
+    function compileDocument(scriptNode,uiList,fn){
         var 
-            b=document.body,
-            xmps=findTemplates(b.children),
+            html,
+            xmps=findTemplates(document.body.children),
             templateXMP=[];
             
+        $t.xhr.get(location.href,false,function(s){
+            html=s;
+        });
         for(var i=0;i<xmps.length;i++){
             if(isDefine(xmps[i])){
                 parseDefine(xmps[i]);
@@ -2857,55 +4287,57 @@ var turtle,$t;
                 templateXMP.push(xmps[i]);
             }
         }
-        oldHTML=b.innerHTML;
         for(var i=0;i<templateXMP.length;i++){
-            ret=parseHTML(getTemplate(templateXMP[i]));
+            parseHTML(getTemplate(templateXMP[i]));
         }
         var s=compileCls();
+        /*获取ui定义*/
         var uiComplie=compileUI(uiList);;
         s+=uiComplie.script;
-        removeNode(xmpStyle);
-        scriptNode.innerHTML=s+scriptNode.innerHTML;
-        for(var i in $t.jsScript){
-            removeNode($t.jsScript[i]);
-        }
-        for(var i=0;i<appends.length;i++){
-            var parentNode=appends[i].parentNode;
-            if(parentNode){
-                parentNode.removeChild(appends[i]);
-            }
-        }
-        delete document.head.appendChild;
-        s='';
-        var ns=document.childNodes;
         
-        b.innerHTML=oldHTML;
-        for(var i=0;i<ns.length;i++){
-            switch(ns[i].nodeType){
-                case 10:/*<!DOCTYPE xxx>*/
-                    s+='<!DOCTYPE '+ns[i].name+(ns[i].publicId?' '+ns[i].publicId:'')+(ns[i].systemId?' '+ns[i].systemId:'')+'>';
-                    break;
-                case 1:/*<html>*/
-                    s+=ns[i].outerHTML;
-                    break;
+        var x=scriptNode.outerHTML;
+        var inner;
+        if(s.length>0){
+            inner=scriptNode.innerHTML;
+            if(/[^ \r\n]/.test(inner)){
+                inner='\r\n;'+s;
+            }else{
+                inner=s;
             }
+        }else{
+            inner='';
         }
-        fn(s,uiComplie.compileJS);
+        var newTurtle=x.substring(0,x.length-9);
+        newTurtle=newTurtle.replace(/ compile=(['"]).*?\1/,'').replace(/ compileuilist=(['"]).*?\1/,'');
+        html=html.replace(x,newTurtle+inner+'</script>');
+        fn(html,uiComplie.compileJS,inner);
     }
     function propertyToJS(v){
         var s=JSON.stringify({xx:v});
         s=s.substring(6,s.length-1);
         return s;
     }
+    function renderTemplate(tp){
+        var sHTML=getTemplate(tp);
+        var vDOM=$DOM(sHTML);
+        initHTML(vDOM.childNodes);
+        
+        if(isFunction(vDOM)){
+            var p=tp.parentNode;
+            replaceNodeByNodes(tp,takeChildNodes(vDOM.toDOM()));
+            vDOM.__domNode__=p;
+            return;   
+        }
+        replaceNodeByNodes(tp,takeChildNodes(vDOM.toDOM()));
+        //vDOM.innerHTML='';
+    }
     function renderDocument(noAppend){
         renderDocument.beginTime=new Date();
-        if($t.body.length>0){
-            document.body.innerHTML=$t.body;
-        }
         var 
             xmps=findTemplates(document.body.children),
             i,
             templateXMP=[];
+        /*优先处理定义先关的模板*/
         for(i=0;i<xmps.length;i++){
             if(isDefine(xmps[i])){
                 parseDefine(xmps[i]);
@@ -2913,11 +4345,12 @@ var turtle,$t;
                 templateXMP.push(xmps[i]);
             }
         }
+        /*处理逻辑模板*/
         for(i=0;i<templateXMP.length;i++){
-            var ret=parseHTML(getTemplate(templateXMP[i]));
-            replaceNodeByNodes(templateXMP[i],ret);
+            renderTemplate(templateXMP[i]);
         }
-        initCls();
+        
+        replaceCls();
         
         /*initLink();*/
         renderDocument.endTime=new Date();
@@ -2930,19 +4363,23 @@ var turtle,$t;
             if(uiList[0].length>0){
                 for(var i=0;i<uiList.length;i++){
                     uiList[i]=trimLine(uiList[i]);
-                    importUIHTML(uiList[i]);
+                    var s=uiList[i].split(':');
+                    importUIHTML(s[1],s[0]);
                 }
             }
         }
+        s=[];
         for(var e in $t.ui){
             if($t.ui.hasOwnProperty(e)){
                 var o=$t.ui[e];
-                var sj=JSON.stringify(o).replace(/<\/script>/g,'</scr"+"ipt>');
-                if(o.isInnerUI){
-                    s.push('$t.ui.define("'+e+','+sj+')");');
+                
+                if(!o.sortPath){
+                    /*内置组件直接定义到html*/
+                    s.push(o.toDefineString());
                 }else{
-                    s.push('$t.importUIJS("'+e+'");');
-                    compileJS.push({name:e,script:'$t.ui.define("'+e+'",'+sj+');'});
+                    /*外置js组件*/
+                    s.push('$t.importUIJS("'+e+'","'+o.sortPath+'");');/*同步加载*/
+                    compileJS.push({name:e,path:o.path,script:o.toDefineString()});
                 }
             }
         }
@@ -3026,12 +4463,68 @@ var turtle,$t;
             scopeParent[name]=this;
         }
     }
+    function Client(){
+        'use strict'
+        var data={};
+        var isListen=false;
+        var events=[];
+        var t=this;
+        function emit(){
+            'use strict'
+            for(var i=0;i<events.length;i++){
+                events[i]();
+            }
+        }
+        function setSizeProperty(name,fn){
+            'use strict'
+            data[name]=undefined;
+            t[name]=function(v){
+                'use strict'
+                /*此属性用于被绑定*/
+                if(data[name]===undefined&&t.__bind__){
+                    if(isListen===false){
+                        isListen=true;
+                        window.addEventListener('resize',emit);
+                    }
+                    var bind=t.__bind__;
+                    var getV=function(){
+                        t[name]=fn();
+                    }
+                    data[name]=fn();
+                    events.push(getV);
+                }
+                if(v){
+                    data[name]=v;
+                }
+                return data[name];
+            }
+        }
+        setSizeProperty('onResize',function(){'use strict'
+            return {width:document.documentElement.clientWidth
+                ,height:document.documentElement.clientHeight};});
+            
+            
+        setSizeProperty('width',function(){'use strict'
+            return document.documentElement.clientWidth;});
+        setSizeProperty('height',function(){'use strict'
+            return document.documentElement.clientHeight;});
+        
+        setSizeProperty('left',function(){'use strict'
+            return document.documentElement.clientLeft;});
+        setSizeProperty('top',function(){'use strict'
+            return document.documentElement.clientTop;});
+            
+        setSizeProperty('right',function(){'use strict'
+            return document.documentElement.clientLeft+document.documentElement.clientWidth;});
+        setSizeProperty('bottom',function(){'use strict'
+            return document.documentElement.clientTop+document.documentElement.clientHeight;});
+        
+    }
     function RootScope(){
         this.__actionNode__=document.documentElement;
         this.__children__=[];
         lockObject2(this);
         document.scope=this;
-        window.$rootScope=this;
     }
     function UIScope(){}
     UIScope.prototype={
@@ -3056,7 +4549,7 @@ var turtle,$t;
             }
             return $rootScope;
         },
-        stack:[new RootScope()],
+        stack:[$rootScope],
         cut:function(scope){
             var p=scope.__parent__;
             scope.__parent__=null;
@@ -3075,7 +4568,7 @@ var turtle,$t;
             }
         }
     }
-    function UILink(){}
+    /*function UILink(){}
     UILink.prototype=new function (){
         var onlink='\\"onlink';
         var t={
@@ -3115,7 +4608,7 @@ var turtle,$t;
             uiLinks:{}
         }
         return t;
-    }
+    }*/
     function UI(){
         Object.defineProperty(this,"__defineCallbacks__",{
                 value: [],
@@ -3125,65 +4618,1717 @@ var turtle,$t;
             }
         )
     }
-    UI.prototype=
-        {
-            onDefine:function(name,fn){
-                if(!isFunction(fn)){
-                    return;
-                }
-                if(!isString(name)){
-                    return;
-                }
-                if(name.length===0){
-                    return;
-                }
-                this.__defineCallbacks__.push({name:name,fn:fn});
-                if(this.hasOwnProperty(name)){
-                    fn(this[name]);
-                }
-            },
-            emitOnDefine:function(name,fn){
-                var cbs=this.__defineCallbacks__;
-                for(var i=0;i<cbs.length;i++){
-                    if(cbs[i].name===name||cbs[i].name==="*"){
-                        cbs[i].fn(fn);
-                    }
-                }
-            },
-            define:function(name,s,isInnerUI){
-                this[name]=new UITemplate(name,s,isInnerUI);
-                this.emitOnDefine(name,this[name]);
+    UI.prototype={
+        onDefine:function(name,fn){
+            if(!isFunction(fn)){
+                return;
             }
+            if(!isString(name)){
+                return;
+            }
+            if(name.length===0){
+                return;
+            }
+            this.__defineCallbacks__.push({name:name,fn:fn});
+            if(this.hasOwnProperty(name)){
+                fn(this[name]);
+            }
+        },
+        emitOnDefine:function(name,fn){
+            var cbs=this.__defineCallbacks__;
+            for(var i=0;i<cbs.length;i++){
+                if(cbs[i].name===name||cbs[i].name==="*"){
+                    cbs[i].fn(fn);
+                }
+            }
+        },
+        define:function(name,sortPath,path,s,ext){
+            this[name]=new UITemplate(name,sortPath,path,s,ext);
+            this.emitOnDefine(name,this[name]);
+            return this[name];
+        },
+        toString:function(){
+            var list=[];
+            for(var i in this){
+                if(this.hasOwnProperty(i)){
+                    list.push(i);    
+                }
+            }
+            return list.join('\r\n');
         }
-    function Service(){
+    }
+    function Service(fns){
         Object.defineProperty(this,"__defineCallbacks__",{
                 value: [],
                 writable: false,
                 enumerable: false,
                 configurable: false
             }
-        )
-    }
-    Service.prototype=
-        {
-            require:function(n){
-                if(!this.hasOwnProperty[n]){
-                    this[n]=getService(n);
-                }
-                return this[n];
-            },
-            onDefine:UI.prototype.onDefine,
-            emitOnDefine:UI.prototype.emitOnDefine,
-            define:function(name,s){
-                try{
-                    this[name]=eval("("+s+")");    
-                }catch(e){
-                    _catch(e);
-                }
-                this.emitOnDefine(name,this[name]);
+        );
+        if(isObject(fns)){
+            for(var i in fns){
+                this[i]=fns[i];
+                this.emitOnDefine(i,this[i]);
             }
         }
-    function UITeam(){}
+    }
+    Service.prototype={
+        require:function(n){
+            if(!this.hasOwnProperty(n)){
+                this[n]=getService(n);
+            }
+            return this[n];
+        },
+        onDefine:UI.prototype.onDefine,
+        emitOnDefine:UI.prototype.emitOnDefine,
+        define:function(name,s){
+            try{
+                this[name]=exec("("+s+")");    
+            }catch(e){
+                _catch(e);
+            }
+            this.emitOnDefine(name,this[name]);
+        },
+        toDefineString:function(){
+            var s='new $t.Service(';
+            var fns=[];
+            for(var i in this){
+                if(this.hasOwnProperty(i)){
+                    fns.push('"'+i+'":'+this[i].toString());    
+                }
+            }
+            if(fns.length>0){
+                s+='{'+fns.join(',')+'})';
+            }else{
+                s+=')';
+            }
+            return s;
+        }
+    }
+    var stringNode={
+        'SCRIPT':/^\/script[>\s]/i,
+        'TEMPLATE':/^\/template[>\s]/i,
+        'STYLE':/^\/style[>\s]/i,
+        'TITLE':/^\/title[>\s]/i,
+        'TEXTAREA':/^\/textarea[>\s]/i,
+        'XMP':/^\/xmp[>\s]/i
+    }
+    var VDOM,VTemplate;
+    (function(){
+        var htmlParse={
+            '':function(html,m){
+                var nodeName=m.node.nodeName;
+                if(m.node.__closeSelf__){
+                    m.node=m.node.parentNode;
+                    m.action='textNode';
+                    m.textNodeStart=m.index;
+                }else if(stringNode.hasOwnProperty(nodeName)){
+                    m.action='stringNode';
+                    m.stringNodeRegExp=stringNode[nodeName];
+                    m.stringNodeKeyLength=nodeName.length+2;
+                    m.stringNodeStart=m.index;
+                    return;
+                }else{
+                    m.action='textNode';
+                    m.textNodeStart=m.index;
+                }
+            },
+            textNode:function(html,m){
+                var data;
+                switch(html[m.index]){
+                    case '<':
+                        if(m.index<m.length+1&&xmlwordRE.test(html[m.index+1])){
+                          
+                            if(m.textNodeStart!==m.index){
+                                data=html.substring(m.textNodeStart,m.index);
+                                if(!emptyTextNodeRE.test(data)){
+                                    m.node(data,3);
+                                }
+                                m.textNodeStart=0;
+                            }
+                            m.xmlNodeStart=m.index;
+                            m.index++;
+                            m.action='xmlNode';
+                        }else{
+                            m.index++;
+                        }
+                        break;
+                    default:
+                        m.index++;
+                }
+            },
+            createXMLNode:function(html,m){
+                m.xmlNodeStart=0;
+                if(m.xmlNodeNameStart>0){
+                    //无属性标签
+                    var nodeName=html.substring(m.xmlNodeNameStart,m.index);
+                    m.node=m.node(nodeName);
+                    m.xmlNodeNameStart=0;
+                    m.index++;
+                }
+                m.action='';
+                
+            },
+            setXMLNodeClose:function(html,m){
+                var n=m.node;
+                var name=trim(html.substring(m.xmlNodeNameStart,m.index)).toUpperCase();
+                while(n){
+                    if(n.nodeName===name){
+                        n.__isClose__=true;
+                        m.node=n.parentNode;
+                        m.action='';
+                        m.xmlNodeNameStart=0;
+                        return;
+                    }
+                    n=n.parentNode;
+                }
+                /*当注释*/
+                console.log('变成注释',name);
+                debugger;
+                m.node(name,8);
+            },
+            setAttrStart:function(m){
+                m.action='attributes';
+                m.attrStart=0;
+                m.attrNameEnd=0;
+                m.equlIndex=0;
+                m.stringStart=0;
+                m.stringStartChar='';
+            },
+            xmlNode:function(html,m){
+                switch(html[m.index]){
+                    case '>':
+                        this.createXMLNode(html,m);
+                        break;
+                    case ' ':
+                        this.createXMLNode(html,m);
+                        m.action='attributes';
+                        break;
+                    case '!':
+                        if(m.xmlNodeStart===m.index-1){
+                            m.action='comment';    
+                        }
+                        m.index++;
+                        break;
+                    case '/':
+                        if(m.xmlNodeStart===m.index-1){
+                            m.action='endXmlNode';
+                            m.index++;
+                            m.xmlNodeNameStart=m.index;
+                            return;
+                        }else if(m.length>=m.index+1){
+                            if(html.substr(m.index+1,1)==='>'){
+                                this.createXMLNode(html,m);
+                                m.index++;
+                                return;
+                            }
+                        }
+                        break;
+                    default:
+                        if(m.xmlNodeNameStart===0){
+                            m.xmlNodeNameStart=m.index;
+                        }
+                        m.index++;
+                }
+            },
+            endXmlNode:function(html,m){
+                switch(html[m.index]){
+                    case '>':
+                        this.setXMLNodeClose(html,m);
+                        m.index++;
+                        break;
+                    default:
+                        m.index++;
+                }
+            },
+            comment:function(html,m){
+                switch(html[m.index]){
+                    case '>':
+                        m.node('',8);
+                        m.index++;
+                        break;
+                    case '-':
+                        if(m.length>=m.index+2){
+                            if(html.substr(m.index+1,1)==='-'){
+                                m.commentStart=m.index+2;
+                                m.action='comment3';
+                                m.index+=2;
+                            }else{
+                                m.commentStart=m.index;
+                                m.action='comment2';
+                                m.index++;
+                            }
+                        }else{
+                            m.index++;
+                        }
+                        break;
+                    case 'd':
+                    case 'D':
+                        if(m.length>=m.index+7){
+                            if(html.substr(m.index+1,6).toUpperCase()==='OCTYPE'){
+                                m.node('',10);
+                                m.index+=13;
+                                m.action='';
+                            }else{
+                                m.index++;
+                            }
+                        }else{
+                            m.index++;
+                        }
+                        break;
+                    default:
+                        m.commentStart=m.index;
+                        m.action='comment2';
+                        m.index++;
+                }
+            },
+            comment2:function(html,m){
+                if(html[m.index]==='>'){
+                    var vNode=m.node(html.substring(m.commentStart,m.index),8);
+                    vNode.dbplus=false;
+                    m.commentStart=0;
+                    m.action='';
+                }
+                m.index++;
+            },
+            comment3:function(html,m){
+                if(html[m.index]==='-'){
+                    if(m.length>=m.index+3){
+                        if(html.substr(m.index+1,2)==='->'){
+                            var vNode=m.node(html.substring(m.commentStart,m.index),8);
+                            vNode.dbplus=true;
+                            m.commentStart=0;
+                            m.action='';
+                            m.index+=3;
+                            return;
+                        }
+                    }
+                }
+                m.index++;
+            },
+            attributes:function(html,m){
+                switch(html[m.index]){
+                    case '/':
+                        if(m.length>=m.index+2){
+                            if(html.substr(m.index+1,1)==='>'){
+                                if(m.attrStart!==m.attrNameEnd){
+                                    if(m.attrNameEnd===0){
+                                        m.attrNameEnd=m.index;
+                                    }
+                                    m.node._(html.substring(m.attrStart,m.attrNameEnd));    
+                                }
+                                m.action='';
+                                m.index+=2;
+                                break;
+                            }
+                        }
+                        m.attrStart=m.attrNameEnd=0;
+                        m.action='';
+                        m.index++;
+                        break;
+                    case '>':
+                        if(m.attrStart!==m.attrNameEnd){
+                            if(m.attrNameEnd===0){
+                                m.attrNameEnd=m.index;
+                            }
+                            m.node._(html.substring(m.attrStart,m.attrNameEnd));   
+                        }
+                        m.attrStart=m.attrNameEnd=0;
+                        m.action='';
+                        m.index++;
+                        break;
+                    case '=':
+                        if(m.attrStart>0&&m.attrNameEnd===0){
+                            m.attrNameEnd=m.index;
+                        }
+                        m.equlIndex=m.index;
+                        m.action='attrValue';
+                        m.index++;
+                        break;
+                    case '\r':
+                    case '\n':
+                    case ' ':
+                        if(m.attrStart>0&&m.attrNameEnd===0){
+                            m.attrNameEnd=m.index;
+                        }
+                        m.index++;
+                        break;
+                    default:
+                        if(m.attrStart===0){
+                            m.attrStart=m.index;
+                        }else if(m.equlIndex>0){
+                            m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                            this.setAttrStart(m);
+                        }else if(m.attrNameEnd!==0){
+                            m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                            this.setAttrStart(m);
+                            m.attrStart=m.index;
+                        }
+                        m.index++;
+                }
+            },
+            attrValue:function(html,m){
+                switch(html[m.index]){
+                    case '\r':
+                    case '\n':
+                    case ' ':
+                        m.index++;
+                        break;
+                    case '"':
+                        m.stringStartChar='"';
+                        m.action='atvstring';
+                        m.index++;
+                        m.stringStart=m.index;
+                        break;
+                    case "'":
+                        m.stringStartChar='\'';
+                        m.action='atvstring';
+                        m.index++;
+                        m.stringStart=m.index;
+                        break;
+                    case '>':
+                        /*忽略等号*/
+                        m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                        m.action='';
+                        m.index++;
+                        break;
+                    case "/":
+                        if(m.length>=m.index+2){
+                            if(html.substring(m.index+1,1)==='>'){
+                                m.node._(html.substring(m.attrStart,m.attrNameEnd));
+                                m.action='';
+                                m.index+=2;
+                                return;
+                            }
+                        }
+                        m.index++
+                        break;
+                    default:
+                        m.action='atvbetweenSpace';
+                        m.betweenSpaceStart=m.index;
+                        m.index++;
+                }
+            },
+            atvbetweenSpace:function(html,m){
+                switch(html[m.index]){
+                    case ' ':
+                        m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.betweenSpaceStart,m.index));
+                        this.setAttrStart(m);
+                        m.index++;
+                        break;
+                    case '>':
+                        m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.betweenSpaceStart,m.index));
+                        this.setAttrStart(m);
+                        break;
+                    case "/":
+                        if(m.length>=m.index+2){
+                            m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.betweenSpaceStart,m.index));
+                            if(html.substring(m.index+1,1)==='>'){
+                                this.setAttrStart(m);
+                                m.index++;
+                                return;
+                            }
+                        }
+                        m.index++
+                    default:
+                        m.index++;
+                }
+            },
+            atvstring:function(html,m){
+                switch(html[m.index]){
+                    case '\\':
+                        m.index+=2;
+                        break;
+                    case m.stringStartChar:
+                        m.node._(html.substring(m.attrStart,m.attrNameEnd),html.substring(m.stringStart,m.index));
+                        this.setAttrStart(m);
+                        m.index++;
+                        break;
+                    default:
+                        m.index++;
+                }
+            },
+            stringNode:function(html,m){
+                if(html[m.index]==='<'){
+                    if(m.length>=m.index+m.stringNodeKeyLength+1){
+                        if(m.stringNodeRegExp.test(html.substr(m.index+1,m.stringNodeKeyLength))){
+                            var s=html.substring(m.stringNodeStart,m.index);
+                            if(!emptyTextNodeRE.test(s)){
+                                m.node.text(s);
+                            }
+                            m.stringNodeStart=0;
+                            m.stringNodeRegExp=null;
+                            m.action='stringNode2';
+                            m.node.__isClose__=true;
+                            m.node=m.node.parentNode;
+                            m.index+=m.stringNodeKeyLength;
+                            m.stringNodeKeyLength=0;
+                            return;
+                        }
+                    }
+                }
+                m.index++;
+            },
+            stringNode2:function(html,m){
+                if(html[m.index]==='>'){
+                    m.action='';
+                }
+                m.index++;
+            },
+            checkEnd:function(html,m){
+                if(m.action==='textNode'){
+                    if(m.textNodeStart!==m.index){
+                        var data=html.substring(m.textNodeStart,m.index);
+                        if(!emptyTextNodeRE.test(data)){
+                            m.node(data,3);
+                        }
+                        m.textNodeStart=0;
+                    }
+                }else if(m.action!==""){
+                    console.log(m.action)
+                    debugger;
+                }
+            }
+        }
+        var htmlParseT={
+            __proto__:htmlParse,
+            checkTemplate:function(html,m){
+                switch(html[m.index]){
+                    case '{':
+                        debugger;
+                        break;
+                    case '<':
+                        if(html[m.idnex+1]==='%'){
+                            debugger;
+                            m.index+=2;
+                            return true; 
+                        }
+                        break;
+                    case '%':
+                        if(html[m.idnex+1]==='>'){
+                            debugger;
+                            m.index+=2;
+                            return true; 
+                        }
+                        break;
+                }
+            },
+            attributes:function(html,m){
+                if(!this.checkTemplate(html,m)){
+                    this.__proto__.attributes(html,m);
+                }
+            },
+            stringNode:function(html,m){
+                if(!this.checkTemplate(html,m)){
+                    this.__proto__.stringNode(html,m);
+                }
+            },
+            attrValue:function(html,m){
+                if(!this.checkTemplate(html,m)){
+                    this.__proto__.attrValue(html,m);
+                }
+            }
+        }
+        function getInitData(vNode,length){
+            if(!vNode){
+                vNode=newVNode('document');
+                vNode.__isClose__=true;
+            }
+            return {
+                index:0,
+                node:vNode,
+                action:'',
+                length:length,
+                textNodeStart:0,
+                xmlNodeStart:0,
+                xmlNodeNameStart:0,
+                attrStart:0,
+                attrNameEnd:0,
+                equlIndex:0,
+                stringStart:0,
+                stringStartChar:'',
+                betweenSpaceStart:0,
+                stringNodeStart:0,
+                stringNodeRegExp:null,
+                stringNodeKeyLength:0
+            };
+        }
+        VTemplate=function(html,vNode){
+            var m=getInitData(vNode,html.length);
+            vNode=m.node;
+            while(m.index<html.length){
+                htmlParseT[m.action](html,m);
+            }
+            htmlParseT.checkEnd(html,m);
+            return vNode;
+        }
+        VDOM=function(html,vNode){
+            var m=getInitData(vNode,html.length);
+            vNode=m.node;
+            while(m.index<html.length){
+                htmlParse[m.action](html,m);
+            }
+            htmlParse.checkEnd(html,m);
+            return vNode;
+        }
+    }());
+    function NullValueHash(s){
+        var arr=s.split(',');
+        for(var i in arr){
+            this[arr[i]]=null;
+        }
+    }
+    
+    
+    var newVNode=(function(){
+        var toHelp          = document.createElement('用于创建VStyle和toDom支持');
+        var styleNode       = toHelp.style;
+        var VStyleprototype ={};
+        function VStyle(elem,attrs){
+            var 
+                style="",
+                isLock=0,
+                __={},
+                t=this;
+            for(var i in styleNode){
+                __[i]="";
+            }
+            Object.defineProperty(this,'__',{
+                    value: __,
+                    writable: false,
+                    enumerable: false,
+                    configurable: false
+                }
+            );
+            Object.defineProperty(this,'length',{
+                    value: 0,
+                    writable: true,
+                    enumerable: false,
+                    configurable: false
+                }
+            );
+            Object.defineProperty(this,'__elem__',{
+                    value: elem,
+                    writable: false,
+                    enumerable: false,
+                    configurable: false
+                }
+            );
+            Object.defineProperty(attrs,"__style__",{
+                    get: function(){
+                        return style;
+                    },
+                    set: function(s){
+                        if(isLock===1||style===s){
+                            return;
+                        }
+                        style=s;
+                        if(isLock===2){
+                            return;
+                        }
+                        isLock=1;
+                        var lst;
+                        var lst2=[];
+                        while((lst=styleListRE.exec(s))!==null){
+                            lst2.push(lst);
+                        }
+                        if(lst2.length>0){
+                            for(var i=0;i<lst2.length-1;i++){
+                                t[camelize(lst2[i][1])]=lst2[i][2];
+                            }
+                            isLock=2;
+                            t[camelize(lst2[i][1])]=lst2[i][2];
+                        }
+                        isLock=0;
+                        //styleListRE.lastIndex=0;
+                    }
+                }
+            );
+        }
+        VStyle.prototype=VStyleprototype;
+        function indexOfStyleName(t,name){
+            for(var i=0;i<t.length;i++){
+                if(t[i]===name){
+                    return i;
+                }
+            }
+            return -1;
+        }
+        function updateStyleAttribyte(t){
+            var style="";
+            for(var i=0;i<t.length;i++){
+                style+=decamelize(t[i])+':'+t[t[i]]+';';
+            }
+            t.__elem__.setAttribute('style',style);
+        }
+        function setVStyleGetSet(name){
+            Object.defineProperty(VStyleprototype,name,{
+                get:function(){
+                    return this.__[name];
+                },
+                set:function(s){
+                    if(s===this.__[name]){
+                        return;
+                    }else if(s===""){
+                        if(this.__[name]===s){
+                            return;
+                        }
+                        //删除
+                        this.__[name]=s;
+                        var idx=indexOfStyleName(this,name);
+                        //if(idx!==-1){
+                            for(var i=idx;i<this.length-1;i++){
+                                this[i]=this[i+1];
+                            }
+                            delete this[i];
+                            this.length--;
+                        //}
+                        //更新标签属性
+                        updateStyleAttribyte(this);
+                    }else{
+                        //验证是否有效style
+                        var s2;
+                        styleNode[name]=s;
+                        s2=styleNode[name];
+                        styleNode[name]="";
+                        if(s!==""){
+                            this.__[name]=s;
+                            var style=this.__elem__.getAttribute(style);
+                            var idx=indexOfStyleName(this,name);
+                            if(idx===-1){
+                                this[this.length]=name;
+                                this.length++;
+                            }
+                            //更新标签属性
+                            updateStyleAttribyte(this);
+                        }else{
+                            throwError(name+"不支持"+s);
+                        }
+                        
+                    }
+                }
+            });
+        }
+        for(var i in styleNode){
+            setVStyleGetSet(i);
+        }
+        VStyleprototype=null;
+        
+        var closeSelf       = new NullValueHash(
+            'br,input,hr,map,img,area,base,link,meta,frame,param,basefont,col'
+        );
+        
+        
+        /*function getOwnGetSets(name){
+            var elem=document.createElement(name);
+            var Elem=elem.constructor.prototype;
+            var ownGetSets=[];
+            if(Elem===HTMLElement.prototype){
+                return ownGetSets;
+            }
+            for(var i in Elem){
+                if(Elem.hasOwnProperty(i)){
+                    var desc=Object.getOwnPropertyDescriptor(Elem,i);
+                    if(desc.hasOwnProperty('get')&&desc.hasOwnProperty('set')){
+                        try{
+                        elem[i]="1";
+                        if(elem.hasAttribute(i)){
+                            ownGetSets.push(i);
+                        }
+                        }catch(e){
+                        }
+                    }
+                }
+            }
+            return ownGetSets;
+        }
+        var name="applet".toUpperCase();
+        var a=name+':["'+getOwnGetSets(name).join('","')+'"],';
+        copy(a);a;*/
+        var htmlNodeInfo={
+            A:["target","download","ping","rel","hreflang","type","coords","charset","name","rev","shape","href"],
+            AREA:["alt","coords","shape","target","ping","noHref","href"],
+            BASE:["href","target"],
+            BLOCKQUOTE:["cite"],
+            BODY:["text","link","vLink","aLink","bgColor","background"],
+            BR:["clear"],
+            CANVAS:["width","height"],
+            CAPTION:["align"],
+            COL:["span","align","vAlign","width"],
+            COLGROUP:["span","align","vAlign","width"],
+            DIALOG:["open"],
+            DIR:["compact"],
+            DIV:["align"],
+            DL:["compact"],
+            FIELDSET:["disabled","name"],
+            H1:["align"],
+            H2:["align"],
+            H3:["align"],
+            H4:["align"],
+            H5:["align"],
+            H6:["align"],
+            HR:["align","color","noShade","size","width"],
+            HTML:["version"],
+            IFRAME:["src","srcdoc","name","sandbox","allowFullscreen","width","height","align","scrolling","frameBorder","longDesc","marginHeight","marginWidth"],
+            IMG:["alt","src","srcset","sizes","crossOrigin","useMap","isMap","width","height","name","lowsrc","align","hspace","vspace","longDesc","border"],
+            INPUT:["accept","alt","autocomplete","autofocus","checked","dirName","disabled","formAction","formEnctype","formMethod","formNoValidate","formTarget","height","max","maxLength","min","minLength","multiple","name","pattern","placeholder","readOnly","required","size","src","step","type","value","width","align","useMap","autocapitalize","webkitdirectory","incremental"],
+            INS:["cite","dateTime"],
+            KEYGEN:["autofocus","challenge","disabled","keytype","name"],
+            LEGEND:["align"],
+            LI:["value","type"],
+            LINK:["disabled","href","crossOrigin","rel","media","hreflang","type","charset","rev","target","integrity"],
+            MAP:["name"],
+            MENU:["compact"],
+            META:["name","content","scheme"],
+            METER:["value","min","max","low","high","optimum"],
+            OL:["reversed","start","type","compact"],
+            OPTGROUP:["disabled","label"],
+            OPTION:["disabled","label","selected","value"],
+            OUTPUT:["name"],
+            P:["align"],
+            PARAM:["name","value","type","valueType"],
+            PRE:["width"],
+            PROGRESS:["value","max"],
+            Q:["cite"],
+            SCRIPT:["src","type","charset","async","defer","crossOrigin","event","integrity"],
+            SELECT:["autofocus","disabled","multiple","name","required","size"],
+            SOURCE:["src","type","srcset","sizes","media"],
+            STYLE:["media","type"],
+            TABLE:["align","border","frame","rules","summary","width","bgColor","cellPadding","cellSpacing"],
+            TBODY:["align","vAlign"],
+            TD:["colSpan","rowSpan","headers","align","axis","height","width","noWrap","vAlign","bgColor","abbr","scope"],
+            TEXTAREA:["autofocus","cols","dirName","disabled","maxLength","minLength","name","placeholder","readOnly","required","rows","wrap","autocapitalize"],
+            TFOOT:["align","vAlign"],
+            TH:["colSpan","rowSpan","headers","align","axis","height","width","noWrap","vAlign","bgColor","abbr","scope"],
+            THEAD:["align","vAlign"],
+            TR:["align","vAlign","bgColor"],
+            TRACK:["kind","src","srclang","label","default"],
+            UL:["compact","type"],
+            VIDEO:["width","height","poster"],
+            XMP:["width"]
+        }
+        
+        function setGetSetPropertyWithAttribute(o,attributes,name){
+            var hideValueName='__'+name+'__';
+            Object.defineProperty(attributes,hideValueName,{
+                    value: "",
+                    writable: true,
+                    enumerable: false,
+                    configurable: false
+                }
+            )
+            Object.defineProperty(o,name,{
+                get:function(){
+                    return attributes[hideValueName];
+                },
+                set:function(s){
+                    this.setAttribute(name,s);
+                }
+            });
+        }
+        function setProto(t){
+            var proto=htmlNodeInfo[t.nodeName];
+            if(isArray(proto)){
+                (htmlNodeInfo[t.nodeName]=t.__proto__=newObject(t.nodeName[0]+t.nodeName.substring(1))).__proto__=prototype;
+                for(var i in proto){
+                    setGetSetPropertyWithAttribute(t.__proto__,t.attributes,proto[i]);
+                }
+            }else{
+                t.__proto__=htmlNodeInfo[t.nodeName];
+            }
+        }
+        function setClassName(o){
+            Object.defineProperty(o.attributes,'__class__',{
+                    value: "",
+                    writable: true,
+                    enumerable: false,
+                    configurable: false
+                }
+            )
+            Object.defineProperty(o,'className',{
+                get:function(){
+                    var v=o.attributes.__class__;
+                    return v===undefined?"":v;
+                },
+                set:function(s){
+                    o.setAttribute('class',s);
+                }
+            });
+        }
+        function newVNode(name,nodeType){
+            //console.log(name);
+            var t=function(name,nodeType){
+                if(name!==undefined){
+                    return t.append(name,nodeType);
+                }else{
+                    t.__isClose__=true;
+                    return t.parentNode;
+                }
+            }
+            if(nodeType===undefined){
+                nodeType=1;
+            }
+            t.__={};
+            t.childNodes=[];
+            switch(nodeType){
+                case 1:
+                    t.nodeName=name.toUpperCase();
+                    t.attributes=new VNamedNodeMap();
+                    t.children=[];
+                    t.__events__=[];
+                    t.__isClose__=t.__closeSelf__=name in closeSelf;
+                    t.style=new VStyle(t,t.attributes);
+                    
+                    setClassName(t);
+                    defineClassList(t);
+                    if(t.nodeName in htmlNodeInfo){
+                        setProto(t);
+                    }else{
+                        t.__proto__=prototype;
+                    }
+                    break;
+                case 3:
+                    t.__proto__=textNodePrototype;
+                    t.nodeName='#text';
+                    if(isString(name)){
+                        t.value=name//decodeHTML(name);    
+                    }else{
+                        t.value=name.toString();
+                    }
+                    t.__isClose__=true;
+                    break;
+                case 8:
+                    t.nodeName='#comment';
+                    t.value=t.data=name;
+                    t.__proto__=prototype;
+                    t.__isClose__=true;
+                    break;
+                case 10:
+                    t.nodeName='html';
+                    t.__proto__=prototype;
+                    t.__isClose__=true;
+                    break;
+            }
+            t.parentNode=null;
+            t.nodeType=nodeType;
+            return t;
+        }
+        function VNamedNodeMap(){
+            Object.defineProperty(this,"__length__",{
+                    value: 0,
+                    writable: true,
+                    enumerable: false,
+                    configurable: false
+                }
+            );
+        }
+        VNamedNodeMap.prototype={
+            indexOfName:function(name){
+                var l=this.__length__;
+                for(var i=0;i<l;i++){
+                    if(this[i].name===name){
+                        return i;
+                    }
+                }
+                return -1;
+            },
+            indexOf:function(o){
+                var l=this.__length__;
+                for(var i=0;i<l;i++){
+                    if(this[i]===o){
+                        return i;
+                    }
+                }
+                return -1;
+            },
+            getNamedItem: function(name){
+                var idx=this.indexOfName(name);
+                if(idx===-1){
+                    return null;
+                }else{
+                    return this[idx];
+                }
+            },
+            //getNamedItemNS: getNamedItemNS()
+            item: function(index){
+                return this[index];
+            },
+            get length(){
+                return this.__length__;
+            },
+            removeNamedItem: function(name){
+                if(isObject(name)){
+                    var idx=this.indexOf(name);
+                }else{
+                    var idx=this.indexOfName(name); 
+                }
+                
+                if(idx!==-1){
+                    var l=this.__length__;
+                    for(var i=idx;i<l;i++){
+                        this[i]=this[i+1];
+                    }
+                    this.__length__--;
+                    delete this[this.__length__];
+                    var hideValueName='__'+name+'__';
+                    if(hideValueName in this){
+                        this[hideValueName]="";
+                    }
+                }
+            },
+            //removeNamedItemNS: removeNamedItemNS()
+            setNamedItem: function(name,value){
+                if(!isString(value)){
+                    if(isObject(value)){
+                        value=value.toString();
+                    }else if(value===undefined){
+                        value="";
+                    }
+                }
+                var idx=this.indexOfName(name);
+                if(idx===-1){
+                    this[this.__length__]={name:name,value:value};
+                    this.__length__++;
+                }else{
+                    this[idx].value=value;
+                }
+                var hideValueName='__'+name+'__';
+                if(hideValueName in this){
+                    this[hideValueName]=value;
+                }
+            }
+            //setNamedItemNS: setNamedItemNS()
+        }
+        function append(name,nodeType){
+            return _appendChild.call(this,newVNode(name,nodeType));
+        }
+        function appendChild(vNode){
+            var idx=this.childNodes.indexOf(vNode);
+            if(idx===-1){
+                return _appendChild.call(this,vNode);
+            }else{
+                return vNode;
+            }
+        }
+        function _appendChild(vNode){
+            if(vNode instanceof Node){
+                throwError('虚拟DOM只能插入虚拟节点！');
+                return;
+            }
+            this.childNodes.push(vNode);
+            if(vNode.nodeType===1){
+                this.children.push(vNode);
+            }
+            var p=vNode.parentNode;
+            if(p){
+                p.removeChild(vNode);
+            }
+            vNode.parentNode=this;
+            return vNode;
+        }
+        function removeChild(vNode){
+            if(!vNode||this.childNodes.length===0){
+                return vNode;
+            }
+            removeItem(this.childNodes,vNode);
+            removeItem(this.children,vNode);
+            vNode.parentNode=null;
+            return vNode;
+        }
+        function addText(){
+            var s=Array.prototype.join.call(arguments,'\r\n');
+            var t=newVNode(s,3);
+            this.appendChild(t);
+            return this;
+        }
+        function addText2(fn){
+            var t=newVNode($t.getFunctionComment(fn),3,this.nodeName==='PRE');
+            this.appendChild(t);
+            return this;
+        }
+        function removeAttribute(name){
+            this.attributes.removeNamedItem(name);
+        }
+        function removeAttributeNode(item){
+            this.attributes.removeNamedItem(item);
+        }
+        function hasAttribute(name){
+            return this.attributes.indexOfName(name)!==-1;
+        }
+        function setAttribute(name,value){
+            if(name&&!emptyTextNodeRE.test(name)){
+                this.attributes.setNamedItem(name,value);
+                return $t.getBind(this,setAttribute);
+            }else{
+                return this;
+            }
+        }
+        function _(name,value){
+            if(name){
+                return setAttribute.call(this,name,value);
+            }else{
+                return this.parentNode;
+            }
+        }
+        function getAttribute(name){
+            var item=this.attributes.getNamedItem(name);
+            if(item){
+                return item.value;
+            }else{
+                return null;
+            }
+        }
+        function valueOf(){
+            if(this.__domNode__){
+                return this.__domNode__;
+            }else{
+                return this;
+            }
+        }
+        function cloneNode(){
+            if(this.nodeType!==1){
+                return newVNode(this.data,this.nodeType);
+            }
+            var node=newVNode(this.nodeName,this.nodeType);
+            var attrs=this.attributes;
+            for(var i=0;i<attrs.length;i++){
+                node.setAttribute(attrs[i].name,attrs[i].value);
+            }
+            node.__isClose__=this.__isClose__;
+            node.__closeSelf__=this.__closeSelf__;
+            return node;
+        }
+        function insertBefore(newNode,node){
+            if(newNode instanceof Node){
+                throwError('虚拟DOM只能插入虚拟节点！');
+                return;
+            }
+            var p1=node.parentNode;
+            if(!p1){
+                return;
+            }
+            var chds=p1.childNodes;
+            var idx=chds.indexOf(node);
+            if(idx===-1){
+                return;
+            }
+            var p2=newNode.parentNode;
+            if(p2){
+                p2.removeChild(newNode);
+            }
+            chds.splice(idx,0,newNode);
+            
+            newNode.parentNode=p1;
+            
+            if(newNode.nodeType===1){
+                if(idx>=chds.length){
+                    chds.push(newNode);
+                }else{
+                    var chds=p1.children;
+                    for(var i=idx;i<chds.length;i++){
+                        if(chds[i].nodeType===1){
+                            chds.splice(i,0,newNode);
+                            return;
+                        }
+                    }
+                    chds.push(newNode);
+                }
+            }
+        }
+        
+        function getinnerText(){
+            var s="";
+            switch(this.nodeType){
+                case 3:
+                    s+=this.data;
+                    break;
+                case 1:
+                    var chdns=this.childNodes;
+                    for(var i=0;i<chdns.length;i++){
+                        s+=encodeHTML(chdns[i].innerText);
+                    }
+            }
+            return s;
+        }
+        function setinnerText(s){
+            var chds;
+            chds=this.children;
+            for(var i in chds){
+                delete chds[i];
+            }
+            chds=this.childNodes;
+            for(var i in chds){
+                delete chds[i];
+            }
+            this.appendChild(newVNode(decodeHTML(s),3));
+        }
+        function setinnerHTML(s){
+            this.children.length=0;
+            this.childNodes.length=0;
+            if(!isString(s)){
+                s=s.toString();
+            }
+            if(this.nodeName in stringNode){
+                this.appendChild($node(s,3));    
+            }else{
+                new VDOM(s,this);
+            }
+        }
+        function getinnerHTML(){
+            var 
+                cs=this.childNodes,
+                data=[];
+            if(cs){
+                for(var i=0;i<cs.length;i++){
+                    data.push(cs[i].outerHTML);
+                }   
+            }
+            return data.join('');
+        }
+        function connectParent(self,elem){
+            var p=self.parentNode;
+            if(p&&p.__domNode__){
+                var pE=p.__domNode__;
+                if(pE.childNodes.length===0){
+                    pE.appendChild(elem);
+                }else{
+                    var node=self;
+                    while(true){
+                        /*
+                         * 向前找
+                         */
+                        node=node.previousSibling;
+                        if(node){
+                            var elem2=node.__domNode__;
+                            if(elem2){
+                                if(elem2.parentNode){
+                                    pE.insertBefore2(elem,elem2);
+                                    pE.insertBefore2(elem2,elem);
+                                    break;
+                                }
+                            }
+                         }else{
+                             node=self;
+                             while(true){
+                                /*
+                                 * 向后找
+                                 */
+                                 node=node.nextSibling;
+                                 if(node){
+                                     var elem2=node.__domNode__;
+                                     if(elem2){
+                                         if(elem2.parentNode){
+                                             pE.insertBefore2(elem,elem2);
+                                             break;
+                                         }else{
+                                             console.log(elem2.innerHTML);
+                                             debugger;
+                                             /*这里怎么处理好呢*/
+                                         }
+                                     }
+                                 }else{
+                                     pE.appendChild(elem);
+                                     break;
+                                 }
+                             
+                             }
+                             break;
+                         }
+                    }
+                }
+            }
+        }
+        function VNode(){
+            this.setAttribute=setAttribute;
+            this._=_;
+            this.text=addText;
+            this.text2=addText2;
+            this.append=append;
+            this.appendChild=appendChild;
+            this.removeChild=removeChild;
+            this.hasAttribute=hasAttribute;
+            this.removeAttribute=removeAttribute;
+            this.removeAttributeNode=removeAttributeNode;
+            this.getAttribute=getAttribute;
+            this.insertBefore=insertBefore;
+            this.insertBefore2=insertBefore;
+            this.cloneNode=cloneNode;
+            this.valueOf=valueOf;
+            this.toString=function(){
+                return "[object HTML"+this.nodeName[0]+this.nodeName.substring(1).toLowerCase()+"Element]";
+            }
+            this.toXMLNodeString=function(){
+                var 
+                    ret=[],
+                    sAttr='',
+                    arrAttr=[],
+                    attr=this.attributes;
+                if(attr){
+                    for(var i=0;i<attr.length;i++){
+                        if(attr[i].value){
+                            arrAttr.push(attr[i].name+'="'+attr[i].value+'"');    
+                        }else{
+                            arrAttr.push(attr[i].name);    
+                        }
+                    }
+                    if(arrAttr.length>0){
+                        sAttr=' '+arrAttr.join(' ');
+                    }
+                }
+                switch(this.nodeType){
+                    case 1:
+                        ret.push('<'+this.nodeName.toLowerCase()+sAttr+'>');
+                        if(!this.__closeSelf__ && this.__isClose__){
+                            ret.push('</'+this.nodeName.toLowerCase()+'>');
+                        }
+                        break;
+                    case 3:
+                        ret.push(this.data);
+                        break;
+                    case 8:
+                        if(this.dbplus){
+                            ret.push('<!--'+this.data+'-->');
+                        }else{
+                            ret.push('<!'+this.data+'>');
+                        }
+                        break;
+                    case 10:
+                        ret.push('<!DOCTYPE html>');
+                        break;
+                }
+                return ret;
+            }
+            this.addEventListener=function(name,fn,useCapture){
+                if(this.nodeType!==1){
+                    return;
+                }
+                if(!useCapture){
+                    useCapture=false;
+                }
+                this.__events__.push([name,fn,useCapture]);
+            }
+            this.removeEventListener=function(name,fn,useCapture){
+                if(this.nodeType!==1){
+                    return;
+                }
+                if(!useCapture){
+                    useCapture=false;
+                }
+                var arr=this.__events__;
+                for(var i in arr){
+                    var e=arr[i];
+                    if(e[0]===name&&e[1]===fn&&e[2]===useCapture){
+                        arr.splice(i,1);
+                        i--;
+                    }
+                }
+            }
+            this.toJS=function(){
+                var 
+                    sBegin='',
+                    sAttr='',
+                    sInner='',
+                    sEnd='',
+                    s;
+                if(this.parentNode!==null&&this.__isClose__){
+                    sEnd='()';
+                }
+                if(this.parentNode===null){
+                    sBegin='$VNode';
+                }
+                if(this.nodeType===1){
+                    sBegin+='("'+this.nodeName+'")';
+                    if(this.attributes.length>0){
+                        sAttr='._';
+                        var attrs=this.attributes;
+                        for(var i=0;i<attrs.length;i++){
+                            sAttr+='("'+attrs[i].name;
+                            if(attrs[i].value){
+                                sAttr+='","'+attrs[i].value+'")';    
+                            }else{
+                                sAttr+='")';
+                            }
+                        }
+                        sAttr+='()';
+                    }
+                    var chds=this.childNodes;
+                    if(chds.length>0){
+                        for(var i=0;i<chds.length;i++){
+                            sInner+=chds[i].toJS();
+                        }
+                    }
+                }else{
+                    s=this.data;
+                    s=s.replace(/[\'\"\r\n]/g,function(s){
+                        switch(s){
+                            case '\'':
+                            case '\"':
+                                return '\\'+s;
+                            case '\r':
+                                return '\\r';
+                            case '\n':
+                                return '\\n';
+                        }
+                    });
+                    sBegin+='("'+s+'",'+this.nodeType+')';
+                }
+                return sBegin+sAttr+sInner+sEnd;
+            }
+            this.toDOM=function(){
+                var elem;
+                switch(this.nodeType){
+                    case 1:
+                        if(this.__domNode__){
+                            elem=this.__domNode__;
+                            return elem;
+                        }
+                        elem=document.createElement(this.nodeName);
+                        this.__domNode__=elem;
+                        break;
+                    case 3:
+                        if(this.__domNode__){
+                            return this.__domNode__;
+                        }
+                        if(this.data!==""){
+                            toHelp.innerHTML=this.data;
+                            elem=toHelp.removeChild(toHelp.childNodes[0]);
+                            //elem=document.createTextNode(this.data);不用这句的原因是为了转码
+                        }else{
+                            elem=document.createTextNode('');
+                        }
+                        this.__domNode__=elem;
+                        break;
+                    case 8:
+                        if(this.__domNode__){
+                            return this.__domNode__;
+                        }
+                        elem=document.createComment(this.data);
+                        this.__domNode__=elem;
+                        break;
+                    case 10:
+                    default:
+                        if(this.__domNode__){
+                            return this.__domNode__;
+                        }
+                        toHelp.innerHTML=this.outerHTML;
+                        elem=toHelp.removeChild(toHelp.childNodes[0]);
+                        this.__domNode__=elem;
+                }
+                for(var i in this){
+                    switch(i){
+                        case 'attributes':
+                            var attrs=this.attributes;
+                            for(var j=0;j<attrs.length;j++){
+                                elem.setAttribute(attrs[j].name,attrs[j].value);
+                            }
+                            break;
+                        
+                        case '__events__':
+                            var arr=this.__events__;
+                            for(var j in arr){
+                                var e=arr[j];
+                                elem.addEventListener(e[0],e[1],e[2]);
+                            }
+                            break;
+                        case '__':
+                            var arr=this.__;
+                            for(var j in arr){
+                                elem[j]=arr[j];
+                            }
+                            break;
+                        case 'children':
+                        case 'childNodes':
+                        case '__proto__':
+                        case '__isClose__':
+                        case '__domNode__':
+                        case 'nodeType':
+                        case 'nodeName':
+                        case 'parentNode':
+                        case "__closeSelf__":
+                        case "style":
+                        case "classList":
+                        case "className":
+                            break;
+                        default:
+                            if(!this.hasOwnProperty(i)){
+                                continue;
+                            }
+                            var desc=Object.getOwnPropertyDescriptor(this,i);
+                            if(desc){
+                                if(!(i in elem)){
+                                    Object.defineProperty(elem,i,desc);    
+                                }else{
+                                    elem[i]=this[i];
+                                }
+                            }else{
+                                elem[i]=this[i];
+                            }
+                    }
+                }
+                connectParent(this,elem);
+                if(this.nodeType===1){
+                    if(this.nodeName==='PRE'){
+                        if(this.childNodes.length>0){
+                            elem.innerHTML=decodeHTML(this.childNodes[0].data);    
+                        }
+                    }else{
+                        var chds=this.childNodes;
+                        for(var j=0;j<chds.length;j++){
+                            chds[j].toDOM();
+                        }
+                    }
+                }
+                delegateNode(this);
+                elem.__vdomNode__=this;
+                return elem;
+            }
+            Object.defineProperty(this,'outerHTML',{
+                get:function(){
+                    var 
+                        xmlNode=this.toXMLNodeString(),
+                        cs=this.childNodes,
+                        data=[xmlNode[0]];
+                    if(cs){
+                        for(var i=0;i<cs.length;i++){
+                            data.push(cs[i].outerHTML);
+                        }
+                    }
+                    if(xmlNode.length===2){
+                        data.push(xmlNode[1]);    
+                    }
+                    return data.join('');
+                }
+            });
+            Object.defineProperty(this,'previousSibling',{
+                get:function(){
+                    var p=this.parentNode;
+                    if(!p){
+                        return null;
+                    }
+                    var chds=p.childNodes;
+                    var idx=chds.indexOf(this);
+                    var node=chds[idx-1];
+                    return node?node:null;
+                }
+            });
+            Object.defineProperty(this,'nextSibling',{
+                get:function(){
+                    var p=this.parentNode;
+                    if(!p){
+                        return null;
+                    }
+                    var chds=p.childNodes;
+                    var idx=chds.indexOf(this);
+                    var node=chds[idx+1];
+                    return node?node:null;
+                }
+            });
+            var arrGetSetEvents=["onabort","onblur","oncancel","oncanplay","oncanplaythrough","onchange","onclick","onclose","oncontextmenu","oncuechange","ondblclick","ondrag","ondragend","ondragenter","ondragleave","ondragover","ondragstart","ondrop","ondurationchange","onemptied","onended","onerror","onfocus","oninput","oninvalid","onkeydown","onkeypress","onkeyup","onload","onloadeddata","onloadedmetadata","onloadstart","onmousedown","onmouseenter","onmouseleave","onmousemove","onmouseout","onmouseover","onmouseup","onmousewheel","onpause","onplay","onplaying","onprogress","onratechange","onreset","onresize","onscroll","onseeked","onseeking","onselect","onshow","onstalled","onsubmit","onsuspend","ontimeupdate","ontoggle","onvolumechange","onwaiting","onautocomplete","onautocompleteerror","onbeforecopy","onbeforecut","onbeforepaste","oncopy","oncut","onpaste","onsearch","onselectstart","onwheel","onwebkitfullscreenchange","onwebkitfullscreenerror"];
+            function defineProtoGetSet(proto,name){
+                Object.defineProperty(proto,name,{
+                    get:function(){
+                        if(this.__domNode__){
+                            return this.__domNode__[name];
+                        }else{
+                            return this.__[name];
+                        }
+                    },
+                    set:function(v){
+                        if(this.__domNode__){
+                            this.__domNode__[name]=v;
+                        }else{
+                            this.__[name]=v;
+                        }
+                        return v;
+                    }
+                });
+            }
+            Object.defineProperty(this,'innerHTML',{
+                get:getinnerHTML,
+                set:setinnerHTML
+            });
+            Object.defineProperty(this,'innerText',{
+                get:getinnerText,
+                set:setinnerText
+            });
+            for(var i in arrGetSetEvents){
+                defineProtoGetSet(this,arrGetSetEvents[i]);
+            }
+        }
+        function VtextNode(){
+            this.__proto__=prototype;
+            this.__value__='';
+            var defineDesc={
+                get:function(){
+                    return this.__value__;
+                },
+                set:function(s){
+                    this.__value__=s;
+                }
+            }
+            Object.defineProperty(this,'data',defineDesc);
+            Object.defineProperty(this,'value',defineDesc);
+        }
+        var prototype=new VNode();
+        var textNodePrototype=new VtextNode();
+        function getHomology(name){
+            return function(){
+                this.__proto__[name].apply(this,arguments);
+                return this.__domNode__[name].apply(this.__domNode__,arguments);
+            }
+        }
+        function getDOMHomology(name){
+            return function(){
+                var objects=[],toDOMs=[];
+                for(var i=0;i<arguments.length;i++){
+                    var o=arguments[i].valueOf();
+                    if(o===arguments[i]){
+                        toDOMs.push(o);
+                        o=o.toDOM();
+                    }
+                    objects.push(o);
+                    
+                }
+                this.__proto__[name].apply(this,arguments);
+                var ret=this.__domNode__[name].apply(this.__domNode__,objects);
+                for(var i=0;i<toDOMs.length;i++){
+                    var chds=toDOMs[i].childNodes;
+                    for(var j=0;j<chds.length;j++){
+                        var chds2=chds[j].childNodes;
+                        if(chds2.length!==chds[j].__domNode__.childNodes.length){
+                            for(var k=0;k<chds2.length;k++){
+                                if(chds2[k].__domNode__.parentNode===null){
+                                    connectParent(chds2[k],chds2[k].__domNode__);
+                                }
+                            }
+                        }
+                    }
+                }
+                return ret;
+            }
+        }
+        function getBridge(name){
+            return function(){
+                return this.__domNode__[name].apply(this.__domNode__,arguments);
+            }
+        }
+        var osetAttribute=getBridge('setAttribute');
+        var ohasAttribute=getBridge('hasAttribute');
+        var oremoveAttribute=getBridge('removeAttribute');
+        var oremoveAttributeNode=getBridge('removeAttributeNode');
+        var oappendChild=getDOMHomology('appendChild');
+        var oremoveChild=(function(){
+            return function(node){
+                if(node.parentNode){
+                    if(node.__domNode__){
+                        //try{
+                            //
+                        this.__domNode__.removeChild(node.__domNode__);
+                        //}catch(e){
+                            
+                        //}
+                    }
+                }else{
+                    debugger;
+                }
+                return this.__proto__.removeChild.call(this,node);
+            }
+        }());
+        var oinsertBefore=getDOMHomology('insertBefore');
+        var oinsertBefore2=getDOMHomology('insertBefore2');
+        var oaddEventListener=getHomology('addEventListener');
+        var oremoveEventListener=getHomology('removeEventListener');
+        var oGetstyle=function(){return this.__domNode__.style};
+        var oGetclassList=function(){return this.__domNode__.classList};
+        var oGetoffsetTop=function(){return this.__domNode__.offsetTop};
+        var oGetoffsetLeft=function(){return this.__domNode__.offsetLeft};
+        var oGetoffsetWidth=function(){return this.__domNode__.offsetWidth};
+        var oGetoffsetHeight=function(){return this.__domNode__.offsetHeight};
+        //var oGetouterHTML=function(){return this.__domNode__.outerHTML};
+        var oGetattributes=function(){return this.__domNode__.attributes};
+        var otoString=function(){return this.__domNode__.toString.apply(this.__domNode__,arguments)};
+        function delegateNode(o){
+            if(o.nodeType===1){
+                o.setAttribute=osetAttribute;
+                o.hasAttribute=ohasAttribute;
+                o.appendChild=oappendChild;
+                o.removeChild=oremoveChild;
+                o.removeAttribute=oremoveAttribute;
+                o.removeAttributeNode=oremoveAttributeNode;
+                o.insertBefore=oinsertBefore;
+                o.insertBefore2=oinsertBefore2;
+                o.toString=otoString;
+                o.addEventListener=oaddEventListener;
+                o.removeEventListener=oremoveEventListener;
+                Object.defineProperty(o,'style',{
+                    get:oGetstyle
+                });
+                Object.defineProperty(o,'classList',{
+                    get:oGetclassList
+                });
+                Object.defineProperty(o,'offsetTop',{
+                    get:oGetoffsetTop
+                });
+                Object.defineProperty(o,'offsetLeft',{
+                    get:oGetoffsetLeft
+                });
+                Object.defineProperty(o,'offsetWidth',{
+                    get:oGetoffsetWidth
+                });
+                Object.defineProperty(o,'offsetHeight',{
+                    get:oGetoffsetHeight
+                });
+                Object.defineProperty(o,'attributes',{
+                    get:oGetattributes
+                });
+                switch(o.nodeName){
+                    case "INPUT":
+                    case "SELECT":
+                    case "TEXTAREA":
+                        Object.defineProperty(o,'value',{
+                            get:function(){
+                                return this.__domNode__.value;
+                            },
+                            set:function(s){
+                                this.__domNode__.value=s;
+                            }
+                        });
+                    case "INPUT":
+                        Object.defineProperty(o,'checked',{
+                            get:function(){
+                                return this.__domNode__.checked;
+                            },
+                            set:function(s){
+                                this.__domNode__.checked=s;
+                            }
+                        });
+                        break;
+                }
+            }else if(o.nodeType===3){
+                Object.defineProperty(o,'data',{
+                    get:function(){
+                        return this.__value__;
+                    },
+                    set:function(s){
+                        this.__value__=s;
+                        this.__domNode__.data=s;
+                    }
+                });
+                Object.defineProperty(o,'value',{
+                    get:function(){
+                        return this.__value__;
+                    },
+                    set:function(s){
+                        this.__value__=s;
+                        this.__domNode__.value=s;
+                    }
+                });
+            }
+            
+        }
+        return newVNode;
+    })();
+    /*function UITeam(){}
     UITeam.prototype=new function (){
         var t={
             push:function(name,group,check,missingCheck){
@@ -3217,16 +6362,26 @@ var turtle,$t;
             }
         }
         return t;
-    }
+    }*/
     function newKeyArrayObject(type){
         return newObject(type,newKeyArrayObject.prototype);
     }
     newKeyArrayObject.prototype={
         push:function(key,node){
-            if(!this.hasOwnProperty(key)){
-                this[key]=[];
+            if(isArray(key)){
+                for(var i=0;i<key.length;i++){
+                    if(!this.hasOwnProperty(key[i])){
+                        (this[key[i]]=[]).last=last;
+                    }
+                    this[key[i]].push(node);
+                }
+            }else{
+                if(!this.hasOwnProperty(key)){
+                    (this[key]=[]).last=last;
+                }
+                this[key].push(node);
             }
-            this[key].push(node);
+            
         },
         clear:function(){
             forEach(this,function(data,key,obj){
@@ -3235,60 +6390,129 @@ var turtle,$t;
         },
         getKeyArray:function(){
             return getKeyArray(this);
+        },
+        pop:function(key){
+            var keyObject=this[key];
+            if(keyObject){
+                return keyObject.pop();
+            }
         }
     }
     function makeCompileString(){
         var script=$t.turtleScriptElement.cloneNode();
         script.setAttribute('compile','');
-        script.setAttribute('compileuilist',getKeyArray($t.ui).join(','));
+        // script.setAttribute('uibasepath',$t.config.baseUIPath.toString());
+        var obj=$t.ui,
+            arr=[];
+        forEach(obj,function(v,key){
+            if(obj[key].sortPath){
+                arr.push(obj[key].sortPath+':'+key);
+            }
+        },this,false);
+        script.setAttribute('compileuilist',arr.join(','));
         
         return script.outerHTML;
     }
-    function beforeReady(){
+    var vNodesToDOM;
+    function setParseMode(mode){
+        $VDOM=VDOM;
+        $VNode=newVNode;
+        if(mode===1){
+            /*
+             * 虚拟DOM
+             */
+            $DOM=VDOM;
+            $node=newVNode;
+            vNodesToDOM=function(vNodes){
+                var arr=[];
+                for(var i=0;i<vNodes.length;i++){
+                    arr.push(vNodes[i].toDOM());    
+                }
+                return arr;
+            }
+        }else{
+            /*
+             * DOM
+             */
+            $DOM=function(html){var elem=document.createElement('ui:dom');elem.innerHTML=html;return elem;}
+            $node=function(name,nodeType){
+                switch(nodeType){
+                    case 3:
+                        return document.createTextNode(name);
+
+                    case 8:
+                        return document.createComment(name);
+                        
+                    case 1:
+                    case undefined:
+                        return document.createElement(name);
+                        
+                    case 10:
+                        return null;
+                        
+                    default:
+                        return null;
+                }
+            };
+            Node.prototype.toDOM=Node.prototype.valueOf=function(){return this}
+            vNodesToDOM=function(nodes){return nodes}
+        }
+    }
+    function aftertInit(){
         var 
             scriptNode=$t.turtleScriptElement=document.scripts[document.scripts.length-1],
-            compile=takeAttr(scriptNode,'compile',null),
+            compile=getAttr(scriptNode,'compile',null),
             load=getAttr(scriptNode,'load',null),
-            sciript=scriptNode.innerHTML,
-            baseuipath=takeAttr(scriptNode,'baseuipath',null),
-            extend=takeAttr(scriptNode,'extend',null),
-            compilename=takeAttr(scriptNode,'compilename',null),
-            compileuilist=takeAttr(scriptNode,'compileuilist',null);
+            script=scriptNode.innerHTML,
+            baseuipath=getAttr(scriptNode,'baseuipath',null),
+            extend=getAttr(scriptNode,'extend',null),
+            compilename=getAttr(scriptNode,'compilename',null),
+            compileuilist=getAttr(scriptNode,'compileuilist',null),
+            compileInfo;
         if(baseuipath){
-            turtle.config.baseUIPath=baseuipath.split(",");
+            baseUIPath.push(baseuipath.split(";"));
+        }else{
+            baseUIPath.push('{path:"ui",name:"ui"}');
         }
-        if(extend)
-            turtle.extend(window,turtle.fn);
-        if(sciript.length>0){
-            execTurtleScript(scriptNode,null,null);
+        if(extend){
+            $t.extend(window,$t.fn);
         }
-            
-        if (compile != null){
+        $t.url=scriptNode.getAttribute("src");
+        if (compile !== null){
             if(getQueryString("turtle_nocompile")!="1"){
                 $t.xhr.get(scriptNode.src+'.setup',false,function(text){
-                    eval('compile='+text);
+                    try{
+                        exec('compileInfo='+text);    
+                    }catch(e){
+                        _catch(e);
+                    }
                 });
             }
+            $t.isCompile=true;
         }
-        var resume=(compile && compile.isOn && compile.url)?r1:r2;
+        var resume=(compileInfo && compileInfo.isOn && compileInfo.url)?r1:r2;
         if(load){
             var loads=load.split(",");
             var i=0;
             var fnLoad=function(){
                 i++;
                 if(i<loads.length){
-                    $t.includeJSFiles(loads[i],fnLoad);
+                    includeJSFiles(loads[i],fnLoad);
                 }else{
                     resume();
                 }
             }
-            $t.includeJSFiles(loads[0],fnLoad);
+            includeJSFiles(loads[0],fnLoad);
         }else{
             resume();
         }
+        
+        if(script.length>0){
+            execScript(scriptNode);
+        }
         function r1(){
             $t.ready(function() {
-                turtle.compileDocument(scriptNode,compileuilist,function(s,uiList){
+                $t.compileDocument(scriptNode,compileuilist,function(html,compileJS,importScripts){
                     if(!compilename){
                         compilename=getNameByURL(getNameByLocation());
                         if(/\./.test(compilename)){
@@ -3296,12 +6520,18 @@ var turtle,$t;
                         }
                         console.log('未提供compilename，自动设置为“'+compilename+'”');
                     }
-                    var url = compile.url + "?htmlName=" + compilename;
+                    var url = compileInfo.url + "?htmlName=" + compilename;
                     
                     var b=document.body;
                     b.innerHTML='<div style="background-color:#fff;position:absolute;left:0;right:0;bottom:0;top:0;">开始编译页面</div>';
                     var c=b.children[0];
-                    $t.xhr.post(url,s,false,function(text){
+                    switch(compile){
+                        case 'onlyBody':
+                        
+                            html='<xmp><script>'+importScripts+'</script></xmp>'+html.match(/(<body[\s\S]*?>)([\s\S]*?)(<\/body>)/)[2];
+                            break;
+                    }
+                    $t.xhr.post(url,html,false,function(text){
                         var br= document.createElement('br');
                         var sec=document.createElement('span');
                         var timeout=1000;
@@ -3314,9 +6544,9 @@ var turtle,$t;
                         c.appendChild(br.cloneNode());
                         c.appendChild(br.cloneNode());
                         c.appendChild(document.createTextNode(text));
-                        for(var i=0;i<uiList.length;i++){
-                            var url = compile.url + "?uiName=" + uiList[i].name;
-                            $t.xhr.post(url,uiList[i].script,false,function(text){
+                        for(var i=0;i<compileJS.length;i++){
+                            var url = compileInfo.url + "?uiName=" + compileJS[i].name + "&uiPath=" + compileJS[i].path;
+                            $t.xhr.post(url,compileJS[i].script,false,function(text){
                                 c.appendChild(br.cloneNode());
                                 c.appendChild(document.createTextNode(text));
                             });
@@ -3336,8 +6566,9 @@ var turtle,$t;
         }
         function r2(){
             $t.ready(function(){
-                $t.renderDocument();
+                renderDocument();
                 $t.readyByRenderDocument.isReady=true;
+                emitResize();
             });
         }
     }
@@ -3345,15 +6576,110 @@ var turtle,$t;
         if($t.readyByRenderDocument.isReady||(readyRE.test(document.readyState)&&document.body!==null)){
             fn();
         }else{
-            window.addEventListener('DOMContentLoaded',function(){
+            function onLoaded(){
                 if(document.body!==null){
-                    window.removeEventListener('DOMContentLoaded',arguments.callee);
-                    fn();   
+                    window.removeEventListener('DOMContentLoaded',onLoaded);
+                    clearInterval(tid);
+                    fn();
                 }
-            },false);
+            }
+            
+            var tid=setInterval(function(){
+                if($t.readyByRenderDocument.isReady||(readyRE.test(document.readyState)&&document.body!==null)){
+                    clearInterval(tid);
+                    window.removeEventListener('DOMContentLoaded',onLoaded);
+                    fn();
+                }
+            },10);
+            window.addEventListener('DOMContentLoaded',onLoaded,false);
         }
         return this;
     }
+    
+    function Config(){
+        this.baseUIPath=baseUIPath;
+        this.baseServicePath='service';
+        lockObject(this);
+        this.debugMode=2;
+    }
+    var onViewOnce=(function(){
+        var viewWatchs=[];
+        function indexOfTarget(arr,o){
+            for(var i=0;i<arr.length;i++){
+                if(arr[i].target===o){
+                    return i;
+                }
+            }
+            return -1;
+        }
+        function ViewWatch(elemScroll){
+            var items=[];
+            var onceItems=[];
+            this.target=elemScroll;
+            this.on=function(elem,fn){
+                var idx=indexOfTarget(onceItems,elem);
+                if(idx!==-1){
+                    fn();
+                    return;
+                }
+                idx=indexOfTarget(items,elem);
+                var item;
+                if(idx!==-1){
+                    item=items[idx];
+                    item.fn.push(fn);
+                }else{
+                    item={target:elem,fn:[fn]}
+                    items.push(item);
+                }
+                if(item.fn.length===1){
+                    if(items.length===1){
+                        window.addEventListener('scroll',scroll);
+                        scroll();
+                    }
+                }
+            }
+            function scroll(e){
+                var t=elemScroll.scrollTop;
+                var b=t+elemScroll.clientHeight;
+                var l=elemScroll.scrollLeft;
+                var r=l+elemScroll.clientWidth;
+                for(var i=0;i<items.length;i++){
+                    var elem=items[i].target;
+                    var t2=0,l2=0;
+                    while(elem!==elemScroll&&elem!==null){
+                        t2+=elem.offsetTop;
+                        l2+=elem.offsetLeft;
+                        elem=elem.parentNode;
+                    }
+                    if(l2>=l&&l2<r&&t2>=t&&t2<=b){
+                        
+                        var fns=items[i].fn;
+                        var len=fns.length
+                        for(var j=0;j<len;j++){
+                            fns.pop()();
+                        }
+                        items.splice(i,1);
+                        i--;
+                    }
+                }
+                if(items.length===0){
+                    window.removeEventListener('scroll',scroll);
+                }
+            }
+        }
+        
+        return function(elem,elemScroll,fn){
+            var idx=indexOfTarget(viewWatchs,elemScroll);
+            
+            if(idx===-1){
+                viewWatch=new ViewWatch(elemScroll);
+                viewWatchs.push(viewWatch);
+            }else{
+                viewWatch=viewWatchs[idx];
+            }
+            viewWatch.on(elem,fn);
+        }
+    })();
     function ReadyObject(){
         var _isReady=false;
         var t={
@@ -3389,8 +6715,11 @@ var turtle,$t;
     
     fn.getClosure=getClosure;
     fn.getClosureTry=getOnTry;
+    fn.getStep=getStep;
+    fn.exec=eval;
     
-    
+    fn.addStyle=addStyle;
+    fn.addClassName=addClassName;
     fn.addClass=addClass;
     fn.addClasses=addClasses;
     fn.removeClass=removeClass;
@@ -3410,16 +6739,21 @@ var turtle,$t;
     fn.isArray=isArray;
     fn.isRepeat=isRepeat;
     fn.isArrayLike=isArrayLike;
+    fn.isPersent=isPersent;
+    fn.persentToFloat=persentToFloat;
     
     fn.toArray=toArray;
     fn.moveArray=moveArray;
     fn.getRect=getRect;
+    fn.getOffsetPos=getOffsetPos;
     fn.encodeHTML=encodeHTML;
     fn.decodeHTML=decodeHTML;
     fn.idle=idle;
     fn.elementDOMdistance=elementDOMdistance;
     fn.elementInElement=elementInElement;
-    fn.debounce=debounce;
+    fn.getDebounce=getDebounce;
+    fn.getReTimeout=getReTimeout;
+    
     fn.getAttr=getAttr;
     fn.extend=extend;
     fn.extendConst=extendConst;
@@ -3429,11 +6763,13 @@ var turtle,$t;
     fn.compact=compact;
     fn.flatten=flatten;
     fn.camelize=camelize;
+    fn.decamelize=decamelize;
     fn.dasherize=dasherize;
     fn.takeOutChildNodes=takeOutChildNodes;
     fn.takeChildNodes=takeChildNodes;
     fn.trim=trim;
     fn.trimLine=trimLine;
+    fn.HTMLTrim=HTMLTrim;
     fn.map=map;
     fn.each=each;
     fn.forEach=forEach;
@@ -3445,8 +6781,10 @@ var turtle,$t;
     fn.replaceNodeByNode=replaceNodeByNode;
     fn.replaceNodeByString=replaceNodeByString;
     fn.insertNodesBefore=insertNodesBefore;
-    fn.replaceByObjectAttr=replaceByObjectAttr;
-    fn.replaceByNodeAttr=replaceByNodeAttr;
+    fn.insertNodeBefore=insertNodeBefore;
+    
+    //fn.replaceByObjectAttr=replaceByObjectAttr;
+    //fn.replaceByNodeAttr=replaceByNodeAttr;
     fn.appendNodes=appendNodes;
     fn.nodesToString=nodesToString;
     fn.parseBool=parseBool;
@@ -3463,24 +6801,29 @@ var turtle,$t;
     fn.getDPI=getDPI;
     fn.removeNode=removeNode;
     fn.ReadyObject=ReadyObject;
+    fn.dateFormat=dateFormat;
     //fn.base64Decode=decode;
     //fn.base64Encode=encode;
     fn.objectChange=objectChange;
     fn.objectPropertyChange=objectPropertyChange;
     fn.bindProperty=bindProperty;
+    fn.bindNodeByCondition=bindNodeByCondition;
+    fn.bindNode=bindNode;
     fn.bindElementProperty=bindElementProperty;
-    fn.getUIName=getUIName;
-    fn.isUI=isUI;
+    fn.getUIInfo=getUIInfo;
     fn.repeatCall=repeatCall;
     fn.removeItem=removeItem;
     fn.UITemplate=UITemplate;
     fn.importUIJS=importUIJS;
+    fn.importUIHTML=importUIHTML;
     fn.onPropertyChange=onPropertyChange;
     fn.bindNodeProperty=bindNodeProperty;
+    fn.bindFunction=bindFunction;
     fn.newHashObject=newHashObject;
     fn.newArrayObject=newArrayObject;
     fn.includeJSFiles=includeJSFiles;
     fn.bindElementPropertyByName=bindElementPropertyByName;
+    fn.toVarString=toVarString;
     fn.log=log;
     fn.bp=bp;
     fn.camelCase=camelCase;
@@ -3489,46 +6832,79 @@ var turtle,$t;
     fn.toPercent=toPercent;
     //fn.delay=delay;
     fn.getStateFunction=getStateFunction;
+    fn.onViewOnce=onViewOnce;
+    fn.removeBlockBetween=removeBlockBetween;
+    fn.takeBlockBetween=takeBlockBetween;
+    fn.getElementsBetween=getElementsBetween;
+    fn.cloneBetween=cloneBetween;
+    fn.dropMove=dropMove;
+    fn.DropRect=DropRect;
+    fn.slice=slice;
+    fn.push=push;
+    fn.getFunctionComment=getFunctionComment;
+    fn.getFunctionComments=getFunctionComments;
+    
+    fn.VDOM=VDOM;
+    fn.newVNode=newVNode;
     function Turtle(){
-        this.config={baseUIPath:['ui'],baseServicePath:'service',debugMode:2};
-        this.event={onerror:function(e){log(e);alert(e)}};
+        this.isTemplate=isTemplate;
+        this.config=new Config();
+        this.event={onerror:function(e){log(e);bp();alert(e);}};
         this.getUI=getUI;
         this.renderIn=renderIn;
         this.renderBefore=renderBefore;
         this.parseHTML=parseHTML;
         this.parseXMP=parseXMP;
         this.renderDocument=renderDocument;
-        this.compileUI=compileUI;
+        this.renderTemplate=renderTemplate;
+        // this.compileUI=compileUI;
         this.compileDocument=compileDocument;
-        this.initCls=initCls;
+        this.replaceCls=replaceCls;
         this.initHTML=initHTML;
         this.ui=new UI();
         this.jsScript=newHashObject('JSHash');
         this.styleClasses=newKeyArrayObject("StyleClasses");
-        this.refNode=newKeyArrayObject("RefNode");
+        this.refs=newKeyArrayObject("RefElements");
+        this.parts=newKeyArrayObject("Parts");
         this.clsNode=newArrayObject('ClassNode');
-        this.getNode=newHashObject('GetNode');
+        this.store=new Store();
         this.service=new Service();
-        this.body='';
-        this.uiTeam=new UITeam();
-        this.uiLink=new UILink();
+        //this.body='';
+        //this.uiTeam=new UITeam();
+        //this.uiLink=new UILink();
         this.uiScope=new UIScope();
         this.xhr=new XHR();
-        Object.defineProperty(this,"rootComponents",{get:function(){return new RootComponents();}});
+        Object.defineProperty(this,"rootParts",{get:function(){return new RootParts();}});
         this.ready=ready;
         this.readyByRenderDocument=new ReadyObject();
         this.fn=fn;
         this.turtleScriptElement='';
         this.makeCompileString=makeCompileString;
+        this.Service=Service;
+        this.UIParam=UIParam;
         this.renderParser={
             attributeParser:attributeParser,
             elementParser:elementParser
         };
         this.require=require;
         this.isIE=isIE;
+        this.templates=templates;
+        this.url="";
+        this.catch=_catch;
+        this.paramFilter=paramFilter;
+        this.locStorage=locStorage;
+        this.isCompile=false;
+        this.throwError=throwError;
+        this.onResize=onResize;
+        this.emitResize=emitResize;
+        this.keyWord=new KeyWord();
     }
     Turtle.prototype=fn;
     turtle=$t=new Turtle();
-    beforeReady();
+    $rootScope=new RootScope();
+    $client=new Client();
+    setParseMode(1);
+    
+    aftertInit();
     
 })();

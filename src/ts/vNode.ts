@@ -3,8 +3,12 @@
 let
         $v                      = new Virturl, 
         styleListRE             = /\s*([\w\-]+)\s*\:\s*(.*?)\s*[;$]/g;
-        
-interface IVElement extends IElement,INode{
+
+interface IVText extends IText{
+
+}
+
+interface IVElement extends IElement{
     (name: string, nodeType?:number):INode;
     text?:Fun;
     __events__?;
@@ -14,6 +18,7 @@ interface IVElement extends IElement,INode{
     __isClose__?:boolean;
     __?:Object;
 }
+
 interface IVComment extends INode{
 
 }

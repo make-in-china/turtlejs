@@ -3,16 +3,19 @@
 
 const memberRE = /{([\-a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g;
 const colorRE=/^\s*((#[\dabcdefABCDEF]{3,6})|(rgba\(.*\)))\s*$/
-class Service{
-    constructor(serv?:Service){
 
-    }
+interface ITurtle{
+    parts:KeyArrayObject
+}
+interface IComment{
+    __part__?:Part;
+    __sign__?:number;
 }
 class PartParamFilter{
-    bool(v){
+    static bool(v){
         return parseBool(v);
     }
-    intmin(v,p){
+    static intmin(v,p){
         v=parseInt(v);
         p=parseInt(p);
         if(v<p||isNaN(v)){
@@ -20,10 +23,10 @@ class PartParamFilter{
         }
         return v;
     }
-    string(v){
+    static string(v){
         return '"'+v+'"';
     }
-    floatmin(v,p){
+    static floatmin(v,p){
         v=parseFloat(v);
         p=parseFloat(p);
         if(v<p||isNaN(v)){
@@ -31,20 +34,20 @@ class PartParamFilter{
         }
         return v;
     }
-    int(v){
+    static int(v){
         return parseInt(v);
     }
-    float(v){
+    static float(v){
         return parseFloat(v);
     }
-    pxtoem(v,p){
+    static pxtoem(v,p){
         p=parseFloat(p);
         if(isNaN(p)){
             p=0;
         }
         return (parseFloat(v)/16+p)+'em';
     }
-    color(v){
+    static color(v){
         
         if(colorRE.test(v)){
             return v;
@@ -52,14 +55,14 @@ class PartParamFilter{
             return 'transparent';    
         }
     }
-    date(v,p){
-        var d=new Date(v);
+    static date(v,p){
+        let d=new Date(v);
         if(d.toDateString()==='Invalid Date'){
             d=new Date();
         }
         return dateFormat(p,d);
     }
-    only(v,p){
+    static only(v,p){
         if(p.indexOf(';')===-1){
             return v;
         }
@@ -78,41 +81,49 @@ class PartParamFilter{
             return filter;
         }
     }
-    udftotrue(v){
+    static udftotrue(v){
         return v===undefined?true:v;
     }
-    anytotrue(v){
+    static anytotrue(v){
         return v!==undefined?true:v;
     }
-    udftofalse(v){
+    static udftofalse(v){
         return v===undefined?false:v;
     }
-    anytofalse(v){
+    static anytofalse(v){
         return v!==undefined?false:v;
     }
-    udftonull(v){
+    static udftonull(v){
         return v===undefined?null:v;
     }
-    anytonull(v){
+    static anytonull(v){
         return v!==undefined?null:v;
     }
-    udftoemptystr(v){
+    static udftoemptystr(v){
         return v===undefined?"":v;
     }
-    anytoemptystr(v){
+    static anytoemptystr(v){
         return v!==undefined?"":v;
     }
 }
 class PartParam{
     constructor(public name:string,public hasDefault:boolean,public filter,public filterParam:string,public defaultValue:string,public limitValue:string){}
 }
-
 class Part{
     template:PartTemplate;
     props:Object;
     isInsert:boolean;
     store:Array<INode>;
     isExtend:boolean;
+    begin:IComment;
+    end:IComment;
+    onresize:()=>void;
+    partMain:IHTMLElement;
+    super:Part;
+    basePart:Part;
+    oninsert:(node:INode)=>void;
+    oninit:(final:Part)=>void;
+    onremove:()=>void;
     constructor(){
 
     }
@@ -123,9 +134,9 @@ class Part{
         if(tabSpace===undefined){
             tabSpace=0;
         }
-        var s="\r\n"+new Array(tabSpace+1).join(" ")+this.toString();
-        var child=this.child;
-        for(var i=0;i<child.length;i++){
+        let s="\r\n"+new Array(tabSpace+1).join(" ")+this.toString();
+        let child=this.child;
+        for(let i=0;i<child.length;i++){
             s+=child[i].treeDiagram(tabSpace+8);
         }
         return s;
@@ -143,12 +154,12 @@ class Part{
         }
         if(this.isInsert){
             try{
-                var elements=[];
-                var node=this.begin.nextSibling;
-                var end=this.end;
+                let elements=[];
+                let node=this.begin.nextSibling;
+                let end=this.end;
                 while(node!==end){
                     elements.push(node);
-                    var node=node.nextSibling;                
+                    node=node.nextSibling;                
                 }
                 return elements;
             }catch(e){
@@ -188,9 +199,9 @@ class Part{
     }
     getRect(){
         if(this.isInsert){
-            var rects=[];
-            var rt;
-            //var recalNode           = document.createElement('div');
+            let rects=[];
+            let rt;
+            //let recalNode           = document.createElement('div');
 
             //recalNode.setAttribute('style',"width:0 !important;height:0 !important;margin-left:0 !important;margin-right:0 !important;");
 
@@ -200,14 +211,14 @@ class Part{
             // rt.push(recalNode.offsetLeft,recalNode.offsetTop);
             // removeNode(recalNode);
             // rects.push(rt);
-            var cs=this.elements;
-            var elem;
-            var dom=document.documentElement;
-            for(var i=0;i<cs.length;i++){
+            let cs=this.elements;
+            let elem;
+            let dom=document.documentElement;
+            for(let i=0;i<cs.length;i++){
                 elem=cs[i].valueOf();
                 if(elem.nodeType===1){
-                    var l=0,t=0;
-                    var elem2=elem;
+                    let l=0,t=0;
+                    let elem2=elem;
                     while(elem2!==dom){
                         t+=elem2.offsetTop;
                         l+=elem2.offsetLeft;
@@ -217,8 +228,8 @@ class Part{
                 }
             }
             
-            var rect={left:0x7fffffff,top:0x7fffffff,width:0,height:0,right:0,bottom:0}
-            for(var i=0;i<rects.length;i++){
+            let rect={left:0x7fffffff,top:0x7fffffff,width:0,height:0,right:0,bottom:0}
+            for(let i=0;i<rects.length;i++){
                 rt=rects[i];
                 if(rt[0]<rect.left){
                     rect.left=rt[0];
@@ -226,8 +237,8 @@ class Part{
                 if(rt[1]<rect.top){
                     rect.top=rt[1];
                 }
-                var right=rt[0]+rt[2];
-                var bottom=rt[1]+rt[3];
+                let right=rt[0]+rt[2];
+                let bottom=rt[1]+rt[3];
                 if(right>rect.right){
                     rect.right=right;
                 }
@@ -252,8 +263,8 @@ class Part{
                     return;
                 }   
             }
-            var cs=this.child;
-            for(var i=0;i<cs.length;i++){
+            let cs=this.child;
+            for(let i=0;i<cs.length;i++){
                 cs[i].emitResize();
             }
         }catch(e){
@@ -262,7 +273,7 @@ class Part{
     }
     onSetSize(rect){
         if(this.partMain){
-            var style=this.partMain.style;
+            let style=this.partMain.style;
             style.left=rect.left+'px';
             style.top=rect.top+'px';
             style.width=rect.width+'px';
@@ -287,71 +298,71 @@ class Part{
     }
     insertTo(elem){
         if(this.isInsert){
-            var elems=this.elements;
+            let elems=this.elements;
             elems.unshift(this.begin);
             elems.push(this.end);
             /*cut scope*/
-            var scopeNodes=this.scopeNodes;
-            for(var i=0;i<scopeNodes.length;i++){
-                $t.uiScope.cut(scopeNodes[i].scope);
+            let scopeNodes=this.scopeNodes;
+            for(let i=0;i<scopeNodes.length;i++){
+                $t.domScope.cut(scopeNodes[i].scope);
             }
             appendNodes(elems,elem);
             /*link scope*/
-            for(var i=0;i<scopeNodes.length;i++){
-                $t.uiScope.link(scopeNodes[i].scope,elem);
+            for(let i=0;i<scopeNodes.length;i++){
+                $t.domScope.link(scopeNodes[i].scope,elem);
             }
-            if(isFunction(this.onInsert)){
-                this.onInsert(elem);
+            if(isFunction(this.oninsert)){
+                this.oninsert(elem);
             }
         }else{
             appendNodes(this.store,elem);
             /*link scope*/
-            var scopeNodes=this.scopeNodes;
-            for(var i=0;i<scopeNodes.length;i++){
-                $t.uiScope.link(scopeNodes[i].scope,elem);
+            let scopeNodes=this.scopeNodes;
+            for(let i=0;i<scopeNodes.length;i++){
+                $t.domScope.link(scopeNodes[i].scope,elem);
             }
-            if(isFunction(this.onInsert)){
-                this.onInsert(elem);
+            if(isFunction(this.oninsert)){
+                this.oninsert(elem);
             }
             this.isInsert=true;
-            if(isFunction(this.oninsert)){
-                this.oninsert();
-            }
+            // if(isFunction(this.oninsert)){
+            //     this.oninsert();
+            // }
         }  
     }
     insertBefore(elem){
         
         if(this.isInsert){
-            var elems=this.elements;
+            let elems=this.elements;
             elems.unshift(this.begin);
             elems.push(this.end);
             /*cut scope*/
-            var scopeNodes=this.scopeNodes;
-            for(var i=0;i<scopeNodes.length;i++){
-                $t.uiScope.cut(scopeNodes[i].scope);
+            let scopeNodes=this.scopeNodes;
+            for(let i=0;i<scopeNodes.length;i++){
+                $t.domScope.cut(scopeNodes[i].scope);
             }
             insertNodesBefore(elem,elems);
             /*link scope*/
-            for(var i=0;i<scopeNodes.length;i++){
-                $t.uiScope.link(scopeNodes[i].scope,elem);
+            for(let i=0;i<scopeNodes.length;i++){
+                $t.domScope.link(scopeNodes[i].scope,elem);
             }
-            if(isFunction(this.onInsert)){
-                this.onInsert(elem);
+            if(isFunction(this.oninsert)){
+                this.oninsert(elem);
             }
         }else{
             insertNodesBefore(elem,this.store);
             /*link scope*/
-            var scopeNodes=this.scopeNodes;
-            for(var i=0;i<scopeNodes.length;i++){
-                $t.uiScope.link(scopeNodes[i].scope,elem);
+            let scopeNodes=this.scopeNodes;
+            for(let i=0;i<scopeNodes.length;i++){
+                $t.domScope.link(scopeNodes[i].scope,elem);
             }
-            if(isFunction(this.onInsert)){
-                this.onInsert(elem);
+            if(isFunction(this.oninsert)){
+                this.oninsert(elem);
             }
             this.basePart.isInsert=true;
-            if(isFunction(this.oninsert)){
-                this.oninsert();
-            }
+            // if(isFunction(this.oninsert)){
+            //     this.oninsert();
+            // }
         }
     }
     getSuper(name){
@@ -367,23 +378,23 @@ class Part{
         if(this.super){
             this.super.emitInit(finalPart);
         }
-        if(this.hasOwnProperty('onInit')&&isFunction(this.onInit)){
-            this.onInit(finalPart);
+        if(isFunction(this.oninit)){
+            this.oninit(finalPart);
         }
     }
     remove(){
         if(this.isInsert){
-            var elems=this.elements;
+            let elems=this.elements;
             elems.unshift(this.begin);
             elems.push(this.end);
-            var scopeNodes=this.scopeNodes;
+            let scopeNodes=this.scopeNodes;
             /*cut scope*/
-            for(var i=0;i<scopeNodes.length;i++){
-                $t.uiScope.cut(scopeNodes[i].scope);
+            for(let i=0;i<scopeNodes.length;i++){
+                $t.domScope.cut(scopeNodes[i].scope);
             }
-            var p=this.begin.parentNode;
+            let p=this.begin.parentNode;
             if(p!==null){
-                for(var i=0;i<elems.length;i++){
+                for(let i=0;i<elems.length;i++){
                     p.removeChild(elems[i]);
                 }
             }
@@ -392,14 +403,13 @@ class Part{
             if(isFunction(this.onremove)){
                 this.onremove();
             }
-            var p=this.parent;
-            if(p){
-                p.emitResize();    
+            if(this.parent){
+                this.parent.emitResize();    
             }
         }
     }
     get scopeNodes(){
-            var scopeNodes=[];
+            let scopeNodes=[];
             treeEach(this.elements,"children",function(node){
                 if(node.hasOwnProperty("scope")){
                     scopeNodes.push(node);
@@ -409,22 +419,55 @@ class Part{
             return scopeNodes;
     }
 }
+function newExtendsPart(template,node,extPart,s,outerChildNodes,outerElement,props,part){
+    let t
+    if(extPart){
+        t=newObject(template.partName,extPart);
+    }else{
+        t=newObject(template.partName,newPart.prototype);    
+    }
+    let name=template.name;
+    
+    let dom=$DOM(s);
+    //node.innerHTML=s;
+    t.template=template;
+    t.super=extPart;
+    t.isExtend=true
+    let nodes=dom.childNodes;
+    t.$=new Service(template.service);
+    initHTML(nodes,outerChildNodes,outerElement,props,t);
+    t.store=[];
+    for(let i=nodes.length;i>0;i--){
+        t.store.push(dom.removeChild(nodes[0]));
+    }
+    t.to=function(part){
+        let proto=part.$.__proto__;
+        t.$.__proto__=proto;
+        part.$.__proto__=t.$;
+        if(extPart){
+            extPart.to(part);
+        }
+        
+        push.apply(part.store,t.store);
+    }
+    return t;
+}
 function newPart(template,node,extPart,s,outerChildNodes,outerElement,props,part,partName){
     if(extPart){
-        var t=newObject(template.partName,extPart);
+        let t=newObject(template.partName,extPart);
     }else{
-        var t=newObject(template.partName,newPart.prototype);    
+        let t=newObject(template.partName,newPart.prototype);    
     }
     
     if(partName){
         $t.parts.push(partName,t);    
     }
-    var name=template.name;
+    let name=template.name;
     
-    var dom=$DOM(s);
+    let dom=$DOM(s);
     //node.innerHTML=s;
-    var begin=t.begin=$node(name,8);// document.createComment('<'+name+'>');
-    var end=t.end=$node('/'+name,8);//document.createComment('</'+name+'>')
+    let begin=t.begin=$node(name,8);// document.createComment('<'+name+'>');
+    let end=t.end=$node('/'+name,8);//document.createComment('</'+name+'>')
     end.part=begin.part=t;
     begin.sign=1;
     end.sign=0;
@@ -435,7 +478,7 @@ function newPart(template,node,extPart,s,outerChildNodes,outerElement,props,part
     t.super=extPart;
     t.isExtend=false;
     t.resPath=template.path+'/'+template.name+'.res';
-    var sp=t;
+    let sp=t;
     while(sp.super){
         sp=sp.super
     }
@@ -444,7 +487,7 @@ function newPart(template,node,extPart,s,outerChildNodes,outerElement,props,part
     t.$=new Service(template.service);
     t.store=[];
     
-    var nodes=dom.childNodes;
+    let nodes=dom.childNodes;
     
     initHTML(nodes,outerChildNodes,outerElement,props,t);
     if(extPart){
@@ -452,7 +495,7 @@ function newPart(template,node,extPart,s,outerChildNodes,outerElement,props,part
     }
     
     t.store.push.apply(t.store,nodes);
-    for(var i=nodes.length;i>0;i--){
+    for(let i=nodes.length;i>0;i--){
         dom.removeChild(nodes[0]);
     }
     t.store.unshift(begin);
@@ -460,27 +503,36 @@ function newPart(template,node,extPart,s,outerChildNodes,outerElement,props,part
     t.emitInit(t);
     return t;
 }
-class PartTemplate{
+interface IPartTemplate{
+    params:ArrayEx<PartParam>;
+    datas:ArrayEx<string>;
+    extends:IPartTemplate;
     partName:string;
-    Instance:ArrayEx<any>=new ArrayEx;
-    params:ArrayEx<any>;
-    datas:ArrayEx<any>;
-    extends:Object;
+    service:Service;
+    beExtends:(node:INode,that,outerChildNodes:INode[],outerElement:IHTMLElement[],props,part)=>IPartTemplate;
+    parseParamsHelp:(p)=>void;
+}
+class PartTemplate implements IPartTemplate{
+    partName:string;
+    Instance:ArrayEx<Part>=new ArrayEx<Part>();
+    params:ArrayEx<PartParam>;
+    datas:ArrayEx<string>;
+    extends:IPartTemplate;
     isJSDefine=true;
     parts:Array<Part>
     service:Service;
-    constructor(public name:string,public sortPath:string,public path:string,s:string|Object,ext){
+    constructor(public name:string,public sortPath:string,public path:string,s:string|IPartTemplate,ext){
         this.partName=name.replace(/[\.]/g,"_");
         if(isObject(s)){
             if(isObject(s)){
-                let obj:any=<Object>s;
+                let obj:IPartTemplate=<IPartTemplate>s;
                 if(!isArray(obj.params)){
-                    this.params=new ArrayEx;    
+                    this.params=new ArrayEx<PartParam>();    
                 }else{
                     this.params=obj.params;
                 }
                 if(!isArray(obj.datas)){
-                    this.datas=new ArrayEx; 
+                    this.datas=new ArrayEx<string>(); 
                 }else{
                     this.datas=obj.datas;
                 }
@@ -497,8 +549,8 @@ class PartTemplate{
                     this.service=new Service();
                 }
             }else{
-                this.params=new ArrayEx;
-                this.datas=new ArrayEx;
+                this.params=new ArrayEx<PartParam>(); 
+                this.datas=new ArrayEx<string>(); 
                 this.isJSDefine=false;
                 this.service=new Service();
                 if(ext){
@@ -620,7 +672,7 @@ class PartTemplate{
         return part;
     }
     /*由props构建html字符串*/
-    joinDatasByProps(props){
+    joinDatasByProps(props):string{
         
         let err=[];
         let d=slice.call(this.datas);
@@ -639,29 +691,29 @@ class PartTemplate{
                 err.push(this.name+'不可缺少'+p.name+'参数');
                 v=undefined;
             }
-            if(p.filter&&hasOwnProperty(p.filter)){
-                v=paramFilter[p.filter](v,p.filterParam);
+            if(p.filter&&PartParamFilter.hasOwnProperty(p.filter)){
+                v=PartParamFilter[p.filter](v,p.filterParam);
             }
             d.splice(i+1, 0, v);  
         }
         if(err.length>0){
-            if($this.config.debugMode==2){
-                alert(err.join('\r\n'));
+            if($t.config.debugMode==2){
+                alert(err.join('\n'));
             }
-            log(err.join('\r\n'));
+            log(err.join('\n'));
             bp();
             return;
         }
         return d.join('');
     }
     /*变成别人的扩展*/
-    beExtends(uiNode,that,outerChildNodes,outerElement,props,part){
-        if(this.extends instanceof UITemplate){
-            let ext=this.extends.beExtends(uiNode,that,outerChildNodes,outerElement,props,part);
+    beExtends(node:INode,that,outerChildNodes:INode[],outerElement:IHTMLElement[],props,part):IPartTemplate{
+        let ext;
+        if(this.extends instanceof PartTemplate){
+            ext=this.extends.beExtends(node,that,outerChildNodes,outerElement,props,part);
         }
-        let html;
-        html=this.joinDatasByProps(props);
-        return newExtendsPart(this,uiNode,ext,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part);
+        let html=this.joinDatasByProps(props);
+        return newExtendsPart(this,node,ext,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement,props,part);
     }
     toDefineString(){
         let s='$this.ui.define("'+this.name+'","'+this.sortPath+'","'+this.path+'",{datas:';
@@ -697,10 +749,11 @@ class PartTemplate{
     parseParamsHelp(p){
         let params=this.params;
         for(let i=0;i<params.length;i++){
-            if(p.hasOwnProperty(params[i].name)){
-                p[params[i].name]|=!params[i].hasDefault;
+            let name=params[i].name;
+            if(p.hasOwnProperty(name)){
+                p[name]=p[name]||!params[i].hasDefault;
             }else{
-                p[params[i].name]=!params[i].hasDefault;
+                p[name]=!params[i].hasDefault;
             }
         }
         if(this.extends){
@@ -744,5 +797,47 @@ class TemplateList{
             }
         }
         return lst.join('\n');
+    }
+}
+class Service{
+    private __defineCallbacks__:ArrayEx<Fun>=new ArrayEx<Fun>();
+    constructor(serv?:Service){
+        if(isObject(serv)){
+            for(let i in serv){
+                this[i]=serv[i];
+                this.emitOnDefine(i,this[i]);
+            }
+        }
+    }
+    require(n){
+        if(!this.hasOwnProperty(n)){
+            this[n]=getService(n);
+        }
+        return this[n];
+    }
+    onDefine:Part.onDefine
+    emitOnDefine:Part.prototype.emitOnDefine
+    define(name,s){
+        try{
+            this[name]=exec("("+s+")");    
+        }catch(e){
+            _catch(e);
+        }
+        this.emitOnDefine(name,this[name]);
+    }
+    toDefineString(){
+        let s='new $t.Service(';
+        let fns=[];
+        for(let i in this){
+            if(this.hasOwnProperty(i)){
+                fns.push('"'+i+'":'+this[i].toString());    
+            }
+        }
+        if(fns.length>0){
+            s+='{'+fns.join(',')+'})';
+        }else{
+            s+=')';
+        }
+        return s;
     }
 }

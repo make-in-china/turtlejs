@@ -2,7 +2,9 @@
 /// <reference path="core.ts"/>
 /// <reference path="Execute.ts"/>
 
-
+interface Object {
+    __bind__?:Object
+}
 function _getBindObject(scope,arrNames:Array<string>){
     let i,obj,length=arrNames.length;;
     while(scope){
@@ -205,7 +207,7 @@ function bindElementProperty(obj:Object,name:string,obj2:Object,name2:string){
 }
 
 /*绑定属性与描述*/
-function bindNodeProperty(node:IVNode,proName:string,condition:string){
+function bindNodeProperty(node:INode,proName:string,condition:string){
     let 
         cdtn    =splitByOnce(condition,"|"),
         name,
@@ -250,7 +252,7 @@ function bindNodeProperty(node:IVNode,proName:string,condition:string){
 /*
     * 绑定标签属性
     */ 
-function bindElementPropertyByName(node,elementValueName,condition){
+function bindElementPropertyByName(node:IHTMLElement,elementValueName:string,condition:string){
     let 
         cdtn=splitByOnce(condition,"|"),
         name=cdtn[0],
@@ -282,4 +284,76 @@ function bindElementPropertyByName(node,elementValueName,condition){
         if(!node.__bind__)node[elementValueName]=obj[name];
         bindProperty(obj,name,node,elementValueName);
     }
+}
+function bindPropertyByOrder(node,condition){
+    let cdtn=splitByOnce(condition,'|');
+    if(cdtn.length<2)return;
+    let 
+        name,
+        scope,
+        obj,
+        bindVar=cdtn[0],
+        arrBindVar:Array<string>,
+        name2,
+        scope2,
+        obj2,
+        bindVar2=cdtn[1],
+        arrBindVar2:Array<string>;
+        
+    if(bindVar.indexOf(".")!=-1){
+        arrBindVar=bindVar.split(".");
+    }else{
+        arrBindVar=[bindVar];
+    }
+    name=bindVar[bindVar.length-1];
+    scope=$t.uiScope.get(node);
+    obj=_getBindObject(scope,arrBindVar);
+    
+    if(bindVar2.indexOf(".")!=-1){
+        arrBindVar2=bindVar2.split(".");
+    }else{
+        arrBindVar2=[bindVar2];
+    }
+    name2=bindVar2[bindVar2.length-1];
+    scope2=$t.uiScope.get(node);
+    obj2=_getBindObject(scope2,arrBindVar2);
+    
+    bindProperty(obj,name,obj2,name2);
+    obj2[name2]=obj[name];
+}
+function bindExpressionsByOrder(node,condition){
+    let cdtn=splitByOnce(condition,'|');
+    if(cdtn.length<2)
+        cdtn.push('v');
+    let 
+        name,
+        scope,
+        obj,
+        bindVar=cdtn[0],
+        arrBindVar:Array<string>,
+        exp,
+        textNode:IText=$node(' ',3);
+        
+    if(bindVar.indexOf(".")!=-1){
+        arrBindVar=bindVar.split(".");
+    }else{
+        arrBindVar=[bindVar];
+    }
+    name=bindVar[bindVar.length-1];
+    scope=$t.uiScope.get(node);
+    obj=_getBindObject(scope,arrBindVar);
+    if(obj===null){
+        throwError('不能获取绑定属性:'+cdtn[0]);
+        return;
+    }
+    exp=function(v){
+        try{
+            return _execExpressionsByScope.call(scope,cdtn[1],v,node);
+        }catch(e){_catch(e)}
+    }
+    exp.__me__=exp;
+    $t.bindProperty(obj,name,exp,'__me__');
+    replaceNodeByNode(node,textNode);
+    bindElementProperty(exp,'__me__',textNode,'data');
+    textNode['data']=exp.__me__;
 }

@@ -7,6 +7,15 @@ class ArrayEx<T> extends Array<T>{
             return this[this.length-1];
         }
     }
+    clear(){
+        let l=this.length;
+        for(let i=0;i<l;i++){
+            this.pop();
+        }
+    }
+}
+interface Constructor{
+    prototype:Object
 }
 let exec                    =	eval,
     toStr                   =	Object.prototype.toString,
@@ -22,8 +31,14 @@ let exec                    =	eval,
     camelizeRE              =   /-+(.)?/g,
     deCamelizeRE            =   /[A-Z]/g,
     classSplitRE            =   /\s+/g,
+    addStyleRE              =   /;\s*$/,
+    addClassNameRE          =   /\s+$/,
     rte                     =   new $Event;
 
+
+interface INode{
+    insertBefore2?(newChild: INode, refChild?: INode): INode;
+}
 /**
  * 压缩js后保留此函数用于console.log;
  */
@@ -40,12 +55,19 @@ function extend<T>(elem:T,elemEx):T{
     }
     return elem;
 }
-
+function merge<T>(elem:T,elemEx):T{
+    for(let e in elemEx){
+        if(!elem.hasOwnProperty(e)){
+            elem[e]=elemEx[e];
+        }
+    }
+    return elem;
+}
 function takeAttr(node:IElement,attrName:string,defaultValue?:any):string{
     if(!node.hasAttribute(attrName)){
         return defaultValue;
     }else{
-        var s=node.getAttribute(attrName);
+        let s=node.getAttribute(attrName);
         node.removeAttribute(attrName);
         return s;
     }
@@ -73,7 +95,7 @@ function isFunction(a){
     return "[object Function]" === toStr.call(a)
 }
 function isObject(a) {
-    var type = typeof a;
+    let type = typeof a;
     return type === 'function' || type === 'object' && !!a;
 }
 function isFinite(obj) {
@@ -121,17 +143,69 @@ function decamelize(str:string){
         return '-'+match.toLowerCase();
     }); 
 }
-function newObject(type:string,prototype?:Object):Object{
-    var s='var '+type+'=function(){};';
-    if(isObject(prototype)){
+class HashObject{
+    clean(){
+        for(var i in this){
+            delete this[i];
+        }
+    }
+}
+class KeyArrayObject extends HashObject{
+    [index:string]:ArrayEx<any>|Fun;
+    push(key:string,value:any){
+        if(isArray(key)){
+            for(var i=0;i<key.length;i++){
+                if(!this.hasOwnProperty(key[i])){
+                    this[key[i]]=new ArrayEx;
+                }
+                (<ArrayEx<any>>this[key[i]]).push(value);
+            }
+        }else{
+            if(!this.hasOwnProperty(key)){
+                this[key]=new ArrayEx;
+            }
+            (<ArrayEx<any>>this[key]).push(value);
+        }
+    }
+    getKeyArray():ArrayEx<any>{
+        let arr:ArrayEx<any>=new ArrayEx;
+        for(var i in this){
+            if(!this.hasOwnProperty(i)){
+                arr.push(i);
+            }
+        }
+        return arr;
+    }
+    pop(key:string){
+        var keyObject:ArrayEx<any>=<ArrayEx<any>>this[key];
+        if(keyObject){
+            return keyObject.pop();
+        }
+    }
+}
+function newKeyArrayObject(type:string):KeyArrayObject{
+    return newObject(type,KeyArrayObject);
+}
+function newHashObject(type:string):HashObject{
+    return newObject(type,HashObject);
+}
+function newObject(type:string,tsClass?:Constructor):any{
+    let s='let '+type+'=function(){};';
+    if(isObject((tsClass).prototype)){
         s+=type+'.prototype=proto;';
     }
     s+='return new '+type+'();';
-    return Function('proto',s)(prototype);
+    return Function('proto',s)((<any>tsClass).prototype);
 }
+let newArrayObject=(function(){
+    return function(type:string):ArrayEx<any>{
+        return newObject(type,ArrayEx);
+    }
+}());
+
 function NullValueHash(s){
-    var arr=s.split(',');
-    for(var i in arr){
+    let arr=s.split(',');
+    for(let i in arr){
         this[arr[i]]=null;
     }
 }
@@ -147,8 +221,81 @@ function parseBool(v):boolean {
     }
     return !!v;
 }
+function addStyle(elem,style){
+        if(!style){
+            return;
+        }
+        var oldStyle=elem.getAttribute('style');
+        if(oldStyle){
+            if(addStyleRE.test(oldStyle)){
+                style=oldStyle+style;
+            }else{
+                style=oldStyle+';'+style;
+            }
+        }
+        elem.setAttribute('style',style);
+    }
+    function addClassName(elem,className){
+        if(!className){
+            return;
+        }
+        var oldClass=elem.getAttribute('class');
+        if(oldClass){
+            if(addClassNameRE.test(oldClass)){
+                className=oldClass+className;
+            }else{
+                className=oldClass+' '+className;
+            }
+        }
+        elem.setAttribute('class',className);
+    }
+    function addClass(elem,...arg){
+        addClasses(elem,arg);
+    }
+    function addClasses(elem,clses){
+        var lst;
+        if(!elem)
+            return;
+        lst=elem.classList;
+        for(var i=0;i<clses.length;i++){
+            if(!lst.contains(clses[i]))
+                lst.add(clses[i]);
+        }
+    }
+    function removeClass(elem,cls){
+        var lst;
+        if(!elem){
+            return;
+        }
+        lst=elem.classList;
+        if(lst.contains(cls)){
+            lst.remove(cls);
+        }
+    }
+    function removeClasses(elem,clses){
+        var lst;
+        if(!elem)
+            return;
+        lst=elem.classList;
+        for(var i=0;i<clses.length;i++){
+            if(lst.contains(clses[i]))
+                lst.remove(clses[i]);
+        }
+    }
+    
+    function replaceClass(sel,a,b){if(sel&&a&&b)sel.className = sel.className.replace(a, b);}
+    function toggleClass(sel,a,t,f) {
+        if (sel && a)
+            if (sel.className.indexOf(a) >= 0) {
+                sel.className = sel.className.replace(a, "");
+                if(f)f();
+            } else {
+                sel.className += " " + a;
+                if(t)t();
+            }
+    }
 function removeItem(arr,obj){
-    var index=arr.indexOf(obj);
+    let index=arr.indexOf(obj);
     if(index!=-1){
         arr.splice(index, 1);
     }
@@ -160,7 +307,7 @@ function trimLine(s){return s.replace(/^\s*/g,"").replace(/\s*$/g,"").replace(/\
 let dateFormat=(function(){
     return function(format,d){
         'use strict' 
-        var o = {
+        let o = {
             "M+" : d.getMonth() + 1, //month
             "d+" : d.getDate(), //day
             "h+" : d.getHours(), //hour
@@ -172,7 +319,7 @@ let dateFormat=(function(){
         if (/(y+)/.test(format)) {
             format = format.replace(RegExp.$1, (d.getFullYear() + "").substr(4 - RegExp.$1.length));
         }
-        for (var k in o) {
+        for (let k in o) {
             if (new RegExp("(" + k + ")").test(format)) {
                 format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
             }
@@ -185,9 +332,150 @@ function camelCase(s){
         return s1.toUpperCase();
     })
 }
-
+function insertNodesBefore(node:INode,nodes:Array<INode>){
+    let parent=node.parentNode;
+    if(parent==null){
+        return;
+    }
+    for(let i=0;i<nodes.length;i++){
+        parent.insertBefore2(nodes[i],node);
+    }
+}
+function removeNode(node:INode){
+    let p:INode=node.parentNode;
+    if(p){
+        return p.removeChild(node);
+    }else{
+        return null;
+    }
+}
+function replaceNodeByNodes(node:INode,nodes:Array<INode>){
+    insertNodesBefore(node,nodes)
+    removeNode(node);
+}
+function insertNode(node:INode,childNode){
+    let parent=node.parentNode;
+    if(parent==null)return 0;
+    parent.insertBefore2(childNode,node)
+    return 0;
+}
+function deepClone(node:INode){
+    let n=node.cloneNode();
+    let ns=node.childNodes;
+    for(let i=0;i<ns.length;i++){
+        n.appendChild(deepClone(ns[i]));
+    }
+    return n;
+}
+function cloneBetween(node1:INode,node2:INode){
+    let nodes=[];
+    let l1=getNodeIndex2(node1);
+    let l2=getNodeIndex2(node2);
+    let p1=node1.parentNode;
+    for(let i=l1+1;i<l2;i++){
+        nodes.push(deepClone(p1.childNodes[i]));
+    }
+    return nodes;
+}
+function removeBlockBetween(node1:INode,node2:INode){
+    let p1=node1.parentNode;
+    let l1=getNodeIndex2(node1)+1;
+    let l2=getNodeIndex2(node2);
+    for(let i=l1;i<l2;i++){
+        p1.removeChild(p1.childNodes[l1]);
+    }
+}
+function replaceNodeByNode(node:INode,node2:INode){
+    let parent=node.parentNode;
+    if(parent==null){
+        return;
+    }
+    insertNode(node,node2);
+    parent.removeChild(node);
+}
+function appendNodes(nodes:Array<INode>,parent:INode){
+    let c:Array<INode>=slice.call(nodes);
+    for(let i=0;i<c.length;i++){
+        parent.appendChild(c[i]);
+    }
+}
+function takeChildNodes(node:INode):Array<INode>{
+    let c=node.childNodes;
+    let length=c.length;
+    let ret=[];
+    for(let i=length;i>0;i--){
+        ret.push(node.removeChild(c[0]));
+    }
+    return ret;
+}
+function takeOutChildNodes(node:INode):number{
+    let parent=node.parentNode;
+    if(parent==null){
+        return 0;
+    }
+    let c=node.childNodes;
+    let i=0;
+    for(let j=c.length-1;j>-1;j--){
+        parent.insertBefore2(node.removeChild(c[0]),node);
+    }
+    parent.removeChild(node);
+    return i;
+}
+function takeBlockBetween(node1:INode,node2:INode):Array<INode>{
+    let p1=node1.parentNode;
+    let ns1=p1.childNodes;
+    let l1=getNodeIndex2(node1)+1;
+    let l2=getNodeIndex2(node2);
+    let ns=[];
+    for(let i=l1;i<l2;i++){
+        ns.push(p1.removeChild(ns1[l1]));
+    }
+    return ns;
+}
+function getNodesLength(node:IHTMLElement){
+    if(node.parentNode){
+        return (<IHTMLElement>node.parentNode).children.length;
+    }
+    let index=getNodeIndex(node)-1;
+    node=node.nextElementSibling;
+    while(node!=null){
+        node=node.nextElementSibling;
+        index++;
+    }
+    return index;
+}
+function getNodeIndex(node:IHTMLElement){
+    let index=0;
+    node=node.previousElementSibling;
+    while(node!=null){
+        node=node.previousElementSibling;
+        index++;
+    }
+    return index;
+}
+function getNodesLength2(node:INode){
+    if(node.parentNode){
+        return node.parentNode.childNodes.length;
+    }
+    let index=getNodeIndex2(node)-1;
+    node=node.nextSibling;
+    while(node!=null){
+        node=node.nextSibling;
+        index++;
+    }
+    return index;
+}
+function getNodeIndex2(node:INode){
+    let index=0;
+    node=node.previousSibling;
+    while(node!=null){
+        node=node.previousSibling;
+        index++;
+    }
+    return index;
+}
 function splitByOnce(s:string,split:string):Array<string>{
-    var 
+    let 
         index=s.indexOf(split),
         arr=[];
     if(index!=-1){
@@ -211,7 +499,7 @@ function treeEach(array:{length:number},property:string,fn:(node:Object,step?:IT
     if(!isArrayLike(array)){
         return;
     }
-    var 
+    let 
         arr=array,
         i=beginIndex,
         stack=[],
@@ -257,8 +545,8 @@ function treeEach(array:{length:number},property:string,fn:(node:Object,step?:IT
 class ClassList{
     constructor(private __elem__:IElement){}
     add(value) {
-        var classes = this.__elem__.className.split(classSplitRE);
-        var index=classes.indexOf(value);
+        let classes = this.__elem__.className.split(classSplitRE);
+        let index=classes.indexOf(value);
         if (!~index){
             classes.push(value);
             this.__elem__.className=classes.join(' ');  
@@ -266,16 +554,16 @@ class ClassList{
         
     }
     remove(value){
-        var classes = this.__elem__.className.split(classSplitRE);
-        var index=classes.indexOf(value);
+        let classes = this.__elem__.className.split(classSplitRE);
+        let index=classes.indexOf(value);
         if (~index){
             classes.splice(index, 1);
             this.__elem__.className=classes.join(' ');  
         }
     }
     toggle(value) {
-        var classes = this.__elem__.className.split(classSplitRE);
-        var index=classes.indexOf(value);
+        let classes = this.__elem__.className.split(classSplitRE);
+        let index=classes.indexOf(value);
         if (~index){
             classes.splice(index, 1);
         }else{

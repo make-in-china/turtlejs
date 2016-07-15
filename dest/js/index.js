@@ -3,7 +3,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var $t, $rootScope, $client, $DOM, $node, $VDOM, $VNode, VTemplate;
+var $t, $client, $DOM, $INode, $VDOM, $VNode, $node, VTemplate;
 /// <reference path="global.ts" />
 var $Event = (function () {
     function $Event() {
@@ -63,9 +63,15 @@ var ArrayEx = (function (_super) {
             return this[this.length - 1];
         }
     };
+    ArrayEx.prototype.clear = function () {
+        var l = this.length;
+        for (var i = 0; i < l; i++) {
+            this.pop();
+        }
+    };
     return ArrayEx;
 }(Array));
-var exec = eval, toStr = Object.prototype.toString, arrayPrototype = Array.prototype, Objectprototype = Object.prototype, slice = arrayPrototype.slice, push = arrayPrototype.push, splice = arrayPrototype.splice, getPrototypeOf = Object.getPrototypeOf, replace = String.prototype.replace, persentRE = /^\s*([\d.]+)%\s*$/, camelCaseRE = /-(\w)/g, camelizeRE = /-+(.)?/g, deCamelizeRE = /[A-Z]/g, classSplitRE = /\s+/g, rte = new $Event;
+var exec = eval, toStr = Object.prototype.toString, arrayPrototype = Array.prototype, Objectprototype = Object.prototype, slice = arrayPrototype.slice, push = arrayPrototype.push, splice = arrayPrototype.splice, getPrototypeOf = Object.getPrototypeOf, replace = String.prototype.replace, persentRE = /^\s*([\d.]+)%\s*$/, camelCaseRE = /-(\w)/g, camelizeRE = /-+(.)?/g, deCamelizeRE = /[A-Z]/g, classSplitRE = /\s+/g, addStyleRE = /;\s*$/, addClassNameRE = /\s+$/, rte = new $Event;
 /**
  * 压缩js后保留此函数用于console.log;
  */
@@ -77,6 +83,14 @@ var bp = Function('debugger');
 function extend(elem, elemEx) {
     for (var e in elemEx) {
         elem[e] = elemEx[e];
+    }
+    return elem;
+}
+function merge(elem, elemEx) {
+    for (var e in elemEx) {
+        if (!elem.hasOwnProperty(e)) {
+            elem[e] = elemEx[e];
+        }
     }
     return elem;
 }
@@ -162,14 +176,73 @@ function decamelize(str) {
         return '-' + match.toLowerCase();
     });
 }
-function newObject(type, prototype) {
-    var s = 'var ' + type + '=function(){};';
-    if (isObject(prototype)) {
+var HashObject = (function () {
+    function HashObject() {
+    }
+    HashObject.prototype.clean = function () {
+        for (var i in this) {
+            delete this[i];
+        }
+    };
+    return HashObject;
+}());
+var KeyArrayObject = (function (_super) {
+    __extends(KeyArrayObject, _super);
+    function KeyArrayObject() {
+        _super.apply(this, arguments);
+    }
+    KeyArrayObject.prototype.push = function (key, value) {
+        if (isArray(key)) {
+            for (var i = 0; i < key.length; i++) {
+                if (!this.hasOwnProperty(key[i])) {
+                    this[key[i]] = new ArrayEx;
+                }
+                this[key[i]].push(value);
+            }
+        }
+        else {
+            if (!this.hasOwnProperty(key)) {
+                this[key] = new ArrayEx;
+            }
+            this[key].push(value);
+        }
+    };
+    KeyArrayObject.prototype.getKeyArray = function () {
+        var arr = new ArrayEx;
+        for (var i in this) {
+            if (!this.hasOwnProperty(i)) {
+                arr.push(i);
+            }
+        }
+        return arr;
+    };
+    KeyArrayObject.prototype.pop = function (key) {
+        var keyObject = this[key];
+        if (keyObject) {
+            return keyObject.pop();
+        }
+    };
+    return KeyArrayObject;
+}(HashObject));
+function newKeyArrayObject(type) {
+    return newObject(type, KeyArrayObject);
+}
+function newHashObject(type) {
+    return newObject(type, HashObject);
+}
+function newObject(type, tsClass) {
+    var s = 'let ' + type + '=function(){};';
+    if (isObject((tsClass).prototype)) {
         s += type + '.prototype=proto;';
     }
     s += 'return new ' + type + '();';
-    return Function('proto', s)(prototype);
+    return Function('proto', s)(tsClass.prototype);
 }
+var newArrayObject = (function () {
+    return function (type) {
+        return newObject(type, ArrayEx);
+    };
+}());
 function NullValueHash(s) {
     var arr = s.split(',');
     for (var i in arr) {
@@ -187,6 +260,88 @@ function parseBool(v) {
         }
     }
     return !!v;
+}
+function addStyle(elem, style) {
+    if (!style) {
+        return;
+    }
+    var oldStyle = elem.getAttribute('style');
+    if (oldStyle) {
+        if (addStyleRE.test(oldStyle)) {
+            style = oldStyle + style;
+        }
+        else {
+            style = oldStyle + ';' + style;
+        }
+    }
+    elem.setAttribute('style', style);
+}
+function addClassName(elem, className) {
+    if (!className) {
+        return;
+    }
+    var oldClass = elem.getAttribute('class');
+    if (oldClass) {
+        if (addClassNameRE.test(oldClass)) {
+            className = oldClass + className;
+        }
+        else {
+            className = oldClass + ' ' + className;
+        }
+    }
+    elem.setAttribute('class', className);
+}
+function addClass(elem) {
+    var arg = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        arg[_i - 1] = arguments[_i];
+    }
+    addClasses(elem, arg);
+}
+function addClasses(elem, clses) {
+    var lst;
+    if (!elem)
+        return;
+    lst = elem.classList;
+    for (var i = 0; i < clses.length; i++) {
+        if (!lst.contains(clses[i]))
+            lst.add(clses[i]);
+    }
+}
+function removeClass(elem, cls) {
+    var lst;
+    if (!elem) {
+        return;
+    }
+    lst = elem.classList;
+    if (lst.contains(cls)) {
+        lst.remove(cls);
+    }
+}
+function removeClasses(elem, clses) {
+    var lst;
+    if (!elem)
+        return;
+    lst = elem.classList;
+    for (var i = 0; i < clses.length; i++) {
+        if (lst.contains(clses[i]))
+            lst.remove(clses[i]);
+    }
+}
+function replaceClass(sel, a, b) { if (sel && a && b)
+    sel.className = sel.className.replace(a, b); }
+function toggleClass(sel, a, t, f) {
+    if (sel && a)
+        if (sel.className.indexOf(a) >= 0) {
+            sel.className = sel.className.replace(a, "");
+            if (f)
+                f();
+        }
+        else {
+            sel.className += " " + a;
+            if (t)
+                t();
+        }
 }
 function removeItem(arr, obj) {
     var index = arr.indexOf(obj);
@@ -224,6 +379,150 @@ function camelCase(s) {
     return s.replace(camelCaseRE, function (s, s1) {
         return s1.toUpperCase();
     });
+}
+function insertNodesBefore(node, nodes) {
+    var parent = node.parentNode;
+    if (parent == null) {
+        return;
+    }
+    for (var i = 0; i < nodes.length; i++) {
+        parent.insertBefore2(nodes[i], node);
+    }
+}
+function removeNode(node) {
+    var p = node.parentNode;
+    if (p) {
+        return p.removeChild(node);
+    }
+    else {
+        return null;
+    }
+}
+function replaceNodeByNodes(node, nodes) {
+    insertNodesBefore(node, nodes);
+    removeNode(node);
+}
+function insertNode(node, childNode) {
+    var parent = node.parentNode;
+    if (parent == null)
+        return 0;
+    parent.insertBefore2(childNode, node);
+    return 0;
+}
+function deepClone(node) {
+    var n = node.cloneNode();
+    var ns = node.childNodes;
+    for (var i = 0; i < ns.length; i++) {
+        n.appendChild(deepClone(ns[i]));
+    }
+    return n;
+}
+function cloneBetween(node1, node2) {
+    var nodes = [];
+    var l1 = getNodeIndex2(node1);
+    var l2 = getNodeIndex2(node2);
+    var p1 = node1.parentNode;
+    for (var i = l1 + 1; i < l2; i++) {
+        nodes.push(deepClone(p1.childNodes[i]));
+    }
+    return nodes;
+}
+function removeBlockBetween(node1, node2) {
+    var p1 = node1.parentNode;
+    var l1 = getNodeIndex2(node1) + 1;
+    var l2 = getNodeIndex2(node2);
+    for (var i = l1; i < l2; i++) {
+        p1.removeChild(p1.childNodes[l1]);
+    }
+}
+function replaceNodeByNode(node, node2) {
+    var parent = node.parentNode;
+    if (parent == null) {
+        return;
+    }
+    insertNode(node, node2);
+    parent.removeChild(node);
+}
+function appendNodes(nodes, parent) {
+    var c = slice.call(nodes);
+    for (var i = 0; i < c.length; i++) {
+        parent.appendChild(c[i]);
+    }
+}
+function takeChildNodes(node) {
+    var c = node.childNodes;
+    var length = c.length;
+    var ret = [];
+    for (var i = length; i > 0; i--) {
+        ret.push(node.removeChild(c[0]));
+    }
+    return ret;
+}
+function takeOutChildNodes(node) {
+    var parent = node.parentNode;
+    if (parent == null) {
+        return 0;
+    }
+    var c = node.childNodes;
+    var i = 0;
+    for (var j = c.length - 1; j > -1; j--) {
+        parent.insertBefore2(node.removeChild(c[0]), node);
+    }
+    parent.removeChild(node);
+    return i;
+}
+function takeBlockBetween(node1, node2) {
+    var p1 = node1.parentNode;
+    var ns1 = p1.childNodes;
+    var l1 = getNodeIndex2(node1) + 1;
+    var l2 = getNodeIndex2(node2);
+    var ns = [];
+    for (var i = l1; i < l2; i++) {
+        ns.push(p1.removeChild(ns1[l1]));
+    }
+    return ns;
+}
+function getNodesLength(node) {
+    if (node.parentNode) {
+        return node.parentNode.children.length;
+    }
+    var index = getNodeIndex(node) - 1;
+    node = node.nextElementSibling;
+    while (node != null) {
+        node = node.nextElementSibling;
+        index++;
+    }
+    return index;
+}
+function getNodeIndex(node) {
+    var index = 0;
+    node = node.previousElementSibling;
+    while (node != null) {
+        node = node.previousElementSibling;
+        index++;
+    }
+    return index;
+}
+function getNodesLength2(node) {
+    if (node.parentNode) {
+        return node.parentNode.childNodes.length;
+    }
+    var index = getNodeIndex2(node) - 1;
+    node = node.nextSibling;
+    while (node != null) {
+        node = node.nextSibling;
+        index++;
+    }
+    return index;
+}
+function getNodeIndex2(node) {
+    var index = 0;
+    node = node.previousSibling;
+    while (node != null) {
+        node = node.previousSibling;
+        index++;
+    }
+    return index;
 }
 function splitByOnce(s, split) {
     var index = s.indexOf(split), arr = [];
@@ -338,6 +637,18 @@ function defineClassList(object) {
     });
 }
 var withthis = 'with(this){return eval($$turtle$$)};' /*eval支持返回最后一个表达式的值*/, _execValueByScope = Function('$$turtle$$,v,node,outer,outerElement,props,part', withthis), _execByScope = Function('$$turtle$$,node,outer,outerElement,props,part', withthis), _execExpressionsByScope = Function('$$turtle$$,v,node', withthis);
+function execValueByScope(node, s, v, scope, outerChildNodes, outerElement, props, part) {
+    return _execValueByScope.call(getScopeBy(scope, node), s, v, node, outerChildNodes, outerElement, props, part);
+}
+var execTemplateScript = (function () {
+    var replaceRE = /{%.+?%}/g;
+    return function (s, node, outerChildNodes, outerElement, props, part) {
+        s = s.replace(replaceRE, function (s) {
+            return execByScope(node, s.substring(2, s.length - 2), null, outerChildNodes, outerElement, props, part);
+        });
+        return s;
+    };
+}());
 /// <reference path="core.ts"/>
 /// <reference path="Execute.ts"/>
 function _getBindObject(scope, arrNames) {
@@ -609,6 +920,64 @@ function bindElementPropertyByName(node, elementValueName, condition) {
         bindProperty(obj, name, node, elementValueName);
     }
 }
+function bindPropertyByOrder(node, condition) {
+    var cdtn = splitByOnce(condition, '|');
+    if (cdtn.length < 2)
+        return;
+    var name, scope, obj, bindVar = cdtn[0], arrBindVar, name2, scope2, obj2, bindVar2 = cdtn[1], arrBindVar2;
+    if (bindVar.indexOf(".") != -1) {
+        arrBindVar = bindVar.split(".");
+    }
+    else {
+        arrBindVar = [bindVar];
+    }
+    name = bindVar[bindVar.length - 1];
+    scope = $t.uiScope.get(node);
+    obj = _getBindObject(scope, arrBindVar);
+    if (bindVar2.indexOf(".") != -1) {
+        arrBindVar2 = bindVar2.split(".");
+    }
+    else {
+        arrBindVar2 = [bindVar2];
+    }
+    name2 = bindVar2[bindVar2.length - 1];
+    scope2 = $t.uiScope.get(node);
+    obj2 = _getBindObject(scope2, arrBindVar2);
+    bindProperty(obj, name, obj2, name2);
+    obj2[name2] = obj[name];
+}
+function bindExpressionsByOrder(node, condition) {
+    var cdtn = splitByOnce(condition, '|');
+    if (cdtn.length < 2)
+        cdtn.push('v');
+    var name, scope, obj, bindVar = cdtn[0], arrBindVar, exp, textNode = $node(' ', 3);
+    if (bindVar.indexOf(".") != -1) {
+        arrBindVar = bindVar.split(".");
+    }
+    else {
+        arrBindVar = [bindVar];
+    }
+    name = bindVar[bindVar.length - 1];
+    scope = $t.uiScope.get(node);
+    obj = _getBindObject(scope, arrBindVar);
+    if (obj === null) {
+        throwError('不能获取绑定属性:' + cdtn[0]);
+        return;
+    }
+    exp = function (v) {
+        try {
+            return _execExpressionsByScope.call(scope, cdtn[1], v, node);
+        }
+        catch (e) {
+            _catch(e);
+        }
+    };
+    exp.__me__ = exp;
+    $t.bindProperty(obj, name, exp, '__me__');
+    replaceNodeByNode(node, textNode);
+    bindElementProperty(exp, '__me__', textNode, 'data');
+    textNode['data'] = exp.__me__;
+}
 /// <reference path='core.ts'/>
 var NameItem = (function () {
     function NameItem(name) {
@@ -727,10 +1096,522 @@ var baseUIPath = new BasePath;
 /// <reference path="core.ts"/>
 /// <reference path="Execute.ts"/>
 /// <reference path="bind.ts"/>
+var orderRE = /^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|let|=)(\s|$)/g, orderCaseRE = /^\s?(else if|else|case break|case|default|end)(\s|$)/g, parseForOrderRE = /[a-zA-Z\d] in .*/, parseForOrderRE2 = /^.*;.*;.*$/, SetParseError = function (msg) {
+    SetParseError.isError = true;
+    alert(msg);
+    return 1 /* c_stopEach */;
+}, orderStack = new ArrayEx;
+SetParseError.isError = false;
+function replaceCls() {
+    var arr = $t.replaceClassStore;
+    for (var i = 0; i < arr.length; i++) {
+        var cls = arr[i].getAttribute('cls');
+        arr[i].removeAttribute('cls');
+        if ($t.defineClassNames[cls]) {
+            arr[i].className += ' ' + $t.defineClassNames[cls].join(" ");
+        }
+    }
+    arr.length = 0;
+}
+function getCommentStringInfo(s) {
+    var order = s.match(orderRE);
+    if (order) {
+        return { order: trim(order[0]), condition: s.substring(order[0].length, s.length) };
+    }
+    else {
+        var orderCase = s.match(orderCaseRE);
+        if (orderCase) {
+            return { orderCase: trim(orderCase[0]), condition: s.substring(orderCase[0].length, s.length) };
+        }
+    }
+}
+var getCommentText = (function () {
+    if (Comment.prototype.hasOwnProperty("text")) {
+        var commentDataRE_1 = /^<!--([\s\S]*?)-->$/;
+        var commentDataRE2_1 = /^<!([\s\S]*?)>$/;
+        var commentDataRE3_1 = /^!-?|-?&/;
+        return function (node) {
+            var s = node.text;
+            if (commentDataRE_1.test(s)) {
+                return s.substring(4, s.length - 3);
+            }
+            else if (commentDataRE2_1.test(s)) {
+                return s.substring(2, s.length - 1);
+            }
+            else {
+                return s.replace(commentDataRE3_1, '');
+            }
+        };
+    }
+    else {
+        return function (node) {
+            return node.data;
+        };
+    }
+}());
+function parseScopeOrder(info, node, outerChildNodes, outerElement, props, part) {
+    var condition = splitByOnce(info.condition, "|");
+    if (condition.length == 2) {
+        $t.domScope.create(node, condition[0]);
+        execScope(condition[1], node, outerChildNodes, outerElement, props, part);
+    }
+    else {
+        $t.domScope.create(node, condition[0]);
+    }
+    removeNode(node);
+}
+function parseCommentOrderNoScript(info, node, outerChildNodes, outerElement, props, part) {
+    /*不渲染，纯找结构*/
+    switch (info.order) {
+        case 'while':
+            return parseWhileOrder(info, node, outerChildNodes, outerElement, props, part);
+        case 'if':
+            return parseIfOrder(info, node, outerChildNodes, outerElement, props, part);
+        case 'for':
+            return parseForOrder(info, node, outerChildNodes, outerElement, props, part);
+        case 'switch':
+            return parseSwitchOrder(info, node, outerChildNodes, outerElement, props, part);
+        case 'async':
+            return parseAsyncOrder(info, node, outerChildNodes, outerElement, props, part);
+    }
+}
+function parseCommentOrderBlock(node, outerChildNodes, outerElement, props, part) {
+    var i = getNodeIndex2(node);
+    var isError = false;
+    var error = function (msg) {
+        isError = true;
+        alert(msg);
+        return 1 /* c_stopEach */;
+    };
+    return treeEach(node.parentNode.childNodes, 'childNodes', function (node, step) {
+        if (node.nodeType != 8)
+            return;
+        var info = getCommentStringInfo(getCommentText(node));
+        if (!info)
+            return;
+        if (info.order) {
+            var ret = parseCommentOrderNoScript(info, node, outerChildNodes, outerElement, props, part);
+            if (ret) {
+                step.next = ret.index - getNodeIndex2(node) + 1;
+            }
+            return 8 /* c_noRepeat */ & 4 /* c_noIn */;
+        }
+        if (info.orderCase == 'end') {
+            if (orderStack.length > 0) {
+                orderStack.pop().__endNode__ = node;
+                return 1 /* c_stopEach */;
+            }
+            else {
+                return error('语法错误：多余的end');
+            }
+        }
+        return 4 /* c_noIn */;
+    }, i + 1);
+}
+function addOrderToNode(node, info, outerChildNodes, outerElement, props, part, fnGetOrder) {
+    var order;
+    if (!node.order) {
+        order = fnGetOrder();
+        node.order = order;
+        order.name = info.order;
+        order.node = node;
+        order.endNode = null;
+        order.condition = info.condition;
+        orderStack.push(order);
+        order.parseCommentOrderBlockReturnValue = parseCommentOrderBlock(node, outerChildNodes, outerElement, props, part);
+    }
+    else {
+        order = node.order;
+    }
+    return order.parseCommentOrderBlockReturnValue;
+}
+function parseIfOrder(info, node, outerChildNodes, outerElement, props, part) {
+    return addOrderToNode(node, info, outerChildNodes, outerElement, props, part, function () {
+        var scope = $t.domScope.get(node);
+        return {
+            endHit: null,
+            hit: null,
+            hasElse: false,
+            run: function () {
+                var order = this;
+                order.hit = parseBool(execByScope(node, this.condition, scope, outerChildNodes, outerElement, props, part)) ? this.node : null;
+                treeEach(node.parentNode.childNodes, 'childNodes', function (node, step) {
+                    if (node.nodeType != 8)
+                        return;
+                    var info = getCommentStringInfo(getCommentText(node));
+                    if (!info)
+                        return;
+                    if (node.__order__) {
+                        step.next = getNodeIndex2(node.__order__.__endNode__) - getNodeIndex2(node);
+                        return;
+                    }
+                    switch (info.orderCase) {
+                        case 'else':
+                        case 'else if':
+                            if (!order.hasElse) {
+                                if (info.orderCase == 'else') {
+                                    order.hasElse = true;
+                                }
+                                if (!order.endHit) {
+                                    if (order.hit) {
+                                        order.endHit = node;
+                                    }
+                                    else {
+                                        if (info.orderCase == 'else' || parseBool(execByScope(node, this.condition, scope, outerChildNodes, outerElement, props, part))) {
+                                            order.hit = node;
+                                        }
+                                        else {
+                                            /*删除else if*/
+                                            removeNode(node);
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                return SetParseError('语法错误：else或else if不能出现在else后');
+                            }
+                            break;
+                    }
+                }, getNodeIndex2(node) + 1);
+                var p = this.node.parentNode;
+                if (!this.hit) {
+                    /*全部删除*/
+                    removeBlockBetween(this.node, this.endNode);
+                    p.removeChild(this.node);
+                    p.removeChild(this.endNode);
+                }
+                else {
+                    if (!this.endHit) {
+                        this.endHit = this.endNode;
+                    }
+                    /*保留hit到break之间的内容*/
+                    var ns = takeBlockBetween(this.hit, this.endHit);
+                    insertNodesBefore(this.node, ns);
+                    /*全部删除*/
+                    removeBlockBetween(this.node, this.endNode);
+                    p.removeChild(this.node);
+                    p.removeChild(this.endNode);
+                }
+            }
+        };
+    });
+}
+function parseBreakOrder(info, node, outerChildNodes, outerElement, props, part) {
+    /*删除后面节点,父节点后面节点,父父节点后面节点直至__break__*/
+    var _node = node.previousSibling;
+    if (!_node)
+        _node = node.parentNode;
+    removeNode(node);
+    var p = _node.parentNode;
+    while (_node.nodeName != '__BREAK__') {
+        var cs = p.childNodes;
+        var length_1 = cs.length;
+        var index = getNodeIndex2(_node) + 1;
+        for (var i = index; i < length_1; i++) {
+            p.removeChild(cs[index]);
+        }
+        _node = p;
+        p = p.parentNode;
+    }
+    _node.source.onBreak();
+}
+function parseWhileOrder(info, node, outerChildNodes, outerElement, props, part) {
+    return addOrderToNode(node, info, outerChildNodes, outerElement, props, part, function () {
+        return {
+            run: function () {
+                var p = this.node.parentNode;
+                if (this.isBreak || !parseBool(execByScope(this.node, this.condition, null, outerChildNodes, outerElement, props, part))) {
+                    //全部删除
+                    removeBlockBetween(this.node, this.endNode);
+                    p.removeChild(this.node);
+                    p.removeChild(this.endNode);
+                }
+                else {
+                    var nodes = cloneBetween(this.node, this.endNode);
+                    this.node.parentNode.insertBefore2(createBreakElement(nodes, this), this.node);
+                }
+            },
+            onBreak: function () {
+                this.isBreak = true;
+            },
+            isBreak: false
+        };
+    });
+}
+function parseAsyncOrder(info, node, outerChildNodes, outerElement, props, part) {
+    return addOrderToNode(node, info, outerChildNodes, outerElement, props, part, function () {
+        return {
+            run: function () {
+                var order = this;
+                var ns = takeBlockBetween(this.node, this.endNode);
+                var delay = parseInt(this.condition);
+                if (delay === NaN) {
+                    delay = 0;
+                }
+                removeNode(this.endNode);
+                var mark = $node('async', 8);
+                replaceNodeByNode(this.node, mark);
+                this.endNode = null;
+                this.node = null;
+                setTimeout(function () {
+                    var elem = $node('div');
+                    var p = mark.parentNode;
+                    replaceNodeByNode(mark, elem);
+                    mark = null;
+                    appendNodes(ns, elem);
+                    var chds = elem.childNodes;
+                    initHTML(chds, outerChildNodes, outerElement, props, part);
+                    takeOutChildNodes(elem);
+                    elem = null;
+                    replaceCls();
+                }, delay);
+            }
+        };
+    });
+}
+function parseSwitchOrder(info, node, outerChildNodes, outerElement, props, part) {
+    return addOrderToNode(node, info, outerChildNodes, outerElement, props, part, function () {
+        return {
+            value: execByScope(node, info.condition, null, outerChildNodes, outerElement, props, part),
+            hit: null,
+            needBreak: false,
+            endHit: null,
+            hasDefault: false,
+            run: function () {
+                var order = this;
+                var scope = $t.domScope.get(node);
+                treeEach(node.parentNode.childNodes, 'childNodes', function (node, step) {
+                    if (node.nodeType != 8)
+                        return;
+                    var info = getCommentStringInfo(getCommentText(node));
+                    if (!info)
+                        return;
+                    if (node.__order__) {
+                        step.next = getNodeIndex2(node.__order__.__endNode__) - getNodeIndex2(node);
+                        return;
+                    }
+                    switch (info.orderCase) {
+                        case 'case':
+                        case 'case break':
+                            if (order.hasDefault) {
+                                return SetParseError('语法错误：default后不应出现case/case break');
+                            }
+                            else if (!order.hit) {
+                                var isPass = order.value == execByScope(node, info.condition, scope, outerChildNodes, outerElement, props, part);
+                                if (isPass) {
+                                    order.hit = node;
+                                    node.__order__ = info.orderCase;
+                                }
+                            }
+                            else if (!order.endHit) {
+                                order.endHit = node;
+                            }
+                            break;
+                        case 'default':
+                            if (order.hasDefault) {
+                                return SetParseError('语法错误：多余的default');
+                            }
+                            else {
+                                order.hasDefault = true;
+                                if (!order.hit) {
+                                    order.hit = node;
+                                    node.__order__ = info.orderCase;
+                                }
+                                else if (!order.endHit) {
+                                    order.endHit = node;
+                                }
+                            }
+                            break;
+                    }
+                }, getNodeIndex2(node) + 1);
+                var p = this.node.parentNode;
+                if (!this.hit) {
+                    /*全部删除*/
+                    removeBlockBetween(this.node, node);
+                    p.removeChild(this.node);
+                    p.removeChild(this.endNode);
+                }
+                else {
+                    if (!this.endHit) {
+                        this.endHit = this.endNode;
+                    }
+                    //删除hit前的数据
+                    removeBlockBetween(this.node, this.hit);
+                    //外置hit的数据
+                    var ns = takeBlockBetween(this.hit, this.endHit);
+                    insertNodesBefore(this.node, ns);
+                    removeNode(this.hit);
+                    if (this.hit.order === 'case break' /*已终止选择*/ || this.endHit === this.endNode /*已结束*/) {
+                        /*全部删除*/
+                        removeBlockBetween(this.node, this.endNode);
+                        p.removeChild(this.node);
+                        p.removeChild(this.endNode);
+                    }
+                }
+                delete this.node.order;
+            }
+        };
+    });
+}
+function parseForOrder(info, node, outerChildNodes, outerElement, props, part) {
+    return addOrderToNode(node, info, outerChildNodes, outerElement, props, part, function () {
+        var check;
+        if (parseForOrderRE.test(info.condition)) {
+            check = (function () {
+                var s = info.condition.split(' in '), index = 0, names = [], source;
+                return function () {
+                    if (!source) {
+                        source = execByScope(node, s[1], null, outerChildNodes, outerElement, props, part);
+                        if (!source) {
+                            return { result: false, params: null };
+                        }
+                        for (var i in source) {
+                            names.push(i);
+                        }
+                        if (names.length == 0) {
+                            return { result: false, params: null };
+                        }
+                    }
+                    if (index < names.length) {
+                        execByScope(node, s[0] + '=\'' + names[index] + '\';', null, outerChildNodes, outerElement, props, part);
+                        index++;
+                        return { result: true, params: null };
+                    }
+                    else {
+                        return { result: false, params: null };
+                    }
+                };
+            }());
+        }
+        else if (parseForOrderRE2.test(info.condition)) {
+            check = (function () {
+                var isFirst = true;
+                var s = info.condition.split(';');
+                if (s.length == 2) {
+                    return function () {
+                        return { result: false, params: null };
+                    };
+                }
+                return function () {
+                    if (isFirst) {
+                        isFirst = false;
+                        execByScope(node, s[0], null, outerChildNodes, outerElement, props, part);
+                    }
+                    else {
+                        execByScope(node, s[2], null, outerChildNodes, outerElement, props, part);
+                    }
+                    return { result: execByScope(node, s[1], null, outerChildNodes, outerElement, props, part), params: null };
+                };
+            }());
+        }
+        else {
+            check = function () {
+                return { result: false, params: null };
+            };
+        }
+        return {
+            check: check,
+            run: function () {
+                var p = this.node.parentNode;
+                var ret = this.check();
+                if (this.isBreak || !ret.result) {
+                    //全部删除
+                    removeBlockBetween(this.node, this.endNode);
+                    p.removeChild(this.node);
+                    p.removeChild(this.endNode);
+                }
+                else {
+                    var nodes = cloneBetween(this.node, this.endNode);
+                    this.node.parentNode.insertBefore2(createBreakElement(nodes, this), this.node);
+                }
+            },
+            onBreak: function () {
+                this.isBreak = true;
+            },
+            isBreak: false
+        };
+    });
+}
+function createBreakElement(nodes, order) {
+    var breakElement = $node('__break__');
+    for (var i = 0; i < nodes.length; i++) {
+        breakElement.appendChild(nodes[i]);
+    }
+    breakElement.source = order;
+    return breakElement;
+}
+function parseCommentOrder(info, node, outerChildNodes, outerElement, props, part) {
+    switch (info.order) {
+        case 'scope':
+            parseScopeOrder(info, node, outerChildNodes, outerElement, props, part);
+            break;
+        case 'let':
+            execScope(info.condition, node, outerChildNodes, outerElement, props, part);
+            removeNode(node);
+            break;
+        case 'bind':
+            bindPropertyByOrder(node, info.condition);
+            break;
+        case '-':
+            bindExpressionsByOrder(node, info.condition);
+            break;
+        case '!':
+            execByScope(node, info.condition, null, outerChildNodes, outerElement, props, part);
+            removeNode(node);
+            break;
+        case '=':
+            var v = execByScope(node, info.condition, null, outerChildNodes, outerElement, props, part);
+            if (isObject(v) && v.nodeType) {
+                replaceNodeByNode(node, v);
+            }
+            else {
+                replaceNodeByNode(node, $node(v, 3));
+            }
+            break;
+        case 'content':
+            replaceNodeByNodes(node, outerChildNodes);
+            break;
+        case 'elements':
+            replaceNodeByNodes(node, outerElement);
+            break;
+        case 'while':
+            return parseWhileOrder(info, node, outerChildNodes, outerElement, props, part);
+        case 'if':
+            return parseIfOrder(info, node, outerChildNodes, outerElement, props, part);
+        case 'break':
+            return parseBreakOrder(info, node, outerChildNodes, outerElement, props, part);
+        case 'for':
+            return parseForOrder(info, node, outerChildNodes, outerElement, props, part);
+        case 'switch':
+            return parseSwitchOrder(info, node, outerChildNodes, outerElement, props, part);
+        case 'async':
+            return parseAsyncOrder(info, node, outerChildNodes, outerElement, props, part);
+    }
+}
+function parseComment(node, outerChildNodes, outerElement, props, part) {
+    var info = getCommentStringInfo(getCommentText(node));
+    if (!info)
+        return;
+    if (!info.order) {
+        alert("语法错误：不恰当的" + info.orderCase);
+        return;
+    }
+    parseCommentOrder(info, node, outerChildNodes, outerElement, props, part);
+    if (node.order) {
+        if (node.order.endNode) {
+            node.order.run();
+        }
+    }
+}
+/// <reference path="core.ts"/>
+/// <reference path="Execute.ts"/>
+/// <reference path="bind.ts"/>
 /// <reference path='TemplateConfig.ts'/>
+/// <reference path='PartOrderCore.ts'/>
+var operatorRE = /\!=|==|=|<|>|\|/;
 function getScopeBy(scope, node) {
     if (!scope)
-        return $t.uiScope.get(node);
+        return $t.domScope.get(node);
     else
         return scope;
 }
@@ -782,6 +1663,48 @@ function getTemplate(node) {
             return node.innerHTML;
         }
     }
+}
+function defineServiceByNode(node) {
+    var name = node.getAttribute('service');
+    if (name) {
+        var nodeName = node.getAttribute('ui');
+        if (nodeName) {
+            if ($t.ui.hasOwnProperty(nodeName)) {
+                /*把服务定义到组件*/
+                $t.ui[nodeName].service.define(name, getTemplate(node));
+            }
+            else {
+                throwError('不能定义service：' + name + '到' + nodeName + '上');
+            }
+        }
+        else {
+            if (!$t.service.hasOwnProperty(name)) {
+                $t.service.define(name, getTemplate(node));
+            }
+            else {
+                throwError('不能重复定义service：' + name);
+            }
+        }
+    }
+    removeNode(node);
+}
+function getExtendsByNode(node, sortPath) {
+    var ext = getAttr(node, 'extends', null);
+    if (isString(ext)) {
+        return getExtends(ext, sortPath);
+    }
+}
+function defineUIByNode(node) {
+    var name = getAttr(node, 'ui');
+    var ext = getExtendsByNode(node, 'ui');
+    if (name) {
+        $t.ui.define(name, '', '', getTemplate(node), ext);
+    }
+    removeNode(node);
+}
+function defineClasses(node) {
+    $t.styleClasses.push(getAttr(node, 'class'), trimLine(getTemplate(node)));
+    removeNode(node);
 }
 function parseDefine(node) {
     switch (true) {
@@ -854,9 +1777,9 @@ function parseUITemplate(uiName, uiSortPath, uiPath, sHTML) {
 }
 function importUIHTML(uiName, uiSortPath) {
     if (!$t.ui.hasOwnProperty(uiName)) {
-        var uiPath = baseUIPath.getPathBySortPath(uiSortPath);
-        $t.xhr.get(uiPath + '/' + (uiName + '.html').toLowerCase(), false, function (text) {
-            parseUITemplate(uiName, uiSortPath, uiPath, text);
+        var uiPath_1 = baseUIPath.getPathBySortPath(uiSortPath);
+        $t.xhr.get(uiPath_1 + '/' + (uiName + '.html').toLowerCase(), false, function (text) {
+            parseUITemplate(uiName, uiSortPath, uiPath_1, text);
         });
     }
     return $t.ui[uiName];
@@ -874,22 +1797,578 @@ function getExtends(extName, sortPath) {
     ext = $t.ui[extName];
     return ext;
 }
+function parseAsync(node, outerChildNodes, outerElement, props, part) {
+    var delay = parseInt(execByScope(node, node.getAttribute('async'), null, outerChildNodes, outerElement, props, part));
+    node.removeAttribute('async');
+    var mark = $node('async', 8);
+    replaceNodeByNode(node, mark);
+    if (delay === NaN) {
+        delay = 0;
+    }
+    setTimeout(function () {
+        replaceNodeByNode(mark, node);
+        mark = null;
+        initHTML([node], outerChildNodes, outerElement, props, part);
+        replaceCls();
+    }, delay);
+}
+function parseLazy(node, outerChildNodes, outerElement, props, part) {
+    node.removeAttribute('lazy');
+    initHTML(node.childNodes, outerChildNodes, outerElement, props, part);
+}
+function getUIInfo(node) {
+    var nodeName = node.nodeName;
+    if (nodeName === 'SCRIPT' && getAttr(node, 'type') === 'ui') {
+        return node.getAttribute('name').toLowerCase();
+    }
+    else if (nodeName.indexOf(':')) {
+        var c = nodeName.split(':');
+        var sortPath = c[0].toLowerCase();
+        if (baseUIPath.hasSortPath(sortPath)) {
+            return { sortPath: sortPath, name: c[1].toLowerCase() };
+        }
+    }
+}
+function parseUI(node, uiInfo, step, part) {
+    var partName, reExtends, outerChildNodes, outerElement, cpn, ui = importUIHTML(uiInfo.name, uiInfo.sortPath);
+    if (!ui) {
+        removeNode(node);
+        throwError(uiInfo.name + '组件不存在！');
+        return;
+    }
+    partName = takeAttr(node, 'p-name');
+    reExtends = takeAttr(node, 're-extends');
+    outerChildNodes = slice.call(node.childNodes);
+    outerElement = slice.call(node.children);
+    for (var i = node.childNodes.length; i > 0; i--) {
+        node.removeChild(node.childNodes[0]);
+    }
+    cpn = ui.render(node, node.parentNode, outerChildNodes, outerElement, null, part, partName, reExtends);
+    if (cpn) {
+        step.next = cpn.elementLength;
+    }
+}
+function parseGet(node, outerChildNodes, outerElement, props, part) {
+    removeNode(node);
+    var name = getAttr(node, 'name');
+    if (name) {
+        initHTML(node.childNodes, outerChildNodes, outerElement, props, part);
+        $t.store[name] = node;
+        return 4 /* c_noIn */;
+    }
+    var toRef = getAttr(node, 'to-p-ref');
+    if (toRef && part) {
+        toRef = '$' + toRef;
+        if (part[toRef]) {
+            appendNodes(node.childNodes, part[toRef]);
+            initHTML(part[toRef].childNodes, outerChildNodes, outerElement, props, part);
+            node.innerHTML = '';
+        }
+    }
+}
+function parseSet(node, outerChildNodes, outerElement, props, part) {
+    if (node.hasAttribute('link')) {
+        /*设置关联子对象*/
+        var link = takeAttr(node, 'link');
+        if ($t.store.hasOwnProperty(link) && node.children.length == 1) {
+            appendNodes($t.store[link].childNodes, node.children[0]);
+            takeOutChildNodes(node);
+        }
+        else {
+            removeNode(node);
+        }
+    }
+    else {
+        var ns = void 0;
+        /*设置属性*/
+        if (node.children.length > 0) {
+            /*设置子对象*/
+            ns = node.children;
+        }
+        else if (node.parentNode) {
+            /*设置父对象*/
+            ns = [node.parentNode];
+        }
+        else {
+            return;
+        }
+        var isAppend = !node.hasAttribute('append');
+        node.removeAttribute('append');
+        var attr = node.attributes;
+        for (var j = 0; j < ns.length; j++) {
+            if (isAppend) {
+                for (var i = 0; i < attr.length; i++) {
+                    ns[j].setAttribute(attr[i].name, attr[i].value);
+                }
+            }
+            else {
+                for (var i = 0; i < attr.length; i++) {
+                    var value = attr[i].value;
+                    var value2 = void 0;
+                    switch (attr[i].name) {
+                        case 'class':
+                            value2 = ns[j].getAttribute(attr[i].name);
+                            if (value2) {
+                                value += (/ $/.test(value) ? '' : ' ') + value2;
+                            }
+                            break;
+                        case 'style':
+                            value2 = ns[j].getAttribute(attr[i].name);
+                            if (value2) {
+                                value += (/; *$/.test(value) ? '' : ';') + value2;
+                            }
+                            break;
+                    }
+                    ns[j].setAttribute(attr[i].name, value);
+                }
+            }
+        }
+        takeOutChildNodes(node);
+    }
+    return 4 /* c_noIn */;
+}
+var includeJSFiles = (function () {
+    var IncludeTask = (function () {
+        function IncludeTask(parent, files, callback) {
+            this.parent = parent;
+            this.callback = callback;
+            this.child = null;
+            this.isallload = false;
+            this.count = 0;
+            if (parent) {
+                parent.child = this;
+            }
+            var arr;
+            if (isArray(files)) {
+                arr = files;
+                for (var i in arr) {
+                    var url = files[i];
+                    if (isString(url) && !(url in $t.jsScript)) {
+                        arr.push(url);
+                        $t.jsScript[url] = $node("script");
+                    }
+                }
+            }
+            else if (files) {
+                arr = [];
+                var url = files;
+                if (isString(url) && !(url in IncludeTask.jsScript)) {
+                    arr.push(url);
+                    $t.jsScript[url] = $node("script");
+                }
+            }
+            this.files = arr;
+        }
+        IncludeTask.prototype.onallload = function () {
+            this.isallload = true;
+            if (this.child == null) {
+                setIncludeTaskDone(this, this.callback);
+            }
+            else if (this.child.isallload) {
+                setIncludeTaskDone(this, this.callback);
+            }
+            if (this.parent != null) {
+                this.parent.onchildallload();
+            }
+        };
+        IncludeTask.prototype.onchildallload = function () {
+            if (this.isallload) {
+                setIncludeTaskDone(this, this.callback);
+            }
+        };
+        IncludeTask.jsScript = newHashObject('JSHash');
+        return IncludeTask;
+    }());
+    var includeTask;
+    function setIncludeTaskDone(task, fn) {
+        includeTask = task.parent;
+        if (includeTask != null)
+            includeTask.child = null;
+        task.child = null;
+        if (isFunction(fn))
+            fn();
+    }
+    function includeJSFile(task) {
+        if (task.files.length > 0) {
+            var url = task.files.shift();
+            var scriptNode = $t.jsScript[url];
+            scriptNode.src = url;
+            task.count++;
+            scriptNode.onload = function () {
+                task.count--;
+                includeJSFile(task);
+            };
+            document.head.appendChild(scriptNode);
+        }
+        else if (task.count == 0) {
+            task.onallload();
+        }
+    }
+    return function (files, callback) {
+        includeTask = new IncludeTask(includeTask, files, callback);
+        includeJSFile(includeTask);
+    };
+}());
+function execOnScript(node, outerChildNodes, outerElement, props, part) {
+    var p = node.parentNode;
+    if (p) {
+        var script = node.innerHTML;
+        if (script.length > 0) {
+            /*设置父对象事件*/
+            var events = exec('({' + script + '})');
+            for (var i in events) {
+                if (isFunction(events[i])) {
+                    p.addEventListener(i, events[i]);
+                }
+            }
+        }
+    }
+}
+function execScript(node, outerChildNodes, outerElement, props, part) {
+    var script = node.innerHTML;
+    if (script.length > 0) {
+        var fn;
+        var keyVar = String(getAttr(node, 'var', ''));
+        var arrKeyVar;
+        fn = Function('outer,outerElement,props,part' + (keyVar ? ',' : '') + keyVar, script);
+        var args = [outerChildNodes, outerElement, props, part];
+        if (keyVar.length > 0) {
+            arrKeyVar = keyVar.split(',');
+            for (var i = 0; i < arrKeyVar.length; i++) {
+                var ui = $t.refs[arrKeyVar[i]];
+                if (ui) {
+                    args.push(ui[ui.length - 1]);
+                }
+                else {
+                    args.push(null);
+                }
+            }
+        }
+        try {
+            fn.apply(node.parentNode, args);
+        }
+        catch (e) {
+            _catch(e);
+        }
+        fn = null;
+    }
+}
+function execTurtleScript(node, outerChildNodes, outerElement, props, part) {
+    var type = getAttr(node, 'type', null);
+    if (type == 'on') {
+        execOnScript(node, outerChildNodes, outerElement, props, part);
+    }
+    else {
+        execScript(node, outerChildNodes, outerElement, props, part);
+    }
+}
+function parseScript(node, outerChildNodes, outerElement, props, part) {
+    if (node.type == "" || node.type == "on" || node.type == "text/javascript") {
+        var src = getAttr(node, 'src', '');
+        if (src) {
+            includeJSFiles(src);
+        }
+        else {
+            execTurtleScript(node, outerChildNodes, outerElement, props, part);
+        }
+        removeNode(node);
+    }
+}
+function execNodeQuestion(node, outerChildNodes, outerElement, props, part) {
+    var v = takeAttr(node, ':');
+    if (v.length > 0) {
+        execByScope(node, v, null, outerChildNodes, outerElement, props, part);
+    }
+}
+function bindNode(node, obj, name) {
+    var elementValueName, eventName;
+    switch (node.nodeName) {
+        case "SELECT":
+            elementValueName = "value";
+            eventName = "change";
+            break;
+        case "TEXTAREA":
+            elementValueName = "value";
+            eventName = "input";
+            break;
+        case "INPUT":
+            switch (node.type) {
+                case "checkbox":
+                    elementValueName = "checked";
+                    eventName = "click";
+                    break;
+                default:
+                    elementValueName = "value";
+                    eventName = "input";
+                    break;
+            }
+            break;
+        case "#text":
+            elementValueName = "data";
+            break;
+        case "BUTTON":
+        case "DIV":
+        default:
+            elementValueName = "innerHTML";
+            break;
+    }
+    if (!node.__bind__) {
+        node[elementValueName] = obj[name];
+    }
+    bindElementProperty(obj, name, node, elementValueName);
+    if (eventName) {
+        node.addEventListener(eventName, function () {
+            obj[name] = node[elementValueName];
+        });
+    }
+}
+function bindNodeByCondition(node, condition) {
+    var cdtn = splitByOnce(condition, "|"), name = cdtn[0], arrName, scope, obj, exp;
+    if (!name) {
+        return;
+    }
+    scope = $t.uiScope.get(node);
+    if (name.indexOf(".") != -1) {
+        arrName = name.split(".");
+        obj = _getBindObject(scope, arrName);
+        name = arrName[arrName.length - 1];
+    }
+    else {
+        obj = _getBindObject(scope, [name]);
+    }
+    if (obj === null) {
+        throwError('不能获取绑定属性:' + cdtn[0]);
+        return;
+    }
+    if (cdtn.length === 2) {
+        exp = function (v) {
+            _execExpressionsByScope(cdtn[1], v, node);
+        };
+        exp.__me__ = exp;
+        bindProperty(obj, name, exp, "__me__");
+    }
+    else {
+        bindNode(node, obj, name);
+    }
+}
+function bindNodeFunction(node, bindVar, fn) {
+    var name, scope, obj;
+    if (bindVar.indexOf(".") != -1) {
+        bindVar = bindVar.split(".");
+    }
+    else {
+        bindVar = [bindVar];
+    }
+    name = bindVar[bindVar.length - 1];
+    scope = $t.uiScope.get(node);
+    obj = _getBindObject(scope, bindVar);
+    fn.__me__ = fn;
+    bindProperty(obj, name, fn, "__me__");
+    return { object: obj, name: name, targetObject: fn, targetName: "__me__" };
+}
+function bindEval(node, s, outer, outerElement, props, part, fn) {
+    var operator = s.match(operatorRE)[0], bindVar = splitByOnce(s, operator), sfn;
+    if (bindVar.length < 2)
+        return;
+    switch (operator) {
+        case "|":
+            sfn = bindVar[1];
+            break;
+        case "=":
+            operator = "==";
+        default:
+            sfn = 'v' + operator + bindVar[1];
+            break;
+    }
+    return bindNodeFunction(node, bindVar[0], function (v) {
+        fn.call(this, execValueByScope(node, sfn, v, this, outer, outerElement, props, part));
+    });
+}
+var ElementParser = (function () {
+    function ElementParser() {
+        this.GET = parseGet;
+        this.SET = parseSet;
+        this.__BREAK__ = parseBreakOrder;
+        this.SCRIPT = parseScript;
+    }
+    return ElementParser;
+}());
+function bindShowHide(node, s, isBindShow, outer, outerElement, props, part) {
+    bindEval(node, s, outer, outerElement, props, part, function (v) {
+        if (v) {
+            if (isBindShow) {
+                removeClass(node, 'uhide');
+            }
+            else {
+                addClass(node, 'uhide');
+            }
+        }
+        else {
+            if (isBindShow) {
+                addClass(node, 'uhide');
+            }
+            else {
+                removeClass(node, 'uhide');
+            }
+        }
+    });
+}
+var AttributeParser = (function () {
+    function AttributeParser() {
+    }
+    AttributeParser.prototype.ref = function (node, outerChildNodes, outerElement, props, part) {
+        var refName = node.getAttribute('ref');
+        node.removeAttribute('ref');
+        $t.refs.push(refName.split(','), node);
+    };
+    AttributeParser.prototype[":"] = function (node, outerChildNodes, outerElement, props, part) {
+        execNodeQuestion(node, outerChildNodes, outerElement, props, part);
+        setQuestionAtrr(node, outerChildNodes, outerElement, props, part);
+    };
+    AttributeParser.prototype['p-ref'] = function (node, outerChildNodes, outerElement, props, part) {
+        var refName = takeAttr(node, 'p-ref');
+        var arrRefName;
+        if (part && refName) {
+            arrRefName = refName.split(',');
+            for (var i = 0; i < arrRefName.length; i++) {
+                part['$' + arrRefName[i]] = node;
+            }
+        }
+    };
+    AttributeParser.prototype.bind = function (node, outerChildNodes, outerElement, props, part) {
+        bindNodeByCondition(node, takeAttr(node, 'bind'));
+    };
+    AttributeParser.prototype.remove = function (node, outerChildNodes, outerElement, props, part) {
+        var bindInfo = bindEval(node, takeAttr(node, 'remove'), outerChildNodes, outerElement, props, part, function (v) {
+            if (!v)
+                return;
+            removeBind(this, bindInfo.targetName, bindInfo.name);
+            removeNode(node);
+        });
+    };
+    AttributeParser.prototype.add = function (node, outerChildNodes, outerElement, props, part) {
+        var placeholder = $node('', 8);
+        replaceNodeByNode(node, placeholder);
+        var bindInfo = bindEval(node, takeAttr(node, 'add'), outerChildNodes, outerElement, props, part, function (v) {
+            if (!v)
+                return;
+            removeBind(this, bindInfo.targetName, bindInfo.name);
+            replaceNodeByNode(placeholder, node);
+        });
+    };
+    AttributeParser.prototype.show = function (node, outerChildNodes, outerElement, props, part) {
+        bindShowHide(node, takeAttr(node, 'show'), true, outerChildNodes, outerElement, props, part);
+    };
+    AttributeParser.prototype.hide = function (node, outerChildNodes, outerElement, props, part) {
+        bindShowHide(node, takeAttr(node, 'hide'), false, outerChildNodes, outerElement, props, part);
+    };
+    AttributeParser.prototype.cls = function (node, outerChildNodes, outerElement, props, part) {
+        $t.clsNode.push(node);
+        /*不要删node.removeAttribute('cls');*/
+    };
+    AttributeParser.prototype['p-main'] = function (node, outerChildNodes, outerElement, props, part) {
+        if (part && !part.partMain) {
+            part.partMain = node;
+        }
+    };
+    return AttributeParser;
+}());
+;
+var elementParser = new ElementParser;
+var attributeParser = new AttributeParser;
+function initHTML(arr, outerChildNodes, outerElement, props, part) {
+    treeEach(arr, 'childNodes', function (node, step) {
+        if (node.nodeType === 8) {
+            try {
+                parseComment(node, outerChildNodes, outerElement, props, part);
+            }
+            catch (e) {
+                _catch(e);
+            }
+            return 4 /* c_noIn */;
+        }
+        if (node.nodeType !== 1) {
+            return;
+        }
+        if (node.hasAttribute('async')) {
+            parseAsync(node, outerChildNodes, outerElement, props, part);
+            return 2 /* c_repeat */;
+        }
+        if (node.hasAttribute('lazy')) {
+            parseLazy(node, outerChildNodes, outerElement, props, part);
+            return 4 /* c_noIn */ | 2 /* c_repeat */;
+        }
+        var uiInfo = getUIInfo(node);
+        if (uiInfo) {
+            parseUI(node, uiInfo, step, part);
+            return 4 /* c_noIn */ | 8 /* c_noRepeat */;
+        }
+        /*if(isTemplate(node)){
+            parseTemp(node);
+            return;
+        }*/
+        if (elementParser.hasOwnProperty(node.nodeName)) {
+            /* let ret=*/ return elementParser[node.nodeName](node, outerChildNodes, outerElement, props, part);
+        }
+        var attrs = slice.call(node.attributes);
+        for (var i = 0; i < attrs.length; i++) {
+            if (attributeParser.hasOwnProperty(attrs[i].name)) {
+                attributeParser[attrs[i].name](node, outerChildNodes, outerElement, props, part);
+            }
+        }
+    });
+}
+function getParts(childNodes) {
+    var child = [];
+    var cpn = null;
+    treeEach(childNodes, "childNodes", function (node) {
+        if (node.nodeType === 8 && node.__part__) {
+            if (cpn !== null) {
+                if (node.__part__ === cpn && node.__sign__ === 0) {
+                    child.push(node.__part__);
+                    cpn = null;
+                }
+            }
+            else {
+                cpn = node.__part__;
+            }
+            return;
+        }
+        if (cpn !== null) {
+            return 4 /* c_noIn */;
+        }
+    });
+    return child;
+}
+function nodesToString(nodes) {
+    var s = '';
+    for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].nodeType === 8) {
+            s += '<!--' + nodes[i].data + '-->';
+        }
+        else if (nodes[i].nodeType === 3) {
+            try {
+                s += nodes[i].data;
+            }
+            catch (e) { }
+        }
+        else if (nodes[i].nodeType === 1) {
+            s += nodes[i].outerHTML;
+        }
+    }
+    return s;
+}
 /// <reference path='core.ts'/>
 /// <reference path='PartCore.ts'/>
 var memberRE = /{([\-a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g;
 var colorRE = /^\s*((#[\dabcdefABCDEF]{3,6})|(rgba\(.*\)))\s*$/;
-var Service = (function () {
-    function Service(serv) {
-    }
-    return Service;
-}());
 var PartParamFilter = (function () {
     function PartParamFilter() {
     }
-    PartParamFilter.prototype.bool = function (v) {
+    PartParamFilter.bool = function (v) {
         return parseBool(v);
     };
-    PartParamFilter.prototype.intmin = function (v, p) {
+    PartParamFilter.intmin = function (v, p) {
         v = parseInt(v);
         p = parseInt(p);
         if (v < p || isNaN(v)) {
@@ -897,10 +2376,10 @@ var PartParamFilter = (function () {
         }
         return v;
     };
-    PartParamFilter.prototype.string = function (v) {
+    PartParamFilter.string = function (v) {
         return '"' + v + '"';
     };
-    PartParamFilter.prototype.floatmin = function (v, p) {
+    PartParamFilter.floatmin = function (v, p) {
         v = parseFloat(v);
         p = parseFloat(p);
         if (v < p || isNaN(v)) {
@@ -908,20 +2387,20 @@ var PartParamFilter = (function () {
         }
         return v;
     };
-    PartParamFilter.prototype.int = function (v) {
+    PartParamFilter.int = function (v) {
         return parseInt(v);
     };
-    PartParamFilter.prototype.float = function (v) {
+    PartParamFilter.float = function (v) {
         return parseFloat(v);
     };
-    PartParamFilter.prototype.pxtoem = function (v, p) {
+    PartParamFilter.pxtoem = function (v, p) {
         p = parseFloat(p);
         if (isNaN(p)) {
             p = 0;
         }
         return (parseFloat(v) / 16 + p) + 'em';
     };
-    PartParamFilter.prototype.color = function (v) {
+    PartParamFilter.color = function (v) {
         if (colorRE.test(v)) {
             return v;
         }
@@ -929,14 +2408,14 @@ var PartParamFilter = (function () {
             return 'transparent';
         }
     };
-    PartParamFilter.prototype.date = function (v, p) {
+    PartParamFilter.date = function (v, p) {
         var d = new Date(v);
         if (d.toDateString() === 'Invalid Date') {
             d = new Date();
         }
         return dateFormat(p, d);
     };
-    PartParamFilter.prototype.only = function (v, p) {
+    PartParamFilter.only = function (v, p) {
         if (p.indexOf(';') === -1) {
             return v;
         }
@@ -954,28 +2433,28 @@ var PartParamFilter = (function () {
             return filter;
         }
     };
-    PartParamFilter.prototype.udftotrue = function (v) {
+    PartParamFilter.udftotrue = function (v) {
         return v === undefined ? true : v;
     };
-    PartParamFilter.prototype.anytotrue = function (v) {
+    PartParamFilter.anytotrue = function (v) {
         return v !== undefined ? true : v;
     };
-    PartParamFilter.prototype.udftofalse = function (v) {
+    PartParamFilter.udftofalse = function (v) {
         return v === undefined ? false : v;
     };
-    PartParamFilter.prototype.anytofalse = function (v) {
+    PartParamFilter.anytofalse = function (v) {
         return v !== undefined ? false : v;
     };
-    PartParamFilter.prototype.udftonull = function (v) {
+    PartParamFilter.udftonull = function (v) {
         return v === undefined ? null : v;
     };
-    PartParamFilter.prototype.anytonull = function (v) {
+    PartParamFilter.anytonull = function (v) {
         return v !== undefined ? null : v;
     };
-    PartParamFilter.prototype.udftoemptystr = function (v) {
+    PartParamFilter.udftoemptystr = function (v) {
         return v === undefined ? "" : v;
     };
-    PartParamFilter.prototype.anytoemptystr = function (v) {
+    PartParamFilter.anytoemptystr = function (v) {
         return v !== undefined ? "" : v;
     };
     return PartParamFilter;
@@ -1032,7 +2511,7 @@ var Part = (function () {
                     var end = this.end;
                     while (node !== end) {
                         elements.push(node);
-                        var node = node.nextSibling;
+                        node = node.nextSibling;
                     }
                     return elements;
                 }
@@ -1089,8 +2568,8 @@ var Part = (function () {
     Part.prototype.getRect = function () {
         if (this.isInsert) {
             var rects = [];
-            var rt;
-            //var recalNode           = document.createElement('div');
+            var rt = void 0;
+            //let recalNode           = document.createElement('div');
             //recalNode.setAttribute('style',"width:0 !important;height:0 !important;margin-left:0 !important;margin-right:0 !important;");
             // insertNodeBefore(this.begin,recalNode);
             // rt=[recalNode.offsetLeft,recalNode.offsetTop];
@@ -1099,7 +2578,7 @@ var Part = (function () {
             // removeNode(recalNode);
             // rects.push(rt);
             var cs = this.elements;
-            var elem;
+            var elem = void 0;
             var dom = document.documentElement;
             for (var i = 0; i < cs.length; i++) {
                 elem = cs[i].valueOf();
@@ -1200,15 +2679,15 @@ var Part = (function () {
             /*cut scope*/
             var scopeNodes = this.scopeNodes;
             for (var i = 0; i < scopeNodes.length; i++) {
-                $t.uiScope.cut(scopeNodes[i].scope);
+                $t.domScope.cut(scopeNodes[i].scope);
             }
             appendNodes(elems, elem);
             /*link scope*/
             for (var i = 0; i < scopeNodes.length; i++) {
-                $t.uiScope.link(scopeNodes[i].scope, elem);
+                $t.domScope.link(scopeNodes[i].scope, elem);
             }
-            if (isFunction(this.onInsert)) {
-                this.onInsert(elem);
+            if (isFunction(this.oninsert)) {
+                this.oninsert(elem);
             }
         }
         else {
@@ -1216,15 +2695,12 @@ var Part = (function () {
             /*link scope*/
             var scopeNodes = this.scopeNodes;
             for (var i = 0; i < scopeNodes.length; i++) {
-                $t.uiScope.link(scopeNodes[i].scope, elem);
+                $t.domScope.link(scopeNodes[i].scope, elem);
             }
-            if (isFunction(this.onInsert)) {
-                this.onInsert(elem);
+            if (isFunction(this.oninsert)) {
+                this.oninsert(elem);
             }
             this.isInsert = true;
-            if (isFunction(this.oninsert)) {
-                this.oninsert();
-            }
         }
     };
     Part.prototype.insertBefore = function (elem) {
@@ -1235,15 +2711,15 @@ var Part = (function () {
             /*cut scope*/
             var scopeNodes = this.scopeNodes;
             for (var i = 0; i < scopeNodes.length; i++) {
-                $t.uiScope.cut(scopeNodes[i].scope);
+                $t.domScope.cut(scopeNodes[i].scope);
             }
             insertNodesBefore(elem, elems);
             /*link scope*/
             for (var i = 0; i < scopeNodes.length; i++) {
-                $t.uiScope.link(scopeNodes[i].scope, elem);
+                $t.domScope.link(scopeNodes[i].scope, elem);
             }
-            if (isFunction(this.onInsert)) {
-                this.onInsert(elem);
+            if (isFunction(this.oninsert)) {
+                this.oninsert(elem);
             }
         }
         else {
@@ -1251,15 +2727,12 @@ var Part = (function () {
             /*link scope*/
             var scopeNodes = this.scopeNodes;
             for (var i = 0; i < scopeNodes.length; i++) {
-                $t.uiScope.link(scopeNodes[i].scope, elem);
+                $t.domScope.link(scopeNodes[i].scope, elem);
             }
-            if (isFunction(this.onInsert)) {
-                this.onInsert(elem);
+            if (isFunction(this.oninsert)) {
+                this.oninsert(elem);
             }
             this.basePart.isInsert = true;
-            if (isFunction(this.oninsert)) {
-                this.oninsert();
-            }
         }
     };
     Part.prototype.getSuper = function (name) {
@@ -1276,8 +2749,8 @@ var Part = (function () {
         if (this.super) {
             this.super.emitInit(finalPart);
         }
-        if (this.hasOwnProperty('onInit') && isFunction(this.onInit)) {
-            this.onInit(finalPart);
+        if (isFunction(this.oninit)) {
+            this.oninit(finalPart);
         }
     };
     Part.prototype.remove = function () {
@@ -1288,7 +2761,7 @@ var Part = (function () {
             var scopeNodes = this.scopeNodes;
             /*cut scope*/
             for (var i = 0; i < scopeNodes.length; i++) {
-                $t.uiScope.cut(scopeNodes[i].scope);
+                $t.domScope.cut(scopeNodes[i].scope);
             }
             var p = this.begin.parentNode;
             if (p !== null) {
@@ -1301,9 +2774,8 @@ var Part = (function () {
             if (isFunction(this.onremove)) {
                 this.onremove();
             }
-            var p = this.parent;
-            if (p) {
-                p.emitResize();
+            if (this.parent) {
+                this.parent.emitResize();
             }
         }
     };
@@ -1323,6 +2795,38 @@ var Part = (function () {
     });
     return Part;
 }());
+function newExtendsPart(template, node, extPart, s, outerChildNodes, outerElement, props, part) {
+    var t;
+    if (extPart) {
+        t = newObject(template.partName, extPart);
+    }
+    else {
+        t = newObject(template.partName, newPart.prototype);
+    }
+    var name = template.name;
+    var dom = $DOM(s);
+    //node.innerHTML=s;
+    t.template = template;
+    t.super = extPart;
+    t.isExtend = true;
+    var nodes = dom.childNodes;
+    t.$ = new Service(template.service);
+    initHTML(nodes, outerChildNodes, outerElement, props, t);
+    t.store = [];
+    for (var i = nodes.length; i > 0; i--) {
+        t.store.push(dom.removeChild(nodes[0]));
+    }
+    t.to = function (part) {
+        var proto = part.$.__proto__;
+        t.$.__proto__ = proto;
+        part.$.__proto__ = t.$;
+        if (extPart) {
+            extPart.to(part);
+        }
+        push.apply(part.store, t.store);
+    };
+    return t;
+}
 function newPart(template, node, extPart, s, outerChildNodes, outerElement, props, part, partName) {
     if (extPart) {
         var t = newObject(template.partName, extPart);
@@ -1374,20 +2878,20 @@ var PartTemplate = (function () {
         this.name = name;
         this.sortPath = sortPath;
         this.path = path;
-        this.Instance = new ArrayEx;
+        this.Instance = new ArrayEx();
         this.isJSDefine = true;
         this.partName = name.replace(/[\.]/g, "_");
         if (isObject(s)) {
             if (isObject(s)) {
                 var obj = s;
                 if (!isArray(obj.params)) {
-                    this.params = new ArrayEx;
+                    this.params = new ArrayEx();
                 }
                 else {
                     this.params = obj.params;
                 }
                 if (!isArray(obj.datas)) {
-                    this.datas = new ArrayEx;
+                    this.datas = new ArrayEx();
                 }
                 else {
                     this.datas = obj.datas;
@@ -1408,8 +2912,8 @@ var PartTemplate = (function () {
                 }
             }
             else {
-                this.params = new ArrayEx;
-                this.datas = new ArrayEx;
+                this.params = new ArrayEx();
+                this.datas = new ArrayEx();
                 this.isJSDefine = false;
                 this.service = new Service();
                 if (ext) {
@@ -1536,29 +3040,29 @@ var PartTemplate = (function () {
                 err.push(this.name + '不可缺少' + p.name + '参数');
                 v = undefined;
             }
-            if (p.filter && hasOwnProperty(p.filter)) {
-                v = paramFilter[p.filter](v, p.filterParam);
+            if (p.filter && PartParamFilter.hasOwnProperty(p.filter)) {
+                v = PartParamFilter[p.filter](v, p.filterParam);
             }
             d.splice(i + 1, 0, v);
         }
         if (err.length > 0) {
-            if ($this.config.debugMode == 2) {
-                alert(err.join('\r\n'));
+            if ($t.config.debugMode == 2) {
+                alert(err.join('\n'));
             }
-            log(err.join('\r\n'));
+            log(err.join('\n'));
             bp();
             return;
         }
         return d.join('');
     };
     /*变成别人的扩展*/
-    PartTemplate.prototype.beExtends = function (uiNode, that, outerChildNodes, outerElement, props, part) {
-        if (this.extends instanceof UITemplate) {
-            var ext = this.extends.beExtends(uiNode, that, outerChildNodes, outerElement, props, part);
+    PartTemplate.prototype.beExtends = function (node, that, outerChildNodes, outerElement, props, part) {
+        var ext;
+        if (this.extends instanceof PartTemplate) {
+            ext = this.extends.beExtends(node, that, outerChildNodes, outerElement, props, part);
         }
-        var html;
-        html = this.joinDatasByProps(props);
-        return newExtendsPart(this, uiNode, ext, execTemplateScript(html, that, outerChildNodes, outerElement, props, part), outerChildNodes, outerElement, props, part);
+        var html = this.joinDatasByProps(props);
+        return newExtendsPart(this, node, ext, execTemplateScript(html, that, outerChildNodes, outerElement, props, part), outerChildNodes, outerElement, props, part);
     };
     PartTemplate.prototype.toDefineString = function () {
         var s = '$this.ui.define("' + this.name + '","' + this.sortPath + '","' + this.path + '",{datas:';
@@ -1596,11 +3100,12 @@ var PartTemplate = (function () {
     PartTemplate.prototype.parseParamsHelp = function (p) {
         var params = this.params;
         for (var i = 0; i < params.length; i++) {
-            if (p.hasOwnProperty(params[i].name)) {
-                p[params[i].name] |= !params[i].hasDefault;
+            var name_3 = params[i].name;
+            if (p.hasOwnProperty(name_3)) {
+                p[name_3] = p[name_3] || !params[i].hasDefault;
             }
             else {
-                p[params[i].name] = !params[i].hasDefault;
+                p[name_3] = !params[i].hasDefault;
             }
         }
         if (this.extends) {
@@ -1652,8 +3157,115 @@ var TemplateList = (function () {
     };
     return TemplateList;
 }());
+var Service = (function () {
+    function Service(serv) {
+        this.__defineCallbacks__ = new ArrayEx();
+        if (isObject(serv)) {
+            for (var i in serv) {
+                this[i] = serv[i];
+                this.emitOnDefine(i, this[i]);
+            }
+        }
+    }
+    Service.prototype.require = function (n) {
+        if (!this.hasOwnProperty(n)) {
+            this[n] = getService(n);
+        }
+        return this[n];
+    };
+    Service.prototype.define = function (name, s) {
+        try {
+            this[name] = exec("(" + s + ")");
+        }
+        catch (e) {
+            _catch(e);
+        }
+        this.emitOnDefine(name, this[name]);
+    };
+    Service.prototype.toDefineString = function () {
+        var s = 'new $t.Service(';
+        var fns = [];
+        for (var i in this) {
+            if (this.hasOwnProperty(i)) {
+                fns.push('"' + i + '":' + this[i].toString());
+            }
+        }
+        if (fns.length > 0) {
+            s += '{' + fns.join(',') + '})';
+        }
+        else {
+            s += ')';
+        }
+        return s;
+    };
+    return Service;
+}());
+/// <reference path="core.ts" />
+var $rootScope;
+var Scope = (function () {
+    function Scope(__commentNode__, parent, __name__) {
+        this.__commentNode__ = __commentNode__;
+        this.__name__ = __name__;
+        this.__children__ = [];
+        this.__actionNode__ = __commentNode__.parentNode;
+        this.__parent__ = parent;
+        this.__proto__ = parent;
+        __commentNode__.parentNode.__scope__ = this;
+        parent.__children__.push(this);
+        if (__name__) {
+            parent[__name__] = this;
+        }
+    }
+    return Scope;
+}());
+var DOMScope = (function () {
+    function DOMScope() {
+        this.stack = [$rootScope];
+    }
+    DOMScope.prototype.create = function (node, name) {
+        var scope = this.get(node);
+        if (node.parentNode !== scope.__actionNode__) {
+            scope = new Scope(node, scope, name);
+            this.stack.push(scope);
+        }
+        else {
+            throwError('当前层不允许重复定义scope:' + name);
+        }
+        return scope;
+    };
+    DOMScope.prototype.get = function (node) {
+        if (!node)
+            return $rootScope;
+        while (node != null) {
+            if (node.scope) {
+                return node.scope;
+            }
+            node = node.parentNode;
+        }
+        return $rootScope;
+    };
+    DOMScope.prototype.cut = function (scope) {
+        var p = scope.__parent__;
+        scope.__parent__ = null;
+        removeItem(p.__children__, scope);
+        delete p[scope.name];
+    };
+    DOMScope.prototype.link = function (scope, node) {
+        var p = $t.domScope.get(node);
+        if (!p) {
+            return;
+        }
+        scope.__parent__ = p;
+        p.__children__.push(scope);
+        if (name) {
+            p[name] = scope;
+        }
+    };
+    return DOMScope;
+}());
 /// <reference path='core.ts'/>
 /// <reference path='Template.ts'/>
+/// <reference path='scope.ts'/>
 function renderTemplate(tp) {
     var sHTML = getTemplate(tp);
     var vDOM = $DOM(sHTML);
@@ -1699,6 +3311,8 @@ var Turtle = (function () {
     function Turtle() {
         this.isTemplate = isTemplate;
         this.config = new Config;
+        this.domScope = new DOMScope;
+        this.parts = newKeyArrayObject('Parts');
         rte.on("error", function (e) { log(e); bp(); alert(e); });
     }
     return Turtle;
