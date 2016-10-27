@@ -1,7 +1,7 @@
 
 /// <reference path="core.ts" />
 let 
-    $rootScope:Scope;
+    $rootScope:RootScope;
 interface INode{
     __scope__?:Scope;
 }
@@ -12,14 +12,18 @@ interface ITurtle{
 }
 
 class RootScope{
-    __actionNode__=document.documentElement;
-    __children__:Scope[]=[];
+    public __actionNode__=document.documentElement;
+    public __children__:Scope[]=[];
     constructor(){
         document['scope']=this;
     }
 }
 class Scope {
-    constructor(public __commentNode__:INode,parent,public __name__:string){
+    public __actionNode__:INode
+    public __parent__:Scope|RootScope
+    public __children__:Scope[]=[]
+    public __proto__:Object|Scope
+    constructor(public __commentNode__:INode,parent:Scope|RootScope,public __name__?:string){
         this.__actionNode__=__commentNode__.parentNode;
         this.__parent__=parent;
         this.__proto__=parent;
@@ -29,18 +33,19 @@ class Scope {
             parent[__name__]=this;
         }
     }
-    __actionNode__:INode
-    __parent__:Scope;
-    __children__:Scope[]=[];
-    __proto__
 }
 class DOMScope{
-    stack:Scope[]
+    stack:Array<Scope|RootScope>
     constructor(){
         this.stack=[$rootScope];
     }
-    create(node,name){
-        var scope=this.get(node);
+    /**
+     * 在dom节点上创建变量作用域对象
+     * @param {INode} node - dom节点
+     * @param {string} name - 名称
+     */
+    create(node:INode,name:string){
+        let scope=this.get(node);
         if(node.parentNode!==scope.__actionNode__){
             scope=new Scope(node,scope,name);
             this.stack.push(scope);
@@ -49,32 +54,49 @@ class DOMScope{
         }
         return scope;
     }
-    get(node){
-        if(!node)
+
+    
+    /**
+     * 获取变量作用域对象
+     * @param {INode} node - dom节点
+     */
+    get(node:INode):Scope|RootScope{
+        if(!node){
             return $rootScope;
+        }
         while(node!=null){
-            if(node.scope){
-                return node.scope;
+            if(node.__scope__){
+                return node.__scope__;
             }
             node=node.parentNode;
         }
         return $rootScope;
     }
-    cut(scope){
+    /**
+     * 切断dom节点和变量作用域对象的链接
+     * @param {Scope} scopeVarObject - 变量作用域对象
+     */
+    unlink(scope:Scope){
         var p=scope.__parent__;
         scope.__parent__=null;
         removeItem(p.__children__,scope);
-        delete p[scope.name];
+        delete p[scope.__name__];
     }
-    link(scope,node){
-        var p=$t.domScope.get(node);
+
+    /**
+     * 链接dom节点和变量作用域对象
+     * @param {Scope} scopeVarObject - 变量作用域对象
+     * @param {INode} node - dom节点
+     */
+    link(scope:Scope,node:INode){
+        var p:Scope|RootScope=$t.domScope.get(node);
         if(!p){
             return;
         }
         scope.__parent__=p;
         p.__children__.push(scope);
-        if(name){
-            p[name]=scope;
+        if(scope.__name__){
+            p[scope.__name__]=scope;
         }
     }
 }

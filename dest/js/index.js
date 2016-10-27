@@ -3721,3 +3721,10 @@ if (!$DOM) {
     };
 }
 var turtle = $t = new Turtle();
+(function () {
+    var _this = this;
+    (function () {
+        console.log(_this);
+        console.log(eval('this'));
+    })();
+}).call({});

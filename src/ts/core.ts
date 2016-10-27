@@ -1,6 +1,7 @@
 
 /// <reference path="global.ts" />
 /// <reference path="$Event.ts"/>
+
 class ArrayEx<T> extends Array<T>{
     last():T{
         if(this.length>0){
@@ -295,7 +296,7 @@ function addStyle(elem,style){
                 if(t)t();
             }
     }
-function removeItem(arr,obj){
+function removeItem<T>(arr:T[],obj:T){
     let index=arr.indexOf(obj);
     if(index!=-1){
         arr.splice(index, 1);
@@ -487,7 +488,7 @@ function splitByOnce(s:string,split:string):Array<string>{
     }
     return arr;
 }
-const enum TreeEach{
+const enum eTreeEach{
     c_stopEach=1,
     c_repeat=2,
     c_noIn=4,
@@ -496,44 +497,59 @@ const enum TreeEach{
 interface ITreeEachStep{
     next:number
 }
-function treeEach(array:{length:number},property:string,fn:(node:Object,step?:ITreeEachStep)=>TreeEach|void,beginIndex:number=0){
+
+
+
+interface IArray{
+    length:number
+}
+
+
+/**
+ * 遍历树
+ * @param {T[]|IArray} array 数组或类数组
+ * @param {string} propertyName 数组元素包含的属性名
+ * @param {(node:T,step?:ITreeEachStep)=>eTreeEach|undefined} fn 回调函数
+ * @param {number} beginIndex 遍历起始位置
+ */
+function treeEach<T>(array:T[]|IArray,propertyName:string,fn:(node:T,step?:ITreeEachStep)=>(eTreeEach|void),beginIndex:number=0){
     if(!isArrayLike(array)){
         return;
     }
     let 
         arr=array,
         i=beginIndex,
-        stack=[],
+        stack:[T[]|IArray,number]=[] as [T[]|IArray,number],
         obj,
         obj2,
-        state,
+        state:eTreeEach|undefined,
         step:ITreeEachStep={next:1};
         
     while(true){
         if(i<arr.length){
             obj=arr[i];
             step.next=1;
-            state=fn(obj,step);
+            state=<eTreeEach|undefined>fn(obj,step);
             if(state==undefined){
                 state=0
-            }else if(state==TreeEach.c_stopEach){
+            }else if(state==eTreeEach.c_stopEach){
                 break;
             }
             obj2=arr[i];
-            if(obj2&&obj2!=obj&&!(TreeEach.c_noRepeat&state)){
-                    state=state|TreeEach.c_repeat;
+            if(obj2 && obj2!=obj && !(eTreeEach.c_noRepeat&state)){
+                    state=state|eTreeEach.c_repeat;
             }
-            if(obj2&&obj2[property]&&obj2[property].length>0&&!(state&TreeEach.c_noIn)&&property){
+            if(obj2 && obj2[propertyName] && obj2[propertyName].length>0 && !(state&eTreeEach.c_noIn)&&propertyName){
                 stack.push(arr);
-                stack.push(i+(state&TreeEach.c_repeat?0:step.next));
+                stack.push(i+(state&eTreeEach.c_repeat?0:step.next));
                 i=0;
-                arr=obj2[property];
+                arr=obj2[propertyName];
             }else{
-                i+=(state&TreeEach.c_repeat?0:step.next);
+                i+=(state&eTreeEach.c_repeat?0:step.next);
             }
         }else if(stack.length>0){
-            i=stack.pop();
-            arr=stack.pop();
+            i=<number>stack.pop();
+            arr=<T[]|IArray>stack.pop();
         }else{
             break;
         }

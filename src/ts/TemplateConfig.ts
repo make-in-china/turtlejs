@@ -6,7 +6,53 @@ class NameItem{
     }
     name:string
 }
+
+
+class BasePath{
+    private paths={};
+    push(v:string|Array<string>){
+        if(isString(v)){
+            this.parseUIPath(<string>v);    
+        }else if(isArray(v)){
+            (<Array<string>>v).length=0;
+            this.paths={};
+            for(var i=0;i<v.length;i++){
+                if(isString(v[i])){
+                    this.parseUIPath(v[i])
+                }
+            }
+        }
+    }
+    parseUIPath(s:string){
+        try{
+            var o=exec('('+s+')');
+            if(isObject(o)&&o.hasOwnProperty('name')&&o.hasOwnProperty('path')){
+                this.paths[o.name]=o;
+                this.push(o);
+            }
+        }catch(e){_catch(e);}
+    }
+    getPathBySortPath(sortPath){
+        return this.paths[sortPath].path;
+    }
+    hasSortPath(sortPath){
+        return this.paths.hasOwnProperty(sortPath);
+    }
+    toString(){
+        var arr=[];
+        for(var i in this.paths){
+            arr.push("{name:'"+this.paths[i].name+"',path:'"+this.paths[i].path+"'}")
+        }
+        return arr.join(';');
+    }
+}
 class TemplateConfig{
+    XMP={};
+    TEMPLATE={};
+    TITLE={getData:function(node:IHTMLTitleElement):string{return node.innerText;}};
+    STYLE={xmp:undefined};
+    SCRIPT={xmp:undefined};
+    TEXTAREA={xmp:undefined,getData:function(node:IHTMLTextAreaElement):string{return node.defaultValue;}};
     toString(){
         let arr=[];
         let desc:string;
@@ -46,59 +92,12 @@ class TemplateConfig{
             if(ts[i].hasOwnProperty('xmp')){
                 s+='[\\s\\S]*? +xmp';
             }
-            s+=`([\\s\\S]*?)>([\\s\\S]*?)<\\/${ts[i].name}>`;
+            s+="([\\s\\S]*?)>([\\s\\S]*?)<\\/"+ts[i].name+">";
             s+=')';
             regExes.push(s);
         }
         let re=new RegExp(regExes.join("|"),"g");//exec(`(/${regExes.join("|")}/g)`);
         return str.match(re);
-    }
-    
-    XMP={};
-    TEMPLATE={};
-    TITLE={getData:function(node:IHTMLTitleElement):string{return node.innerText;}};
-    STYLE={xmp:undefined};
-    SCRIPT={xmp:undefined};
-    TEXTAREA={xmp:undefined,getData:function(node:IHTMLTextAreaElement):string{return node.defaultValue;}};
-
-}
-
-class BasePath{
-    private paths={};
-    push(v:string|Array<string>){
-        if(isString(v)){
-            this.parseUIPath(<string>v);    
-        }else if(isArray(v)){
-            v.length=0;
-            this.paths={};
-            for(var i=0;i<v.length;i++){
-                if(isString(v[i])){
-                    this.parseUIPath(v[i])
-                }
-            }
-        }
-    }
-    parseUIPath(s:string){
-        try{
-            var o=exec('('+s+')');
-            if(isObject(o)&&o.hasOwnProperty('name')&&o.hasOwnProperty('path')){
-                this.paths[o.name]=o;
-                this.push(o);
-            }
-        }catch(e){_catch(e);}
-    }
-    getPathBySortPath(sortPath){
-        return this.paths[sortPath].path;
-    }
-    hasSortPath(sortPath){
-        return this.paths.hasOwnProperty(sortPath);
-    }
-    toString(){
-        var arr=[];
-        for(var i in this.paths){
-            arr.push("{name:'"+this.paths[i].name+"',path:'"+this.paths[i].path+"'}")
-        }
-        return arr.join(';');
     }
 }
 let templateConfig=new TemplateConfig;

@@ -112,7 +112,7 @@ class Turtle implements ITurtle{
     readyByRenderDocument:ReadyObject=new ReadyObject;
     isCompile:boolean;/**未使用 */
     get RootParts(){
-        var t=getParts(document.body.childNodes);
+        var t=getParts(<any>document.body.childNodes);
         Object.defineProperty(t,"treeDiagram",{
             get :function(){
                 var tabSpace=0;
@@ -159,7 +159,7 @@ class Turtle implements ITurtle{
     constructor(){
         rte.on("error",function(e:Event){log(e);bp();alert(e);});
         let 
-            scriptNode:IHTMLScriptElement=this.turtleScriptElement=<IHTMLScriptElement>document.scripts[document.scripts.length-1],
+            scriptNode:IHTMLScriptElement=this.turtleScriptElement=<any>document.scripts[document.scripts.length-1],
             compile=getAttr(scriptNode,'compile',null),
             load=getAttr(scriptNode,'load',null),
             script=scriptNode.innerHTML,
@@ -167,7 +167,7 @@ class Turtle implements ITurtle{
             isExtend=getAttr(scriptNode,'extend',null),
             compilename=getAttr(scriptNode,'compilename',null),
             compileuilist=getAttr(scriptNode,'compileuilist',null),
-            compileInfo;
+            compileInfo:{isOn?:boolean,url?:string};
         if(baseuipath){
             baseUIPath.push(baseuipath.split(";"));
         }else{
@@ -281,7 +281,7 @@ class Turtle implements ITurtle{
         if(this.readyByRenderDocument.isReady||(readyRE.test(document.readyState)&&document.body!==null)){
             fn();
         }else{
-            function onLoaded(){
+            let onLoaded=function (){
                 if(document.body!==null){
                     window.removeEventListener('DOMContentLoaded',onLoaded);
                     clearInterval(tid);

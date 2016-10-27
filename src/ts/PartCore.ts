@@ -142,11 +142,12 @@ function isTemplate(node:IHTMLElement):boolean{
     }
     return false;
 }
-function findTemplates(nodes){
+function findTemplates(nodes:IElement[]|IArray):IElement[]|IArray{
     let temps=[];
-    treeEach(nodes,'children',function(node:IHTMLElement){
-        if(isTemplate(node))
+    treeEach(nodes,'children',function(node){
+        if(isTemplate(node)){
             temps.push(node);
+        }
     });
     return temps;
 }
@@ -274,7 +275,7 @@ function parseGet(node,outerChildNodes,outerElement,props,part){
     if(name){
         initHTML(node.childNodes,outerChildNodes,outerElement,props,part);
         $t.store[name]=node;    
-        return TreeEach.c_noIn;
+        return eTreeEach.c_noIn;
     }
     let toRef=getAttr(node,'to-p-ref');
     if(toRef&&part){
@@ -349,7 +350,7 @@ function parseSet(node,outerChildNodes,outerElement,props,part){
         }
         takeOutChildNodes(node);
     }
-    return TreeEach.c_noIn;
+    return eTreeEach.c_noIn;
 }
 
 let includeJSFiles=(function(){
@@ -546,9 +547,9 @@ function bindNodeByCondition(node:INode,condition:string){
         cdtn=splitByOnce(condition,"|"),
         name=cdtn[0],
         arrName:string[],
-        scope,
+        scope:Scope|RootScope,
         obj,
-        exp;
+        exp:IExp;
         
     if(!name){
         return;
@@ -566,7 +567,7 @@ function bindNodeByCondition(node:INode,condition:string){
         return;
     }
     if(cdtn.length===2){
-        exp=function(v){
+        exp=<any>function(v){
             _execExpressionsByScope(cdtn[1],v,node);
         }
         exp.__me__=exp;
@@ -698,23 +699,23 @@ function initHTML(arr:INodeArray,outerChildNodes?,outerElement?,props?,part?){
             try{
                 parseComment(node,outerChildNodes,outerElement,props,part);    
             }catch(e){_catch(e)}
-            return TreeEach.c_noIn;
+            return eTreeEach.c_noIn;
         }
         if(node.nodeType!==1){
             return;
         }
         if(node.hasAttribute('async')){
             parseAsync(node,outerChildNodes,outerElement,props,part);
-            return TreeEach.c_repeat;
+            return eTreeEach.c_repeat;
         }
         if(node.hasAttribute('lazy')){
             parseLazy(node,outerChildNodes,outerElement,props,part);
-            return TreeEach.c_noIn|TreeEach.c_repeat;
+            return eTreeEach.c_noIn|eTreeEach.c_repeat;
         }
         let uiInfo=getUIInfo(node);
         if(uiInfo){
             parseUI(node,uiInfo,step,part);
-            return TreeEach.c_noIn|TreeEach.c_noRepeat;
+            return eTreeEach.c_noIn|eTreeEach.c_noRepeat;
         }
         /*if(isTemplate(node)){
             parseTemp(node);
@@ -750,7 +751,7 @@ function getParts(childNodes:INodeArray){
             return;
         }
         if(cpn!==null){
-            return TreeEach.c_noIn;
+            return eTreeEach.c_noIn;
         }
     });
     return child;

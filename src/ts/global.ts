@@ -9,6 +9,10 @@ interface ITurtle{
 
 
 
+interface IExp{
+    (...arg):any
+    __me__:IExp
+}
 
 interface INodeList {
     length: number;
@@ -17,6 +21,7 @@ interface INodeList {
 }
 type INodeArray=INodeList|ArrayEx<INode>|INode[];
 interface INode extends EventTarget {
+    valueOf():INode
     attributes?: NamedNodeMap;
     baseURI?: string;
     childNodes?: INodeList;
@@ -91,11 +96,16 @@ interface IChildNode {
     remove?(): void;
 }
 interface IElement extends INode, GlobalEventHandlers, IElementTraversal, INodeSelector, IChildNode {
+    valueOf():IElement;
     classList?: DOMTokenList;
     clientHeight?: number;
     clientLeft?: number;
     clientTop?: number;
     clientWidth?: number;
+    offsetHeight?: number;
+    offsetLeft?: number;
+    offsetTop?: number;
+    offsetWidth?: number;
     msContentZoomFactor?: number;
     msRegionOverflow?: string;
     onariarequest?: (ev: AriaRequestEvent) => any;

@@ -10,13 +10,13 @@ let
     SetParseError:IParseError  =   function(msg:string){
         SetParseError.isError=true;
         alert(msg);
-        return TreeEach.c_stopEach;
+        return eTreeEach.c_stopEach;
     },
     orderStack              =   new ArrayEx;
 SetParseError.isError=false;
 interface IParseError{
     isError?:boolean;
-    (msg:string):TreeEach;
+    (msg:string):eTreeEach;
 }
 interface ICommentOrderInfo{
     order?: any;
@@ -108,7 +108,7 @@ function parseCommentOrderBlock(node,outerChildNodes,outerElement,props,part){
     let error=function(msg){
         isError=true;
         alert(msg);
-        return TreeEach.c_stopEach;
+        return eTreeEach.c_stopEach;
     }
     return treeEach(node.parentNode.childNodes,'childNodes',function(node:INode,step){
         if(node.nodeType!=8)return;
@@ -119,18 +119,18 @@ function parseCommentOrderBlock(node,outerChildNodes,outerElement,props,part){
             if(ret){
                 step.next=ret.index-getNodeIndex2(node)+1;
             }
-            return TreeEach.c_noRepeat&TreeEach.c_noIn;
+            return eTreeEach.c_noRepeat&eTreeEach.c_noIn;
         }
         if(info.orderCase=='end'){
             if(orderStack.length>0){
                 (<IComment>orderStack.pop()).__endNode__=node;
                 
-                return TreeEach.c_stopEach;
+                return eTreeEach.c_stopEach;
             }else{
                 return error('语法错误：多余的end');
             }
         }
-        return TreeEach.c_noIn;
+        return eTreeEach.c_noIn;
     },i+1);
     
 }

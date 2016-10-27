@@ -8,14 +8,14 @@ if(!$DOM){
     $node=function(name:string,nodeType?:number):INode{
         switch(nodeType){
             case 3:
-                return document.createTextNode(name);
+                return <any>document.createTextNode(name);
 
             case 8:
-                return document.createComment(name);
+                return <any>document.createComment(name);
                 
             case 1:
             case undefined:
-                return document.createElement(name);
+                return <any>document.createElement(name);
                 
             case 10:
                 return null;
@@ -28,3 +28,9 @@ if(!$DOM){
 
 
 let turtle=$t=new Turtle();
+(function(){
+    (()=>{
+        console.log(this);
+        console.log(eval('this'));
+    })()
+}).call({})

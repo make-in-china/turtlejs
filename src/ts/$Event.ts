@@ -46,25 +46,25 @@ class $Event{
     }
 }
 class ReadyObject{
-        private _isReady=false;
-        on(fn:()=>void){
-            if(!isFunction(fn)){
-                return;
-            }
-            if(this._isReady){
-                fn();
-            }else{
-                this.readyFunctions.push(fn);
-            }
+    private _isReady=false;
+    on(fn:()=>void){
+        if(!isFunction(fn)){
+            return;
         }
-        readyFunctions:Fun[]=[];
-        get isReady(){
-            return this._isReady;
-        }
-        set isReady(v){
-            this._isReady=v;
-            while(this.readyFunctions.length>0){
-                this.readyFunctions.shift()();
-            }
+        if(this._isReady){
+            fn();
+        }else{
+            this.readyFunctions.push(fn);
         }
     }
+    readyFunctions:Fun[]=[];
+    get isReady(){
+        return this._isReady;
+    }
+    set isReady(v){
+        this._isReady=v;
+        while(this.readyFunctions.length>0){
+            this.readyFunctions.shift()();
+        }
+    }
+}
