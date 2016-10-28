@@ -1,0 +1,17 @@
+{
+  "name": "turtlejs",
+  "version": "1.0.0",
+  "description": "玄武",
+  "scripts": {
+    "tsc:w": "gulp tsc:w",
+    "tsc": "gulp tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/make-in-china/turtlejs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/make-in-china/turtlejs/issues"
+  },
+  "homepage": "https://github.com/make-in-china/turtlejs#readme"
+}

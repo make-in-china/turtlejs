@@ -1,6 +1,6 @@
 
 /// <reference path='core.ts'/>
-/// <reference path='Template.ts'/>
+/// <reference path='./part/Template.ts'/>
 /// <reference path='scope.ts'/>
 /// <reference path='Client.ts'/>
 
@@ -98,7 +98,7 @@ class Turtle implements ITurtle{
     domScope=new DOMScope;
     rootScope=new RootScope;
     config=new Config;
-    replaceClassStore:IHTMLElement[];
+    replaceClassStore:IHTMLElement[]=[];
     defineClassNames:string[];
     T:TemplateList=new TemplateList;
     parts:KeyArrayObject<Part>=newKeyArrayObject<Part>('Parts');
@@ -111,51 +111,6 @@ class Turtle implements ITurtle{
     url:string;
     readyByRenderDocument:ReadyObject=new ReadyObject;
     isCompile:boolean;/**未使用 */
-    get RootParts(){
-        var t=getParts(<any>document.body.childNodes);
-        Object.defineProperty(t,"treeDiagram",{
-            get :function(){
-                var tabSpace=0;
-                var s="";
-                for(var i=0;i<t.length;i++){
-                    s+=t[i].treeDiagram(tabSpace+2);
-                }
-                return s;
-            }
-        });
-        return t;
-    }
-    
-    emitResize(){
-        var parts=this.RootParts;
-        for(var i=0;i<parts.length;i++){
-            parts[i].emitResize();
-        }
-    }
-    renderDocument:IRenderDocument=()=>{
-        this.renderDocument.beginTime=new Date();
-        let 
-            xmps=findTemplates(document.body.children),
-            i,
-            templateXMP=[];
-        /*优先处理定义相关的模板*/
-        for(i=0;i<xmps.length;i++){
-            if(isDefine(xmps[i])){
-                parseDefine(xmps[i]);
-            }else{
-                templateXMP.push(xmps[i]);
-            }
-        }
-        /*处理逻辑模板*/
-        for(i=0;i<templateXMP.length;i++){
-            renderTemplate(templateXMP[i]);
-        }
-        
-        replaceCls();
-        
-        /*initLink();*/
-        this.renderDocument.endTime=new Date();
-    }
     constructor(){
         rte.on("error",function(e:Event){log(e);bp();alert(e);});
         let 
@@ -168,6 +123,8 @@ class Turtle implements ITurtle{
             compilename=getAttr(scriptNode,'compilename',null),
             compileuilist=getAttr(scriptNode,'compileuilist',null),
             compileInfo:{isOn?:boolean,url?:string};
+
+        //初始化组件配置
         if(baseuipath){
             baseUIPath.push(baseuipath.split(";"));
         }else{
@@ -176,6 +133,8 @@ class Turtle implements ITurtle{
         if(isExtend){
             extend(window,this.fn);
         }
+
+        //初始化预编译输出路径
         this.url=scriptNode.getAttribute("src");
         if (compile !== null){
             if(getQueryString("turtle_nocompile")!="1"){
@@ -189,6 +148,8 @@ class Turtle implements ITurtle{
             }
             this.isCompile=true;
         }
+        
+        //预加载依赖项
         if(load){
             let loads=load.split(",");
             let i=0;
@@ -218,6 +179,52 @@ class Turtle implements ITurtle{
         }
         
     }
+    
+    get rootParts(){
+        var t=getParts(<any>document.body.childNodes);
+        Object.defineProperty(t,"treeDiagram",{
+            get :function(){
+                var tabSpace=0;
+                var s="";
+                for(var i=0;i<t.length;i++){
+                    s+=t[i].treeDiagram(tabSpace+2);
+                }
+                return s;
+            }
+        });
+        return t;
+    }
+    emitResize(){
+        var parts=this.rootParts;
+        for(var i=0;i<parts.length;i++){
+            parts[i].emitResize();
+        }
+    }
+    renderDocument:IRenderDocument=()=>{
+        this.renderDocument.beginTime=new Date();
+        let 
+            xmps=findTemplates(document.body.children),
+            i,
+            templateXMP=[];
+        /*优先处理定义相关的模板*/
+        for(i=0;i<xmps.length;i++){
+            if(isDefine(xmps[i])){
+                parseDefine(xmps[i]);
+            }else{
+                templateXMP.push(xmps[i]);
+            }
+        }
+        /*处理逻辑模板*/
+        for(i=0;i<templateXMP.length;i++){
+            renderTemplate(templateXMP[i]);
+        }
+        
+        replaceCls();
+        
+        /*initLink();*/
+        this.renderDocument.endTime=new Date();
+    }
+    
     private r1(scriptNode:IHTMLScriptElement,compileuilist:string,compilename:string,compileInfo:{isOn?:boolean,url?:string},compile:string){
         this.ready(function() {
             this.compileDocument(scriptNode,compileuilist,function(html,compileJS,importScripts){
@@ -277,7 +284,7 @@ class Turtle implements ITurtle{
             this.emitResize();
         });
     }
-    ready(fn){
+    ready(fn:Fun){
         if(this.readyByRenderDocument.isReady||(readyRE.test(document.readyState)&&document.body!==null)){
             fn();
         }else{

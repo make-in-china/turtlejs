@@ -220,7 +220,7 @@ function bindNodeProperty(node:INode,proName:string,condition:string){
         obj2    =node,
         bindVar =cdtn[0],
         arrBindVar:Array<string>,
-        exp,
+        exp:IExp,
         name2   =camelCase(proName);
     if(name2.indexOf(".")!=-1){
         name2=name2.split(".");
@@ -243,7 +243,7 @@ function bindNodeProperty(node:INode,proName:string,condition:string){
         return;
     }
     if(cdtn.length==2){
-        exp=function(v){
+        exp=<any>function(v){
             obj2[name2]=_execExpressionsByScope(cdtn[1],v,node);
         }
         exp.__me__=exp;
@@ -262,7 +262,7 @@ function bindElementPropertyByName(node:IHTMLElement,elementValueName:string,con
         name=cdtn[0],
         arrName:Array<string>,
         scope,
-        exp,
+        exp:IExp,
         obj;
     if(!name)return;
     scope=$t.domScope.get(node);
@@ -279,7 +279,7 @@ function bindElementPropertyByName(node:IHTMLElement,elementValueName:string,con
     }
     
     if(cdtn.length==2){
-        exp=function(v){
+        exp=<any>function(v){
             _execExpressionsByScope(cdtn[1],v,node);
         }
         exp.__me__=exp;
@@ -337,7 +337,7 @@ function bindExpressionsByOrder(node,condition){
         obj,
         bindVar=cdtn[0],
         arrBindVar:Array<string>,
-        exp,
+        exp:IExp,
         textNode:IText=$node(' ',3);
         
     if(bindVar.indexOf(".")!=-1){
@@ -352,7 +352,7 @@ function bindExpressionsByOrder(node,condition){
         throwError('不能获取绑定属性:'+cdtn[0]);
         return;
     }
-    exp=function(v){
+    exp=<any>function(v){
         try{
             return _execExpressionsByScope.call(scope,cdtn[1],v,node);
         }catch(e){_catch(e)}
@@ -361,5 +361,5 @@ function bindExpressionsByOrder(node,condition){
     bindProperty(obj,name,exp,'__me__');
     replaceNodeByNode(node,textNode);
     bindElementProperty(exp,'__me__',textNode,'data');
-    textNode['data']=exp.__me__;
+    textNode['data']=<any>exp.__me__;
 }

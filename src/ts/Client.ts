@@ -1,4 +1,4 @@
-let $client:Client=new Client;
+let $client:Client;
 class Client{
 	private data={};
     private isListen=false;
@@ -61,3 +61,4 @@ class Client{
     }
     
 }
+$client=new Client;

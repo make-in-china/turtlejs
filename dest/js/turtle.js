@@ -103,6 +103,8 @@ var ArrayEx = (function (_super) {
     return ArrayEx;
 }(Array));
 var exec = eval, toStr = Object.prototype.toString, arrayPrototype = Array.prototype, Objectprototype = Object.prototype, slice = arrayPrototype.slice, push = arrayPrototype.push, splice = arrayPrototype.splice, getPrototypeOf = Object.getPrototypeOf, replace = String.prototype.replace, persentRE = /^\s*([\d.]+)%\s*$/, camelCaseRE = /-(\w)/g, camelizeRE = /-+(.)?/g, deCamelizeRE = /[A-Z]/g, classSplitRE = /\s+/g, addStyleRE = /;\s*$/, addClassNameRE = /\s+$/, rte = new $Event;
+Node.prototype.toDOM = Node.prototype.valueOf = function () { return this; };
+var vNodesToDOM = function (nodes) { return nodes; };
 /**
  * 压缩js后保留此函数用于console.log;
  */
@@ -566,7 +568,14 @@ function splitByOnce(s, split) {
     }
     return arr;
 }
-function treeEach(array, property, fn, beginIndex) {
+/**
+ * 遍历树
+ * @param {T[]|IArray} array 数组或类数组
+ * @param {string} propertyName 数组元素包含的属性名
+ * @param {(node:T,step?:ITreeEachStep)=>eTreeEach|undefined} fn 回调函数
+ * @param {number} beginIndex 遍历起始位置
+ */
+function treeEach(array, propertyName, fn, beginIndex) {
     if (beginIndex === void 0) { beginIndex = 0; }
     if (!isArrayLike(array)) {
         return;
@@ -587,11 +596,11 @@ function treeEach(array, property, fn, beginIndex) {
             if (obj2 && obj2 != obj && !(8 /* c_noRepeat */ & state)) {
                 state = state | 2 /* c_repeat */;
             }
-            if (obj2 && obj2[property] && obj2[property].length > 0 && !(state & 4 /* c_noIn */) && property) {
+            if (obj2 && obj2[propertyName] && obj2[propertyName].length > 0 && !(state & 4 /* c_noIn */) && propertyName) {
                 stack.push(arr);
                 stack.push(i + (state & 2 /* c_repeat */ ? 0 : step.next));
                 i = 0;
-                arr = obj2[property];
+                arr = obj2[propertyName];
             }
             else {
                 i += (state & 2 /* c_repeat */ ? 0 : step.next);
@@ -667,6 +676,39 @@ function defineClassList(object) {
         }
     });
 }
+var isIE = !!window.ActiveXObject || "ActiveXObject" in window;
+(function () {
+    var insertBefore = Node.prototype.insertBefore;
+    if (isIE) {
+        Node.prototype.insertBefore2 = function (newNode, node) {
+            var reAppend = [];
+            var n;
+            switch (newNode.nodeType) {
+                case 3:
+                    if (newNode.data === "") {
+                        return;
+                    }
+                case 8:
+                    n = node.nextSibling;
+                    while (n !== null) {
+                        reAppend.push(this.removeChild(n));
+                        n = node.nextSibling;
+                    }
+                    reAppend.unshift(this.removeChild(node));
+                    this.appendChild(newNode);
+                    for (var i = 0; i < reAppend.length; i++) {
+                        this.appendChild(reAppend[i]);
+                    }
+                    break;
+                default:
+                    insertBefore.call(this, newNode, node);
+            }
+        };
+    }
+    else {
+        Node.prototype.insertBefore2 = insertBefore;
+    }
+})();
 var withthis = 'with(this){return eval($$turtle$$)};' /*eval支持返回最后一个表达式的值*/, _execValueByScope = Function('$$turtle$$,v,node,outer,outerElement,props,part', withthis), _execByScope = Function('$$turtle$$,node,outer,outerElement,props,part', withthis), _execExpressionsByScope = Function('$$turtle$$,v,node', withthis);
 function execValueByScope(node, s, v, scope, outerChildNodes, outerElement, props, part) {
     return _execValueByScope.call(getScopeBy(scope, node), s, v, node, outerChildNodes, outerElement, props, part);
@@ -1011,12 +1053,55 @@ function bindExpressionsByOrder(node, condition) {
     bindElementProperty(exp, '__me__', textNode, 'data');
     textNode['data'] = exp.__me__;
 }
-/// <reference path='core.ts'/>
+/// <reference path='../core.ts'/>
 var NameItem = (function () {
     function NameItem(name) {
         this.name = name;
     }
     return NameItem;
+}());
+var BasePath = (function () {
+    function BasePath() {
+        this.paths = {};
+    }
+    BasePath.prototype.push = function (v) {
+        if (isString(v)) {
+            this.parseUIPath(v);
+        }
+        else if (isArray(v)) {
+            for (var i = 0; i < v.length; i++) {
+                if (isString(v[i])) {
+                    this.parseUIPath(v[i]);
+                }
+            }
+        }
+    };
+    BasePath.prototype.parseUIPath = function (s) {
+        try {
+            var o = exec('(' + s + ')');
+            if (isObject(o) && o.hasOwnProperty('name') && o.hasOwnProperty('path')) {
+                this.paths[o.name] = o;
+                this.push(o);
+            }
+        }
+        catch (e) {
+            _catch(e);
+        }
+    };
+    BasePath.prototype.getPathBySortPath = function (sortPath) {
+        return this.paths[sortPath].path;
+    };
+    BasePath.prototype.hasSortPath = function (sortPath) {
+        return this.paths.hasOwnProperty(sortPath);
+    };
+    BasePath.prototype.toString = function () {
+        var arr = [];
+        for (var i in this.paths) {
+            arr.push("{name:'" + this.paths[i].name + "',path:'" + this.paths[i].path + "'}");
+        }
+        return arr.join(';');
+    };
+    return BasePath;
 }());
 var TemplateConfig = (function () {
     function TemplateConfig() {
@@ -1079,56 +1164,11 @@ var TemplateConfig = (function () {
     };
     return TemplateConfig;
 }());
-var BasePath = (function () {
-    function BasePath() {
-        this.paths = {};
-    }
-    BasePath.prototype.push = function (v) {
-        if (isString(v)) {
-            this.parseUIPath(v);
-        }
-        else if (isArray(v)) {
-            v.length = 0;
-            this.paths = {};
-            for (var i = 0; i < v.length; i++) {
-                if (isString(v[i])) {
-                    this.parseUIPath(v[i]);
-                }
-            }
-        }
-    };
-    BasePath.prototype.parseUIPath = function (s) {
-        try {
-            var o = exec('(' + s + ')');
-            if (isObject(o) && o.hasOwnProperty('name') && o.hasOwnProperty('path')) {
-                this.paths[o.name] = o;
-                this.push(o);
-            }
-        }
-        catch (e) {
-            _catch(e);
-        }
-    };
-    BasePath.prototype.getPathBySortPath = function (sortPath) {
-        return this.paths[sortPath].path;
-    };
-    BasePath.prototype.hasSortPath = function (sortPath) {
-        return this.paths.hasOwnProperty(sortPath);
-    };
-    BasePath.prototype.toString = function () {
-        var arr = [];
-        for (var i in this.paths) {
-            arr.push("{name:'" + this.paths[i].name + "',path:'" + this.paths[i].path + "'}");
-        }
-        return arr.join(';');
-    };
-    return BasePath;
-}());
 var templateConfig = new TemplateConfig;
 var baseUIPath = new BasePath;
-/// <reference path="core.ts"/>
-/// <reference path="Execute.ts"/>
-/// <reference path="bind.ts"/>
+/// <reference path="../core.ts"/>
+/// <reference path="../Execute.ts"/>
+/// <reference path="../bind.ts"/>
 var orderRE = /^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|let|=)(\s|$)/g, orderCaseRE = /^\s?(else if|else|case break|case|default|end)(\s|$)/g, parseForOrderRE = /[a-zA-Z\d] in .*/, parseForOrderRE2 = /^.*;.*;.*$/, SetParseError = function (msg) {
     SetParseError.isError = true;
     alert(msg);
@@ -1663,13 +1703,13 @@ var XHR = (function () {
     };
     return XHR;
 }());
-/// <reference path="global.ts"/>
-/// <reference path="core.ts"/>
-/// <reference path="Execute.ts"/>
-/// <reference path="bind.ts"/>
+/// <reference path="../global.ts"/>
+/// <reference path="../core.ts"/>
+/// <reference path="../Execute.ts"/>
+/// <reference path="../bind.ts"/>
 /// <reference path='TemplateConfig.ts'/>
 /// <reference path='PartOrderCore.ts'/>
-/// <reference path='XHR.ts'/>
+/// <reference path='../XHR.ts'/>
 var $DOM, $node, operatorRE = /\!=|==|=|<|>|\|/;
 function getScopeBy(scope, node) {
     if (!scope)
@@ -1805,8 +1845,9 @@ function isTemplate(node) {
 function findTemplates(nodes) {
     var temps = [];
     treeEach(nodes, 'children', function (node) {
-        if (isTemplate(node))
+        if (isTemplate(node)) {
             temps.push(node);
+        }
     });
     return temps;
 }
@@ -2434,7 +2475,7 @@ function nodesToString(nodes) {
     }
     return s;
 }
-/// <reference path='core.ts'/>
+/// <reference path='../core.ts'/>
 /// <reference path='PartCore.ts'/>
 var memberRE = /{([\-a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g;
 var colorRE = /^\s*((#[\dabcdefABCDEF]{3,6})|(rgba\(.*\)))\s*$/;
@@ -2545,6 +2586,95 @@ var PartParam = (function () {
         this.limitValue = limitValue;
     }
     return PartParam;
+}());
+var PartBase = (function () {
+    function PartBase(template, extPart, props, html, outerChildNodes, outerElement) {
+        this.template = template;
+        this.props = props;
+        this.store = [];
+        this.$ = new Service(template.service);
+        this.partName = template.partName;
+        if (extPart) {
+            /**继承 */
+            this.__proto__ = extPart;
+        }
+        this.super = extPart;
+        var dom = $DOM(html);
+        var nodes = dom.childNodes;
+        initHTML(nodes, outerChildNodes, outerElement, props, this);
+        for (var i = nodes.length; i > 0; i--) {
+            this.store.push(dom.removeChild(nodes[0]));
+        }
+    }
+    Object.defineProperty(PartBase.prototype, "child", {
+        get: function () {
+            return getParts(this.elements);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PartBase.prototype, "elements", {
+        get: function () { return []; },
+        enumerable: true,
+        configurable: true
+    });
+    PartBase.prototype.emitResize = function () {
+        try {
+            if (!this.isInsert) {
+                return;
+            }
+            if (this.onresize) {
+                if (this.onresize()) {
+                    return;
+                }
+            }
+            var cs = this.child;
+            for (var i = 0; i < cs.length; i++) {
+                cs[i].emitResize();
+            }
+        }
+        catch (e) {
+            _catch(e);
+        }
+    };
+    PartBase.prototype.onSetSize = function (rect) {
+        if (this.partMain) {
+            var style = this.partMain.style;
+            style.left = rect.left + 'px';
+            style.top = rect.top + 'px';
+            style.width = rect.width + 'px';
+            style.height = rect.height + 'px';
+            style.boxSizing = 'border-box';
+            this.emitResize();
+        }
+    };
+    PartBase.prototype.getSuper = function (name) {
+        if (this.super) {
+            if (this.super.template.name === name) {
+                return this.super;
+            }
+            else {
+                return this.super.getSuper(name);
+            }
+        }
+    };
+    PartBase.prototype.emitInit = function (finalPart) {
+        if (this.super) {
+            this.super.emitInit(finalPart);
+        }
+        if (isFunction(this.oninit)) {
+            this.oninit(finalPart);
+        }
+    };
+    PartBase.prototype.setSize = function (rect) {
+        if (this.onSetSize) {
+            return this.onSetSize(rect);
+        }
+        if (this.super) {
+            this.super.setSize(rect);
+        }
+    };
+    return PartBase;
 }());
 var Part = (function (_super) {
     __extends(Part, _super);
@@ -2741,7 +2871,7 @@ var Part = (function (_super) {
             /*cut scope*/
             var scopeNodes = this.scopeNodes;
             for (var i = 0; i < scopeNodes.length; i++) {
-                $t.domScope.cut(scopeNodes[i].scope);
+                $t.domScope.unlink(scopeNodes[i].scope);
             }
             appendNodes(elems, elem);
             /*link scope*/
@@ -2773,7 +2903,7 @@ var Part = (function (_super) {
             /*cut scope*/
             var scopeNodes = this.scopeNodes;
             for (var i = 0; i < scopeNodes.length; i++) {
-                $t.domScope.cut(scopeNodes[i].scope);
+                $t.domScope.unlink(scopeNodes[i].scope);
             }
             insertNodesBefore(elem, elems);
             /*link scope*/
@@ -2805,7 +2935,7 @@ var Part = (function (_super) {
             var scopeNodes = this.scopeNodes;
             /*cut scope*/
             for (var i = 0; i < scopeNodes.length; i++) {
-                $t.domScope.cut(scopeNodes[i].scope);
+                $t.domScope.unlink(scopeNodes[i].scope);
             }
             var p = this.begin.parentNode;
             if (p !== null) {
@@ -2839,94 +2969,6 @@ var Part = (function (_super) {
     });
     return Part;
 }(PartBase));
-var PartBase = (function () {
-    function PartBase(template, extPart, props, html, outerChildNodes, outerElement) {
-        this.template = template;
-        this.props = props;
-        this.$ = new Service(template.service);
-        this.partName = template.partName;
-        if (extPart) {
-            /**继承 */
-            this.__proto__ = extPart;
-        }
-        this.super = extPart;
-        var dom = $DOM(html);
-        var nodes = dom.childNodes;
-        initHTML(nodes, outerChildNodes, outerElement, props, this);
-        for (var i = nodes.length; i > 0; i--) {
-            this.store.push(dom.removeChild(nodes[0]));
-        }
-    }
-    Object.defineProperty(PartBase.prototype, "child", {
-        get: function () {
-            return getParts(this.elements);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(PartBase.prototype, "elements", {
-        get: function () { return []; },
-        enumerable: true,
-        configurable: true
-    });
-    PartBase.prototype.emitResize = function () {
-        try {
-            if (!this.isInsert) {
-                return;
-            }
-            if (this.onresize) {
-                if (this.onresize()) {
-                    return;
-                }
-            }
-            var cs = this.child;
-            for (var i = 0; i < cs.length; i++) {
-                cs[i].emitResize();
-            }
-        }
-        catch (e) {
-            _catch(e);
-        }
-    };
-    PartBase.prototype.onSetSize = function (rect) {
-        if (this.partMain) {
-            var style = this.partMain.style;
-            style.left = rect.left + 'px';
-            style.top = rect.top + 'px';
-            style.width = rect.width + 'px';
-            style.height = rect.height + 'px';
-            style.boxSizing = 'border-box';
-            this.emitResize();
-        }
-    };
-    PartBase.prototype.getSuper = function (name) {
-        if (this.super) {
-            if (this.super.template.name === name) {
-                return this.super;
-            }
-            else {
-                return this.super.getSuper(name);
-            }
-        }
-    };
-    PartBase.prototype.emitInit = function (finalPart) {
-        if (this.super) {
-            this.super.emitInit(finalPart);
-        }
-        if (isFunction(this.oninit)) {
-            this.oninit(finalPart);
-        }
-    };
-    PartBase.prototype.setSize = function (rect) {
-        if (this.onSetSize) {
-            return this.onSetSize(rect);
-        }
-        if (this.super) {
-            this.super.setSize(rect);
-        }
-    };
-    return PartBase;
-}());
 var ExtendsPart = (function (_super) {
     __extends(ExtendsPart, _super);
     function ExtendsPart(template, extPart, props, html, outerChildNodes, outerElement) {
@@ -2953,69 +2995,68 @@ var PartTemplate = (function () {
         this.path = path;
         this.Instance = new ArrayEx();
         this.isJSDefine = true;
+        this.parts = [];
         this.partName = name.replace(/[\.]/g, "_");
         if (isObject(s)) {
-            if (isObject(s)) {
-                var obj = s;
-                if (!isArray(obj.params)) {
-                    this.params = new ArrayEx();
+            var obj = s;
+            if (!isArray(obj.params)) {
+                this.params = new ArrayEx();
+            }
+            else {
+                this.params = obj.params;
+            }
+            if (!isArray(obj.datas)) {
+                this.datas = new ArrayEx();
+            }
+            else {
+                this.datas = obj.datas;
+            }
+            if (isObject(obj.extends)) {
+                this.extends = obj.extends;
+            }
+            if (isObject(obj.service)) {
+                if (!(obj.service instanceof Service)) {
+                    this.service = new Service(obj.service);
                 }
                 else {
-                    this.params = obj.params;
-                }
-                if (!isArray(obj.datas)) {
-                    this.datas = new ArrayEx();
-                }
-                else {
-                    this.datas = obj.datas;
-                }
-                if (isObject(obj.extends)) {
-                    this.extends = obj.extends;
-                }
-                if (isObject(obj.service)) {
-                    if (!(obj.service instanceof Service)) {
-                        this.service = new Service(obj.service);
-                    }
-                    else {
-                        this.service = obj.service;
-                    }
-                }
-                else {
-                    this.service = new Service();
+                    this.service = obj.service;
                 }
             }
             else {
-                this.params = new ArrayEx();
-                this.datas = new ArrayEx();
-                this.isJSDefine = false;
                 this.service = new Service();
-                if (ext) {
-                    this.extends = ext;
-                }
-                var start_1 = 0, idx_1 = 0, str = s;
-                str.replace(memberRE, function (s0, name, s1, dft, s2, s3, limit, s4, s5, s6, filter, filterParam, index, sSource) {
-                    var hasDefault;
-                    if (s1 === "!") {
-                        if (s1 !== s3) {
-                            dft = limit;
-                            limit = "";
-                        }
-                        hasDefault = true;
-                    }
-                    else {
-                        hasDefault = false;
-                    }
-                    if (filterParam) {
-                        filterParam = filterParam.substring(1, filterParam.length - 1);
-                    }
-                    idx_1++;
-                    this.params.push(new PartParam(name, hasDefault, filter, filterParam, dft, limit));
-                    this.datas.push(sSource.substring(start_1, index));
-                    start_1 = index + s0.length;
-                    return '';
-                });
-                this.datas.push(str.substring(start_1, str.length));
             }
+        }
+        else {
+            this.params = new ArrayEx();
+            this.datas = new ArrayEx();
+            this.isJSDefine = false;
+            this.service = new Service();
+            if (ext) {
+                this.extends = ext;
+            }
+            var start_1 = 0, idx_1 = 0, str = s;
+            str.replace(memberRE, function (s0, name, s1, dft, s2, s3, limit, s4, s5, s6, filter, filterParam, index, sSource) {
+                var hasDefault;
+                if (s1 === "!") {
+                    if (s1 !== s3) {
+                        dft = limit;
+                        limit = "";
+                    }
+                    hasDefault = true;
+                }
+                else {
+                    hasDefault = false;
+                }
+                if (filterParam) {
+                    filterParam = filterParam.substring(1, filterParam.length - 1);
+                }
+                idx_1++;
+                this.params.push(new PartParam(name, hasDefault, filter, filterParam, dft, limit));
+                this.datas.push(sSource.substring(start_1, index));
+                start_1 = index + s0.length;
+                return '';
+            });
+            this.datas.push(str.substring(start_1, str.length));
         }
     }
     /*调用render*/
@@ -3048,7 +3089,9 @@ var PartTemplate = (function () {
         }
         return this.render(uiNode, elem, outerChildNodes, outerElement, props, part, partName, reExtends);
     };
-    /*渲染dom*/
+    /**
+     * 渲染dom
+     */
     PartTemplate.prototype.render = function (uiNode, that, outerChildNodes, outerElement, props, part, refPartName, reExtends) {
         var ext, attrs, len, html;
         if (!isObject(props)) {
@@ -3095,7 +3138,9 @@ var PartTemplate = (function () {
         }
         return newPart;
     };
-    /*由props构建html字符串*/
+    /**由props构建html字符串
+     * @param {} props
+     * */
     PartTemplate.prototype.joinDatasByProps = function (props) {
         var err = [];
         var d = slice.call(this.datas);
@@ -3309,6 +3354,11 @@ var DOMScope = (function () {
     function DOMScope() {
         this.stack = [$rootScope];
     }
+    /**
+     * 在dom节点上创建变量作用域对象
+     * @param {INode} node - dom节点
+     * @param {string} name - 名称
+     */
     DOMScope.prototype.create = function (node, name) {
         var scope = this.get(node);
         if (node.parentNode !== scope.__actionNode__) {
@@ -3320,23 +3370,37 @@ var DOMScope = (function () {
         }
         return scope;
     };
+    /**
+     * 获取变量作用域对象
+     * @param {INode} node - dom节点
+     */
     DOMScope.prototype.get = function (node) {
-        if (!node)
+        if (!node) {
             return $rootScope;
+        }
         while (node != null) {
-            if (node.scope) {
-                return node.scope;
+            if (node.__scope__) {
+                return node.__scope__;
             }
             node = node.parentNode;
         }
         return $rootScope;
     };
-    DOMScope.prototype.cut = function (scope) {
+    /**
+     * 切断dom节点和变量作用域对象的链接
+     * @param {Scope} scopeVarObject - 变量作用域对象
+     */
+    DOMScope.prototype.unlink = function (scope) {
         var p = scope.__parent__;
         scope.__parent__ = null;
         removeItem(p.__children__, scope);
-        delete p[scope.name];
+        delete p[scope.__name__];
     };
+    /**
+     * 链接dom节点和变量作用域对象
+     * @param {Scope} scopeVarObject - 变量作用域对象
+     * @param {INode} node - dom节点
+     */
     DOMScope.prototype.link = function (scope, node) {
         var p = $t.domScope.get(node);
         if (!p) {
@@ -3344,13 +3408,13 @@ var DOMScope = (function () {
         }
         scope.__parent__ = p;
         p.__children__.push(scope);
-        if (name) {
-            p[name] = scope;
+        if (scope.__name__) {
+            p[scope.__name__] = scope;
         }
     };
     return DOMScope;
 }());
-var $client = new Client;
+var $client;
 var Client = (function () {
     function Client() {
         this.data = {};
@@ -3410,8 +3474,9 @@ var Client = (function () {
     };
     return Client;
 }());
+$client = new Client;
 /// <reference path='core.ts'/>
-/// <reference path='Template.ts'/>
+/// <reference path='./part/Template.ts'/>
 /// <reference path='scope.ts'/>
 /// <reference path='Client.ts'/>
 var readyRE = /complete|loaded|interactive/;
@@ -3504,6 +3569,7 @@ var Turtle = (function () {
         this.domScope = new DOMScope;
         this.rootScope = new RootScope;
         this.config = new Config;
+        this.replaceClassStore = [];
         this.T = new TemplateList;
         this.parts = newKeyArrayObject('Parts');
         this.xhr = new XHR;
@@ -3534,6 +3600,7 @@ var Turtle = (function () {
         };
         rte.on("error", function (e) { log(e); bp(); alert(e); });
         var scriptNode = this.turtleScriptElement = document.scripts[document.scripts.length - 1], compile = getAttr(scriptNode, 'compile', null), load = getAttr(scriptNode, 'load', null), script = scriptNode.innerHTML, baseuipath = getAttr(scriptNode, 'baseuipath', null), isExtend = getAttr(scriptNode, 'extend', null), compilename = getAttr(scriptNode, 'compilename', null), compileuilist = getAttr(scriptNode, 'compileuilist', null), compileInfo;
+        //初始化组件配置
         if (baseuipath) {
             baseUIPath.push(baseuipath.split(";"));
         }
@@ -3543,6 +3610,7 @@ var Turtle = (function () {
         if (isExtend) {
             extend(window, this.fn);
         }
+        //初始化预编译输出路径
         this.url = scriptNode.getAttribute("src");
         if (compile !== null) {
             if (getQueryString("turtle_nocompile") != "1") {
@@ -3557,6 +3625,7 @@ var Turtle = (function () {
             }
             this.isCompile = true;
         }
+        //预加载依赖项
         if (load) {
             var loads_1 = load.split(",");
             var i_1 = 0;
@@ -3588,7 +3657,7 @@ var Turtle = (function () {
             execScript(scriptNode);
         }
     }
-    Object.defineProperty(Turtle.prototype, "RootParts", {
+    Object.defineProperty(Turtle.prototype, "rootParts", {
         get: function () {
             var t = getParts(document.body.childNodes);
             Object.defineProperty(t, "treeDiagram", {
@@ -3607,7 +3676,7 @@ var Turtle = (function () {
         configurable: true
     });
     Turtle.prototype.emitResize = function () {
-        var parts = this.RootParts;
+        var parts = this.rootParts;
         for (var i = 0; i < parts.length; i++) {
             parts[i].emitResize();
         }
@@ -3676,21 +3745,21 @@ var Turtle = (function () {
             fn();
         }
         else {
-            function onLoaded() {
+            var onLoaded_1 = function () {
                 if (document.body !== null) {
-                    window.removeEventListener('DOMContentLoaded', onLoaded);
+                    window.removeEventListener('DOMContentLoaded', onLoaded_1);
                     clearInterval(tid);
                     fn();
                 }
-            }
+            };
             var tid = setInterval(function () {
                 if (_this.readyByRenderDocument.isReady || (readyRE.test(document.readyState) && document.body !== null)) {
                     clearInterval(tid);
-                    window.removeEventListener('DOMContentLoaded', onLoaded);
+                    window.removeEventListener('DOMContentLoaded', onLoaded_1);
                     fn();
                 }
             }, 10);
-            window.addEventListener('DOMContentLoaded', onLoaded, false);
+            window.addEventListener('DOMContentLoaded', onLoaded_1, false);
         }
         return this;
     };
@@ -3721,10 +3790,3 @@ if (!$DOM) {
     };
 }
 var turtle = $t = new Turtle();
-(function () {
-    var _this = this;
-    (function () {
-        console.log(_this);
-        console.log(eval('this'));
-    })();
-}).call({});

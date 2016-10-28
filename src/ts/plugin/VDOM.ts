@@ -493,22 +493,19 @@ interface IMember{
 }());
 
 
-    $VDOM=VDOM;
-    $VNode=newVNode;
-    if(mode===1){
-        /*
-            * 虚拟DOM
-            */
-        $DOM=VDOM;
-        $node=newVNode;
-        vNodesToDOM=function(vNodes){
-            var arr=[];
-            for(var i=0;i<vNodes.length;i++){
-                arr.push(vNodes[i].toDOM());    
-            }
-            return arr;
-        }
-    }else{
-
-    Node.prototype.toDOM=Node.prototype.valueOf=function(){return this}
-    vNodesToDOM=function(nodes){return nodes}
+    // $VDOM=VDOM;
+    // $VNode=newVNode;
+    // if(mode===1){
+    //     /*
+    //         * 虚拟DOM
+    //         */
+    //     $DOM=VDOM;
+    //     $node=newVNode;
+    //     vNodesToDOM=function(vNodes){
+    //         var arr=[];
+    //         for(var i=0;i<vNodes.length;i++){
+    //             arr.push(vNodes[i].toDOM());    
+    //         }
+    //         return arr;
+    //     }
+    // }else{

@@ -28,9 +28,3 @@ if(!$DOM){
 
 
 let turtle=$t=new Turtle();
-(function(){
-    (()=>{
-        console.log(this);
-        console.log(eval('this'));
-    })()
-}).call({})
