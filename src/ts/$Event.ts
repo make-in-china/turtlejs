@@ -39,7 +39,7 @@ class $Event{
             }
         }
     }
-    events(name:string):Array<Fun>{
+    events(name:string):Array<Function>|undefined{
         if(this.eventsCol.hasOwnProperty(name)){
             return this.eventsCol[name];
         }
@@ -64,7 +64,7 @@ class ReadyObject{
     set isReady(v){
         this._isReady=v;
         while(this.readyFunctions.length>0){
-            this.readyFunctions.shift()();
+            (<Function>this.readyFunctions.shift())();
         }
     }
 }

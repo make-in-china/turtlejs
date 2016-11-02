@@ -1,7 +1,7 @@
 
 
 class XHR{
-    private send(type:'POST'|'GET',url:string,data:string,async:boolean,fn:(s:string)=>void,fnerror?:Fun){
+    private send(type:'POST'|'GET',url:string,data:string|undefined,async:boolean,fn:(s:string)=>void,fnerror?:(this: XMLHttpRequest, ev?: ErrorEvent) => any){
         var xhr=new XMLHttpRequest();
         xhr.open(type,url,!!async);
         xhr.onreadystatechange = function() {
@@ -14,7 +14,7 @@ class XHR{
             }
         }
         type=='POST' && xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xhr.onerror=fnerror;
+        xhr.onerror=<any>fnerror;
         xhr.send(data);
     }
     get(url:string,async:boolean,fn:(s:string)=>void,fnerror?:Fun){

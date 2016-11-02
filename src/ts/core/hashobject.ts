@@ -1,7 +1,7 @@
 
 
 class ArrayEx<T> extends Array<T>{
-    last():T{
+    last():T|undefined{
         if(this.length>0){
             return this[this.length-1];
         }
@@ -26,7 +26,7 @@ class HashObjectManage<T> {
             }
         }
     }
-    static take<T>(data:IHashObject<T>,name:string):T{
+    static take<T>(data:IHashObject<T>,name:string):T|null{
         if(data.hasOwnProperty(name)){
             let ret:T=data[name];
             delete this[name];
@@ -52,7 +52,7 @@ class KeyArrayHashObjectManage{
             }
         }
     }
-    static take<T>(data:IKeyArrayHashObject<T>,name:string):ArrayEx<T>{
+    static take<T>(data:IKeyArrayHashObject<T>,name:string):ArrayEx<T>|null{
         if(data.hasOwnProperty(name)){
             let ret:ArrayEx<T>=data[name];
             delete this[name];

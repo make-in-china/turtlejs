@@ -50,17 +50,20 @@ function getQueryString(name:string):string|null{
     }
     return null;
 }
+interface String{
+    match(regexp: RegExp): RegExpMatchArray;
+}
 let getNameByURL=(function(){
     let RE1=/[a-zA-Z\d\._]+\.[a-zA-Z\d]+$/;
     let RE2=/\.[a-zA-Z\d]+$/;
-    return function (url:string){
+    return function (url:string):string{
         return url.match(RE1)[0].replace(RE2,'');
     }
 }());
 let getFileNameByURL=(function(){
-    let RE1=/[a-zA-Z\d\._]+\.[a-zA-Z\d]+$/;
-    return function (url:string){
-        return url.match(RE1)[0];
+    let RE=/[a-zA-Z\d\._]+\.[a-zA-Z\d]+$/;
+    return function (url:string):string{
+        return url.match(RE)[0];
     }
 }());
 function appendQueryString(name,value){
@@ -71,48 +74,52 @@ function appendQueryString(name,value){
     }
 }
 class Turtle implements ITurtle{
-    domScope=new DOMScope;
-    rootScope=new RootScope;
-    config=new Config;
-    replaceClassStore:IHTMLElement[]=[];
+    domScope                                =new DOMScope
+    rootScope                               =new RootScope
+    config                                  =new Config
+    T:TemplateList                          =new TemplateList
+    xhr                                     =new XHR
+    service                                 =new Service
+    store                                   =new Store
+    readyByRenderDocument:ReadyObject       =new ReadyObject
+    parts:IKeyArrayHashObject<Part>         ={}
+    refs:IKeyArrayHashObject<IHTMLElement>  ={}
+    // private fn                              ={}
+    replaceClassStore:IHTMLElement[]        =[]
     defineClassNames:string[];
-    T:TemplateList=new TemplateList;
-    parts:IKeyArrayHashObject<Part>={};
-    xhr=new XHR;
-    service=new Service;
-    store=new Store;
-    refs:IKeyArrayHashObject<IHTMLElement>={};
-    fn={}
-    turtleScriptElement:IHTMLScriptElement;
-    url:string;
-    readyByRenderDocument:ReadyObject=new ReadyObject;
+    turtleScriptElement:IHTMLScriptElement
+    url:string
     isCompile:boolean;/**未使用 */
     constructor(){
-        rte.on("error",function(e:Event){log(e);bp();alert(e);});
+        rte.on("error",function(e:Event){
+            log(e);
+            bp();
+            alert(e);
+        });
         let 
-            scriptNode:IHTMLScriptElement=this.turtleScriptElement=<IHTMLScriptElement><any>document.scripts[document.scripts.length-1],
-            compile=getAttr(scriptNode,'compile',null),
-            load=getAttr(scriptNode,'load',null),
-            script:string=<string>scriptNode.innerHTML,
-            baseuipath=getAttr(scriptNode,'baseuipath',null),
-            isExtend=getAttr(scriptNode,'extend',null),
-            compilename=getAttr(scriptNode,'compilename',null),
-            compileuilist=getAttr(scriptNode,'compileuilist',null),
+            scriptNode                                              =this.getScriptNode(),
+            compile                                                 =getAttr(scriptNode,'compile',""),
+            load                                                    =getAttr(scriptNode,'load',null),
+            baseuipath                                              =getAttr(scriptNode,'baseuipath',null),
+            // isExtend                                                =getAttr(scriptNode,'extend',null),
+            compileName                                             =getAttr(scriptNode,'compilename',""),
+            compileuilist                                           =getAttr(scriptNode,'compileuilist',null),
+            script                                                  =<string>scriptNode.innerHTML,
             compileInfo:{isOn?:boolean,url?:string}|undefined;
 
+        this.turtleScriptElement=scriptNode;
         //初始化组件配置
         if(baseuipath){
             baseUIPath.push(baseuipath.split(";"));
         }else{
             baseUIPath.push('{path:"ui",name:"ui"}');
         }
-        if(isExtend){
-            extend(window,this.fn);
-        }
-
+        // if(isExtend){
+        //     extend(window,this.fn);
+        // }
         //初始化预编译输出路径
         this.url=scriptNode.getAttribute("src");
-        if (compile !== null){
+        if (compile !== ""){
             if(getQueryString("turtle_nocompile")!="1"){
                 this.xhr.get(scriptNode.src+'.setup',false,function(text){
                     try{
@@ -135,7 +142,7 @@ class Turtle implements ITurtle{
                     includeJSFiles(loads[i],fnLoad);
                 }else{
                     if(compileInfo && compileInfo.isOn && compileInfo.url){
-                        this.r1(scriptNode,compileuilist,compilename,compileInfo,compile);
+                        this.r1(scriptNode,compileuilist,compileName,compileInfo,compile);
                     }else{
                         this.r2();
                     }
@@ -144,7 +151,7 @@ class Turtle implements ITurtle{
             includeJSFiles(loads[0],fnLoad);
         }else{
             if(compileInfo && compileInfo.isOn && compileInfo.url){
-                this.r1(scriptNode,compileuilist,compilename,compileInfo,compile);
+                this.r1(scriptNode,compileuilist,compileName,compileInfo,compile);
             }else{
                 this.r2();
             }
@@ -155,7 +162,9 @@ class Turtle implements ITurtle{
         }
         
     }
-    
+    private getScriptNode():IHTMLScriptElement{
+        return <any>document.scripts[document.scripts.length-1];
+    }
     get rootParts(){
         var t=getParts(<any>document.body.childNodes);
         Object.defineProperty(t,"treeDiagram",{
@@ -201,17 +210,17 @@ class Turtle implements ITurtle{
         this.renderDocument.endTime=new Date();
     }
     
-    private r1(scriptNode:IHTMLScriptElement,compileuilist:string,compilename:string,compileInfo:{isOn?:boolean,url?:string},compile:string){
+    private r1(scriptNode:IHTMLScriptElement,compileuilist:string|null,compileName:string,compileInfo:{isOn?:boolean,url?:string},compile:string){
         this.ready(function() {
             this.compileDocument(scriptNode,compileuilist,function(html,compileJS,importScripts){
-                if(!compilename){
-                    compilename=getNameByURL(getFileNameByURL(location.href));
-                    if(/\./.test(compilename)){
-                        compilename=compilename.split('.')[0];
+                if(compileName===""){
+                    compileName=getNameByURL(getFileNameByURL(location.href));
+                    if(/\./.test(compileName)){
+                        compileName=compileName.split('.')[0];
                     }
-                    console.log('未提供compilename，自动设置为“'+compilename+'”');
+                    console.log('未提供compileName，自动设置为“'+compileName+'”');
                 }
-                let url = compileInfo.url + "?htmlName=" + compilename;
+                let url = compileInfo.url + "?htmlName=" + compileName;
                 
                 let b=document.body;
                 b.innerHTML='<div style="background-color:#fff;position:absolute;left:0;right:0;bottom:0;top:0;">开始编译页面</div>';

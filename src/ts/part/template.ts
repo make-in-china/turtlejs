@@ -161,7 +161,7 @@ class PartBase{
     }
     onSetSize(rect){
         if(this.partMain){
-            let style=this.partMain.style;
+            let style:CSSStyleDeclaration=<any>this.partMain.style;
             style.left=rect.left+'px';
             style.top=rect.top+'px';
             style.width=rect.width+'px';
@@ -209,8 +209,8 @@ class Part extends PartBase{
         let name=template.name;
         
         let dom=$DOM(html);
-        let begin:IComment=this.begin=$node(name,8);// document.createComment('<'+name+'>');
-        let end:IComment=this.end=$node('/'+name,8);//document.createComment('</'+name+'>')
+        let begin:IComment=this.begin=<any>$node(name,8);// document.createComment('<'+name+'>');
+        let end:IComment=this.end=<any>$node('/'+name,8);//document.createComment('</'+name+'>')
         end.__part__=begin.__part__=this;
         begin.__sign__=1;
         end.__sign__=0;
@@ -307,7 +307,7 @@ class Part extends PartBase{
     }
     getRect(){
         if(this.isInsert){
-            let rects=[];
+            let rects:Array<[number,number,number,number]>=<any>[];
             let rt;
             //let recalNode           = document.createElement('div');
 
@@ -345,8 +345,8 @@ class Part extends PartBase{
                 if(rt[1]<rect.top){
                     rect.top=rt[1];
                 }
-                let right=rt[0]+rt[2];
-                let bottom=rt[1]+rt[3];
+                let right:number=rt[0]+rt[2];
+                let bottom:number=rt[1]+rt[3];
                 if(right>rect.right){
                     rect.right=right;
                 }
@@ -615,7 +615,7 @@ class PartTemplate implements IPartTemplate{
         
         let 
             ext,
-            attrs,
+            attrs:NamedNodeMap,
             len,
             html;
             
@@ -672,9 +672,9 @@ class PartTemplate implements IPartTemplate{
         return newPart;
     }
     /**由props构建html字符串
-     * @param {} props 
+     * @param {Object} props 
      * */
-    joinDatasByProps(props):string{
+    joinDatasByProps(props:Object):string|undefined{
         
         let err=[];
         let d:ArrayEx<string>=slice.call(this.datas);
@@ -715,7 +715,14 @@ class PartTemplate implements IPartTemplate{
             ext=this.extends.beExtends(node,that,outerChildNodes,outerElement,props,part);
         }
         let html=this.joinDatasByProps(props);
-        return new ExtendsPart(this,ext,props,execTemplateScript(html,that,outerChildNodes,outerElement,props,part),outerChildNodes,outerElement);
+        return new ExtendsPart(
+            this,
+            ext,
+            props,
+            execTemplateScript(html,that,outerChildNodes,outerElement,props,part),
+            outerChildNodes,
+            outerElement
+        );
     }
     toDefineString(){
         let s='$this.ui.define("'+this.name+'","'+this.sortPath+'","'+this.path+'",{datas:';

@@ -1,7 +1,5 @@
 
-/// <reference path="../global.ts"/>
 /// <reference path="../core/core.ts"/>
-/// <reference path="../Execute.ts"/>
 /// <reference path="../bind.ts"/>
 /// <reference path='TemplateConfig.ts'/>
 /// <reference path='PartOrderCore.ts'/>
@@ -9,7 +7,7 @@
 /// <reference path='../instantiation.ts'/>
 let
         $DOM,
-        $node:(name:string,nodeType?:number)=>INode,
+        $node:(name:string,nodeType?:number)=>INode|null,
         operatorRE              = /\!=|==|=|<|>|\|/;
 
 interface ITurtle{

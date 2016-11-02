@@ -20,7 +20,7 @@ class RootScope{
 }
 class Scope {
     public __actionNode__:INode
-    public __parent__:Scope|RootScope
+    public __parent__:Scope|RootScope|null
     public __children__:Scope[]=[]
     public __proto__:Object|Scope
     constructor(public __commentNode__:INode,parent:Scope|RootScope,public __name__?:string){
@@ -78,9 +78,14 @@ class DOMScope{
      */
     unlink(scope:Scope){
         var p=scope.__parent__;
-        scope.__parent__=null;
-        removeItem(p.__children__,scope);
-        delete p[scope.__name__];
+        if(!isNull(p)){
+            scope.__parent__=null;
+            removeItem(p.__children__,scope);
+            var name=scope.__name__;
+            if(!isUndefined(name)){
+                delete p[name];
+            }
+        }
     }
 
     /**

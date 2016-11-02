@@ -1,8 +1,8 @@
 class Store{
-    [index:string]:IElement
+    [index:string]:IHTMLElement
 }
 class StoreManage{
-    static take(data:Store,name:string):INode|INodeArray{
+    static take(data:Store,name:string):INode|INodeArray|null{
         if(data.hasOwnProperty(name)){
             let ret=data[name];
             delete data[name];
@@ -14,7 +14,7 @@ class StoreManage{
         }
         return null;
     }
-    static takeElem(data:Store,name:string):IHTMLElement|IHTMLCollection{
+    static takeElem(data:Store,name:string):IHTMLElement|IHTMLCollection|null{
         if(data.hasOwnProperty(name)){
             let ret:IHTMLElement=data[name];
             delete data[name];

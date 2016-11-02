@@ -1,21 +1,15 @@
 
-/// <reference path="../global.ts" />
+/// <reference no-default-lib="true" path="../lib/lib.d.ts" />
+/// <reference path="typeprototype.ts" />
+/// <reference path="is.ts" />
 /// <reference path="../hashobject.ts"/>
 /// <reference path="../$Event.ts"/>
+/// <reference path="bind.ts"/>
 
 interface Constructor{
     prototype:Object
 }
 let exec                    =	eval,
-    toStr                   =	Object.prototype.toString,
-    arrayPrototype          =   Array.prototype,
-    Objectprototype         =   Object.prototype,
-    slice                   =   arrayPrototype.slice,
-    push                    =   arrayPrototype.push,
-    splice                  =   arrayPrototype.splice,
-    getPrototypeOf          =   Object.getPrototypeOf,
-    replace                 =   String.prototype.replace,
-    persentRE               =   /^\s*([\d.]+)%\s*$/,
     camelCaseRE             =   /-(\w)/g,
     camelizeRE              =   /-+(.)?/g,
     deCamelizeRE            =   /[A-Z]/g,
@@ -54,7 +48,7 @@ function merge<T>(elem:T,elemEx):T{
     }
     return elem;
 }
-function takeAttr(node:IElement,attrName:string,defaultValue?:any):string{
+function takeAttr<T>(node:IElement,attrName:string,defaultValue?:T):string|T{
     if(!node.hasAttribute(attrName)){
         return defaultValue;
     }else{
@@ -63,52 +57,20 @@ function takeAttr(node:IElement,attrName:string,defaultValue?:any):string{
         return s;
     }
 }
-function getAttr(node:IElement,attrName:string,defaultValue?:any):string{
+function getAttr<T>(node:IElement,attrName:string,defaultValue?:T):string|T{
     if(!node.hasAttribute(attrName)){
         return defaultValue;
     }else{
         return node.getAttribute(attrName);
     }
 }
-function isRegExp(a){
-    return "[object RegExp]" === toStr.call(a)
-}
-function isDate(a){
-    return "[object Date]" === toStr.call(a)
-}
-function isNumber(a){
-    return "[object Number]" === toStr.call(a)
-}
-function isString(a){
-    return "[object String]" === toStr.call(a)
-}
-function isFunction(a){
-    return "[object Function]" === toStr.call(a)
-}
-function isObject(a) {
-    let type = typeof a;
-    return type === 'function' || type === 'object' && !!a;
-}
-// function isFinite(obj) {
-//     return isFinite(obj) && !isNaN(parseFloat(obj));
-// }
-function isUndefined(a) {
-    return a === void 0;
-}
-let isArray = Array.isArray || function(a) {
-    return "[object Array]"===toStr.call(a)
-}
-function isPersent(s){
-    return persentRE.test(s);
-}
+
 function persentToFloat(s){
     let v=persentRE.exec(s);
     if(v){
         return parseInt(v[1])/100;
     }
 }
-function isArrayLike(a){return typeof a.length=='number'}
-
 function _catch(e:Event,fn?:Fun){
     if(fn){
         fn(e);
