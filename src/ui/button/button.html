@@ -1,4 +1,4 @@
-<xmp ui="skin.btn.fround" js="./button.js">
+<xmp ui="skin.btn.fround">
   <div ref="{ref!}" style="cursor: pointer;" class="animated fadeIn ct click2 pdipt5 pdipb5 rdip30 bfrdip30 " style="background-image:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#29c3e9), to(#09a3c9));-webkit-box-shadow: inset 0 0 0.25em #000,0 0 .25em #eee;box-shadow:inset 0 0 0.25em #000,0 0 .25em #eee;">
     <!content>
   </div>
@@ -6,7 +6,7 @@
 <xmp ui="skin.btn.close"><div ref="{ref!}" style="cursor:pointer;" class="rem1 bfrem1 click2 fa ct wem1 hem1 bred15 fgray15">&#xf00d;</div></xmp>
 <xmp ui="skin.btn.sub"><div ref="{ref!}" style="cursor:pointer;" class="fa ct wem1 hem1">&#xf068;</div></xmp>
 <xmp ui="skin.btn.add"><div ref="{ref!}" style="cursor:pointer;" class="fa ct wem1 hem1">&#xf067;</div></xmp>
-<xmp><! if {skin!false!true}>
+<xmp js="./button.class.js"><! if {skin!false!true}>
 <ui:skin.btn.{skin!} ref="{ref!}">{text!}</ui:skin.btn.{skin!}>
 <! else>
 <a ref="{ref!}" href="javascript:;">{text!}</a>

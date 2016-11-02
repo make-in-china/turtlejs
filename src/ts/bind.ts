@@ -1,5 +1,5 @@
 
-/// <reference path="core.ts"/>
+/// <reference path='./core/core.ts'/>
 /// <reference path="Execute.ts"/>
 
 function _getBindObject(scope,arrNames:Array<string>){

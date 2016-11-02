@@ -8,13 +8,12 @@ function tsc(event){
     var tsResult=gulp.src('src/ts/index.ts')
         .pipe(ts({
             target: 'es5',//把typescript转换成es5标准的js文件,也可以是es6,但这个node版本不支持
-            outFile:'js/turtle.js',
+            outFile:'js/turtle.0.1.js',
             "declaration": true
             })
         );
-        
+        // tsResult.pipe(sourcemaps.init()).pipe(sourcemaps.write('../maps', {addComment: false}))
      merge([
-         tsResult.pipe(sourcemaps.init()).pipe(sourcemaps.write('../maps', {addComment: false})),
          tsResult.js.pipe(gulp.dest('dest')),
          tsResult.dts.pipe(gulp.dest('dest'))])   
         

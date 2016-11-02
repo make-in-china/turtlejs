@@ -1,11 +1,12 @@
 
 /// <reference path="../global.ts"/>
-/// <reference path="../core.ts"/>
+/// <reference path="../core/core.ts"/>
 /// <reference path="../Execute.ts"/>
 /// <reference path="../bind.ts"/>
 /// <reference path='TemplateConfig.ts'/>
 /// <reference path='PartOrderCore.ts'/>
 /// <reference path='../XHR.ts'/>
+/// <reference path='../instantiation.ts'/>
 let
         $DOM,
         $node:(name:string,nodeType?:number)=>INode,
@@ -13,7 +14,7 @@ let
 
 interface ITurtle{
     xhr:XHR;
-    refs:KeyArrayObject<IHTMLElement>;
+    refs:IKeyArrayHashObject<IHTMLElement>;
 }
 function getScopeBy(scope,node:INode){
     if(!scope)
@@ -287,18 +288,22 @@ function parseGet(node,outerChildNodes,outerElement,props,part){
         }
     }
 }
-function parseSet(node,outerChildNodes,outerElement,props,part){
+
+function isHTMLElement(p: IHTMLElement | IHTMLCollection): p is IHTMLElement {
+    return typeof p==="IHTMLElement";
+}
+function parseSet(node:IHTMLElement,outerChildNodes:INode[],outerElement:IElement[],props,part){
     
     if(node.hasAttribute('link')){
         /*设置关联子对象*/
         let link=takeAttr(node,'link');
-        let chds=$t.store.takeElem(link);
+        let chds=StoreManage.takeElem($t.store,link);
 
         if(chds!==null){
-            if(typeof chds ==='IHTMLElement'){
+            if(isHTMLElement(chds)){
                 node.appendChild(chds);
             }else{
-                appendNodes(<INodeArray>chds,node.children[0]);
+                appendNodes(<IHTMLCollection>chds,node.children[0]);
             }
             
             takeOutChildNodes(node);
@@ -306,14 +311,14 @@ function parseSet(node,outerChildNodes,outerElement,props,part){
             removeNode(node);
         }
     }else{
-        let ns;
+        let ns:IHTMLElement[]|IHTMLCollection;
         /*设置属性*/
         if(node.children.length>0){
             /*设置子对象*/
             ns=node.children;
         }else if(node.parentNode){
             /*设置父对象*/
-            ns=[node.parentNode];
+            ns=[<IHTMLElement>node.parentNode];
         }else{
             return;
         }
@@ -355,28 +360,29 @@ function parseSet(node,outerChildNodes,outerElement,props,part){
 
 let includeJSFiles=(function(){
     class IncludeTask{
-        static jsScript=newHashObject('JSHash');
+        static jsScript:IHashObject<IHTMLScriptElement>={};
         files:Array<string>;
         constructor(public parent:IncludeTask,files:Array<string>|string,public callback:()=>void){
             if(parent){
                 parent.child=this;      
             }
-            let arr:Array<string>
+            let arr:Array<string>;
+            let data=IncludeTask.jsScript;
             if(isArray(files)){
                 arr=<Array<string>>files;
                 for(let i in arr){
                     let url=files[i];
-                    if(isString(url)&&!(url in IncludeTask.jsScript)){
+                    if(isString(url)&&!(url in data)){
                         arr.push(url);
-                        IncludeTask.jsScript[url]=$node("script");
+                        data[url]=<IHTMLScriptElement>$node("script");
                     }
                 }
             }else if(files){
                 arr=[];
                 let url:string=<string>files;
-                if(isString(url)&&!(url in IncludeTask.jsScript)){
+                if(isString(url)&&!(url in data)){
                     arr.push(url);
-                    IncludeTask.jsScript[url]=$node("script");
+                    data[url]=<IHTMLScriptElement>$node("script");
                 }
             }
             this.files=arr;
@@ -419,7 +425,7 @@ let includeJSFiles=(function(){
                 task.count--;
                 includeJSFile(task);
             }
-            document.head.appendChild(scriptNode);
+            document.head.appendChild(<any>scriptNode);
             
         }else if(task.count==0){
             task.onallload();
@@ -637,10 +643,10 @@ function bindShowHide(node,s,isBindShow,outer,outerElement,props,part){
     });
 }
 class AttributeParser{
-    ref(node,outerChildNodes,outerElement,props,part){
-        let refName=node.getAttribute('ref')
+    ref(node:IElement,outerChildNodes:IElement[],outerElement,props,part){
+        let refName=node.getAttribute('ref');
         node.removeAttribute('ref');
-        $t.refs.push(refName.split(','),node);
+        KeyArrayHashObjectManage.push($t.refs,refName.split(','),node);
     }
     ":"(node,outerChildNodes,outerElement,props,part){
         execNodeQuestion(node,outerChildNodes,outerElement,props,part);

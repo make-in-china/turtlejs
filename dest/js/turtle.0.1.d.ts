@@ -11,7 +11,7 @@ interface INodeList {
     item(index: number): INode;
     [index: number]: INode;
 }
-declare type INodeArray = INodeList | ArrayEx<INode> | INode[];
+declare type INodeArray = INodeList | ArrayEx<INode> | INode[] | IHTMLCollection;
 interface INode extends EventTarget {
     valueOf(): INode;
     attributes?: NamedNodeMap;
@@ -751,6 +751,28 @@ interface IHTMLScriptElement extends IHTMLElement {
 interface Object {
     __proto__?: Object;
 }
+declare class ArrayEx<T> extends Array<T> {
+    last(): T;
+    clear(): void;
+}
+interface IHashObject<T> {
+    [index: string]: T;
+}
+declare class HashObjectManage<T> {
+    static clean<T>(data: IHashObject<T>): void;
+    static take<T>(data: IHashObject<T>, name: string): T;
+}
+interface IKeyArrayHashObject<T> {
+    [index: string]: ArrayEx<T>;
+}
+declare class KeyArrayHashObjectManage {
+    private static isArray<T>(p);
+    static clean<T>(data: IKeyArrayHashObject<T>): void;
+    static take<T>(data: IKeyArrayHashObject<T>, name: string): ArrayEx<T>;
+    static getKeyArray<T>(data: IKeyArrayHashObject<T>): ArrayEx<ArrayEx<T>>;
+    static pop<T>(data: IKeyArrayHashObject<T>, key: string): T;
+    static push<T>(data: IKeyArrayHashObject<T>, key: string | string[], value: T): void;
+}
 interface IEventsCol {
     [index: string]: Array<Fun>;
 }
@@ -766,10 +788,6 @@ declare class ReadyObject {
     on(fn: () => void): void;
     readyFunctions: Fun[];
     isReady: boolean;
-}
-declare class ArrayEx<T> extends Array<T> {
-    last(): T;
-    clear(): void;
 }
 interface Constructor {
     prototype: Object;
@@ -814,18 +832,6 @@ declare function _catch(e: Event, fn?: Fun): void;
 declare function throwError(err: string): void;
 declare function camelize(str: string): string;
 declare function decamelize(str: string): string;
-declare class HashObject<T> {
-    [index: string]: T | T[] | Fun;
-    clean(): void;
-}
-declare class KeyArrayObject<T> extends HashObject<T> {
-    [index: string]: ArrayEx<T> | Fun;
-    push(key: string, value: T): void;
-    getKeyArray(): ArrayEx<ArrayEx<T>>;
-    pop(key: string): T;
-}
-declare function newKeyArrayObject<T>(type: string): KeyArrayObject<T>;
-declare function newHashObject(type: string): HashObject<any>;
 declare function create(type: string, tsClass?: Constructor): any;
 declare let newArrayObject: (type: string) => ArrayEx<any>;
 declare function NullValueHash(s: any): void;
@@ -849,7 +855,7 @@ declare function removeNode(node: INode): INode;
 declare function replaceNodeByNodes(node: INode, nodes: INodeArray): void;
 declare function insertNode(node: INode, childNode: any): number;
 declare function deepClone(node: INode): INode;
-declare function cloneBetween(node1: INode, node2: INode): any[];
+declare function cloneBetween(node1: INode, node2: INode): INode[];
 declare function removeBlockBetween(node1: INode, node2: INode): void;
 declare function replaceNodeByNode(node: INode, node2: INode): void;
 declare function appendNodes(nodes: INodeArray, parent: INode): void;
@@ -881,9 +887,9 @@ interface IArray {
  * @param {number} beginIndex 遍历起始位置
  */
 declare function treeEach<T>(array: T[] | IArray, propertyName: string, fn: (node: T, step?: ITreeEachStep) => (eTreeEach | void), beginIndex?: number): {
-    stack: [T[] | IArray, number];
-    state: any;
-    array: T[] | IArray;
+    stack: [IArray | T[], number];
+    state: eTreeEach;
+    array: IArray | T[];
     index: number;
 };
 /**浏览器兼容 */
@@ -903,7 +909,7 @@ interface Window {
 declare let isIE: boolean;
 declare let withthis: string, _execValueByScope: Function, _execByScope: Function, _execExpressionsByScope: Function;
 declare function execValueByScope(node: INode, s: string, v: any, scope: Scope, outerChildNodes: INodeArray, outerElement: IHTMLElement[], props: any, part: any): any;
-declare let execTemplateScript: (s: string, node: INode, outerChildNodes: INodeList | ArrayEx<INode> | INode[], outerElement: any, props: any, part: any) => string;
+declare let execTemplateScript: (s: string, node: INode, outerChildNodes: INodeArray, outerElement: any, props: any, part: any) => string;
 declare function _getBindObject(scope: any, arrNames: Array<string>): any;
 interface IBindInfo {
     name: string;
@@ -960,7 +966,7 @@ declare class TemplateConfig {
         getData: (node: IHTMLTextAreaElement) => string;
     };
     toString(): string;
-    items: Array<NameItem>;
+    readonly items: Array<NameItem>;
     findByString(str: string): RegExpMatchArray;
 }
 declare let templateConfig: TemplateConfig;
@@ -990,7 +996,7 @@ declare function parseScopeOrder(info: ICommentOrderInfo, node: IComment, outerC
 declare function parseCommentOrderNoScript(info: ICommentOrderInfo, node: IComment, outerChildNodes: any, outerElement: any, props: any, part: any): any;
 declare function parseCommentOrderBlock(node: any, outerChildNodes: any, outerElement: any, props: any, part: any): {
     stack: [INode[] | IArray, number];
-    state: any;
+    state: eTreeEach;
     array: INode[] | IArray;
     index: number;
 };
@@ -1016,10 +1022,31 @@ declare class XHR {
     get(url: string, async: boolean, fn: (s: string) => void, fnerror?: Fun): void;
     post(url: string, data: string, async: boolean, fn: (s: string) => void, fnerror?: Fun): void;
 }
+declare namespace _util {
+    const DI_TARGET = "$di$target";
+    const DI_DEPENDENCIES = "$di$dependencies";
+    function getServiceDependencies(ctor: any): {
+        id: ServiceIdentifier<any>;
+        index: number;
+        optional: boolean;
+    }[];
+}
+declare function storeServiceDependency(id: Function, target: Function, index: number, optional: boolean): void;
+/**
+ * A *only* valid way to create a {{ServiceIdentifier}}.
+ */
+declare function createDecorator<T>(serviceId: string): {
+    (...args: any[]): void;
+    type: T;
+};
+interface ServiceIdentifier<T> {
+    (...args: any[]): void;
+    type: T;
+}
 declare let $DOM: any, $node: (name: string, nodeType?: number) => INode, operatorRE: RegExp;
 interface ITurtle {
     xhr: XHR;
-    refs: KeyArrayObject<IHTMLElement>;
+    refs: IKeyArrayHashObject<IHTMLElement>;
 }
 declare function getScopeBy(scope: any, node: INode): any;
 declare function execByScope(node: INode, s: string, scope: any, outer: any, outerElement: any, props: any, part: any): any;
@@ -1043,8 +1070,9 @@ declare function parseLazy(node: any, outerChildNodes: any, outerElement: any, p
 declare function getUIInfo(node: any): any;
 declare function parseUI(node: IHTMLElement, uiInfo: any, step: any, part: any): void;
 declare function parseGet(node: any, outerChildNodes: any, outerElement: any, props: any, part: any): eTreeEach;
-declare function parseSet(node: any, outerChildNodes: any, outerElement: any, props: any, part: any): eTreeEach;
-declare let includeJSFiles: (files: string[] | string, callback?: () => void) => void;
+declare function isHTMLElement(p: IHTMLElement | IHTMLCollection): p is IHTMLElement;
+declare function parseSet(node: IHTMLElement, outerChildNodes: INode[], outerElement: IElement[], props: any, part: any): eTreeEach;
+declare let includeJSFiles: (files: string | string[], callback?: () => void) => void;
 declare function execOnScript(node: any, outerChildNodes: any, outerElement: any, props: any, part: any): void;
 declare function execScript(node: any, outerChildNodes?: any, outerElement?: any, props?: any, part?: any): void;
 declare function execTurtleScript(node: any, outerChildNodes: any, outerElement: any, props: any, part: any): void;
@@ -1072,7 +1100,7 @@ declare class ElementParser {
 }
 declare function bindShowHide(node: any, s: any, isBindShow: any, outer: any, outerElement: any, props: any, part: any): void;
 declare class AttributeParser {
-    ref(node: any, outerChildNodes: any, outerElement: any, props: any, part: any): void;
+    ref(node: IElement, outerChildNodes: IElement[], outerElement: any, props: any, part: any): void;
     ":"(node: any, outerChildNodes: any, outerElement: any, props: any, part: any): void;
     'p-ref'(node: any, outerChildNodes: any, outerElement: any, props: any, part: any): void;
     bind(node: any, outerChildNodes: any, outerElement: any, props: any, part: any): void;
@@ -1092,7 +1120,7 @@ declare function nodesToString(nodes: INode[]): string;
 declare const memberRE: RegExp;
 declare const colorRE: RegExp;
 interface ITurtle {
-    parts: KeyArrayObject<any>;
+    parts: IKeyArrayHashObject<Part>;
     service: Service;
     T: TemplateList;
 }
@@ -1142,8 +1170,8 @@ declare class PartBase {
     store: INode[];
     isExtends: boolean;
     constructor(template: PartTemplate, extPart: PartBase, props: Object, html: string, outerChildNodes: INodeArray, outerElement: IHTMLCollection);
-    child: any[];
-    elements: INode[];
+    readonly child: any[];
+    readonly elements: INode[];
     emitResize(): void;
     onSetSize(rect: any): void;
     getSuper(name: string): any;
@@ -1162,10 +1190,10 @@ declare class Part extends PartBase {
     constructor(template: PartTemplate, extPart: PartBase, props: Object, html: string, outerChildNodes: INodeArray, outerElement: IHTMLCollection);
     toString(): string;
     treeDiagram(tabSpace: any): string;
-    elementLength: number;
-    elements: INode[];
+    readonly elementLength: number;
+    readonly elements: INode[];
     getParentPart(node: any): any;
-    parent: any;
+    readonly parent: any;
     getRect(): {
         left: number;
         top: number;
@@ -1174,12 +1202,12 @@ declare class Part extends PartBase {
         right: number;
         bottom: number;
     };
-    innerHTML: string;
-    elemParent: INode;
+    readonly innerHTML: string;
+    readonly elemParent: INode;
     insertTo(elem: any): void;
     insertBefore(elem: any): void;
     remove(): void;
-    scopeNodes: any[];
+    readonly scopeNodes: any[];
 }
 declare class ExtendsPart extends PartBase {
     props: Object;
@@ -1221,7 +1249,10 @@ declare class PartTemplate implements IPartTemplate {
     beExtends(node: INode, that: any, outerChildNodes: INodeArray, outerElement: IHTMLCollection, props: any, part: any): ExtendsPart;
     toDefineString(): string;
     parseParamsHelp(p: any): void;
-    getParamsHelp(): any[];
+    getParamsHelp(): {
+        name: string;
+        necessary: any;
+    }[];
 }
 declare class ITemplateList {
     [index: string]: Object;
@@ -1296,6 +1327,13 @@ declare class Client {
     private setSizeProperty(name, fn);
     constructor();
 }
+declare class Store {
+    [index: string]: IElement;
+}
+declare class StoreManage {
+    static take(data: Store, name: string): INode | INodeArray;
+    static takeElem(data: Store, name: string): IHTMLElement | IHTMLCollection;
+}
 declare let readyRE: RegExp;
 declare function renderTemplate(tp: any): void;
 interface IRenderDocument {
@@ -1307,10 +1345,6 @@ declare class Config {
     baseUIPath: BasePath;
     baseServicePath: string;
     debugMode: number;
-}
-declare class Store extends HashObject<IHTMLElement> {
-    take(name: string): INode | INodeArray;
-    takeElem(name: string): IHTMLElement | INodeArray;
 }
 interface ITurtle {
     config: Config;
@@ -1328,18 +1362,18 @@ declare class Turtle implements ITurtle {
     replaceClassStore: IHTMLElement[];
     defineClassNames: string[];
     T: TemplateList;
-    parts: KeyArrayObject<Part>;
+    parts: IKeyArrayHashObject<Part>;
     xhr: XHR;
     service: Service;
     store: Store;
-    refs: KeyArrayObject<IHTMLElement>;
+    refs: IKeyArrayHashObject<IHTMLElement>;
     fn: {};
     turtleScriptElement: IHTMLScriptElement;
     url: string;
     readyByRenderDocument: ReadyObject;
     isCompile: boolean;
     constructor();
-    rootParts: any[];
+    readonly rootParts: any[];
     emitResize(): void;
     renderDocument: IRenderDocument;
     private r1(scriptNode, compileuilist, compilename, compileInfo, compile);
@@ -1347,3 +1381,5 @@ declare class Turtle implements ITurtle {
     ready(fn: Fun): this;
 }
 declare let turtle: Turtle;
+declare const data = "1234";
+declare var s: string;

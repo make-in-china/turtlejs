@@ -1,10 +1,11 @@
-/// <reference path='../core.ts'/>
-/// <reference path='PartCore.ts'/>
+/// <reference path='../core/core.ts'/>
+/// <reference path='partcore.ts'/>
+/// <reference path='partview.ts'/>
 
 const memberRE = /{([\-a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g;
 const colorRE=/^\s*((#[\dabcdefABCDEF]{3,6})|(rgba\(.*\)))\s*$/
 interface ITurtle{
-    parts:KeyArrayObject<any>;
+    parts:IKeyArrayHashObject<Part>;
     service:Service;
     T:TemplateList;
 }
@@ -510,7 +511,13 @@ class PartTemplate implements IPartTemplate{
     isJSDefine=true;
     parts:Array<Part>=[];
     service:Service;
-    constructor(public name:string,public sortPath:string,public path:string,s:string|IPartTemplate,ext){
+    constructor(
+        public name:string,
+        public sortPath:string,
+        public path:string,
+        s:string|IPartTemplate,
+        ext
+    ){
         this.partName=name.replace(/[\.]/g,"_");
         if(isObject(s)){
             let obj:IPartTemplate=<IPartTemplate>s;
@@ -573,14 +580,14 @@ class PartTemplate implements IPartTemplate{
     }
     /*调用render*/
     renderIn(elem,outerChildNodes,outerElement,props,part,partName,reExtends){
-        let uiNode:IElement;
+        let uiNode:IHTMLElement;
         if(!isArray(outerChildNodes)){
             outerChildNodes=[];
         }
         if(!isArray(outerElement)){
             outerElement=[];
         }
-        uiNode=<IElement>$node('ui:render');//document.createElement("ui:render");
+        uiNode=<IHTMLElement>$node('ui:render');//document.createElement("ui:render");
         if(elem){
             elem.appendChild(uiNode);    
         }
@@ -588,14 +595,14 @@ class PartTemplate implements IPartTemplate{
     }
     /*调用render*/
     renderBefore(elem,outerChildNodes,outerElement,props,part,partName,reExtends){
-        let uiNode:IElement;
+        let uiNode:IHTMLElement;
         if(!isArray(outerChildNodes)){
             outerChildNodes=[];
         }
         if(!isArray(outerElement)){
             outerElement=[];
         }
-        uiNode=<IElement>$node('ui:render');//document.createElement("ui:render");
+        uiNode=<IHTMLElement>$node('ui:render');//document.createElement("ui:render");
         if(elem&&elem.parentNode){
             elem.parentNode.insertBefore2(uiNode,elem);
         }
@@ -649,7 +656,7 @@ class PartTemplate implements IPartTemplate{
         let newPart=new Part(this,ext,props,html,outerChildNodes,outerElement);
         if(refPartName){
             /**放置到全局引用 */
-            $t.parts.push(refPartName,newPart);    
+            KeyArrayHashObjectManage.push($t.parts,refPartName,newPart);
         }
         this.parts.push(newPart);
         

@@ -1,5 +1,4 @@
 /// <reference path='turtle.ts'/>
-/// <reference path='plugin/index.ts'/>
 
 if(!$DOM){
     $DOM=function(html){

@@ -19,7 +19,7 @@ interface INodeList {
     item(index: number): INode;
     [index: number]: INode;
 }
-type INodeArray=INodeList|ArrayEx<INode>|INode[];
+type INodeArray=INodeList|ArrayEx<INode>|INode[]|IHTMLCollection;
 interface INode extends EventTarget {
     valueOf():INode
     attributes?: NamedNodeMap;

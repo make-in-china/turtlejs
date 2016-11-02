@@ -1,5 +1,5 @@
 
-/// <reference path='../core.ts'/>
+/// <reference path='../core/core.ts'/>
 class NameItem{
     constructor(name:string){
         this.name=name;

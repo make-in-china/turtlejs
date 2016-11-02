@@ -1,8 +1,9 @@
 
-/// <reference path='core.ts'/>
+/// <reference path='./core/core.ts'/>
 /// <reference path='./part/Template.ts'/>
 /// <reference path='scope.ts'/>
-/// <reference path='Client.ts'/>
+/// <reference path='client.ts'/>
+/// <reference path='store.ts'/>
 
 
 let 
@@ -35,38 +36,13 @@ class Config{
     baseServicePath='service';
     debugMode=2;
 }
-class Store extends HashObject<IHTMLElement>{
-    take(name:string):INode|INodeArray{
-        if(this.hasOwnProperty(name)){
-            let ret:IHTMLElement=<IHTMLElement>this[name];
-            delete this[name];
-            if(ret.childNodes.length>1){
-                return ret.childNodes;
-            }else{
-                return ret.childNodes[0];
-            }
-        }
-        return null;
-    }
-    takeElem(name:string):IHTMLElement|INodeArray{
-        if(this.hasOwnProperty(name)){
-            let ret:IHTMLElement=<IHTMLElement>this[name];
-            delete this[name];
-            if(ret.children.length>1){
-                return ret.children;
-            }else{
-                return ret.children[0];
-            }
-        }
-        return null;
-    }
-}
+
 interface ITurtle{
     config: Config;
     store:Store;
 }
 declare var unescape:(v:string)=>string;
-function getQueryString(name:string):string{
+function getQueryString(name:string):string|null{
     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
     var r = location.search.substr(1).match(reg);
     if(r!=null){
@@ -101,11 +77,11 @@ class Turtle implements ITurtle{
     replaceClassStore:IHTMLElement[]=[];
     defineClassNames:string[];
     T:TemplateList=new TemplateList;
-    parts:KeyArrayObject<Part>=newKeyArrayObject<Part>('Parts');
+    parts:IKeyArrayHashObject<Part>={};
     xhr=new XHR;
     service=new Service;
     store=new Store;
-    refs=newKeyArrayObject<IHTMLElement>("RefElements");
+    refs:IKeyArrayHashObject<IHTMLElement>={};
     fn={}
     turtleScriptElement:IHTMLScriptElement;
     url:string;
@@ -114,15 +90,15 @@ class Turtle implements ITurtle{
     constructor(){
         rte.on("error",function(e:Event){log(e);bp();alert(e);});
         let 
-            scriptNode:IHTMLScriptElement=this.turtleScriptElement=<any>document.scripts[document.scripts.length-1],
+            scriptNode:IHTMLScriptElement=this.turtleScriptElement=<IHTMLScriptElement><any>document.scripts[document.scripts.length-1],
             compile=getAttr(scriptNode,'compile',null),
             load=getAttr(scriptNode,'load',null),
-            script=scriptNode.innerHTML,
+            script:string=<string>scriptNode.innerHTML,
             baseuipath=getAttr(scriptNode,'baseuipath',null),
             isExtend=getAttr(scriptNode,'extend',null),
             compilename=getAttr(scriptNode,'compilename',null),
             compileuilist=getAttr(scriptNode,'compileuilist',null),
-            compileInfo:{isOn?:boolean,url?:string};
+            compileInfo:{isOn?:boolean,url?:string}|undefined;
 
         //初始化组件配置
         if(baseuipath){
@@ -140,7 +116,7 @@ class Turtle implements ITurtle{
             if(getQueryString("turtle_nocompile")!="1"){
                 this.xhr.get(scriptNode.src+'.setup',false,function(text){
                     try{
-                        exec('compileInfo='+text);    
+                        compileInfo=exec('('+text+')');    
                     }catch(e){
                         _catch(e);
                     }

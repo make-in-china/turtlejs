@@ -4,6 +4,118 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var $t;
+var ArrayEx = (function (_super) {
+    __extends(ArrayEx, _super);
+    function ArrayEx() {
+        return _super.apply(this, arguments) || this;
+    }
+    ArrayEx.prototype.last = function () {
+        if (this.length > 0) {
+            return this[this.length - 1];
+        }
+    };
+    ArrayEx.prototype.clear = function () {
+        var l = this.length;
+        for (var i = 0; i < l; i++) {
+            this.pop();
+        }
+    };
+    return ArrayEx;
+}(Array));
+var HashObjectManage = (function () {
+    function HashObjectManage() {
+    }
+    HashObjectManage.clean = function (data) {
+        for (var i in data) {
+            if (!data.hasOwnProperty(i)) {
+                delete data[i];
+            }
+        }
+    };
+    HashObjectManage.take = function (data, name) {
+        if (data.hasOwnProperty(name)) {
+            var ret = data[name];
+            delete this[name];
+            return ret;
+        }
+        return null;
+    };
+    return HashObjectManage;
+}());
+var KeyArrayHashObjectManage = (function () {
+    function KeyArrayHashObjectManage() {
+    }
+    KeyArrayHashObjectManage.isArray = function (p) {
+        return typeof p === "array";
+    };
+    KeyArrayHashObjectManage.clean = function (data) {
+        for (var i in data) {
+            if (!data.hasOwnProperty(i)) {
+                delete data[i];
+            }
+        }
+    };
+    KeyArrayHashObjectManage.take = function (data, name) {
+        if (data.hasOwnProperty(name)) {
+            var ret = data[name];
+            delete this[name];
+            return ret;
+        }
+        return null;
+    };
+    KeyArrayHashObjectManage.getKeyArray = function (data) {
+        var arr = new ArrayEx();
+        for (var i in data) {
+            if (!data.hasOwnProperty(i)) {
+                arr.push(data[i]);
+            }
+        }
+        return arr;
+    };
+    KeyArrayHashObjectManage.pop = function (data, key) {
+        var keyObject = data[key];
+        if (keyObject) {
+            return keyObject.pop();
+        }
+    };
+    KeyArrayHashObjectManage.push = function (data, key, value) {
+        if (KeyArrayHashObjectManage.isArray(key)) {
+            for (var i = 0; i < key.length; i++) {
+                if (!data.hasOwnProperty(key[i])) {
+                    data[key[i]] = new ArrayEx();
+                }
+                data[key[i]].push(value);
+            }
+        }
+        else {
+            if (!data.hasOwnProperty(key)) {
+                data[key] = new ArrayEx();
+            }
+            data[key].push(value);
+        }
+    };
+    return KeyArrayHashObjectManage;
+}());
+// class KeyArrayHashObject<T>{
+//     clean(){
+//         KeyArrayHashObjectManage.clean(<any>this);
+//     }
+//     take(name:string):ArrayEx<T>{
+//         return <any>KeyArrayHashObjectManage.take(<any>this,name);
+//     }
+//     getKeyArray():ArrayEx<ArrayEx<T>>{
+//         return <any>KeyArrayHashObjectManage.getKeyArray(<any>this);
+//     }
+//     pop(key:string){
+//         KeyArrayHashObjectManage.pop(<any>this,key);
+//     }
+//     push(key:string|string[],value:T){
+//         KeyArrayHashObjectManage.push(<any>this,key,value);
+//     }
+// }
+// function createKeyArrayHashObject<T>():IKeyArrayHashObject<T> & KeyArrayHashObject<T>{
+//     return <any>(new KeyArrayHashObject<T>());
+// }
 /// <reference path="global.ts" />
 var $Event = (function () {
     function $Event() {
@@ -82,26 +194,9 @@ var ReadyObject = (function () {
     });
     return ReadyObject;
 }());
-/// <reference path="global.ts" />
-/// <reference path="$Event.ts"/>
-var ArrayEx = (function (_super) {
-    __extends(ArrayEx, _super);
-    function ArrayEx() {
-        _super.apply(this, arguments);
-    }
-    ArrayEx.prototype.last = function () {
-        if (this.length > 0) {
-            return this[this.length - 1];
-        }
-    };
-    ArrayEx.prototype.clear = function () {
-        var l = this.length;
-        for (var i = 0; i < l; i++) {
-            this.pop();
-        }
-    };
-    return ArrayEx;
-}(Array));
+/// <reference path="../global.ts" />
+/// <reference path="../hashobject.ts"/>
+/// <reference path="../$Event.ts"/>
 var exec = eval, toStr = Object.prototype.toString, arrayPrototype = Array.prototype, Objectprototype = Object.prototype, slice = arrayPrototype.slice, push = arrayPrototype.push, splice = arrayPrototype.splice, getPrototypeOf = Object.getPrototypeOf, replace = String.prototype.replace, persentRE = /^\s*([\d.]+)%\s*$/, camelCaseRE = /-(\w)/g, camelizeRE = /-+(.)?/g, deCamelizeRE = /[A-Z]/g, classSplitRE = /\s+/g, addStyleRE = /;\s*$/, addClassNameRE = /\s+$/, rte = new $Event;
 Node.prototype.toDOM = Node.prototype.valueOf = function () { return this; };
 var vNodesToDOM = function (nodes) { return nodes; };
@@ -132,9 +227,9 @@ function takeAttr(node, attrName, defaultValue) {
         return defaultValue;
     }
     else {
-        var s = node.getAttribute(attrName);
+        var s_1 = node.getAttribute(attrName);
         node.removeAttribute(attrName);
-        return s;
+        return s_1;
     }
 }
 function getAttr(node, attrName, defaultValue) {
@@ -164,9 +259,9 @@ function isObject(a) {
     var type = typeof a;
     return type === 'function' || type === 'object' && !!a;
 }
-function isFinite(obj) {
-    return isFinite(obj) && !isNaN(parseFloat(obj));
-}
+// function isFinite(obj) {
+//     return isFinite(obj) && !isNaN(parseFloat(obj));
+// }
 function isUndefined(a) {
     return a === void 0;
 }
@@ -209,60 +304,12 @@ function decamelize(str) {
         return '-' + match.toLowerCase();
     });
 }
-var HashObject = (function () {
-    function HashObject() {
-    }
-    HashObject.prototype.clean = function () {
-        for (var i in this) {
-            delete this[i];
-        }
-    };
-    return HashObject;
-}());
-var KeyArrayObject = (function (_super) {
-    __extends(KeyArrayObject, _super);
-    function KeyArrayObject() {
-        _super.apply(this, arguments);
-    }
-    KeyArrayObject.prototype.push = function (key, value) {
-        if (isArray(key)) {
-            for (var i = 0; i < key.length; i++) {
-                if (!this.hasOwnProperty(key[i])) {
-                    this[key[i]] = new ArrayEx();
-                }
-                this[key[i]].push(value);
-            }
-        }
-        else {
-            if (!this.hasOwnProperty(key)) {
-                this[key] = new ArrayEx();
-            }
-            this[key].push(value);
-        }
-    };
-    KeyArrayObject.prototype.getKeyArray = function () {
-        var arr = new ArrayEx();
-        for (var i in this) {
-            if (!this.hasOwnProperty(i)) {
-                arr.push(this[i]);
-            }
-        }
-        return arr;
-    };
-    KeyArrayObject.prototype.pop = function (key) {
-        var keyObject = this[key];
-        if (keyObject) {
-            return keyObject.pop();
-        }
-    };
-    return KeyArrayObject;
-}(HashObject));
-function newKeyArrayObject(type) {
-    return create(type, KeyArrayObject);
-}
-function newHashObject(type) {
-    return create(type, HashObject);
-}
+// function newKeyArrayObject<T>(type:string):KeyArrayObject<T>{
+//     return create(type,KeyArrayObject);
+// }
+// function newHashObject(type:string):HashObject<any>{
+//     return create(type,HashObject);
+// }
 function create(type, tsClass) {
     var s = 'let ' + type + '=function(){};';
     if (isObject((tsClass).prototype)) {
@@ -722,7 +769,7 @@ var execTemplateScript = (function () {
         return s;
     };
 }());
-/// <reference path="core.ts"/>
+/// <reference path='./core/core.ts'/>
 /// <reference path="Execute.ts"/>
 function _getBindObject(scope, arrNames) {
     var i, obj, length = arrNames.length;
@@ -1053,7 +1100,7 @@ function bindExpressionsByOrder(node, condition) {
     bindElementProperty(exp, '__me__', textNode, 'data');
     textNode['data'] = exp.__me__;
 }
-/// <reference path='../core.ts'/>
+/// <reference path='../core/core.ts'/>
 var NameItem = (function () {
     function NameItem(name) {
         this.name = name;
@@ -1151,13 +1198,13 @@ var TemplateConfig = (function () {
         var ts = this.items;
         var regExes = [];
         for (var i = 0; i < ts.length; i++) {
-            var s = '(<' + ts[i].name;
+            var s_2 = '(<' + ts[i].name;
             if (ts[i].hasOwnProperty('xmp')) {
-                s += '[\\s\\S]*? +xmp';
+                s_2 += '[\\s\\S]*? +xmp';
             }
-            s += "([\\s\\S]*?)>([\\s\\S]*?)<\\/" + ts[i].name + ">";
-            s += ')';
-            regExes.push(s);
+            s_2 += "([\\s\\S]*?)>([\\s\\S]*?)<\\/" + ts[i].name + ">";
+            s_2 += ')';
+            regExes.push(s_2);
         }
         var re = new RegExp(regExes.join("|"), "g"); //exec(`(/${regExes.join("|")}/g)`);
         return str.match(re);
@@ -1166,7 +1213,7 @@ var TemplateConfig = (function () {
 }());
 var templateConfig = new TemplateConfig;
 var baseUIPath = new BasePath;
-/// <reference path="../core.ts"/>
+/// <reference path="../core/core.ts"/>
 /// <reference path="../Execute.ts"/>
 /// <reference path="../bind.ts"/>
 var orderRE = /^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|let|=)(\s|$)/g, orderCaseRE = /^\s?(else if|else|case break|case|default|end)(\s|$)/g, parseForOrderRE = /[a-zA-Z\d] in .*/, parseForOrderRE2 = /^.*;.*;.*$/, SetParseError = function (msg) {
@@ -1703,13 +1750,45 @@ var XHR = (function () {
     };
     return XHR;
 }());
+var _util;
+(function (_util) {
+    _util.DI_TARGET = '$di$target';
+    _util.DI_DEPENDENCIES = '$di$dependencies';
+    function getServiceDependencies(ctor) {
+        return ctor[_util.DI_DEPENDENCIES] || [];
+    }
+    _util.getServiceDependencies = getServiceDependencies;
+})(_util || (_util = {}));
+function storeServiceDependency(id, target, index, optional) {
+    if (target[_util.DI_TARGET] === target) {
+        target[_util.DI_DEPENDENCIES].push({ id: id, index: index, optional: optional });
+    }
+    else {
+        target[_util.DI_DEPENDENCIES] = [{ id: id, index: index, optional: optional }];
+        target[_util.DI_TARGET] = target;
+    }
+}
+/**
+ * A *only* valid way to create a {{ServiceIdentifier}}.
+ */
+function createDecorator(serviceId) {
+    var id = function (target, key, index) {
+        if (arguments.length !== 3) {
+            throw new Error('@IServiceName-decorator can only be used to decorate a parameter');
+        }
+        storeServiceDependency(id, target, index, false);
+    };
+    id.toString = function () { return serviceId; };
+    return id;
+}
 /// <reference path="../global.ts"/>
-/// <reference path="../core.ts"/>
+/// <reference path="../core/core.ts"/>
 /// <reference path="../Execute.ts"/>
 /// <reference path="../bind.ts"/>
 /// <reference path='TemplateConfig.ts'/>
 /// <reference path='PartOrderCore.ts'/>
 /// <reference path='../XHR.ts'/>
+/// <reference path='../instantiation.ts'/>
 var $DOM, $node, operatorRE = /\!=|==|=|<|>|\|/;
 function getScopeBy(scope, node) {
     if (!scope)
@@ -1969,13 +2048,16 @@ function parseGet(node, outerChildNodes, outerElement, props, part) {
         }
     }
 }
+function isHTMLElement(p) {
+    return typeof p === "IHTMLElement";
+}
 function parseSet(node, outerChildNodes, outerElement, props, part) {
     if (node.hasAttribute('link')) {
         /*设置关联子对象*/
         var link = takeAttr(node, 'link');
-        var chds = $t.store.takeElem(link);
+        var chds = StoreManage.takeElem($t.store, link);
         if (chds !== null) {
-            if (typeof chds === 'IHTMLElement') {
+            if (isHTMLElement(chds)) {
                 node.appendChild(chds);
             }
             else {
@@ -2048,22 +2130,23 @@ var includeJSFiles = (function () {
                 parent.child = this;
             }
             var arr;
+            var data = IncludeTask.jsScript;
             if (isArray(files)) {
                 arr = files;
                 for (var i in arr) {
                     var url = files[i];
-                    if (isString(url) && !(url in IncludeTask.jsScript)) {
+                    if (isString(url) && !(url in data)) {
                         arr.push(url);
-                        IncludeTask.jsScript[url] = $node("script");
+                        data[url] = $node("script");
                     }
                 }
             }
             else if (files) {
                 arr = [];
                 var url = files;
-                if (isString(url) && !(url in IncludeTask.jsScript)) {
+                if (isString(url) && !(url in data)) {
                     arr.push(url);
-                    IncludeTask.jsScript[url] = $node("script");
+                    data[url] = $node("script");
                 }
             }
             this.files = arr;
@@ -2085,9 +2168,9 @@ var includeJSFiles = (function () {
                 setIncludeTaskDone(this, this.callback);
             }
         };
-        IncludeTask.jsScript = newHashObject('JSHash');
         return IncludeTask;
     }());
+    IncludeTask.jsScript = {};
     var includeTask;
     function setIncludeTaskDone(task, fn) {
         includeTask = task.parent;
@@ -2328,7 +2411,7 @@ var AttributeParser = (function () {
     AttributeParser.prototype.ref = function (node, outerChildNodes, outerElement, props, part) {
         var refName = node.getAttribute('ref');
         node.removeAttribute('ref');
-        $t.refs.push(refName.split(','), node);
+        KeyArrayHashObjectManage.push($t.refs, refName.split(','), node);
     };
     AttributeParser.prototype[":"] = function (node, outerChildNodes, outerElement, props, part) {
         execNodeQuestion(node, outerChildNodes, outerElement, props, part);
@@ -2475,8 +2558,17 @@ function nodesToString(nodes) {
     }
     return s;
 }
-/// <reference path='../core.ts'/>
-/// <reference path='PartCore.ts'/>
+// class View{
+//     constructor(
+//         public outerElement:IElement[],
+//         public outerNodes:INode[],
+//         public parent:Part
+//     ){
+//     }
+// } 
+/// <reference path='../core/core.ts'/>
+/// <reference path='partcore.ts'/>
+/// <reference path='partview.ts'/>
 var memberRE = /{([\-a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g;
 var colorRE = /^\s*((#[\dabcdefABCDEF]{3,6})|(rgba\(.*\)))\s*$/;
 var PartParamFilter = (function () {
@@ -2679,36 +2771,37 @@ var PartBase = (function () {
 var Part = (function (_super) {
     __extends(Part, _super);
     function Part(template, extPart, props, html, outerChildNodes, outerElement) {
-        _super.call(this, template, extPart, props, html, outerChildNodes, outerElement);
-        this.props = props;
+        var _this = _super.call(this, template, extPart, props, html, outerChildNodes, outerElement) || this;
+        _this.props = props;
         var name = template.name;
         var dom = $DOM(html);
-        var begin = this.begin = $node(name, 8); // document.createComment('<'+name+'>');
-        var end = this.end = $node('/' + name, 8); //document.createComment('</'+name+'>')
-        end.__part__ = begin.__part__ = this;
+        var begin = _this.begin = $node(name, 8); // document.createComment('<'+name+'>');
+        var end = _this.end = $node('/' + name, 8); //document.createComment('</'+name+'>')
+        end.__part__ = begin.__part__ = _this;
         begin.__sign__ = 1;
         end.__sign__ = 0;
-        this.super = extPart;
-        this.resPath = template.path + '/' + template.name + '.res';
-        var sp = this;
+        _this.super = extPart;
+        _this.resPath = template.path + '/' + template.name + '.res';
+        var sp = _this;
         while (sp.super) {
             sp = sp.super;
         }
-        this.basePart = sp ? sp : this;
-        this.basePart.isInsert = false;
+        _this.basePart = sp ? sp : _this;
+        _this.basePart.isInsert = false;
         var nodes = dom.childNodes;
-        initHTML(nodes, outerChildNodes, outerElement, props, this);
+        initHTML(nodes, outerChildNodes, outerElement, props, _this);
         if (extPart) {
-            extPart.to(this);
+            extPart.to(_this);
         }
-        var store = this.store;
+        var store = _this.store;
         store.push.apply(store, nodes);
         for (var i = nodes.length; i > 0; i--) {
             dom.removeChild(nodes[0]);
         }
         store.unshift(begin);
         store.push(end);
-        this.emitInit(this);
+        _this.emitInit(_this);
+        return _this;
     }
     Part.prototype.toString = function () {
         return this.template.partName + ":" + JSON.stringify(this.props);
@@ -2972,9 +3065,10 @@ var Part = (function (_super) {
 var ExtendsPart = (function (_super) {
     __extends(ExtendsPart, _super);
     function ExtendsPart(template, extPart, props, html, outerChildNodes, outerElement) {
-        _super.call(this, template, extPart, props, html, outerChildNodes, outerElement);
-        this.props = props;
-        this.isExtends = true;
+        var _this = _super.call(this, template, extPart, props, html, outerChildNodes, outerElement) || this;
+        _this.props = props;
+        _this.isExtends = true;
+        return _this;
     }
     ExtendsPart.prototype.to = function (part) {
         /**剪切厡型链 */
@@ -3128,7 +3222,7 @@ var PartTemplate = (function () {
         var newPart = new Part(this, ext, props, html, outerChildNodes, outerElement);
         if (refPartName) {
             /**放置到全局引用 */
-            $t.parts.push(refPartName, newPart);
+            KeyArrayHashObjectManage.push($t.parts, refPartName, newPart);
         }
         this.parts.push(newPart);
         if (uiNode.parentNode !== null) {
@@ -3282,14 +3376,15 @@ var TemplateList = (function () {
 var Service = (function (_super) {
     __extends(Service, _super);
     function Service(serv) {
-        _super.call(this);
-        this.__defineCallbacks__ = new ArrayEx();
+        var _this = _super.call(this) || this;
+        _this.__defineCallbacks__ = new ArrayEx();
         if (isObject(serv)) {
             for (var i in serv) {
-                this[i] = serv[i];
-                this.event.emit(i, this[i]);
+                _this[i] = serv[i];
+                _this.event.emit(i, _this[i]);
             }
         }
+        return _this;
     }
     Service.prototype.require = function (n) {
         if (!this.hasOwnProperty(n)) {
@@ -3324,7 +3419,7 @@ var Service = (function (_super) {
     };
     return Service;
 }(TemplateList));
-/// <reference path="core.ts" />
+/// <reference path='./core/core.ts'/>
 var $rootScope;
 var RootScope = (function () {
     function RootScope() {
@@ -3475,10 +3570,47 @@ var Client = (function () {
     return Client;
 }());
 $client = new Client;
-/// <reference path='core.ts'/>
+var Store = (function () {
+    function Store() {
+    }
+    return Store;
+}());
+var StoreManage = (function () {
+    function StoreManage() {
+    }
+    StoreManage.take = function (data, name) {
+        if (data.hasOwnProperty(name)) {
+            var ret = data[name];
+            delete data[name];
+            if (ret.childNodes.length > 1) {
+                return ret.childNodes;
+            }
+            else {
+                return ret.childNodes[0];
+            }
+        }
+        return null;
+    };
+    StoreManage.takeElem = function (data, name) {
+        if (data.hasOwnProperty(name)) {
+            var ret = data[name];
+            delete data[name];
+            if (ret.children.length > 1) {
+                return ret.children;
+            }
+            else {
+                return ret.children[0];
+            }
+        }
+        return null;
+    };
+    return StoreManage;
+}());
+/// <reference path='./core/core.ts'/>
 /// <reference path='./part/Template.ts'/>
 /// <reference path='scope.ts'/>
-/// <reference path='Client.ts'/>
+/// <reference path='client.ts'/>
+/// <reference path='store.ts'/>
 var readyRE = /complete|loaded|interactive/;
 function renderTemplate(tp) {
     var sHTML = getTemplate(tp);
@@ -3501,39 +3633,6 @@ var Config = (function () {
     }
     return Config;
 }());
-var Store = (function (_super) {
-    __extends(Store, _super);
-    function Store() {
-        _super.apply(this, arguments);
-    }
-    Store.prototype.take = function (name) {
-        if (this.hasOwnProperty(name)) {
-            var ret = this[name];
-            delete this[name];
-            if (ret.childNodes.length > 1) {
-                return ret.childNodes;
-            }
-            else {
-                return ret.childNodes[0];
-            }
-        }
-        return null;
-    };
-    Store.prototype.takeElem = function (name) {
-        if (this.hasOwnProperty(name)) {
-            var ret = this[name];
-            delete this[name];
-            if (ret.children.length > 1) {
-                return ret.children;
-            }
-            else {
-                return ret.children[0];
-            }
-        }
-        return null;
-    };
-    return Store;
-}(HashObject));
 function getQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
     var r = location.search.substr(1).match(reg);
@@ -3571,11 +3670,11 @@ var Turtle = (function () {
         this.config = new Config;
         this.replaceClassStore = [];
         this.T = new TemplateList;
-        this.parts = newKeyArrayObject('Parts');
+        this.parts = {};
         this.xhr = new XHR;
         this.service = new Service;
         this.store = new Store;
-        this.refs = newKeyArrayObject("RefElements");
+        this.refs = {};
         this.fn = {};
         this.readyByRenderDocument = new ReadyObject;
         this.renderDocument = function () {
@@ -3766,7 +3865,6 @@ var Turtle = (function () {
     return Turtle;
 }());
 /// <reference path='turtle.ts'/>
-/// <reference path='plugin/index.ts'/>
 if (!$DOM) {
     $DOM = function (html) {
         var elem = document.createElement('ui:dom');
@@ -3790,3 +3888,5 @@ if (!$DOM) {
     };
 }
 var turtle = $t = new Turtle();
+var data = "1234";
+var s = "\n<div class=\"xxx\">\n    <div class='xxx'>\n        " + data + "\n    </div>\n</div>\n";
