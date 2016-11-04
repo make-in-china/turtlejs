@@ -1,13 +1,13 @@
 
-/// <reference path="global.ts" />
+/// <reference path="lib/lib.d.ts" />
 
 interface IEventsCol{
-    [index:string]:Array<Fun>
+    [index:string]:Array<Function>
 }
 class $Event{
     private eventsCol:IEventsCol={};
-    on(name:string,fn:Fun){
-        let lst:Array<Fun>;
+    on(name:string,fn:Function){
+        let lst:Array<Function>;
         if(this.eventsCol.hasOwnProperty(name)){
             lst=this.eventsCol[name];    
         }else{
@@ -16,8 +16,8 @@ class $Event{
         }
         lst.push(fn);
     }
-    off(name:string,fn:Fun):boolean{
-        let lst:Array<Fun>;
+    off(name:string,fn:Function):boolean{
+        let lst:Array<Function>;
         if(this.eventsCol.hasOwnProperty(name)){
             lst=this.eventsCol[name];
             lst.forEach((item,index,array)=>{
@@ -31,7 +31,7 @@ class $Event{
         }
     }
     emit(name:string,event:Event){
-        let lst:Array<Fun>;
+        let lst:Array<Function>;
         if(this.eventsCol.hasOwnProperty(name)){
             lst=this.eventsCol[name];
             for(let i=0;i<lst.length;i++){
@@ -57,7 +57,7 @@ class ReadyObject{
             this.readyFunctions.push(fn);
         }
     }
-    readyFunctions:Fun[]=[];
+    readyFunctions:Function[]=[];
     get isReady(){
         return this._isReady;
     }

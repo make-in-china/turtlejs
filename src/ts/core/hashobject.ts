@@ -1,5 +1,17 @@
 
-
+/**
+ * 一个普通对象
+ * @param {string} s 格式为:xxx,yyy,zzz
+ * @param {any} defaultValue 初始化时每个属性的默认值
+ */
+class HashObject{
+    constructor(s:string,defaultValue:any=null){
+        let arr=s.split(',');
+        for(let i in arr){
+            this[arr[i]]=defaultValue;
+        }
+    }
+}
 class ArrayEx<T> extends Array<T>{
     last():T|undefined{
         if(this.length>0){

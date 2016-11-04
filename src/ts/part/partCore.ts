@@ -1,10 +1,9 @@
 
 /// <reference path="../core/core.ts"/>
-/// <reference path="../bind.ts"/>
 /// <reference path='TemplateConfig.ts'/>
 /// <reference path='PartOrderCore.ts'/>
-/// <reference path='../XHR.ts'/>
-/// <reference path='../instantiation.ts'/>
+/// <reference path='../core/XHR.ts'/>
+/// <reference path='../core/instantiation.ts'/>
 let
         $DOM,
         $node:(name:string,nodeType?:number)=>INode|null,

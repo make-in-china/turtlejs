@@ -17,10 +17,10 @@ class XHR{
         xhr.onerror=<any>fnerror;
         xhr.send(data);
     }
-    get(url:string,async:boolean,fn:(s:string)=>void,fnerror?:Fun){
+    get(url:string,async:boolean,fn:(s:string)=>void,fnerror?:(this: XMLHttpRequest, ev?: ErrorEvent) => any){
         this.send('GET',url,undefined,async,fn,fnerror);
     }
-    post(url:string,data:string,async:boolean,fn:(s:string)=>void,fnerror?:Fun){
+    post(url:string,data:string,async:boolean,fn:(s:string)=>void,fnerror?:(this: XMLHttpRequest, ev?: ErrorEvent) => any){
         this.send('POST',url,data,async,fn,fnerror);
     }
 }

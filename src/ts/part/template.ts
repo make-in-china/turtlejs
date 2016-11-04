@@ -1,6 +1,7 @@
 /// <reference path='../core/core.ts'/>
 /// <reference path='partcore.ts'/>
 /// <reference path='partview.ts'/>
+/// <reference path='../turtle.lib.ts'/>
 
 const memberRE = /{([\-a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g;
 const colorRE=/^\s*((#[\dabcdefABCDEF]{3,6})|(rgba\(.*\)))\s*$/
@@ -114,7 +115,7 @@ class PartParam{
 }
 class PartBase{
     partName:string;
-    super:PartBase;
+    super:PartBase|null=null;
     oninit:(final:Part)=>void;
     partMain:IHTMLElement;
     isInsert:boolean;
@@ -122,14 +123,16 @@ class PartBase{
     $:Service;
     store:INode[]=[];
     isExtends:boolean;
-    constructor(public template:PartTemplate,extPart:PartBase,public props:Object,html:string,outerChildNodes:INodeArray,outerElement:IHTMLCollection){
+    constructor(public template:PartTemplate,extPart:PartBase|undefined,public props:Object,html:string,outerChildNodes:INodeArray,outerElement:IHTMLCollection){
         this.$=new Service(template.service);
         this.partName=template.partName;
         if(extPart){
             /**继承 */
             this.__proto__=extPart;   
         }
-        this.super=extPart;
+        if(!isUndefined(extPart)){
+            this.super=extPart;
+        }
         let dom=$DOM(html);
         let nodes=dom.childNodes;
         initHTML(nodes,outerChildNodes,outerElement,props,this);
@@ -477,7 +480,7 @@ class Part extends PartBase{
 
 class ExtendsPart extends PartBase{
 
-    constructor(template:PartTemplate,extPart:PartBase,public props:Object,html:string,outerChildNodes:INodeArray,outerElement:IHTMLCollection){
+    constructor(template:PartTemplate,extPart:PartBase|undefined,public props:Object,html:string,outerChildNodes:INodeArray,outerElement:IHTMLCollection){
         super(template,extPart,props,html,outerChildNodes,outerElement);
         this.isExtends=true;
     }
@@ -674,7 +677,7 @@ class PartTemplate implements IPartTemplate{
     /**由props构建html字符串
      * @param {Object} props 
      * */
-    joinDatasByProps(props:Object):string|undefined{
+    joinDatasByProps(props:Object):string{
         
         let err=[];
         let d:ArrayEx<string>=slice.call(this.datas);
@@ -704,7 +707,7 @@ class PartTemplate implements IPartTemplate{
             }
             log(err.join('\n'));
             bp();
-            return;
+            return "";
         }
         return d.join('');
     }
@@ -784,7 +787,7 @@ class ITemplateList{
 }
 class TemplateList{
     protected event=new $Event;
-    onDefine(name:string,fn:Fun){
+    onDefine(name:string,fn:Function){
         if(name.length===0){
             return;
         }
@@ -810,7 +813,7 @@ class TemplateList{
     }
 }
 class Service extends TemplateList{
-    private __defineCallbacks__:ArrayEx<Fun>=new ArrayEx<Fun>();
+    private __defineCallbacks__:ArrayEx<Function>=new ArrayEx<Function>();
     constructor(serv?:Service){
         super();
         if(isObject(serv)){

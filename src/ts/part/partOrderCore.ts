@@ -1,7 +1,7 @@
 
 /// <reference path="../core/core.ts"/>
 /// <reference path="../core/execute.ts"/>
-/// <reference path="../bind.ts"/>
+/// <reference path="../core/bind.ts"/>
 let 
     orderRE                 =	/^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|let|=)(\s|$)/g,
     orderCaseRE             =   /^\s?(else if|else|case break|case|default|end)(\s|$)/g,

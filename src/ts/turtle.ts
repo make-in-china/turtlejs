@@ -99,11 +99,11 @@ class Turtle implements ITurtle{
         let 
             scriptNode                                              =this.getScriptNode(),
             compile                                                 =getAttr(scriptNode,'compile',""),
-            load                                                    =getAttr(scriptNode,'load',null),
-            baseuipath                                              =getAttr(scriptNode,'baseuipath',null),
+            load                                                    =getAttr(scriptNode,'load',""),
+            baseuipath                                              =getAttr(scriptNode,'baseuipath',""),
             // isExtend                                                =getAttr(scriptNode,'extend',null),
             compileName                                             =getAttr(scriptNode,'compilename',""),
-            compileuilist                                           =getAttr(scriptNode,'compileuilist',null),
+            compileuilist                                           =getAttr(scriptNode,'compileuilist',""),
             script                                                  =<string>scriptNode.innerHTML,
             compileInfo:{isOn?:boolean,url?:string}|undefined;
 
@@ -210,7 +210,7 @@ class Turtle implements ITurtle{
         this.renderDocument.endTime=new Date();
     }
     
-    private r1(scriptNode:IHTMLScriptElement,compileuilist:string|null,compileName:string,compileInfo:{isOn?:boolean,url?:string},compile:string){
+    private r1(scriptNode:IHTMLScriptElement,compileuilist:string|undefined,compileName:string|undefined,compileInfo:{isOn?:boolean,url?:string},compile:string|undefined){
         this.ready(function() {
             this.compileDocument(scriptNode,compileuilist,function(html,compileJS,importScripts){
                 if(compileName===""){
@@ -269,7 +269,7 @@ class Turtle implements ITurtle{
             this.emitResize();
         });
     }
-    ready(fn:Fun){
+    ready(fn:()=>void){
         if(this.readyByRenderDocument.isReady||(readyRE.test(document.readyState)&&document.body!==null)){
             fn();
         }else{

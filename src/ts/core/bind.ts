@@ -124,7 +124,7 @@ interface Object{
 interface IBindFunction{
     (name:string)
     isBinding:boolean;
-    removeObject:Fun;
+    removeObject:Function;
     list:Array<Object>;
 }
 function bindPropertyByName(obj:Object,name:string,obj2:Object,name2:string):IBindFunction{
@@ -337,7 +337,7 @@ function bindExpressionsByOrder(node,condition){
         bindVar=cdtn[0],
         arrBindVar:Array<string>,
         exp:IExp,
-        textNode:IText=$node(' ',3);
+        textNode:IText=<any>$node(' ',3);
         
     if(bindVar.indexOf(".")!=-1){
         arrBindVar=bindVar.split(".");

@@ -1,5 +1,5 @@
 
-/// <reference path='../core.ts'/>
+/// <reference path='../core/core.ts'/>
 let 
     VDOM,
     VTemplate,
