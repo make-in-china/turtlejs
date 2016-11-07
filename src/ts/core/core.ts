@@ -6,7 +6,7 @@
 /// <reference path="../$Event.ts"/>
 /// <reference path="node.ts"/>
 /// <reference path="bind.ts"/>
-/// <reference path="browserhelp.ts"/>
+/// <reference path="browserhelper.ts"/>
 /// <reference path="debughelper.ts"/>
 /// <reference path="treeeach.ts"/>
 

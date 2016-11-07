@@ -738,8 +738,8 @@ function initHTML(arr:INodeArray,outerChildNodes?,outerElement?,props?,part?){
         }
     });
 }
-function getParts(childNodes:INodeArray){
-    var child=[];
+function getParts(childNodes:INodeArray):PartBase[]{
+    var child:PartBase[]=[];
     var cpn=null;
     treeEach(childNodes,"childNodes",function(node:INode){
         if(node.nodeType===8&&(<IComment>node).__part__){

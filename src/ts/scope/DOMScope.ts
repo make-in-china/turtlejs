@@ -1,39 +1,8 @@
 
-/// <reference path='./core/core.ts'/>
-let 
-    $rootScope:RootScope;
-interface INode{
-    __scope__?:Scope;
-}
-
 interface ITurtle{
     domScope:DOMScope;
-    rootScope:RootScope;
 }
 
-class RootScope{
-    public __actionNode__=document.documentElement;
-    public __children__:Scope[]=[];
-    constructor(){
-        document['scope']=this;
-    }
-}
-class Scope {
-    public __actionNode__:INode
-    public __parent__:Scope|RootScope|null
-    public __children__:Scope[]=[]
-    public __proto__:Object|Scope
-    constructor(public __commentNode__:INode,parent:Scope|RootScope,public __name__?:string){
-        this.__actionNode__=__commentNode__.parentNode;
-        this.__parent__=parent;
-        this.__proto__=parent;
-        __commentNode__.parentNode.__scope__=this;
-        parent.__children__.push(this);
-        if(__name__){
-            parent[__name__]=this;
-        }
-    }
-}
 class DOMScope{
     stack:Array<Scope|RootScope>
     constructor(){
@@ -78,7 +47,7 @@ class DOMScope{
      */
     unlink(scope:Scope){
         var p=scope.__parent__;
-        if(!isNull(p)){
+        if(p){
             scope.__parent__=null;
             removeItem(p.__children__,scope);
             var name=scope.__name__;

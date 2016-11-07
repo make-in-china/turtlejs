@@ -13,5 +13,8 @@
   "bugs": {
     "url": "https://github.com/make-in-china/turtlejs/issues"
   },
-  "homepage": "https://github.com/make-in-china/turtlejs#readme"
+  "homepage": "https://github.com/make-in-china/turtlejs#readme",
+  "dependencies": {
+    
+  }
 }

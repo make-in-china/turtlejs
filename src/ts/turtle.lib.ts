@@ -1,5 +1,5 @@
 
-function _catch(e:Event,fn?:Fun){
+function _catch(e:Event,fn?:Function){
     if(fn){
         fn(e);
     }else{

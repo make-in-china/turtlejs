@@ -1,5 +1,4 @@
 
-/// <reference path="typeprototype.ts" />
 let
     persentRE               =   /^\s*([\d.]+)%\s*$/
 
