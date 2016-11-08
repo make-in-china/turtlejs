@@ -8,7 +8,7 @@ interface IPartRefs {
     begin:IComment
     end:IComment
 }
-class Part extends EventEmitter {
+class Part extends EventEmitterEx {
 //属性
     /**组件名*/
     partName: string;
@@ -33,22 +33,6 @@ class Part extends EventEmitter {
     resPath:string;
 
     
-
-    /**
-     * 缓存事件管理器
-     */
-    private eventHelpers:{[index:string]:EventHelper<ICallBack,Function>}={}
-    /**
-     * 生成或获取一个事件管理器
-     */
-    getEventHelper<T extends ICallBack,U extends Function>(type:string):EventHelper<T,U>{
-        var eventHelper=this.eventHelpers[type];
-        if(!eventHelper){
-        }else{
-            eventHelper=this.eventHelpers[type]=new EventHelper<T,U>(this,type);
-        }
-        return <EventHelper<T,U>>eventHelper;
-    }
 //事件管理器
     /**resize事件管理器*/
     $resize=this.getEventHelper<

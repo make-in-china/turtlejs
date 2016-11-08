@@ -5,7 +5,8 @@ class Service extends TemplateList{
         if(isObject(serv)){
             for(let i in serv){
                 this[i]=serv[i];
-                this.event.emit(i,this[i]);
+                this.emit(i,this[i]);
+                // this.event.emit(i,this[i]);
             }
         }
     }
@@ -21,7 +22,8 @@ class Service extends TemplateList{
         }catch(e){
             _catch(e);
         }
-        this.event.emit(name,this[name]);
+        this.emit(name,this[name]);
+        // this.event.emit(name,this[name]);
     }
     toDefineString(){
         let s='new $t.Service(';

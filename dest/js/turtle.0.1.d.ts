@@ -732,6 +732,14 @@ declare class Turtle extends EventEmitter implements ITurtle {
     service: Service;
     store: Store;
     readyByRenderDocument: Ready;
+    /**
+     * 缓存事件管理器
+     */
+    private eventHelpers;
+    /**
+     * 生成或获取一个事件管理器
+     */
+    getEventHelper<T extends ICallBack, U extends Function>(type: string): EventHelper<T, U>;
     /**error事件管理器*/
     $error: EventHelper<(this: void, event: any) => void, (this: void, event: any) => boolean>;
     parts: IKeyArrayHashObject<Part>;
@@ -741,14 +749,6 @@ declare class Turtle extends EventEmitter implements ITurtle {
     turtleScriptElement: IHTMLScriptElement;
     url: string;
     isCompile: boolean;
-    /**
-     * 缓存事件管理器
-     */
-    private eventHelpers;
-    /**
-     * 生成或获取一个事件管理器
-     */
-    getEventHelper<T extends ICallBack, U extends Function>(type: string): EventHelper<T, U>;
     constructor();
     private getScriptNode();
     readonly rootParts: Part[];

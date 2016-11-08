@@ -75,7 +75,7 @@ function appendQueryString(name,value){
         return location.href+'?'+name+'='+value;
     }
 }
-class Turtle extends EventEmitter implements ITurtle{
+class Turtle extends EventEmitterEx implements ITurtle{
     domScope                                =new DOMScope;
     rootScope                               =new RootScope;
     config                                  =new Config;
@@ -84,6 +84,7 @@ class Turtle extends EventEmitter implements ITurtle{
     service                                 =new Service;
     store                                   =new Store;
     readyByRenderDocument:Ready             =new Ready;
+    
     /**error事件管理器*/
     $error                                  =this.getEventHelper<
                                                 (this:void,event:any)=>void,
@@ -97,21 +98,6 @@ class Turtle extends EventEmitter implements ITurtle{
     url:string
     isCompile:boolean;/**未使用 */
     
-    /**
-     * 缓存事件管理器
-     */
-    private eventHelpers:{[index:string]:EventHelper<ICallBack,Function>}={}
-    /**
-     * 生成或获取一个事件管理器
-     */
-    getEventHelper<T extends ICallBack,U extends Function>(type:string):EventHelper<T,U>{
-        var eventHelper=this.eventHelpers[type];
-        if(!eventHelper){
-        }else{
-            eventHelper=this.eventHelpers[type]=new EventHelper<T,U>(this,type);
-        }
-        return <EventHelper<T,U>>eventHelper;
-    }
     constructor(){
         super();
         this.$error.on((e)=>{

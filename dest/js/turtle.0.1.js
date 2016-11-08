@@ -1081,7 +1081,7 @@ var EventHelper = (function () {
                 args[_i - 0] = arguments[_i];
             }
             args.unshift(this.type);
-            return this.part.emit.apply(this.part, args);
+            return this.target.emit.apply(this, args);
         };
     }
     EventHelper.prototype.on = function (listener) {
@@ -3049,12 +3049,12 @@ var TemplateList = (function (_super) {
             return;
         }
         this.on(name, fn);
-        this.emit(name);
+        this.emit(name, fn);
     };
     TemplateList.prototype.define = function (name, sortPath, path, s, ext) {
         this[name] = new PartTemplate(name, sortPath, path, s, ext);
         // this.event.emit(name,this[name]);
-        this.emit(name);
+        this.emit(name, this[name]);
         return this[name];
     };
     TemplateList.prototype.toString = function () {
@@ -3268,7 +3268,7 @@ var Service = (function (_super) {
         if (isObject(serv)) {
             for (var i in serv) {
                 _this[i] = serv[i];
-                _this.event.emit(i, _this[i]);
+                _this.emit(i, _this[i]);
             }
         }
         return _this;
@@ -3286,7 +3286,8 @@ var Service = (function (_super) {
         catch (e) {
             _catch(e);
         }
-        this.event.emit(name, this[name]);
+        this.emit(name, this[name]);
+        // this.event.emit(name,this[name]);
     };
     Service.prototype.toDefineString = function () {
         var s = 'new $t.Service(';
@@ -3385,8 +3386,6 @@ var Part = (function (_super) {
     Part.prototype.getEventHelper = function (type) {
         var eventHelper = this.eventHelpers[type];
         if (!eventHelper) {
-        }
-        else {
             eventHelper = this.eventHelpers[type] = new EventHelper(this, type);
         }
         return eventHelper;
@@ -3792,16 +3791,16 @@ var Turtle = (function (_super) {
         _this.service = new Service;
         _this.store = new Store;
         _this.readyByRenderDocument = new Ready;
+        /**
+         * 缓存事件管理器
+         */
+        _this.eventHelpers = {};
         /**error事件管理器*/
         _this.$error = _this.getEventHelper("error");
         _this.parts = {};
         _this.refs = {};
         // private fn                              ={}
         _this.replaceClassStore = [];
-        /**
-         * 缓存事件管理器
-         */
-        _this.eventHelpers = {};
         _this.renderDocument = function () {
             _this.renderDocument.beginTime = new Date();
             var xmps = findTemplates(document.body.children), i, templateXMP = [];
@@ -3895,8 +3894,6 @@ var Turtle = (function (_super) {
     Turtle.prototype.getEventHelper = function (type) {
         var eventHelper = this.eventHelpers[type];
         if (!eventHelper) {
-        }
-        else {
             eventHelper = this.eventHelpers[type] = new EventHelper(this, type);
         }
         return eventHelper;

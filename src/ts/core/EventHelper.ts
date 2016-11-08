@@ -2,9 +2,9 @@
 /// <reference path="EventEmitter.ts"/>
 class EventHelper<T extends ICallBack,E extends Function>{
     constructor(private target:EventEmitter,private type:string){}
-    emit:E=<any>function(...args):boolean{
+    emit:E=<any>function(this:EventHelper<T,E>,...args):boolean{
         args.unshift(this.type);
-        return this.part.emit.apply(this.part,args);
+        return this.target.emit.apply(this,args);
     }
     on(listener:T):void{
         this.target.on(this.type,listener);
