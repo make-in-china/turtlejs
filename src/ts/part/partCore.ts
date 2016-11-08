@@ -11,7 +11,7 @@ let
 interface I$Node {
     (name:'__break__', nodeType?:number):IHTMLBreakElement
     (name: string, nodeType?: 1): INode
-    (name: string, nodeType?: 3): INode
+    (name: string, nodeType?: 3): IText
     (name: string, nodeType?: 8): IComment
     (name: string, nodeType?: number): INode | null
 }
@@ -460,7 +460,7 @@ let includeJSFiles = (function () {
                 task.count--;
                 includeJSFile(task);
             }
-            document.head.appendChild(<any>scriptNode);
+            document.head.appendChild(scriptNode);
 
         } else if (task.count == 0) {
             task.onallload();

@@ -1,7 +1,10 @@
 
 /// <reference path="../lib/lib.d.ts" />
 interface INode {
-    insertBefore2(newChild: INode, refChild?: INode): INode;
+    insertBefore2(newChild: INode, refChild: INode): INode;
+}
+interface Node {
+    insertBefore2(newChild: INode, refChild: INode): INode;
 }
 interface Node {
     toDOM(): Node
@@ -253,4 +256,8 @@ function toggleClass(sel, a, t, f) {
 /**判断是否注释节点 */
 function isCommentNode(node:INode): node is IComment{
     return node.nodeType===Node.COMMENT_NODE;
+}
+/**判断是否文本节点 */
+function isTextNode(node:INode): node is IText{
+    return node.nodeType===Node.TEXT_NODE;
 }

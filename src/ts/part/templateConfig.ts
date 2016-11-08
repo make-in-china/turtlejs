@@ -48,10 +48,10 @@ class BasePath{
 class TemplateConfig{
     ["XMP"]         ={};
     ["TEMPLATE"]    ={};
-    ["TITLE"]       ={getData:function(node:IHTMLTitleElement):string{return <any>node.innerText;}};
+    ["TITLE"]       ={getData:function(node:IHTMLTitleElement):string{return node.innerText;}};
     ["STYLE"]       ={xmp:undefined};
     ["SCRIPT"]      ={xmp:undefined};
-    ["TEXTAREA"]    ={xmp:undefined,getData:function(node:IHTMLTextAreaElement):string{return <any>node.defaultValue;}};
+    ["TEXTAREA"]    ={xmp:undefined,getData:function(node:IHTMLTextAreaElement):string{return node.defaultValue;}};
     toString(){
         let arr=[];
         let desc:string;

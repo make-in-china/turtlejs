@@ -627,99 +627,99 @@ interface IHTMLTextAreaElement extends IHTMLElement {
     /**
       * Provides a way to direct a user to a specific field when a document loads. This can provide both direction and convenience for a user, reducing the need to click or tab to a field when a page opens. This attribute is true when present on an element, and false when missing.
       */
-    autofocus?: boolean;
+    autofocus: boolean;
     /**
       * Sets or retrieves the width of the object.
       */
-    cols?: number;
+    cols: number;
     /**
       * Sets or retrieves the initial contents of the object.
       */
-    defaultValue?: string;
-    disabled?: boolean;
+    defaultValue: string;
+    disabled: boolean;
     /**
       * Retrieves a reference to the form that the object is embedded in.
       */
-    form?: HTMLFormElement;
+    form: HTMLFormElement;
     /**
       * Sets or retrieves the maximum number of characters that the user can enter in a text control.
       */
-    maxLength?: number;
+    maxLength: number;
     /**
       * Sets or retrieves the name of the object.
       */
-    name?: string;
+    name: string;
     /**
       * Gets or sets a text string that is displayed in an input field as a hint or prompt to users as the format or type of information they need to enter.The text appears in an input field until the user puts focus on the field.
       */
-    placeholder?: string;
+    placeholder: string;
     /**
       * Sets or retrieves the value indicated whether the content of the object is read-only.
       */
-    readOnly?: boolean;
+    readOnly: boolean;
     /**
       * When present, marks an element that can't be submitted without a value.
       */
-    required?: boolean;
+    required: boolean;
     /**
       * Sets or retrieves the number of horizontal rows contained in the object.
       */
-    rows?: number;
+    rows: number;
     /**
       * Gets or sets the end position or offset of a text selection.
       */
-    selectionEnd?: number;
+    selectionEnd: number;
     /**
       * Gets or sets the starting position or offset of a text selection.
       */
-    selectionStart?: number;
+    selectionStart: number;
     /**
       * Sets or retrieves the value indicating whether the control is selected.
       */
-    status?: any;
+    status: any;
     /**
       * Retrieves the type of control.
       */
-    type?: string;
+    type: string;
     /**
       * Returns the error message that would be displayed if the user submits the form, or an empty string if no error message. It also triggers the standard error message, such as "this is a required field". The result is that the user sees validation messages without actually submitting.
       */
-    validationMessage?: string;
+    validationMessage: string;
     /**
       * Returns a  ValidityState object that represents the validity states of an element.
       */
-    validity?: ValidityState;
+    validity: ValidityState;
     /**
       * Retrieves or sets the text in the entry field of the textArea element.
       */
-    value?: string;
+    value: string;
     /**
       * Returns whether an element will successfully validate based on forms validation rules and constraints.
       */
-    willValidate?: boolean;
+    willValidate: boolean;
     /**
       * Sets or retrieves how to handle wordwrapping in the object.
       */
-    wrap?: string;
+    wrap: string;
     /**
       * Returns whether a form will validate when it is submitted, without having to submit it.
       */
-    checkValidity?(): boolean;
+    checkValidity(): boolean;
     /**
       * Highlights the input area of a form element.
       */
-    select?(): void;
+    select(): void;
     /**
       * Sets a custom error message that is displayed when a form is submitted.
       * @param error Sets a custom error message that is displayed when a form is submitted.
       */
-    setCustomValidity?(error: string): void;
+    setCustomValidity(error: string): void;
     /**
       * Sets the start and end positions of a selection in a text field.
       * @param start The offset into the text field for the start of the selection.
       * @param end The offset into the text field for the end of the selection.
       */
-    setSelectionRange?(start: number, end: number): void;
+    setSelectionRange(start: number, end: number): void;
 }
 
 interface IHTMLTitleElement extends IHTMLElement {

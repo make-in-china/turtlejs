@@ -203,7 +203,7 @@ class Turtle extends EventEmitter implements ITurtle{
     emitResize(){
         var parts=this.rootParts;
         for(var i=0;i<parts.length;i++){
-            parts[i].emitResize();
+            parts[i].$resize.emit(parts[i]);
         }
     }
     renderDocument:IRenderDocument=()=>{

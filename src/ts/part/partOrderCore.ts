@@ -19,9 +19,9 @@ interface IParseError{
     (msg:string):eTreeEach;
 }
 interface ICommentOrderInfo{
-    order?: any;
-    orderCase?: any;
-    condition: any;
+    order?: string;
+    orderCase?: string;
+    condition: string;
 }
 interface ITurtle{
     replaceClassStore:IHTMLElement[];

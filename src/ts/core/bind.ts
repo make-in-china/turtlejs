@@ -337,7 +337,7 @@ function bindExpressionsByOrder(node,condition){
         bindVar=cdtn[0],
         arrBindVar:Array<string>,
         exp:IExp,
-        textNode:IText=<any>$node(' ',3);
+        textNode:IText=$node(' ',3);
         
     if(bindVar.indexOf(".")!=-1){
         arrBindVar=bindVar.split(".");
