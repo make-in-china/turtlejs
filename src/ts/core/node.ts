@@ -258,8 +258,3 @@ function isCommentNode(node:INode): node is IComment{
 function isTextNode(node:INode): node is IText{
     return node.nodeType===Node.TEXT_NODE;
 }
-let functionCommentRE = /\/\*([\s\S]*?)\*\//g
-function getFunctionComment(fn:Function) {
-    let s: RegExpExecArray = <RegExpExecArray>functionCommentRE.exec(fn.toString());
-    return s[1];
-}

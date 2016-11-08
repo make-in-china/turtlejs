@@ -1,10 +1,3 @@
-interface Window {
-    ActiveXObject?: Object;
-}
-interface Node {
-    insertBefore2(newChild: INode, refChild: INode): INode;
-}
-declare let isIE: boolean;
 declare class ArrayEx<T> extends Array<T> {
     last(): T | undefined;
     clear(): void;
@@ -756,7 +749,7 @@ interface IHTMLScriptElement extends IHTMLElement {
     type?: string;
 }
 interface Object {
-    __proto__?: Object;
+    __proto__: Object;
 }
 interface INode {
     insertBefore2(newChild: INode, refChild: INode): INode;
@@ -798,8 +791,6 @@ declare function toggleClass(sel: any, a: any, t: any, f: any): void;
 declare function isCommentNode(node: INode): node is IComment;
 /**判断是否文本节点 */
 declare function isTextNode(node: INode): node is IText;
-declare let functionCommentRE: RegExp;
-declare function getFunctionComment(fn: Function): string;
 declare let arrayConstructor: Array<any>, objectConstructor: ObjectConstructor, stringConstructor: String, toStr: () => string, slice: (start?: number, end?: number) => any[], push: (...items: any[]) => number, splice: {
     (start: number): any[];
     (start: number, deleteCount: number, ...items: any[]): any[];
@@ -912,6 +903,13 @@ declare function treeEach<T>(array: T[] | IArray, propertyName: string, fn: (nod
     array: IArray | T[];
     index: number;
 };
+interface Window {
+    ActiveXObject?: Object;
+}
+interface Node {
+    insertBefore2(newChild: INode, refChild: INode): INode;
+}
+declare let isIE: boolean;
 declare class TemplateList extends EventEmitter {
     onDefine(name: string, fn: ICallBack): void;
     define(name: string, sortPath: string, path: string, s: string, ext: any): any;
@@ -1488,7 +1486,6 @@ declare class Turtle extends EventEmitterEx implements ITurtle {
     url: string;
     isCompile: boolean;
     getBind: typeof getBind;
-    getFunctionComment: typeof getFunctionComment;
     constructor();
     private getScriptNode();
     readonly rootParts: Part[];

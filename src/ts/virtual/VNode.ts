@@ -4,18 +4,18 @@
 /// <reference path='../lib/HashObject.ts'/>
 /// <reference path='../lib/Encode.ts'/>
 /// <reference path='../lib/ClassList.ts'/>
-/// <reference path='../core/Node.ts'/>
-let 
-        emptyTextNodeRE = /^\s*$/,
-        styleListRE = /\s*([\w\-]+)\s*\:\s*(.*?)\s*[;$]/g,
-        stringNode = {
-            SCRIPT: /^\/script[>\s]/i,
-            TEMPLATE: /^\/template[>\s]/i,
-            STYLE: /^\/style[>\s]/i,
-            TITLE: /^\/title[>\s]/i,
-            TEXTAREA: /^\/textarea[>\s]/i,
-            XMP: /^\/xmp[>\s]/i
-        }
+/// <reference path='../lib/lib.ts'/>
+let
+    emptyTextNodeRE = /^\s*$/,
+    styleListRE = /\s*([\w\-]+)\s*\:\s*(.*?)\s*[;$]/g,
+    stringNode = {
+        SCRIPT: /^\/script[>\s]/i,
+        TEMPLATE: /^\/template[>\s]/i,
+        STYLE: /^\/style[>\s]/i,
+        TITLE: /^\/title[>\s]/i,
+        TEXTAREA: /^\/textarea[>\s]/i,
+        XMP: /^\/xmp[>\s]/i
+    }
 
 interface IVText extends IVNode {
     value: string
@@ -290,6 +290,12 @@ let VNode: IVNode = <any>(function () {
             }
         });
     }
+
+    let functionCommentRE = /\/\*([\s\S]*?)\*\//g
+    function getFunctionComment(fn: Function) {
+        let s: RegExpExecArray = <RegExpExecArray>functionCommentRE.exec(fn.toString());
+        return s[1];
+    }
     function setProto(t) {
         let proto = htmlNodeInfo[t.nodeName];
         if (isArray(proto)) {
@@ -332,7 +338,7 @@ let VNode: IVNode = <any>(function () {
     function isVDocType(node: IVNode): node is IVDocType {
         return node.nodeType === 10
     }
-    
+
     function defineClassList(object) {
         Object.defineProperty(object, 'classList', {
             enumerable: true,
@@ -352,33 +358,30 @@ let VNode: IVNode = <any>(function () {
             }
         });
     }
-    function newVNode(name: string, nodeType: number): IVNode {
+//用于返回给VNode的函数对象
+    function newVNode(name: string, nodeType: number=1): IVNode {
         //console.log(name);
         let t: IVNode = <any>function (name: string, nodeType: number) {
-            if (name !== undefined) {
+            if (name) {
                 return t.append(name, nodeType);
             } else {
                 t.__isClose__ = true;
                 return t.parentNode;
             }
         }
-        if (nodeType === undefined) {
-            nodeType = 1;
-        }
         t.__ = {};
         t.childNodes = [];
-        t.nodeType = nodeType;
+        nodeType = nodeType;
         if (isVText(t)) {
             t.__proto__ = textNodePrototype;
             t.nodeName = '#text';
             if (isString(name)) {
                 t.value = name//decodeHTML(name);    
-            // } else {
-            //     t.value = name.toString();
+                // } else {
+                //     t.value = name.toString();
             }
             t.__isClose__ = true;
-        } else
-            if (isVElement(t)) {
+        } else if (isVElement(t)) {
                 t.nodeName = name.toUpperCase();
                 t.attributes = new VNamedNodeMap();
                 t.children = [];
@@ -409,19 +412,20 @@ let VNode: IVNode = <any>(function () {
         return t;
     }
 
+//VNode的函数定义
     function append(name: string, nodeType: number): IVNode {
         return _appendChild.call(this, newVNode(name, nodeType));
     }
     function appendChild(this: IVNode, vNode: IVNode): IVNode {
         let idx = this.childNodes.indexOf(vNode);
-        if (idx === -1) {
+        if (idx === -1) {  
             return _appendChild.call(this, vNode);
         } else {
             return vNode;
         }
     }
     function _appendChild(this:IVNode,vNode: IVNode) {
-        if (vNode instanceof Node) {
+        if (vNode instanceof Node) { 
             throw new Error('虚拟DOM只能插入虚拟节点！');
         }
         this.childNodes.push(vNode);
@@ -764,6 +768,7 @@ let VNode: IVNode = <any>(function () {
     }
     function toDOM(this: IVNode): Node {
         let elem: Node;
+        let toHelp = document.createElement('用于创建VStyle和toDom支持');
         switch (this.nodeType) {
             case 1:
                 if (this.__domNode__) {
@@ -874,6 +879,7 @@ let VNode: IVNode = <any>(function () {
         return elem;
     }
 
+//VNode的模拟继承
     function VtextNode() {
         this.__proto__ = prototype;
         this.__value__ = '';

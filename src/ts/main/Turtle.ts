@@ -60,7 +60,6 @@ class Turtle extends EventEmitterEx implements ITurtle{
     url:string
     isCompile:boolean;/**未使用 */
     getBind                                 =getBind
-    getFunctionComment                      =getFunctionComment
     constructor(){
         super();
         this.$error.on((e)=>{

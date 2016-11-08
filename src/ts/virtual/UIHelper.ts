@@ -20,8 +20,12 @@ namespace Component{
     }
 }`
     static makeClass(path:string){
-        var html=this.fs.readdirSync(path);
+        var html=this.fs.readFileSync(path);
+        if(!isString(html)){
+            html=html.toString();
+        }
         var data=VDOM(html).toJS;
         console.log(data);
     }
 }
+exports.UIHelper=UIHelper;

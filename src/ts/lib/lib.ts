@@ -1,5 +1,4 @@
 
-/// <reference path="../core/BrowserHelper.ts"/>
 /// <reference path="../lib/ArrayEx.ts"/>
 
 interface IExp{
@@ -754,6 +753,7 @@ interface IHTMLScriptElement extends IHTMLElement {
       */
     type?: string;
 }
+
 interface Object {
-    __proto__?:Object
+    __proto__:Object
 }

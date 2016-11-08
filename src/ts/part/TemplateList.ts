@@ -1,4 +1,5 @@
 
+/// <reference path="../core/BrowserHelper.ts"/>
 class TemplateList extends EventEmitter{
     onDefine(name:string,fn:ICallBack){
         if(name.length===0){

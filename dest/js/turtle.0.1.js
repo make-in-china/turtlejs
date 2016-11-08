@@ -3,46 +3,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var isIE;
-try {
-    isIE = !!(typeof window !== "undefined" && window.ActiveXObject || "ActiveXObject" in window);
-}
-catch (e) {
-    isIE = false;
-}
-(function () {
-    var insertBefore = Node.prototype.insertBefore;
-    if (isIE) {
-        Node.prototype.insertBefore2 = function (newNode, node) {
-            var reAppend = [];
-            var n;
-            if (isTextNode(newNode)) {
-                if (newNode.data === "") {
-                    return;
-                }
-            }
-            else if (isCommentNode(newNode)) {
-                n = node.nextSibling;
-                while (n !== null) {
-                    reAppend.push(this.removeChild(n));
-                    n = node.nextSibling;
-                }
-                reAppend.unshift(this.removeChild(node));
-                this.appendChild(newNode);
-                for (var i = 0; i < reAppend.length; i++) {
-                    this.appendChild(reAppend[i]);
-                }
-                return newNode;
-            }
-            else {
-                return insertBefore.call(this, newNode, node);
-            }
-        };
-    }
-    else {
-        Node.prototype.insertBefore2 = insertBefore;
-    }
-})();
 var ArrayEx = (function (_super) {
     __extends(ArrayEx, _super);
     function ArrayEx() {
@@ -61,7 +21,6 @@ var ArrayEx = (function (_super) {
     };
     return ArrayEx;
 }(Array));
-/// <reference path="../core/BrowserHelper.ts"/>
 /// <reference path="../lib/ArrayEx.ts"/>
 /// <reference path="../lib/lib.ts" />
 Node.prototype.toDOM =
@@ -324,11 +283,6 @@ function isCommentNode(node) {
 /**判断是否文本节点 */
 function isTextNode(node) {
     return node.nodeType === Node.TEXT_NODE;
-}
-var functionCommentRE = /\/\*([\s\S]*?)\*\//g;
-function getFunctionComment(fn) {
-    var s = functionCommentRE.exec(fn.toString());
-    return s[1];
 }
 var arrayConstructor = Array.prototype, objectConstructor = Object.prototype, stringConstructor = String.prototype, toStr = objectConstructor.toString, slice = arrayConstructor.slice, push = arrayConstructor.push, splice = arrayConstructor.splice, getPrototypeOf = objectConstructor.getPrototypeOf, replace = stringConstructor.replace;
 function extend(elem, elemEx) {
@@ -714,6 +668,47 @@ function treeEach(array, propertyName, fn, beginIndex) {
     }
     return { stack: stack, state: state, array: arr, index: i };
 }
+var isIE;
+try {
+    isIE = !!(typeof window !== "undefined" && window.ActiveXObject || "ActiveXObject" in window);
+}
+catch (e) {
+    isIE = false;
+}
+(function () {
+    var insertBefore = Node.prototype.insertBefore;
+    if (isIE) {
+        Node.prototype.insertBefore2 = function (newNode, node) {
+            var reAppend = [];
+            var n;
+            if (isTextNode(newNode)) {
+                if (newNode.data === "") {
+                    return;
+                }
+            }
+            else if (isCommentNode(newNode)) {
+                n = node.nextSibling;
+                while (n !== null) {
+                    reAppend.push(this.removeChild(n));
+                    n = node.nextSibling;
+                }
+                reAppend.unshift(this.removeChild(node));
+                this.appendChild(newNode);
+                for (var i = 0; i < reAppend.length; i++) {
+                    this.appendChild(reAppend[i]);
+                }
+                return newNode;
+            }
+            else {
+                return insertBefore.call(this, newNode, node);
+            }
+        };
+    }
+    else {
+        Node.prototype.insertBefore2 = insertBefore;
+    }
+})();
+/// <reference path="../core/BrowserHelper.ts"/>
 var TemplateList = (function (_super) {
     __extends(TemplateList, _super);
     function TemplateList() {
@@ -3870,7 +3865,6 @@ var Turtle = (function (_super) {
         // private fn                              ={}
         _this.replaceClassStore = [];
         _this.getBind = getBind;
-        _this.getFunctionComment = getFunctionComment;
         _this.renderDocument = function () {
             _this.renderDocument.beginTime = new Date();
             var xmps = findTemplates(document.body.children), i, templateXMP = [];

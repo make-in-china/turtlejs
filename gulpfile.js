@@ -61,8 +61,9 @@ function tscui(event){
     });   
 }
 function uibuild(path){
-    var UIHealper=require('./dest/virtual/UIHelper.0.1.js');
-    UIHealper.makeClass(path);
+    var UIHelper=require('./dest/virtual/UIHelper.0.1.js').UIHelper;
+    console.log(UIHelper);
+    UIHelper.makeClass(path);
     // console.log('\n['+moment().format("HH:mm:ss")+']\n'+path.replace(/\\\\/g,'\\'));
 }
 function uiwatch(event){
