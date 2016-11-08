@@ -1,9 +1,11 @@
 
 /// <reference path='./core/core.ts'/>
 /// <reference path='./part/Template.ts'/>
-// // / <reference path='scope.ts'/>
+/// <reference path='./scope/Scope.ts'/>
 /// <reference path='ClientHelper.ts'/>
 /// <reference path='store.ts'/>
+/// <reference path='./part/Part.ts'/>
+/// <reference path='Ready.ts'/>
 
 
 let 

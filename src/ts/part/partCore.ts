@@ -460,7 +460,7 @@ let includeJSFiles = (function () {
                 task.count--;
                 includeJSFile(task);
             }
-            document.head.appendChild(scriptNode);
+            document.head.appendChild(<any>scriptNode);
 
         } else if (task.count == 0) {
             task.onallload();

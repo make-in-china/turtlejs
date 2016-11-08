@@ -1,6 +1,6 @@
 
 /// <reference path="../core/core.ts"/>
-/// <reference path="../core/execute.ts"/>
+/// <reference path="../scope/execute.ts"/>
 /// <reference path="../core/bind.ts"/>
 let 
     orderRE                 =	/^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|let|=)(\s|$)/g,

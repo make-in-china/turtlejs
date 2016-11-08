@@ -421,20 +421,18 @@ class PartTemplate implements IPartTemplate{
 class ITemplateList{
     [index:string]:Object
 }
-class TemplateList{
-    protected event=new $Event;
-    onDefine(name:string,fn:Function){
+class TemplateList extends EventEmitter{
+    onDefine(name:string,fn:ICallBack){
         if(name.length===0){
             return;
         }
-        this.event.on('name',fn);
-        if(this.event.events.length>1){
-            this[name];
-        }
+        this.on(name,fn);
+        this.emit(name);
     }
     define(name:string,sortPath:string,path:string,s:string,ext){
         this[name]=new PartTemplate(name,sortPath,path,s,ext);
-        this.event.emit(name,this[name]);
+        // this.event.emit(name,this[name]);
+        this.emit(name);
         return this[name];
     }
     

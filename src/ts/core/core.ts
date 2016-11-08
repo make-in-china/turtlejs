@@ -8,6 +8,7 @@
 /// <reference path="browserhelper.ts"/>
 /// <reference path="debughelper.ts"/>
 /// <reference path="treeeach.ts"/>
+/// <reference path="EventHelper.ts"/>
 
 
 

@@ -4,7 +4,7 @@ let
     _execValueByScope       = Function('$$turtle$$,v,node,outer,outerElement,props,part',withthis),
     _execByScope            = Function('$$turtle$$,node,outer,outerElement,props,part',withthis),
     _execExpressionsByScope = Function('$$turtle$$,v,node',withthis);
-function execValueByScope(node:INode,s:string,v,scope:Scope,outerChildNodes:INodeArray,outerElement:IHTMLElement[],props,part){
+function execValueByScope(node:INode,s:string,v,scope:Scope,outerChildNodes:INodeArray,outerElement:IHTMLElement[],props,part:Part){
     return _execValueByScope.call(getScopeBy(scope,node),s,v,node,outerChildNodes,outerElement,props,part);
 }
 let execTemplateScript=(function(){

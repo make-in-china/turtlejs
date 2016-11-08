@@ -1,4 +1,5 @@
 
+/// <reference path="EventEmitter.ts"/>
 class EventHelper<T extends ICallBack,E extends Function>{
     constructor(private target:EventEmitter,private type:string){}
     emit:E=<any>function(...args):boolean{

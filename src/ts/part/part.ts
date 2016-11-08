@@ -1,5 +1,6 @@
 
-/// <reference path="../core/EventHelper.ts"/>
+/// <reference path="../core/core.ts"/>
+/// <reference path="Server.ts"/>
 interface IPartRefs {
     [index: string]: INode | undefined
     resize?: IHTMLElement

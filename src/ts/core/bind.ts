@@ -1,5 +1,5 @@
 
-/// <reference path="execute.ts"/>
+/// <reference path="../scope/execute.ts"/>
 
 function _getBindObject(scope,arrNames:Array<string>){
     let i,obj,length=arrNames.length;;
