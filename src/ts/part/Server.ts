@@ -1,3 +1,5 @@
+
+/// <reference path='TemplateList.ts'/>
 class Service extends TemplateList{
     private __defineCallbacks__:ArrayEx<Function>=new ArrayEx<Function>();
     constructor(serv?:Service){
@@ -17,11 +19,11 @@ class Service extends TemplateList{
         return this[n];
     }
     define(name,s){
-        try{
+        // try{
             this[name]=exec("("+s+")");    
-        }catch(e){
-            _catch(e);
-        }
+        // }catch(e){
+        //     _catch(e);
+        // }
         this.emit(name,this[name]);
         // this.event.emit(name,this[name]);
     }

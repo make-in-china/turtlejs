@@ -1,4 +1,4 @@
-
+/// <reference path="../lib/ArrayEx.ts"/>
 /**
  * 一个普通对象
  * @param {string} s 格式为:xxx,yyy,zzz
@@ -9,19 +9,6 @@ class HashObject{
         let arr=s.split(',');
         for(let i in arr){
             this[arr[i]]=defaultValue;
-        }
-    }
-}
-class ArrayEx<T> extends Array<T>{
-    last():T|undefined{
-        if(this.length>0){
-            return this[this.length-1];
-        }
-    }
-    clear(){
-        let l=this.length;
-        for(let i=0;i<l;i++){
-            this.pop();
         }
     }
 }

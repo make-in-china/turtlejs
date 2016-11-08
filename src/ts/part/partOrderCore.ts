@@ -1,7 +1,6 @@
 
-/// <reference path="../core/core.ts"/>
 /// <reference path="../scope/execute.ts"/>
-/// <reference path="../core/bind.ts"/>
+/// <reference path="../main/bind.ts"/>
 let 
     orderRE                 =	/^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|let|=)(\s|$)/g,
     orderCaseRE             =   /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
@@ -77,10 +76,10 @@ let getCommentText=(function(){
 function parseScopeOrder(info:ICommentOrderInfo,node:IComment,outerChildNodes,outerElement,props,part){
     let condition=splitByOnce(info.condition,"|");
     if(condition.length==2){
-        $t.domScope.create(node,condition[0]);
+        DOMScope.create(node,condition[0]);
         execScope(condition[1],node,outerChildNodes,outerElement,props,part);
     }else{
-        $t.domScope.create(node,condition[0]);
+        DOMScope.create(node,condition[0]);
     }
     removeNode(node);
 }
@@ -168,7 +167,7 @@ function addOrderToNode(node:INode,info,outerChildNodes,outerElement,props,part,
 }
 function parseIfOrder(info,node,outerChildNodes,outerElement,props,part){
     return addOrderToNode(node,info,outerChildNodes,outerElement,props,part,function(){
-        let scope=$t.domScope.get(node);
+        let scope=DOMScope.get(node);
         return {
             endHit:null,
             hit:null,
@@ -317,7 +316,7 @@ function parseSwitchOrder(info,node,outerChildNodes,outerElement,props,part){
             hasDefault:false,
             run:function(){
                 let order=this;
-                let scope=$t.domScope.get(node);
+                let scope=DOMScope.get(node);
                 treeEach(node.parentNode.childNodes,'childNodes',function(node:IComment,step){
                     if(!isCommentNode(node)){
                         return;

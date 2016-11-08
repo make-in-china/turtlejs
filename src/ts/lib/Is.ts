@@ -1,4 +1,5 @@
 
+/// <reference path="../lib/TypeHelper.ts"/>
 let
     persentRE               =   /^\s*([\d.]+)%\s*$/
 
@@ -15,19 +16,19 @@ function isObject<T>(p:any): p is Object {
     let type = typeof p;
     return type === 'function' || type === 'object' && !!p;
 }
-function isRegExp(a){
+function isRegExp(a):a is RegExp{
     return "[object RegExp]" === toStr.call(a)
 }
-function isDate(a){
+function isDate(a):a is Date{
     return "[object Date]" === toStr.call(a)
 }
-function isNumber(a){
+function isNumber(a):a is number{
     return "[object Number]" === toStr.call(a)
 }
-function isString(a){
+function isString(a):a is string{
     return "[object String]" === toStr.call(a)
 }
-function isFunction(a){
+function isFunction(a):a is Function{
     return "[object Function]" === toStr.call(a)
 }
 // function isFinite(obj) {

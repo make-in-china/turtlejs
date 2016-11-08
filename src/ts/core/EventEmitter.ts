@@ -1,5 +1,5 @@
 
-/// <reference path="is.ts" />
+/// <reference path="../lib/is.ts" />
 interface ICallBack {
     (this: void, ...arg): void
 }
@@ -32,15 +32,14 @@ class EventEmitter{
             return false;
         } else if (isArray(handler)) {
             
-            let listeners = handler.slice();
+            let listeners = (<ICallBack[]>handler).slice();
             for (let i = 0, l = listeners.length; i < l; i++) {
                 listeners[i].apply(this, args);
             }
             return true;
 
         } else{
-
-            handler.apply(this, args);
+            (<ICallBack>handler).apply(this, args);
             return true;
         }
     };
@@ -58,16 +57,16 @@ class EventEmitter{
         // To avoid recursion in the case that type == "newListeners"! Before
         // adding it to the listeners, first emit "newListeners".
         this.emit('newListener', type, listener);
-        let hanlder = this.events[type];
-        if (!hanlder) {
+        let handler = this.events[type];
+        if (!handler) {
             // Optimize the case of one listener. Don't need the extra array object.
             this.events[type] = listener;
-        } else if (isArray(hanlder)) {
+        } else if (isArray(handler)) {
             // If we've already got an array, just append.
-            hanlder.push(listener);
+            (<ICallBack[]>handler).push(listener);
         } else {
             // Adding the second element, need to change to array.
-            this.events[type] = [hanlder, listener];
+            this.events[type] = [<ICallBack>handler, listener];
         }
 
         return this;
@@ -94,9 +93,9 @@ class EventEmitter{
         let list = this.events[<string>type];
 
         if (isArray(list)) {
-            let i = list.indexOf(listener);
+            let i = (<ICallBack[]>list).indexOf(listener);
             if (i < 0) return this;
-            list.splice(i, 1);
+            (<ICallBack[]>list).splice(i, 1);
             if (list.length == 0)
                 delete this.events[<string>type];
         } else if (this.events[<string>type] === listener) {
@@ -120,7 +119,7 @@ class EventEmitter{
         if (!handler) {
             this.events[<string>type] = [];
         } else if (!isArray(handler)) {
-            this.events[<string>type] = [handler];
+            this.events[<string>type] = [<ICallBack>handler];
         }
         return this.events[<string>type];
     };

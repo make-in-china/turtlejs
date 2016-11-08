@@ -1,3 +1,8 @@
+
+/// <reference path='../lib/lib.ts'/>
+interface ITurtle{
+    store:Store;
+}
 class Store{
     [index:string]:IHTMLElement
 }

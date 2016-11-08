@@ -37,22 +37,3 @@ class ClassList {
         return this.element.className.split(classSplitRE)[i] || null;
     }
 }
-// function defineClassList(object) {
-//     Object.defineProperty(object, 'classList', {
-//         enumerable: true,
-//         configurable: true,
-//         get: function () {
-//             if (this.__classList__) {
-//                 return this.__classList__;
-//             } else {
-//                 Object.defineProperty(this, '__classList__', {
-//                     writable: false,
-//                     enumerable: false,
-//                     configurable: false,
-//                     value: new ClassList(this)
-//                 });
-//                 return this.__classList__;
-//             }
-//         }
-//     });
-// }

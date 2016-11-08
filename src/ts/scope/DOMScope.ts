@@ -1,25 +1,19 @@
-
-interface ITurtle{
-    domScope:DOMScope;
-}
-
+/// <reference path="RootScope.ts"/>
+/// <reference path="Scope.ts"/>
 class DOMScope{
-    stack:Array<Scope|RootScope>
-    constructor(){
-        this.stack=[$rootScope];
-    }
+    static stack:Array<Scope|RootScope>=[$rootScope]
     /**
      * 在dom节点上创建变量作用域对象
      * @param {INode} node - dom节点
      * @param {string} name - 名称
      */
-    create(node:INode,name:string){
+    static create(node:INode,name:string){
         let scope=this.get(node);
         if(node.parentNode!==scope.__actionNode__){
             scope=new Scope(node,scope,name);
             this.stack.push(scope);
         }else/* if(scope.__name__!==name)*/{
-            throwError('当前层不允许重复定义scope:'+name);
+            throw new Error('当前层不允许重复定义scope:'+name);
         }
         return scope;
     }
@@ -29,7 +23,7 @@ class DOMScope{
      * 获取变量作用域对象
      * @param {INode} node - dom节点
      */
-    get(node:INode):Scope|RootScope{
+    static get(node:INode):Scope|RootScope{
         if(!node){
             return $rootScope;
         }
@@ -45,7 +39,7 @@ class DOMScope{
      * 切断dom节点和变量作用域对象的链接
      * @param {Scope} scopeVarObject - 变量作用域对象
      */
-    unlink(scope:Scope){
+    static unlink(scope:Scope){
         var p=scope.__parent__;
         if(p){
             scope.__parent__=null;
@@ -62,8 +56,8 @@ class DOMScope{
      * @param {Scope} scopeVarObject - 变量作用域对象
      * @param {INode} node - dom节点
      */
-    link(scope:Scope,node:INode){
-        var p:Scope|RootScope=$t.domScope.get(node);
+    static link(scope:Scope,node:INode){
+        var p:Scope|RootScope=this.get(node);
         if(!p){
             return;
         }

@@ -1,13 +1,14 @@
 
-/// <reference path='../core/core.ts'/>
-/// <reference path='../part/Template.ts'/>
+/// <reference path="../core/Node.ts"/>
 /// <reference path='../part/Part.ts'/>
 /// <reference path='../scope/Scope.ts'/>
 /// <reference path='ClientHelper.ts'/>
-/// <reference path='Store.ts'/>
 /// <reference path='Ready.ts'/>
+/// <reference path='../lib/is.ts'/>
 /// <reference path='Config.ts'/>
 /// <reference path='lib.ts'/>
+/// <reference path='../lib/HashObject.ts'/>
+/// <reference path='../lib/Encode.ts'/>
 
 
 let 
@@ -36,12 +37,9 @@ interface IRenderDocument{
 
 
 
-interface ITurtle{
-    store:Store;
-}
 class Turtle extends EventEmitterEx implements ITurtle{
-    domScope                                =new DOMScope;
-    rootScope                               =new RootScope;
+    // domScope                                =new DOMScope;
+    // rootScope                               =new RootScope;
     config                                  =new Config;
     T:TemplateList                          =new TemplateList;
     xhr                                     =new XHR;
@@ -61,7 +59,8 @@ class Turtle extends EventEmitterEx implements ITurtle{
     turtleScriptElement:IHTMLScriptElement
     url:string
     isCompile:boolean;/**未使用 */
-    
+    getBind                                 =getBind
+    getFunctionComment                      =getFunctionComment
     constructor(){
         super();
         this.$error.on((e)=>{
@@ -95,11 +94,11 @@ class Turtle extends EventEmitterEx implements ITurtle{
         if (compile !== ""){
             if(getQueryString("turtle_nocompile")!="1"){
                 this.xhr.get(scriptNode.src+'.setup',false,function(text){
-                    try{
+                    // try{
                         compileInfo=exec('('+text+')');    
-                    }catch(e){
-                        _catch(e);
-                    }
+                    // }catch(e){
+                    //     _catch(e);
+                    // }
                 });
             }
             this.isCompile=true;

@@ -4,9 +4,6 @@ interface INode {
     insertBefore2(newChild: INode, refChild: INode): INode;
 }
 interface Node {
-    insertBefore2(newChild: INode, refChild: INode): INode;
-}
-interface Node {
     toDOM(): Node
     valueOf(): Node
 }
@@ -260,4 +257,9 @@ function isCommentNode(node:INode): node is IComment{
 /**判断是否文本节点 */
 function isTextNode(node:INode): node is IText{
     return node.nodeType===Node.TEXT_NODE;
+}
+let functionCommentRE = /\/\*([\s\S]*?)\*\//g
+function getFunctionComment(fn:Function) {
+    let s: RegExpExecArray = <RegExpExecArray>functionCommentRE.exec(fn.toString());
+    return s[1];
 }

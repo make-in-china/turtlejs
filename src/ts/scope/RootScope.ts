@@ -1,11 +1,4 @@
 
-let 
-    $rootScope:RootScope;
-
-interface ITurtle{
-    rootScope:RootScope;
-}
-
 class RootScope{
     public __actionNode__=document.documentElement;
     public __children__:Scope[]=[];
@@ -13,3 +6,5 @@ class RootScope{
         document['scope']=this;
     }
 }
+
+let $rootScope:RootScope=new RootScope;

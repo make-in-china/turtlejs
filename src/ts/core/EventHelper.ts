@@ -4,7 +4,7 @@ class EventHelper<T extends ICallBack,E extends Function>{
     constructor(private target:EventEmitter,private type:string){}
     readonly emit:E=<any>function(this:EventHelper<T,E>,...args):boolean{
         args.unshift(this.type);
-        return this.emit.apply(this,args);
+        return this.target.emit.apply(this.target,args);
     }
     on(listener:T):void{
         this.target.on(this.type,listener);

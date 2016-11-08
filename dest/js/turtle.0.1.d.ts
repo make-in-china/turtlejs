@@ -1,5 +1,10 @@
-declare let $t: Turtle;
-interface ITurtle {
+interface Window {
+    ActiveXObject?: Object;
+}
+declare let isIE: boolean;
+declare class ArrayEx<T> extends Array<T> {
+    last(): T | undefined;
+    clear(): void;
 }
 interface IExp {
     (...arg: any[]): any;
@@ -750,74 +755,6 @@ interface IHTMLScriptElement extends IHTMLElement {
 interface Object {
     __proto__?: Object;
 }
-declare let arrayConstructor: Array<any>, objectConstructor: ObjectConstructor, stringConstructor: String, toStr: () => string, slice: (start?: number, end?: number) => any[], push: (...items: any[]) => number, splice: {
-    (start: number): any[];
-    (start: number, deleteCount: number, ...items: any[]): any[];
-}, getPrototypeOf: (o: any) => any, replace: {
-    (searchValue: string, replaceValue: string): string;
-    (searchValue: string, replacer: (substring: string, ...args: any[]) => string): string;
-    (searchValue: RegExp, replaceValue: string): string;
-    (searchValue: RegExp, replacer: (substring: string, ...args: any[]) => string): string;
-};
-interface Constructor {
-    prototype: Object;
-}
-declare function extend<T>(elem: T, elemEx: any): T;
-declare function merge<T>(elem: T, elemEx: any): T;
-declare function removeItem<T>(arr: T[], obj: T): void;
-declare function persentToFloat(s: string): number | undefined;
-declare function parseBool(v: any): boolean;
-declare function trim(s: any): any;
-declare function HTMLTrim(s: any): any;
-declare function trimLine(s: any): any;
-declare let dateFormat: (format: any, d: any) => any;
-declare let camelCaseRE: RegExp, camelizeRE: RegExp, deCamelizeRE: RegExp;
-declare function camelCase(s: any): any;
-declare function camelize(str: string): string;
-declare function decamelize(str: string): string;
-declare function splitByOnce(s: string, split: string): Array<string>;
-declare let persentRE: RegExp;
-declare function isNull<T>(p: T | null): p is null;
-declare function isUndefined<T>(p: T | undefined): p is undefined;
-declare function isObject<T>(p: any): p is Object;
-declare function isRegExp(a: any): boolean;
-declare function isDate(a: any): boolean;
-declare function isNumber(a: any): boolean;
-declare function isString(a: any): boolean;
-declare function isFunction(a: any): boolean;
-declare let isArray: (a: any) => boolean;
-declare function isPersent(s: any): boolean;
-declare function isArrayLike(a: any): boolean;
-/**
- * 一个普通对象
- * @param {string} s 格式为:xxx,yyy,zzz
- * @param {any} defaultValue 初始化时每个属性的默认值
- */
-declare class HashObject {
-    constructor(s: string, defaultValue?: any);
-}
-declare class ArrayEx<T> extends Array<T> {
-    last(): T | undefined;
-    clear(): void;
-}
-interface IHashObject<T> {
-    [index: string]: T;
-}
-declare class HashObjectManage<T> {
-    static clean<T>(data: IHashObject<T>): void;
-    static take<T>(data: IHashObject<T>, name: string): T | null;
-}
-interface IKeyArrayHashObject<T> {
-    [index: string]: ArrayEx<T>;
-}
-declare class KeyArrayHashObjectManage {
-    private static isArray<T>(p);
-    static clean<T>(data: IKeyArrayHashObject<T>): void;
-    static take<T>(data: IKeyArrayHashObject<T>, name: string): ArrayEx<T> | null;
-    static getKeyArray<T>(data: IKeyArrayHashObject<T>): ArrayEx<ArrayEx<T>>;
-    static pop<T>(data: IKeyArrayHashObject<T>, key: string): T;
-    static push<T>(data: IKeyArrayHashObject<T>, key: string | string[], value: T): void;
-}
 interface INode {
     insertBefore2(newChild: INode, refChild: INode): INode;
 }
@@ -861,80 +798,47 @@ declare function toggleClass(sel: any, a: any, t: any, f: any): void;
 declare function isCommentNode(node: INode): node is IComment;
 /**判断是否文本节点 */
 declare function isTextNode(node: INode): node is IText;
-declare let withthis: string, _execValueByScope: Function, _execByScope: Function, _execExpressionsByScope: Function;
-declare function execValueByScope(node: INode, s: string, v: any, scope: Scope, outerChildNodes: INodeArray, outerElement: IHTMLElement[], props: any, part: Part): any;
-declare let execTemplateScript: (s: string, node: INode, outerChildNodes: INodeArray, outerElement: any, props: any, part: any) => string;
-declare function _getBindObject(scope: any, arrNames: Array<string>): any;
-interface IBindInfo {
-    name: string;
-    target: Object;
-    targetName: string;
-    event: IBindFunction;
-}
-declare function addBindInfo(obj: Object, name: string, target: Object, targetName: string, event: IBindFunction): void;
-declare function removeBind(obj: any, name: any, targetName: any): boolean;
-declare function onPropertyChange(obj: any, name: any, fnOnSet: any): void;
-declare function objectPropertyChange(obj: any, name: any, fnOnSet: any): void;
-interface Object {
-    __bind__: IBindInfo[];
-}
-interface IBindFunction {
-    (name: string): any;
-    isBinding: boolean;
-    removeObject: Function;
-    list: Array<Object>;
-}
-declare function bindPropertyByName(obj: Object, name: string, obj2: Object, name2: string): IBindFunction;
-declare let bindProperty: (obj: Object, name: string, obj2: Object, name2: string, type?: number) => void;
-declare function bindElementProperty(obj: Object, name: string, obj2: Object, name2: string): void;
-declare function bindNodeProperty(node: INode, proName: string, condition: string): void;
-declare function bindElementPropertyByName(node: IHTMLElement, elementValueName: string, condition: string): void;
-declare function bindPropertyByOrder(node: any, condition: any): void;
-declare function bindExpressionsByOrder(node: any, condition: any): void;
-interface Window {
-    ActiveXObject?: Object;
-}
-declare let isIE: boolean;
-/**
- * 可躲过一些js压缩库console.log;
- */
-declare let log: Function;
-/**
- * 可躲过一些js压缩库debugger;
- */
-declare let bp: Function;
-/**
- * 遍历树回调函数返回值的枚举:
-    c_stopEach 结束枚举,
-    c_repeat 重复本次,
-    c_noIn 不进入子集,
-    c_noRepeat 不重复（默认）
- */
-declare const enum eTreeEach {
-    c_stopEach = 1,
-    c_repeat = 2,
-    c_noIn = 4,
-    c_noRepeat = 8,
-}
-interface ITreeEachStep {
-    next: number;
-}
-interface IArray {
-    length: number;
-}
-/**
- * 遍历树
- * @param {T[]|IArray} array 数组或类数组
- * @param {string} propertyName 数组元素包含的属性名
- * @param {(node:T,step?:ITreeEachStep)=>eTreeEach|undefined} fn 回调函数
- * @param {number} beginIndex 遍历起始位置
- */
-declare function treeEach<T>(array: T[] | IArray, propertyName: string, fn: (node: T, step: ITreeEachStep) => (eTreeEach | void), beginIndex?: number): {
-    stack: [IArray | T[], number];
-    state: eTreeEach;
-    array: IArray | T[];
-    index: number;
+declare let functionCommentRE: RegExp;
+declare function getFunctionComment(fn: Function): string;
+declare let arrayConstructor: Array<any>, objectConstructor: ObjectConstructor, stringConstructor: String, toStr: () => string, slice: (start?: number, end?: number) => any[], push: (...items: any[]) => number, splice: {
+    (start: number): any[];
+    (start: number, deleteCount: number, ...items: any[]): any[];
+}, getPrototypeOf: (o: any) => any, replace: {
+    (searchValue: string, replaceValue: string): string;
+    (searchValue: string, replacer: (substring: string, ...args: any[]) => string): string;
+    (searchValue: RegExp, replaceValue: string): string;
+    (searchValue: RegExp, replacer: (substring: string, ...args: any[]) => string): string;
 };
+interface Constructor {
+    prototype: Object;
+}
+declare function extend<T>(elem: T, elemEx: any): T;
+declare function merge<T>(elem: T, elemEx: any): T;
+declare function removeItem<T>(arr: T[], obj: T): void;
+declare function persentToFloat(s: string): number | undefined;
+declare function parseBool(v: any): boolean;
+declare function trim(s: any): any;
+declare function HTMLTrim(s: any): any;
+declare function trimLine(s: any): any;
+declare let dateFormat: (format: any, d: any) => any;
+declare let camelCaseRE: RegExp, camelizeRE: RegExp, deCamelizeRE: RegExp;
+declare function camelCase(s: any): any;
+declare function camelize(str: string): string;
+declare function decamelize(str: string): string;
+declare function splitByOnce(s: string, split: string): Array<string>;
+declare function getBind(obj: Object, fn: Function): () => any;
+declare let persentRE: RegExp;
+declare function isNull<T>(p: T | null): p is null;
+declare function isUndefined<T>(p: T | undefined): p is undefined;
+declare function isObject<T>(p: any): p is Object;
+declare function isRegExp(a: any): a is RegExp;
+declare function isDate(a: any): a is Date;
+declare function isNumber(a: any): a is number;
+declare function isString(a: any): a is string;
+declare function isFunction(a: any): a is Function;
+declare let isArray: (a: any) => boolean;
+declare function isPersent(s: any): boolean;
+declare function isArrayLike(a: any): boolean;
 interface ICallBack {
     (this: void, ...arg: any[]): void;
 }
@@ -976,6 +880,50 @@ declare class EventEmitterEx extends EventEmitter {
      */
     getEventHelper<T extends ICallBack, U extends Function>(type: string): EventHelper<T, U>;
 }
+/**
+ * 遍历树回调函数返回值的枚举:
+    c_stopEach 结束枚举,
+    c_repeat 重复本次,
+    c_noIn 不进入子集,
+    c_noRepeat 不重复（默认）
+ */
+declare const enum eTreeEach {
+    c_stopEach = 1,
+    c_repeat = 2,
+    c_noIn = 4,
+    c_noRepeat = 8,
+}
+interface ITreeEachStep {
+    next: number;
+}
+interface IArray {
+    length: number;
+}
+/**
+ * 遍历树
+ * @param {T[]|IArray} array 数组或类数组
+ * @param {string} propertyName 数组元素包含的属性名
+ * @param {(node:T,step?:ITreeEachStep)=>eTreeEach|undefined} fn 回调函数
+ * @param {number} beginIndex 遍历起始位置
+ */
+declare function treeEach<T>(array: T[] | IArray, propertyName: string, fn: (node: T, step: ITreeEachStep) => (eTreeEach | void), beginIndex?: number): {
+    stack: [IArray | T[], number];
+    state: eTreeEach;
+    array: IArray | T[];
+    index: number;
+};
+declare class TemplateList extends EventEmitter {
+    onDefine(name: string, fn: ICallBack): void;
+    define(name: string, sortPath: string, path: string, s: string, ext: any): any;
+    toString(): string;
+}
+declare class Service extends TemplateList {
+    private __defineCallbacks__;
+    constructor(serv?: Service);
+    require(n: any): any;
+    define(name: any, s: any): void;
+    toDefineString(): string;
+}
 declare class NameItem {
     constructor(name: string);
     name: string;
@@ -1010,6 +958,79 @@ declare class TemplateConfig {
 }
 declare let templateConfig: TemplateConfig;
 declare let baseUIPath: BasePath;
+declare let withthis: string, _execValueByScope: Function, _execByScope: Function, _execExpressionsByScope: Function;
+declare function execValueByScope(node: INode, s: string, v: any, scope: Scope, outerChildNodes: INodeArray, outerElement: IHTMLElement[], props: any, part: Part): any;
+declare let execTemplateScript: (s: string, node: INode, outerChildNodes: INodeArray, outerElement: any, props: any, part: any) => string;
+declare class RootScope {
+    __actionNode__: HTMLElement;
+    __children__: Scope[];
+    constructor();
+}
+declare let $rootScope: RootScope;
+interface INode {
+    __scope__?: Scope;
+}
+declare class Scope {
+    __commentNode__: INode;
+    __name__: string;
+    __actionNode__: INode;
+    __parent__: Scope | RootScope | null;
+    __children__: Scope[];
+    __proto__: Object | Scope;
+    constructor(__commentNode__: INode, parent: Scope | RootScope, __name__?: string);
+}
+declare class DOMScope {
+    static stack: Array<Scope | RootScope>;
+    /**
+     * 在dom节点上创建变量作用域对象
+     * @param {INode} node - dom节点
+     * @param {string} name - 名称
+     */
+    static create(node: INode, name: string): Scope;
+    /**
+     * 获取变量作用域对象
+     * @param {INode} node - dom节点
+     */
+    static get(node: INode): Scope | RootScope;
+    /**
+     * 切断dom节点和变量作用域对象的链接
+     * @param {Scope} scopeVarObject - 变量作用域对象
+     */
+    static unlink(scope: Scope): void;
+    /**
+     * 链接dom节点和变量作用域对象
+     * @param {Scope} scopeVarObject - 变量作用域对象
+     * @param {INode} node - dom节点
+     */
+    static link(scope: Scope, node: INode): void;
+}
+declare function _getBindObject(scope: any, arrNames: Array<string>): any;
+interface IBindInfo {
+    name: string;
+    target: Object;
+    targetName: string;
+    event: IBindFunction;
+}
+declare function addBindInfo(obj: Object, name: string, target: Object, targetName: string, event: IBindFunction): void;
+declare function removeBind(obj: any, name: any, targetName: any): boolean;
+declare function onPropertyChange(obj: any, name: any, fnOnSet: any): void;
+declare function objectPropertyChange(obj: any, name: any, fnOnSet: any): void;
+interface Object {
+    __bind__: IBindInfo[];
+}
+interface IBindFunction {
+    (name: string): any;
+    isBinding: boolean;
+    removeObject: Function;
+    list: Array<Object>;
+}
+declare function bindPropertyByName(obj: Object, name: string, obj2: Object, name2: string): IBindFunction;
+declare let bindProperty: (obj: Object, name: string, obj2: Object, name2: string, type?: number) => void;
+declare function bindElementProperty(obj: Object, name: string, obj2: Object, name2: string): void;
+declare function bindNodeProperty(node: INode, proName: string, condition: string): void;
+declare function bindElementPropertyByName(node: IHTMLElement, elementValueName: string, condition: string): void;
+declare function bindPropertyByOrder(node: any, condition: any): void;
+declare function bindExpressionsByOrder(node: any, condition: any): void;
 declare let orderRE: RegExp, orderCaseRE: RegExp, parseForOrderRE: RegExp, parseForOrderRE2: RegExp, SetParseError: IParseError, orderStack: ArrayEx<IOrder>;
 interface IParseError {
     isError?: boolean;
@@ -1135,6 +1156,25 @@ interface ServiceIdentifier<T> {
     (...args: any[]): void;
     type: T;
 }
+interface ITurtle {
+    store: Store;
+}
+declare class Store {
+    [index: string]: IHTMLElement;
+}
+declare class StoreManage {
+    static take(data: Store, name: string): INode | INodeArray | null;
+    static takeElem(data: Store, name: string): IHTMLElement | IHTMLCollection | null;
+}
+interface ITurtle {
+    config: Config;
+}
+declare class Config {
+    baseUIPath: BasePath;
+    baseServicePath: string;
+    debugMode: number;
+}
+declare let $t: ITurtle;
 declare let $DOM: any, $node: I$Node, operatorRE: RegExp;
 interface I$Node {
     (name: '__break__', nodeType?: number): IHTMLBreakElement;
@@ -1227,9 +1267,15 @@ declare function initHTML(arr: INodeArray, outerChildNodes?: any, outerElement?:
 declare function getParts(childNodes: INodeArray): Part[];
 declare function getService(serviceName: string): any;
 declare function nodesToString(nodes: INode[]): string;
-declare function _catch(e: any, fn?: Function): void;
-declare function throwError(err: string): void;
-declare var unescape: (v: string) => string;
+/**
+ * 可躲过一些js压缩库console.log;
+ */
+declare let log: Function;
+/**
+ * 可躲过一些js压缩库debugger;
+ */
+declare let bp: Function;
+declare let unescape: (v: string) => string;
 declare function getQueryString(name: string): string | null;
 interface String {
     match(regexp: RegExp): RegExpMatchArray;
@@ -1237,16 +1283,31 @@ interface String {
 declare let getNameByURL: (url: string) => string;
 declare let getFileNameByURL: (url: string) => string;
 declare function appendQueryString(name: any, value: any): string;
-declare const memberRE: RegExp;
-declare const colorRE: RegExp;
-interface ITurtle {
-    parts: IKeyArrayHashObject<Part>;
-    service: Service;
-    T: TemplateList;
+/**
+ * 一个普通对象
+ * @param {string} s 格式为:xxx,yyy,zzz
+ * @param {any} defaultValue 初始化时每个属性的默认值
+ */
+declare class HashObject {
+    constructor(s: string, defaultValue?: any);
 }
-interface IComment {
-    __part__?: Part;
-    __sign__?: number;
+interface IHashObject<T> {
+    [index: string]: T;
+}
+declare class HashObjectManage<T> {
+    static clean<T>(data: IHashObject<T>): void;
+    static take<T>(data: IHashObject<T>, name: string): T | null;
+}
+interface IKeyArrayHashObject<T> {
+    [index: string]: ArrayEx<T>;
+}
+declare class KeyArrayHashObjectManage {
+    private static isArray<T>(p);
+    static clean<T>(data: IKeyArrayHashObject<T>): void;
+    static take<T>(data: IKeyArrayHashObject<T>, name: string): ArrayEx<T> | null;
+    static getKeyArray<T>(data: IKeyArrayHashObject<T>): ArrayEx<ArrayEx<T>>;
+    static pop<T>(data: IKeyArrayHashObject<T>, key: string): T;
+    static push<T>(data: IKeyArrayHashObject<T>, key: string | string[], value: T): void;
 }
 declare class PartParamFilter {
     static bool(v: any): boolean;
@@ -1268,6 +1329,12 @@ declare class PartParamFilter {
     static udftoemptystr(v: any): any;
     static anytoemptystr(v: any): any;
 }
+declare const colorRE: RegExp;
+interface ITurtle {
+    parts: IKeyArrayHashObject<Part>;
+    service: Service;
+    T: TemplateList;
+}
 declare class PartParam {
     name: string;
     hasDefault: boolean;
@@ -1277,6 +1344,7 @@ declare class PartParam {
     limitValue: string;
     constructor(name: string, hasDefault: boolean, filter: any, filterParam: string, defaultValue: string, limitValue: string);
 }
+declare const memberRE: RegExp;
 interface IPartTemplate {
     params: ArrayEx<PartParam>;
     datas: ArrayEx<string>;
@@ -1315,20 +1383,9 @@ declare class PartTemplate implements IPartTemplate {
         necessary: any;
     }[];
 }
-declare class ITemplateList {
-    [index: string]: Object;
-}
-declare class TemplateList extends EventEmitter {
-    onDefine(name: string, fn: ICallBack): void;
-    define(name: string, sortPath: string, path: string, s: string, ext: any): any;
-    toString(): string;
-}
-declare class Service extends TemplateList {
-    private __defineCallbacks__;
-    constructor(serv?: Service);
-    require(n: any): any;
-    define(name: any, s: any): void;
-    toDefineString(): string;
+interface IComment {
+    __part__?: Part;
+    __sign__?: number;
 }
 interface IPartRefs {
     [index: string]: INode | undefined;
@@ -1390,56 +1447,6 @@ declare class Part extends EventEmitterEx {
     insertBefore(elem: any): void;
     remove(): void;
 }
-declare let $rootScope: RootScope;
-interface ITurtle {
-    rootScope: RootScope;
-}
-declare class RootScope {
-    __actionNode__: HTMLElement;
-    __children__: Scope[];
-    constructor();
-}
-interface ITurtle {
-    domScope: DOMScope;
-}
-declare class DOMScope {
-    stack: Array<Scope | RootScope>;
-    constructor();
-    /**
-     * 在dom节点上创建变量作用域对象
-     * @param {INode} node - dom节点
-     * @param {string} name - 名称
-     */
-    create(node: INode, name: string): Scope | RootScope;
-    /**
-     * 获取变量作用域对象
-     * @param {INode} node - dom节点
-     */
-    get(node: INode): Scope | RootScope;
-    /**
-     * 切断dom节点和变量作用域对象的链接
-     * @param {Scope} scopeVarObject - 变量作用域对象
-     */
-    unlink(scope: Scope): void;
-    /**
-     * 链接dom节点和变量作用域对象
-     * @param {Scope} scopeVarObject - 变量作用域对象
-     * @param {INode} node - dom节点
-     */
-    link(scope: Scope, node: INode): void;
-}
-interface INode {
-    __scope__?: Scope;
-}
-declare class Scope {
-    __commentNode__: INode;
-    __name__: string;
-    __actionNode__: INode;
-    __parent__: Scope | RootScope | null;
-    __children__: Scope[];
-    __proto__: Object | Scope;
-    constructor(__commentNode__: INode, parent: Scope | RootScope, __name__?: string);
-}
 declare class ClientHelper {
     private data;
     private isListen;
@@ -1449,27 +1456,14 @@ declare class ClientHelper {
     constructor();
 }
 declare let $clientHelper: ClientHelper;
-declare class Store {
-    [index: string]: IHTMLElement;
-}
-declare class StoreManage {
-    static take(data: Store, name: string): INode | INodeArray | null;
-    static takeElem(data: Store, name: string): IHTMLElement | IHTMLCollection | null;
-}
 declare class Ready {
     private _isReady;
     on(fn: () => void): void;
     readyFunctions: Function[];
     isReady: boolean;
 }
-interface ITurtle {
-    config: Config;
-}
-declare class Config {
-    baseUIPath: BasePath;
-    baseServicePath: string;
-    debugMode: number;
-}
+declare let encodeHTML: (value: string) => string;
+declare let decodeHTML: (value: string) => string;
 declare let readyRE: RegExp;
 declare function renderTemplate(tp: any): void;
 interface IRenderDocument {
@@ -1477,12 +1471,7 @@ interface IRenderDocument {
     beginTime?: Date;
     endTime?: Date;
 }
-interface ITurtle {
-    store: Store;
-}
 declare class Turtle extends EventEmitterEx implements ITurtle {
-    domScope: DOMScope;
-    rootScope: RootScope;
     config: Config;
     T: TemplateList;
     xhr: XHR;
@@ -1498,6 +1487,8 @@ declare class Turtle extends EventEmitterEx implements ITurtle {
     turtleScriptElement: IHTMLScriptElement;
     url: string;
     isCompile: boolean;
+    getBind: typeof getBind;
+    getFunctionComment: typeof getFunctionComment;
     constructor();
     private getScriptNode();
     readonly rootParts: Part[];

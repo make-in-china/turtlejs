@@ -1,5 +1,4 @@
 
-/// <reference path='../core/core.ts'/>
 class NameItem{
     constructor(name:string){
         this.name=name;
@@ -23,13 +22,13 @@ class BasePath{
         }
     }
     parseUIPath(s:string){
-        try{
+        // try{
             var o=exec('('+s+')');
             if(isObject(o)&&o.hasOwnProperty('name')&&o.hasOwnProperty('path')){
                 this.paths[o.name]=o;
                 this.push(o);
             }
-        }catch(e){_catch(e);}
+        // }catch(e){_catch(e);}
     }
     getPathBySortPath(sortPath){
         return this.paths[sortPath].path;

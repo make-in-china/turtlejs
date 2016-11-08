@@ -1,5 +1,5 @@
 
-/// <reference path='../core/core.ts'/>
+/// <reference path='VNode.ts'/>
 let 
     VDOM,
     VTemplate,
@@ -15,7 +15,7 @@ let
                         };
 interface IMember{
     index:number
-    node:INode
+    node:IVNode
     action:string
     length:number
     textNodeStart:number
@@ -28,7 +28,7 @@ interface IMember{
     stringStartChar:string
     betweenSpaceStart:number
     stringNodeStart:number
-    stringNodeRegExp:RegExp
+    stringNodeRegExp:RegExp|null
     stringNodeKeyLength:number
     commentStart:number
 }
@@ -37,6 +37,9 @@ interface IMember{
         '':function(html:string,m:IMember){
             let nodeName=m.node.nodeName;
             if(m.node.__closeSelf__){
+                if(!m.node.parentNode){
+                    throw new Error("渲染出错！");
+                }
                 m.node=m.node.parentNode;
                 m.action='textNode';
                 m.textNodeStart=m.index;
@@ -91,6 +94,9 @@ interface IMember{
             let n=m.node;
             let name=trim(html.substring(m.xmlNodeNameStart,m.index)).toUpperCase();
             while(n){
+                if(!n.parentNode){
+                    throw new Error("渲染出错！");
+                }
                 if(n.nodeName===name){
                     n.__isClose__=true;
                     m.node=n.parentNode;
@@ -369,7 +375,7 @@ interface IMember{
         stringNode:function(html:string,m:IMember){
             if(html[m.index]==='<'){
                 if(m.length>=m.index+m.stringNodeKeyLength+1){
-                    if(m.stringNodeRegExp.test(html.substr(m.index+1,m.stringNodeKeyLength))){
+                    if(m.stringNodeRegExp&&m.stringNodeRegExp.test(html.substr(m.index+1,m.stringNodeKeyLength))){
                         let s=html.substring(m.stringNodeStart,m.index);
                         if(!emptyTextNodeRE.test(s)){
                             m.node.text(s);
@@ -378,6 +384,9 @@ interface IMember{
                         m.stringNodeRegExp=null;
                         m.action='stringNode2';
                         m.node.__isClose__=true;
+                        if(!m.node.parentNode){
+                            throw new Error("渲染出错！");
+                        }
                         m.node=m.node.parentNode;
                         m.index+=m.stringNodeKeyLength;
                         m.stringNodeKeyLength=0;
@@ -445,11 +454,26 @@ interface IMember{
             if(!this.checkTemplate(html,m)){
                 this.__proto__.attrValue(html,m);
             }
+        },
+        checkEnd:function(html:string,m:IMember){
+            debugger;
+            if(m.action==='textNode'){
+                if(m.textNodeStart!==m.index){
+                    let data=html.substring(m.textNodeStart,m.index);
+                    if(!emptyTextNodeRE.test(data)){
+                        m.node(data,3);
+                    }
+                    m.textNodeStart=0;
+                }
+            }else if(m.action!==""){
+                console.log(m.action)
+                debugger;
+            }
         }
     }
-    function getInitData(vNode,length):IMember{
+    function getInitData(vNode:IVNode,length:number):IMember{
         if(!vNode){
-            vNode=newVNode('document');
+            vNode=VNode('document');
             vNode.__isClose__=true;
         }
         return {

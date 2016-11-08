@@ -119,3 +119,29 @@ function splitByOnce(s:string,split:string):Array<string>{
     }
     return arr;
 }
+
+// function newKeyArrayObject<T>(type:string):KeyArrayObject<T>{
+//     return create(type,KeyArrayObject);
+// }
+// function newHashObject(type:string):HashObject<any>{
+//     return create(type,HashObject);
+// }
+// function create(type:string,tsClass?:Constructor):any{
+//     let s='let '+type+'=function(){};';
+//     if(isObject((tsClass).prototype)){
+//         s+=type+'.prototype=proto;';
+//     }
+//     s+='return new '+type+'();';
+//     return Function('proto',s)((<any>tsClass).prototype);
+// }
+// let newArrayObject=(function(){
+//     return function(type:string):ArrayEx<any>{
+//         return create(type,ArrayEx);
+//     }
+// }());
+
+function getBind(obj:Object, fn:Function) {
+    return function () {
+        return fn.apply(obj, arguments);
+    };
+}

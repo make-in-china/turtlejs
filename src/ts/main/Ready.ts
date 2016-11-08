@@ -1,4 +1,5 @@
 
+/// <reference path='../lib/is.ts'/>
 class Ready{
     private _isReady=false;
     on(fn:()=>void){

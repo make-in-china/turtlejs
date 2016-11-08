@@ -1,11 +1,6 @@
 
-declare let 
-    $t:Turtle;
-interface ITurtle{
-    
-}
-
-
+/// <reference path="../core/BrowserHelper.ts"/>
+/// <reference path="../lib/ArrayEx.ts"/>
 
 interface IExp{
     (...arg):any

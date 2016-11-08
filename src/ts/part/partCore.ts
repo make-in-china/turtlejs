@@ -1,9 +1,14 @@
 
-/// <reference path="../core/core.ts"/>
 /// <reference path='TemplateConfig.ts'/>
 /// <reference path='PartOrderCore.ts'/>
 /// <reference path='../core/XHR.ts'/>
-/// <reference path='../core/instantiation.ts'/>
+/// <reference path='../lib/instantiation.ts'/>
+/// <reference path='../lib/treeEach.ts'/>
+/// <reference path='Part.ts'/>
+/// <reference path='Store.ts'/>
+/// <reference path='../main/Config.ts'/>
+
+declare let $t:ITurtle;
 let
     $DOM,
     $node: I$Node,
@@ -21,7 +26,7 @@ interface ITurtle {
 }
 function getScopeBy(scope, node: INode) {
     if (!scope)
-        return $t.domScope.get(node);
+        return DOMScope.get(node);
     else
         return scope;
 }
@@ -88,13 +93,13 @@ function defineServiceByNode(node: IHTMLElement) {
                 /*把服务定义到组件*/
                 $t.T[partType].service.define(name, getTemplate(node));
             } else {
-                throwError('不能定义service：' + name + '到' + partType + '上');
+                throw new Error('不能定义service：' + name + '到' + partType + '上');
             }
         } else {
             if (!$t.service.hasOwnProperty(name)) {
                 $t.service.define(name, getTemplate(node));
             } else {
-                throwError('不能重复定义service：' + name);
+                throw new Error('不能重复定义service：' + name);
             }
         }
     }
@@ -211,7 +216,7 @@ function getExtends(extName, sortPath) {
         extName = extName[1];
     }
     if (!isObject(importUIHTML(extName, sortPath))) {
-        throwError('找不到可继承的模板：' + extName);
+        throw new Error('找不到可继承的模板：' + extName);
     }
     ext = $t.T[extName];
     return ext;
@@ -281,8 +286,7 @@ function parseUI(node: IHTMLElement, uiInfo, step, part) {
 
     if (!ui) {
         removeNode(node);
-        throwError(uiInfo.name + '组件不存在！');
-        return;
+        throw new Error(uiInfo.name + '组件不存在！');
     }
 
     partName = takeAttr(node, 'p-name');
@@ -508,11 +512,11 @@ function execScript(node: IHTMLElement, outerChildNodes?, outerElement?, props?,
                 }
             }
         }
-        try {
+        // try {
             fn.apply(node.parentNode, args);
-        } catch (e) {
-            _catch(e);
-        }
+        // } catch (e) {
+        //     _catch(e);
+        // }
         fn = null;
     }
 }
@@ -600,7 +604,7 @@ function bindNodeByCondition(node: INode, condition: string) {
     if (!name) {
         return;
     }
-    scope = $t.domScope.get(node);
+    scope = DOMScope.get(node);
     if (name.indexOf(".") != -1) {
         arrName = name.split(".");
         obj = _getBindObject(scope, arrName);
@@ -609,8 +613,7 @@ function bindNodeByCondition(node: INode, condition: string) {
         obj = _getBindObject(scope, [name]);
     }
     if (obj === null) {
-        throwError('不能获取绑定属性:' + cdtn[0]);
-        return;
+        throw new Error('不能获取绑定属性:' + cdtn[0]);
     }
     if (cdtn.length === 2) {
         exp = <any>function (v) {
@@ -633,7 +636,7 @@ function bindNodeFunction(node: INode, bindVar, fn) {
         bindVar = [bindVar];
     }
     name = bindVar[bindVar.length - 1];
-    scope = $t.domScope.get(node);
+    scope = DOMScope.get(node);
     obj = _getBindObject(scope, bindVar);
     fn.__me__ = fn;
     bindProperty(obj, name, fn, "__me__");
@@ -747,9 +750,9 @@ let attributeParser = new AttributeParser;
 function initHTML(arr: INodeArray, outerChildNodes?, outerElement?, props?, part?) {
     treeEach(arr, 'childNodes', function (node: IHTMLElement, step) {
         if (node.nodeType === 8) {
-            try {
+            // try {
                 parseComment(node, outerChildNodes, outerElement, props, part);
-            } catch (e) { _catch(e) }
+            // } catch (e) { _catch(e) }
             return eTreeEach.c_noIn;
         }
         if (node.nodeType !== 1) {
