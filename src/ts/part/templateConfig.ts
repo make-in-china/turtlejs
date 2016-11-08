@@ -46,12 +46,12 @@ class BasePath{
     }
 }
 class TemplateConfig{
-    XMP         ={};
-    TEMPLATE    ={};
-    TITLE       ={getData:function(node:IHTMLTitleElement):string{return <any>node.innerText;}};
-    STYLE       ={xmp:undefined};
-    SCRIPT      ={xmp:undefined};
-    TEXTAREA    ={xmp:undefined,getData:function(node:IHTMLTextAreaElement):string{return <any>node.defaultValue;}};
+    ["XMP"]         ={};
+    ["TEMPLATE"]    ={};
+    ["TITLE"]       ={getData:function(node:IHTMLTitleElement):string{return <any>node.innerText;}};
+    ["STYLE"]       ={xmp:undefined};
+    ["SCRIPT"]      ={xmp:undefined};
+    ["TEXTAREA"]    ={xmp:undefined,getData:function(node:IHTMLTextAreaElement):string{return <any>node.defaultValue;}};
     toString(){
         let arr=[];
         let desc:string;

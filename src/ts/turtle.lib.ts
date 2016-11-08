@@ -1,9 +1,9 @@
 
-function _catch(e:Event,fn?:Function){
+function _catch(e,fn?:Function){
     if(fn){
         fn(e);
     }else{
-        rte.emit("error",e);
+        $t.$error.emit(e);
     }
 }
 function throwError(err:string){

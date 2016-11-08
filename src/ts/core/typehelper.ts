@@ -84,10 +84,27 @@ let dateFormat=(function(){
         return format;
     }
 })();
+let 
+    camelCaseRE             =   /-(\w)/g,
+    camelizeRE              =   /-+(.)?/g,
+    deCamelizeRE            =   /[A-Z]/g
 function camelCase(s){
     return s.replace(camelCaseRE,function(s,s1){
         return s1.toUpperCase();
     })
+}
+function camelize(str:string){ 
+    return str.replace(
+        camelizeRE, 
+        function(match, chr){ 
+            return chr ? chr.toUpperCase() : '' 
+        }   
+    )
+}
+function decamelize(str:string){
+    return str.replace(deCamelizeRE, function(match){ 
+        return '-'+match.toLowerCase();
+    }); 
 }
 
 function splitByOnce(s:string,split:string):Array<string>{
@@ -101,19 +118,4 @@ function splitByOnce(s:string,split:string):Array<string>{
         arr.push(s);
     }
     return arr;
-}
-
-
-function camelize(str:string){ 
-    return str.replace(
-        camelizeRE, 
-        function(match, chr){ 
-            return chr ? chr.toUpperCase() : '' 
-        }   
-    )
-}
-function decamelize(str:string){
-    return str.replace(deCamelizeRE, function(match){ 
-        return '-'+match.toLowerCase();
-    }); 
 }

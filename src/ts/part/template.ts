@@ -1,6 +1,5 @@
 /// <reference path='../core/core.ts'/>
 /// <reference path='partcore.ts'/>
-/// <reference path='partview.ts'/>
 /// <reference path='../turtle.lib.ts'/>
 
 const memberRE = /{([\-a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g;
@@ -114,302 +113,23 @@ class PartParam{
     constructor(public name:string,public hasDefault:boolean,public filter,public filterParam:string,public defaultValue:string,public limitValue:string){}
 }
 
-class Part extends PartBase{
-    isInsert:boolean;
-    begin:IComment;
-    end:IComment;
-    basePart:PartBase;
-    oninsert:(node:INode)=>void;
-    onremove:()=>void;
-    resPath:string;
-    constructor(template:PartTemplate,extPart:PartBase,public props:Object,html:string,outerChildNodes:INodeArray,outerElement:IHTMLCollection){
-        super(template,extPart,props,html,outerChildNodes,outerElement);
-        let name=template.name;
-        
-        let dom=$DOM(html);
-        let begin:IComment=this.begin=<any>$node(name,8);// document.createComment('<'+name+'>');
-        let end:IComment=this.end=<any>$node('/'+name,8);//document.createComment('</'+name+'>')
-        end.__part__=begin.__part__=this;
-        begin.__sign__=1;
-        end.__sign__=0;
-        this.super=extPart;
-        this.resPath=template.path+'/'+template.name+'.res';
-        let sp:PartBase=this;
-        while(sp.super){
-            sp=sp.super
-        }
-        this.basePart=sp?sp:this;
-        this.basePart.isInsert=false;
-        
-        let nodes=dom.childNodes;
-        
-        initHTML(nodes,outerChildNodes,outerElement,props,this);
-        if(extPart){
-            (<ExtendsPart>extPart).to(this);
-        }
-        let store=this.store;
-        store.push.apply(store,nodes);
-        for(let i=nodes.length;i>0;i--){
-            dom.removeChild(nodes[0]);
-        }
-        store.unshift(begin);
-        store.push(end);
-        this.emitInit(this);
-    }
-    toString(){
-        return this.template.partName+":"+JSON.stringify(this.props);
-    }
-    treeDiagram(tabSpace){
-        if(tabSpace===undefined){
-            tabSpace=0;
-        }
-        let s="\r\n"+new Array(tabSpace+1).join(" ")+this.toString();
-        let child=this.child;
-        for(let i=0;i<child.length;i++){
-            s+=child[i].treeDiagram(tabSpace+8);
-        }
-        return s;
-    }
-    get elementLength(){
-        if(this.isInsert){
-            return this.store.length;
-        }else{
-            return 1;
-        }
-    }
-    get elements():INode[]{
-        if(this.isExtends){
-            return new ArrayEx<INode>();
-        }
-        if(this.isInsert){
-            try{
-                let elements=new ArrayEx<INode>();
-                let node=this.begin.nextSibling;
-                let end=this.end;
-                while(node!==end){
-                    elements.push(node);
-                    node=node.nextSibling;                
-                }
-                return elements;
-            }catch(e){
-                _catch(e);
-                return new ArrayEx<INode>();
-            }
-        }
-        if(isArray(this.store)){
-            return this.store.slice().splice(1,this.store.length-2);    
-        }else{
-            return new ArrayEx<INode>();
-        }
-    }
-    getParentPart(node){
-        while(1){
-            if(node.previousSibling!==null){
-                node=node.previousSibling;
-            }else if(node.parentNode!==null){
-                node=node.parentNode;
-            }else{
-                return null;
-            }
-            if(node.nodeType===8&&node.part){
-                if(node.sign===0){
-                    node=node.part.begin;
-                }else{
-                    return node.part;
-                }
-            }
-        } 
-    }
-    get parent(){
-        return this.getParentPart(this.begin);
-    }
-    getRect(){
-        if(this.isInsert){
-            let rects:Array<[number,number,number,number]>=<any>[];
-            let rt;
-            //let recalNode           = document.createElement('div');
+// class ExtendsPart extends PartBase{
 
-            //recalNode.setAttribute('style',"width:0 !important;height:0 !important;margin-left:0 !important;margin-right:0 !important;");
-
-            // insertNodeBefore(this.begin,recalNode);
-            // rt=[recalNode.offsetLeft,recalNode.offsetTop];
-            // insertNodeBefore(this.end,recalNode);
-            // rt.push(recalNode.offsetLeft,recalNode.offsetTop);
-            // removeNode(recalNode);
-            // rects.push(rt);
-            let cs=this.elements;
-            let elem:IElement;
-            let dom:IElement=<any>document.documentElement;
-            for(let i=0;i<cs.length;i++){
-                elem=<IElement>cs[i].valueOf();
-                if(elem.nodeType===1){
-                    let l=0,t=0;
-                    let elem2=elem;
-                    while(elem2!==dom){
-                        t+=elem2.offsetTop;
-                        l+=elem2.offsetLeft;
-                        elem2=<IElement>elem2.parentNode;
-                    }
-                    rects.push([l,t,elem.offsetWidth,elem.offsetHeight]);
-                }
-            }
-            
-            let rect={left:0x7fffffff,top:0x7fffffff,width:0,height:0,right:0,bottom:0}
-            for(let i=0;i<rects.length;i++){
-                rt=rects[i];
-                if(rt[0]<rect.left){
-                    rect.left=rt[0];
-                }
-                if(rt[1]<rect.top){
-                    rect.top=rt[1];
-                }
-                let right:number=rt[0]+rt[2];
-                let bottom:number=rt[1]+rt[3];
-                if(right>rect.right){
-                    rect.right=right;
-                }
-                if(bottom>rect.bottom){
-                    rect.bottom=bottom;
-                }
-            }
-            rect.width=rect.right-rect.left;
-            rect.height=rect.bottom-rect.top;
-            return rect;
-        }else{
-            return {left:0,top:0,width:0,height:0,right:0,bottom:0};
-        }
-    }
-    get innerHTML(){
-        return nodesToString(this.elements);
-    }
-    get elemParent(){
-        return this.begin.parentNode;
-    }
-    insertTo(elem){
-        if(this.isInsert){
-            let elems=this.elements;
-            elems.unshift(this.begin);
-            elems.push(this.end);
-            /*cut scope*/
-            let scopeNodes=this.scopeNodes;
-            for(let i=0;i<scopeNodes.length;i++){
-                $t.domScope.unlink(scopeNodes[i].scope);
-            }
-            appendNodes(elems,elem);
-            /*link scope*/
-            for(let i=0;i<scopeNodes.length;i++){
-                $t.domScope.link(scopeNodes[i].scope,elem);
-            }
-            if(isFunction(this.oninsert)){
-                this.oninsert(elem);
-            }
-        }else{
-            appendNodes(this.store,elem);
-            /*link scope*/
-            let scopeNodes=this.scopeNodes;
-            for(let i=0;i<scopeNodes.length;i++){
-                $t.domScope.link(scopeNodes[i].scope,elem);
-            }
-            if(isFunction(this.oninsert)){
-                this.oninsert(elem);
-            }
-            this.isInsert=true;
-            // if(isFunction(this.oninsert)){
-            //     this.oninsert();
-            // }
-        }  
-    }
-    insertBefore(elem){
-        
-        if(this.isInsert){
-            let elems=this.elements;
-            elems.unshift(this.begin);
-            elems.push(this.end);
-            /*cut scope*/
-            let scopeNodes=this.scopeNodes;
-            for(let i=0;i<scopeNodes.length;i++){
-                $t.domScope.unlink(scopeNodes[i].scope);
-            }
-            insertNodesBefore(elem,elems);
-            /*link scope*/
-            for(let i=0;i<scopeNodes.length;i++){
-                $t.domScope.link(scopeNodes[i].scope,elem);
-            }
-            if(isFunction(this.oninsert)){
-                this.oninsert(elem);
-            }
-        }else{
-            insertNodesBefore(elem,this.store);
-            /*link scope*/
-            let scopeNodes=this.scopeNodes;
-            for(let i=0;i<scopeNodes.length;i++){
-                $t.domScope.link(scopeNodes[i].scope,elem);
-            }
-            if(isFunction(this.oninsert)){
-                this.oninsert(elem);
-            }
-            this.basePart.isInsert=true;
-            // if(isFunction(this.oninsert)){
-            //     this.oninsert();
-            // }
-        }
-    }
-    
-    remove(){
-        if(this.isInsert){
-            let elems=this.elements;
-            elems.unshift(this.begin);
-            elems.push(this.end);
-            let scopeNodes=this.scopeNodes;
-            /*cut scope*/
-            for(let i=0;i<scopeNodes.length;i++){
-                $t.domScope.unlink(scopeNodes[i].scope);
-            }
-            let p=this.begin.parentNode;
-            if(p!==null){
-                for(let i=0;i<elems.length;i++){
-                    p.removeChild(elems[i]);
-                }
-            }
-            this.store=elems;
-            this.basePart.isInsert=false;
-            if(isFunction(this.onremove)){
-                this.onremove();
-            }
-            if(this.parent){
-                this.parent.emitResize();    
-            }
-        }
-    }
-    get scopeNodes(){
-            let scopeNodes=[];
-            treeEach(this.elements,"children",function(node){
-                if(node.hasOwnProperty("scope")){
-                    scopeNodes.push(node);
-                    return eTreeEach.c_noIn;
-                }
-            });
-            return scopeNodes;
-    }
-}
-
-class ExtendsPart extends PartBase{
-
-    constructor(template:PartTemplate,extPart:PartBase|undefined,public props:Object,html:string,outerChildNodes:INodeArray,outerElement:IHTMLCollection){
-        super(template,extPart,props,html,outerChildNodes,outerElement);
-        this.isExtends=true;
-    }
-    to(part:PartBase){
-        /**剪切厡型链 */
-        let proto=part.$.__proto__;
-        this.$.__proto__=proto;
-        part.$.__proto__=this.$;
-        if(this.super){
-            (<ExtendsPart>this.super).to(part);
-        }
-        push.apply(part.store,this.store);
-    }
-}
+//     constructor(template:PartTemplate,extPart:PartBase|undefined,public props:Object,html:string,outerChildNodes:INodeArray,outerElement:IHTMLCollection){
+//         super(template,props,html,outerChildNodes,outerElement);
+//         // this.isExtends=true;
+//     }
+//     to(part:PartBase){
+//         /**剪切厡型链 */
+//         let proto=part.$.__proto__;
+//         this.$.__proto__=proto;
+//         part.$.__proto__=this.$;
+//         if(this.super){
+//             (<ExtendsPart>this.super).to(part);
+//         }
+//         push.apply(part.store,this.store);
+//     }
+// }
 
 interface IPartTemplate{
     params:ArrayEx<PartParam>;
@@ -417,7 +137,7 @@ interface IPartTemplate{
     extends:IPartTemplate;
     partName:string;
     service:Service;
-    beExtends:(node:INode,that,outerChildNodes:INodeArray,outerElement:IHTMLCollection,props,part)=>ExtendsPart;
+    // beExtends:(node:INode,that,outerChildNodes:INodeArray,outerElement:IHTMLCollection,props,part)=>ExtendsPart;
     parseParamsHelp:(p)=>void;
 }
 class PartTemplate implements IPartTemplate{
@@ -568,10 +288,11 @@ class PartTemplate implements IPartTemplate{
         if(!ext){
             ext=this.extends;
         }
-        if(ext instanceof PartTemplate){
-            ext=ext.beExtends(uiNode,that,outerChildNodes,outerElement,props,part);
-        }
-        let newPart=new Part(this,ext,props,html,outerChildNodes,outerElement);
+        // if(ext instanceof PartTemplate){
+        //     ext=ext.beExtends(uiNode,that,outerChildNodes,outerElement,props,part);
+        // }
+        // let newPart=new Part(this,ext,props,html,outerChildNodes,outerElement);
+        let newPart=new Part(this,props,html,outerChildNodes,outerElement);
         if(refPartName){
             /**放置到全局引用 */
             KeyArrayHashObjectManage.push($t.parts,refPartName,newPart);
@@ -626,22 +347,22 @@ class PartTemplate implements IPartTemplate{
         }
         return d.join('');
     }
-    /*变成别人的扩展*/
-    beExtends(node:INode,that,outerChildNodes:INodeArray,outerElement:IHTMLCollection,props,part):ExtendsPart{
-        let ext;
-        if(this.extends instanceof PartTemplate){
-            ext=this.extends.beExtends(node,that,outerChildNodes,outerElement,props,part);
-        }
-        let html=this.joinDatasByProps(props);
-        return new ExtendsPart(
-            this,
-            ext,
-            props,
-            execTemplateScript(html,that,outerChildNodes,outerElement,props,part),
-            outerChildNodes,
-            outerElement
-        );
-    }
+    // /*变成别人的扩展*/
+    // beExtends(node:INode,that,outerChildNodes:INodeArray,outerElement:IHTMLCollection,props,part):ExtendsPart{
+    //     let ext;
+    //     if(this.extends instanceof PartTemplate){
+    //         ext=this.extends.beExtends(node,that,outerChildNodes,outerElement,props,part);
+    //     }
+    //     let html=this.joinDatasByProps(props);
+    //     return new ExtendsPart(
+    //         this,
+    //         ext,
+    //         props,
+    //         execTemplateScript(html,that,outerChildNodes,outerElement,props,part),
+    //         outerChildNodes,
+    //         outerElement
+    //     );
+    // }
     toDefineString(){
         let s='$this.ui.define("'+this.name+'","'+this.sortPath+'","'+this.path+'",{datas:';
         s+=JSON.stringify(this.datas).replace(/<\/script>/g,'</scr"+"ipt>');

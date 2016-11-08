@@ -1,6 +1,6 @@
 
 declare let 
-    $t:ITurtle;
+    $t:Turtle;
 interface ITurtle{
     
 }
@@ -386,23 +386,23 @@ interface IElement extends INode, GlobalEventHandlers, IElementTraversal, INodeS
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
 }
 interface ICharacterData extends INode, IChildNode {
-    data?: string;
-    length?: number;
-    appendData?(arg: string): void;
-    deleteData?(offset: number, count: number): void;
-    insertData?(offset: number, arg: string): void;
-    replaceData?(offset: number, count: number, arg: string): void;
-    substringData?(offset: number, count: number): string;
+    data: string;
+    length: number;
+    appendData(arg: string): void;
+    deleteData(offset: number, count: number): void;
+    insertData(offset: number, arg: string): void;
+    replaceData(offset: number, count: number, arg: string): void;
+    substringData(offset: number, count: number): string;
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
 }
 
 interface IText extends ICharacterData {
-    wholeText?: string;
-    replaceWholeText?(content: string): Text;
-    splitText?(offset: number): Text;
+    wholeText: string;
+    replaceWholeText(content: string): Text;
+    splitText(offset: number): Text;
 }
 interface IComment extends ICharacterData {
-    text?: string;
+    text: string;
 }
 interface IHTMLCollection {
     /**

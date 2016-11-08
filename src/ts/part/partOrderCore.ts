@@ -12,7 +12,7 @@ let
         alert(msg);
         return eTreeEach.c_stopEach;
     },
-    orderStack              =   new ArrayEx;
+    orderStack              =   new ArrayEx<IOrder>();
 SetParseError.isError=false;
 interface IParseError{
     isError?:boolean;
@@ -22,10 +22,6 @@ interface ICommentOrderInfo{
     order?: any;
     orderCase?: any;
     condition: any;
-}
-interface IComment{
-    __order__?:INode
-    __endNode__?:INode
 }
 interface ITurtle{
     replaceClassStore:IHTMLElement[];
@@ -42,7 +38,8 @@ function replaceCls(){
     }
     arr.length=0;
 }
-function getCommentStringInfo(s):ICommentOrderInfo{
+/**从注释中读取命令 */
+function getCommentStringInfo(s):ICommentOrderInfo|null{
     let order=s.match(orderRE);
     if(order){
         return {order:trim(order[0]),condition:s.substring(order[0].length,s.length)}    
@@ -52,7 +49,9 @@ function getCommentStringInfo(s):ICommentOrderInfo{
             return {orderCase:trim(orderCase[0]),condition:s.substring(orderCase[0].length,s.length)}  
         }
     } 
+    return null;
 }
+/**从注释中读取字符串 */
 let getCommentText=(function(){
     if(Comment.prototype.hasOwnProperty("text")){
         let commentDataRE=/^<!--([\s\S]*?)-->$/;
@@ -74,8 +73,6 @@ let getCommentText=(function(){
             return node.data;
         }
     }
-
-
 }());
 function parseScopeOrder(info:ICommentOrderInfo,node:IComment,outerChildNodes,outerElement,props,part){
     let condition=splitByOnce(info.condition,"|");
@@ -102,7 +99,7 @@ function parseCommentOrderNoScript(info:ICommentOrderInfo,node:IComment,outerChi
             return parseAsyncOrder(info,node,outerChildNodes,outerElement,props,part);
     }
 }
-function parseCommentOrderBlock(node,outerChildNodes,outerElement,props,part){
+function parseCommentOrderBlock(node:INode,outerChildNodes,outerElement,props,part){
     let i=getNodeIndex2(node);
     let isError=false;
     let error=function(msg){
@@ -110,10 +107,14 @@ function parseCommentOrderBlock(node,outerChildNodes,outerElement,props,part){
         alert(msg);
         return eTreeEach.c_stopEach;
     }
-    return treeEach(node.parentNode.childNodes,'childNodes',function(node:INode,step){
-        if(node.nodeType!=8)return;
+    return treeEach(node.parentNode.childNodes,'childNodes',function(node,step){
+        if(!isCommentNode(node)){
+            return;
+        }
         let info=getCommentStringInfo(getCommentText(node));
-        if(!info)return;
+        if(!info){
+            return;
+        }
         if(info.order){
             let ret=parseCommentOrderNoScript(info,node,outerChildNodes,outerElement,props,part);
             if(ret){
@@ -121,9 +122,9 @@ function parseCommentOrderBlock(node,outerChildNodes,outerElement,props,part){
             }
             return eTreeEach.c_noRepeat&eTreeEach.c_noIn;
         }
-        if(info.orderCase=='end'){
+        if(info.orderCase==='end'){
             if(orderStack.length>0){
-                (<IComment>orderStack.pop()).__endNode__=node;
+                (<IOrder>orderStack.pop()).endNode=node;
                 
                 return eTreeEach.c_stopEach;
             }else{
@@ -134,11 +135,26 @@ function parseCommentOrderBlock(node,outerChildNodes,outerElement,props,part){
     },i+1);
     
 }
-function addOrderToNode(node,info,outerChildNodes,outerElement,props,part,fnGetOrder){
+interface INode{
+    __order__?:IOrder
+}
+interface IOrder{
+    name?:string
+    node?:INode
+    endNode?:INode|null
+    condition?:string
+    parseCommentOrderBlockReturnValue?:{
+        stack: [IArray | INode[], number];
+        state: eTreeEach | undefined;
+        array: IArray | INode[];
+        index: number;
+    } | undefined
+}
+function addOrderToNode(node:INode,info,outerChildNodes,outerElement,props,part,fnGetOrder:()=>IOrder){
     let order;
-    if(!node.order){
+    if(!node.__order__){
         order=fnGetOrder();
-        node.order=order;
+        node.__order__=order;
         order.name=info.order;
         order.node=node;
         order.endNode=null;
@@ -146,7 +162,7 @@ function addOrderToNode(node,info,outerChildNodes,outerElement,props,part,fnGetO
         orderStack.push(order);
         order.parseCommentOrderBlockReturnValue=parseCommentOrderBlock(node,outerChildNodes,outerElement,props,part);
     }else{
-        order=node.order;
+        order=node.__order__;
     }
     return order.parseCommentOrderBlockReturnValue;
 }
@@ -161,11 +177,13 @@ function parseIfOrder(info,node,outerChildNodes,outerElement,props,part){
                 let order=this;
                 order.hit=parseBool(execByScope(node,this.condition,scope,outerChildNodes,outerElement,props,part))?this.node:null;
                 treeEach(node.parentNode.childNodes,'childNodes',function(node:INode,step){
-                    if(node.nodeType!=8)return;
+                    if(!isCommentNode(node)){
+                        return;
+                    }
                     let info=getCommentStringInfo(getCommentText(node));
                     if(!info)return;
-                    if((<IComment>node).__order__){
-                        step.next=getNodeIndex2((<IComment>(<IComment>node).__order__).__endNode__)-getNodeIndex2(node);
+                    if(node.__order__&&node.__order__.node){
+                        step.next=getNodeIndex2(node.__order__.node)-getNodeIndex2(node);
                         return;
                     }
                     switch(info.orderCase){
@@ -277,12 +295,12 @@ function parseAsyncOrder(info,node,outerChildNodes,outerElement,props,part){
                     let elem=$node('div');
                     let p=mark.parentNode;
                     replaceNodeByNode(mark,elem);
-                    mark=null;
+                    // mark=null;
                     appendNodes(ns,elem);
                     let chds=elem.childNodes;
                     initHTML(chds,outerChildNodes,outerElement,props,part);
                     takeOutChildNodes(elem);
-                    elem=null;
+                    // elem=null;
                     replaceCls();
                 },delay);
             }
@@ -301,11 +319,15 @@ function parseSwitchOrder(info,node,outerChildNodes,outerElement,props,part){
                 let order=this;
                 let scope=$t.domScope.get(node);
                 treeEach(node.parentNode.childNodes,'childNodes',function(node:IComment,step){
-                    if(node.nodeType!=8)return;
+                    if(!isCommentNode(node)){
+                        return;
+                    }
                     let info=getCommentStringInfo(getCommentText(node));
-                    if(!info)return;
-                    if((<IComment>node).__order__){
-                        step.next=getNodeIndex2((<IComment>(<IComment>node).__order__).__endNode__)-getNodeIndex2(node);
+                    if(!info){
+                        return;
+                    }
+                    if(node.__order__&&node.__order__.endNode){
+                        step.next=getNodeIndex2(node.__order__.endNode)-getNodeIndex2(node);
                         return;
                     }
                     switch(info.orderCase){

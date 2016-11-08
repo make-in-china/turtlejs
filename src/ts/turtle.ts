@@ -1,8 +1,8 @@
 
 /// <reference path='./core/core.ts'/>
 /// <reference path='./part/Template.ts'/>
-/// <reference path='scope.ts'/>
-/// <reference path='client.ts'/>
+// // / <reference path='scope.ts'/>
+/// <reference path='ClientHelper.ts'/>
 /// <reference path='store.ts'/>
 
 
@@ -73,15 +73,19 @@ function appendQueryString(name,value){
         return location.href+'?'+name+'='+value;
     }
 }
-class Turtle implements ITurtle{
-    domScope                                =new DOMScope
-    rootScope                               =new RootScope
-    config                                  =new Config
-    T:TemplateList                          =new TemplateList
-    xhr                                     =new XHR
-    service                                 =new Service
-    store                                   =new Store
-    readyByRenderDocument:ReadyObject       =new ReadyObject
+class Turtle extends EventEmitter implements ITurtle{
+    domScope                                =new DOMScope;
+    rootScope                               =new RootScope;
+    config                                  =new Config;
+    T:TemplateList                          =new TemplateList;
+    xhr                                     =new XHR;
+    service                                 =new Service;
+    store                                   =new Store;
+    readyByRenderDocument:Ready             =new Ready;
+    /**error事件管理器*/
+    $error                                  =this.getEventHelper<
+                                                (this:void,event:any)=>void,
+                                                (this:void,event:any)=>boolean>("error");
     parts:IKeyArrayHashObject<Part>         ={}
     refs:IKeyArrayHashObject<IHTMLElement>  ={}
     // private fn                              ={}
@@ -90,8 +94,25 @@ class Turtle implements ITurtle{
     turtleScriptElement:IHTMLScriptElement
     url:string
     isCompile:boolean;/**未使用 */
+    
+    /**
+     * 缓存事件管理器
+     */
+    private eventHelpers:{[index:string]:EventHelper<ICallBack,Function>}={}
+    /**
+     * 生成或获取一个事件管理器
+     */
+    getEventHelper<T extends ICallBack,U extends Function>(type:string):EventHelper<T,U>{
+        var eventHelper=this.eventHelpers[type];
+        if(!eventHelper){
+        }else{
+            eventHelper=this.eventHelpers[type]=new EventHelper<T,U>(this,type);
+        }
+        return <EventHelper<T,U>>eventHelper;
+    }
     constructor(){
-        rte.on("error",function(e:Event){
+        super();
+        this.$error.on((e)=>{
             log(e);
             bp();
             alert(e);
