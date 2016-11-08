@@ -1,5 +1,5 @@
 
-/// <reference path="../lib/lib.d.ts" />
+/// <reference path="../lib/lib.ts" />
 interface INode {
     insertBefore2(newChild: INode, refChild: INode): INode;
 }

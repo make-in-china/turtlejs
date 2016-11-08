@@ -1,5 +1,5 @@
 
-/// <reference path="../lib/lib.d.ts" />
+/// <reference path="../lib/lib.ts" />
 /// <reference path="typehelper.ts" />
 /// <reference path="is.ts" />
 /// <reference path="hashobject.ts"/>

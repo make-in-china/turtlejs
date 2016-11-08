@@ -11,8 +11,9 @@ class EventEmitter{
     }
     constructor() {
         this.on = this.addListener;
+        this.off = this.removeListener;
     }
-    emit = function (type: string, ...args): boolean {
+    emit(type: string, ...args): boolean {
         // If there is no 'error' event listener then throw.
         if (type === 'error') {
             if (!this.events || !this.events.error ||
@@ -26,31 +27,28 @@ class EventEmitter{
         }
 
         if (!this.events) return false;
-        let handler = this.events[<string>type];
-        if (!handler) return false;
-
-        if (!isArray(handler)) {
-            handler.apply(this, args);
-            return true;
-
+        let handler = this.events[type];
+        if (!handler){
+            return false;
         } else if (isArray(handler)) {
-
+            
             let listeners = handler.slice();
             for (let i = 0, l = listeners.length; i < l; i++) {
                 listeners[i].apply(this, args);
             }
             return true;
 
-        } else {
-            return false;
+        } else{
+
+            handler.apply(this, args);
+            return true;
         }
     };
 
     on: (type: string, listener: ICallBack) => this
     // EventEmitter is defined in src/nodeevents.cc
     // EventEmitter.prototype.emit() is also defined there.
-    addListener: (type: string, listener: ICallBack) => this =
-    function (type: string, listener: ICallBack) {
+    addListener(type: string, listener: ICallBack) {
         if ('function' !== typeof listener) {
             throw new Error('addListener only takes instances of Function');
         }
@@ -76,7 +74,7 @@ class EventEmitter{
     };
 
 
-    once = function (type: string, listener: ICallBack):void {
+    once(type: string, listener: ICallBack):void {
         let self = this;
         self.on(type, function g() {
             self.removeListener(type, g);
@@ -84,8 +82,8 @@ class EventEmitter{
         });
     };
 
-    removeListener: (type: string, listener: ICallBack) => this =
-    function (type: string, listener: ICallBack) {
+    off: (type: string, listener: ICallBack) => this
+    removeListener(type: string, listener: ICallBack) {
         if ('function' !== typeof listener) {
             throw new Error('removeListener only takes instances of Function');
         }
@@ -108,8 +106,7 @@ class EventEmitter{
         return this;
     };
 
-    removeAllListeners: (type: string) => this =
-    function (type: string) {
+    removeAllListeners(type: string) {
         // does not use listeners(), so no side effect of creating events[type]
         if (type && this.events && this.events[<string>type]) {
             delete this.events[<string>type]
@@ -117,8 +114,7 @@ class EventEmitter{
         return this;
     };
 
-    listeners: (type: string) => ICallBack[] =
-    function (type: string) {
+    listeners(type: string) {
         if (!this.events) this.events = {};
         let handler = this.events[<string>type];
         if (!handler) {

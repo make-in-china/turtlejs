@@ -1,6 +1,6 @@
 /// <reference path='../core/core.ts'/>
 /// <reference path='partcore.ts'/>
-/// <reference path='../turtle.lib.ts'/>
+/// <reference path='../main/lib.ts'/>
 
 const memberRE = /{([\-a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g;
 const colorRE=/^\s*((#[\dabcdefABCDEF]{3,6})|(rgba\(.*\)))\s*$/
@@ -432,7 +432,7 @@ class TemplateList extends EventEmitter{
     define(name:string,sortPath:string,path:string,s:string,ext){
         this[name]=new PartTemplate(name,sortPath,path,s,ext);
         // this.event.emit(name,this[name]);
-        this.emit(name,this[name]);
+        this.emit(name,this);
         return this[name];
     }
     

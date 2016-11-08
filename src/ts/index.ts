@@ -1,4 +1,4 @@
-/// <reference path='turtle.ts'/>
+/// <reference path='./main/Turtle.ts'/>
 
 if(!$DOM){
     $DOM=function(html){

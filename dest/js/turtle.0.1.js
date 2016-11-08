@@ -258,7 +258,7 @@ var KeyArrayHashObjectManage = (function () {
 // function createKeyArrayHashObject<T>():IKeyArrayHashObject<T> & KeyArrayHashObject<T>{
 //     return <any>(new KeyArrayHashObject<T>());
 // }
-/// <reference path="../lib/lib.d.ts" />
+/// <reference path="../lib/lib.ts" />
 Node.prototype.toDOM =
     Node.prototype.valueOf = function () {
         return this;
@@ -956,118 +956,123 @@ function treeEach(array, propertyName, fn, beginIndex) {
 /// <reference path="is.ts" />
 var EventEmitter = (function () {
     function EventEmitter() {
-        this.emit = function (type) {
-            var args = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                args[_i - 1] = arguments[_i];
-            }
-            // If there is no 'error' event listener then throw.
-            if (type === 'error') {
-                if (!this.events || !this.events.error ||
-                    (isArray(this.events.error) && !this.events.error.length)) {
-                    if (arguments[1] instanceof Error) {
-                        throw arguments[1]; // Unhandled 'error' event
-                    }
-                    else {
-                        throw new Error("Uncaught, unspecified 'error' event.");
-                    }
-                }
-            }
-            if (!this.events)
-                return false;
-            var handler = this.events[type];
-            if (!handler)
-                return false;
-            if (!isArray(handler)) {
-                handler.apply(this, args);
-                return true;
-            }
-            else if (isArray(handler)) {
-                var listeners = handler.slice();
-                for (var i = 0, l = listeners.length; i < l; i++) {
-                    listeners[i].apply(this, args);
-                }
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
-        // EventEmitter is defined in src/nodeevents.cc
-        // EventEmitter.prototype.emit() is also defined there.
-        this.addListener = function (type, listener) {
-            if ('function' !== typeof listener) {
-                throw new Error('addListener only takes instances of Function');
-            }
-            if (!this.events)
-                this.events = {};
-            // To avoid recursion in the case that type == "newListeners"! Before
-            // adding it to the listeners, first emit "newListeners".
-            this.emit('newListener', type, listener);
-            var hanlder = this.events[type];
-            if (!hanlder) {
-                // Optimize the case of one listener. Don't need the extra array object.
-                this.events[type] = listener;
-            }
-            else if (isArray(hanlder)) {
-                // If we've already got an array, just append.
-                hanlder.push(listener);
-            }
-            else {
-                // Adding the second element, need to change to array.
-                this.events[type] = [hanlder, listener];
-            }
-            return this;
-        };
-        this.once = function (type, listener) {
-            var self = this;
-            self.on(type, function g() {
-                self.removeListener(type, g);
-                listener.apply(this, arguments);
-            });
-        };
-        this.removeListener = function (type, listener) {
-            if ('function' !== typeof listener) {
-                throw new Error('removeListener only takes instances of Function');
-            }
-            // does not use listeners(), so no side effect of creating events[type]
-            if (!this.events || !this.events[type])
-                return this;
-            var list = this.events[type];
-            if (isArray(list)) {
-                var i = list.indexOf(listener);
-                if (i < 0)
-                    return this;
-                list.splice(i, 1);
-                if (list.length == 0)
-                    delete this.events[type];
-            }
-            else if (this.events[type] === listener) {
-                delete this.events[type];
-            }
-            return this;
-        };
-        this.removeAllListeners = function (type) {
-            // does not use listeners(), so no side effect of creating events[type]
-            if (type && this.events && this.events[type]) {
-                delete this.events[type];
-            }
-            return this;
-        };
-        this.listeners = function (type) {
-            if (!this.events)
-                this.events = {};
-            var handler = this.events[type];
-            if (!handler) {
-                this.events[type] = [];
-            }
-            else if (!isArray(handler)) {
-                this.events[type] = [handler];
-            }
-            return this.events[type];
-        };
         this.on = this.addListener;
+        this.off = this.removeListener;
     }
+    EventEmitter.prototype.emit = function (type) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        // If there is no 'error' event listener then throw.
+        if (type === 'error') {
+            if (!this.events || !this.events.error ||
+                (isArray(this.events.error) && !this.events.error.length)) {
+                if (arguments[1] instanceof Error) {
+                    throw arguments[1]; // Unhandled 'error' event
+                }
+                else {
+                    throw new Error("Uncaught, unspecified 'error' event.");
+                }
+            }
+        }
+        if (!this.events)
+            return false;
+        var handler = this.events[type];
+        if (!handler) {
+            return false;
+        }
+        else if (isArray(handler)) {
+            var listeners = handler.slice();
+            for (var i = 0, l = listeners.length; i < l; i++) {
+                listeners[i].apply(this, args);
+            }
+            return true;
+        }
+        else {
+            handler.apply(this, args);
+            return true;
+        }
+    };
+    ;
+    // EventEmitter is defined in src/nodeevents.cc
+    // EventEmitter.prototype.emit() is also defined there.
+    EventEmitter.prototype.addListener = function (type, listener) {
+        if ('function' !== typeof listener) {
+            throw new Error('addListener only takes instances of Function');
+        }
+        if (!this.events)
+            this.events = {};
+        // To avoid recursion in the case that type == "newListeners"! Before
+        // adding it to the listeners, first emit "newListeners".
+        this.emit('newListener', type, listener);
+        var hanlder = this.events[type];
+        if (!hanlder) {
+            // Optimize the case of one listener. Don't need the extra array object.
+            this.events[type] = listener;
+        }
+        else if (isArray(hanlder)) {
+            // If we've already got an array, just append.
+            hanlder.push(listener);
+        }
+        else {
+            // Adding the second element, need to change to array.
+            this.events[type] = [hanlder, listener];
+        }
+        return this;
+    };
+    ;
+    EventEmitter.prototype.once = function (type, listener) {
+        var self = this;
+        self.on(type, function g() {
+            self.removeListener(type, g);
+            listener.apply(this, arguments);
+        });
+    };
+    ;
+    EventEmitter.prototype.removeListener = function (type, listener) {
+        if ('function' !== typeof listener) {
+            throw new Error('removeListener only takes instances of Function');
+        }
+        // does not use listeners(), so no side effect of creating events[type]
+        if (!this.events || !this.events[type])
+            return this;
+        var list = this.events[type];
+        if (isArray(list)) {
+            var i = list.indexOf(listener);
+            if (i < 0)
+                return this;
+            list.splice(i, 1);
+            if (list.length == 0)
+                delete this.events[type];
+        }
+        else if (this.events[type] === listener) {
+            delete this.events[type];
+        }
+        return this;
+    };
+    ;
+    EventEmitter.prototype.removeAllListeners = function (type) {
+        // does not use listeners(), so no side effect of creating events[type]
+        if (type && this.events && this.events[type]) {
+            delete this.events[type];
+        }
+        return this;
+    };
+    ;
+    EventEmitter.prototype.listeners = function (type) {
+        if (!this.events)
+            this.events = {};
+        var handler = this.events[type];
+        if (!handler) {
+            this.events[type] = [];
+        }
+        else if (!isArray(handler)) {
+            this.events[type] = [handler];
+        }
+        return this.events[type];
+    };
+    ;
     return EventEmitter;
 }());
 /// <reference path="EventEmitter.ts"/>
@@ -1081,7 +1086,7 @@ var EventHelper = (function () {
                 args[_i - 0] = arguments[_i];
             }
             args.unshift(this.type);
-            return this.target.emit.apply(this, args);
+            return this.emit.apply(this, args);
         };
     }
     EventHelper.prototype.on = function (listener) {
@@ -1092,6 +1097,9 @@ var EventHelper = (function () {
     };
     EventHelper.prototype.once = function (listener) {
         this.target.once(this.type, listener);
+    };
+    EventHelper.prototype.off = function (listener) {
+        this.target.off(this.type, listener);
     };
     EventHelper.prototype.removeListener = function (listener) {
         return this.target.removeListener(this.type, listener);
@@ -1104,7 +1112,31 @@ var EventHelper = (function () {
     };
     return EventHelper;
 }());
-/// <reference path="../lib/lib.d.ts" />
+/// <reference path="EventEmitter.ts"/>
+/// <reference path="EventHelper.ts"/>
+var EventEmitterEx = (function (_super) {
+    __extends(EventEmitterEx, _super);
+    function EventEmitterEx() {
+        var _this = _super.apply(this, arguments) || this;
+        /**
+         * 缓存事件管理器
+         */
+        _this.eventHelpers = {};
+        return _this;
+    }
+    /**
+     * 生成或获取一个事件管理器
+     */
+    EventEmitterEx.prototype.getEventHelper = function (type) {
+        var eventHelper = this.eventHelpers[type];
+        if (!eventHelper) {
+            eventHelper = this.eventHelpers[type] = new EventHelper(this, type);
+        }
+        return eventHelper;
+    };
+    return EventEmitterEx;
+}(EventEmitter));
+/// <reference path="../lib/lib.ts" />
 /// <reference path="typehelper.ts" />
 /// <reference path="is.ts" />
 /// <reference path="hashobject.ts"/>
@@ -1113,7 +1145,7 @@ var EventHelper = (function () {
 /// <reference path="browserhelper.ts"/>
 /// <reference path="debughelper.ts"/>
 /// <reference path="treeeach.ts"/>
-/// <reference path="EventHelper.ts"/>
+/// <reference path="EventEmitterEx.ts"/>
 // function newKeyArrayObject<T>(type:string):KeyArrayObject<T>{
 //     return create(type,KeyArrayObject);
 // }
@@ -2656,9 +2688,38 @@ function throwError(err) {
         _catch(e);
     }
 }
+function getQueryString(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+    var r = location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}
+var getNameByURL = (function () {
+    var RE1 = /[a-zA-Z\d\._]+\.[a-zA-Z\d]+$/;
+    var RE2 = /\.[a-zA-Z\d]+$/;
+    return function (url) {
+        return url.match(RE1)[0].replace(RE2, '');
+    };
+}());
+var getFileNameByURL = (function () {
+    var RE = /[a-zA-Z\d\._]+\.[a-zA-Z\d]+$/;
+    return function (url) {
+        return url.match(RE)[0];
+    };
+}());
+function appendQueryString(name, value) {
+    if (location.search) {
+        return location.href + '&' + name + '=' + value;
+    }
+    else {
+        return location.href + '?' + name + '=' + value;
+    }
+}
 /// <reference path='../core/core.ts'/>
 /// <reference path='partcore.ts'/>
-/// <reference path='../turtle.lib.ts'/>
+/// <reference path='../main/lib.ts'/>
 var memberRE = /{([\-a-zA-Z\d\.\%\u4e00-\u9fa5]+)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\4)(\!)?((['"]?)-?[\-a-zA-Z\d\.\%\u4e00-\u9fa5]*?\7)}(\.(([a-zA-Z][a-zA-Z\d]+)(\([a-zA-Z\d\-\.\,\;\%\u4e00-\u9fa5]*\))?))?/g;
 var colorRE = /^\s*((#[\dabcdefABCDEF]{3,6})|(rgba\(.*\)))\s*$/;
 var PartParamFilter = (function () {
@@ -3054,7 +3115,7 @@ var TemplateList = (function (_super) {
     TemplateList.prototype.define = function (name, sortPath, path, s, ext) {
         this[name] = new PartTemplate(name, sortPath, path, s, ext);
         // this.event.emit(name,this[name]);
-        this.emit(name, this[name]);
+        this.emit(name, this);
         return this[name];
     };
     TemplateList.prototype.toString = function () {
@@ -3068,198 +3129,6 @@ var TemplateList = (function (_super) {
     };
     return TemplateList;
 }(EventEmitter));
-var $rootScope;
-var RootScope = (function () {
-    function RootScope() {
-        this.__actionNode__ = document.documentElement;
-        this.__children__ = [];
-        document['scope'] = this;
-    }
-    return RootScope;
-}());
-var DOMScope = (function () {
-    function DOMScope() {
-        this.stack = [$rootScope];
-    }
-    /**
-     * 在dom节点上创建变量作用域对象
-     * @param {INode} node - dom节点
-     * @param {string} name - 名称
-     */
-    DOMScope.prototype.create = function (node, name) {
-        var scope = this.get(node);
-        if (node.parentNode !== scope.__actionNode__) {
-            scope = new Scope(node, scope, name);
-            this.stack.push(scope);
-        }
-        else {
-            throwError('当前层不允许重复定义scope:' + name);
-        }
-        return scope;
-    };
-    /**
-     * 获取变量作用域对象
-     * @param {INode} node - dom节点
-     */
-    DOMScope.prototype.get = function (node) {
-        if (!node) {
-            return $rootScope;
-        }
-        while (node != null) {
-            if (node.__scope__) {
-                return node.__scope__;
-            }
-            node = node.parentNode;
-        }
-        return $rootScope;
-    };
-    /**
-     * 切断dom节点和变量作用域对象的链接
-     * @param {Scope} scopeVarObject - 变量作用域对象
-     */
-    DOMScope.prototype.unlink = function (scope) {
-        var p = scope.__parent__;
-        if (p) {
-            scope.__parent__ = null;
-            removeItem(p.__children__, scope);
-            var name = scope.__name__;
-            if (!isUndefined(name)) {
-                delete p[name];
-            }
-        }
-    };
-    /**
-     * 链接dom节点和变量作用域对象
-     * @param {Scope} scopeVarObject - 变量作用域对象
-     * @param {INode} node - dom节点
-     */
-    DOMScope.prototype.link = function (scope, node) {
-        var p = $t.domScope.get(node);
-        if (!p) {
-            return;
-        }
-        scope.__parent__ = p;
-        p.__children__.push(scope);
-        if (scope.__name__) {
-            p[scope.__name__] = scope;
-        }
-    };
-    return DOMScope;
-}());
-/// <reference path='RootScope.ts'/>
-/// <reference path='DOMScope.ts'/>
-var Scope = (function () {
-    function Scope(__commentNode__, parent, __name__) {
-        this.__commentNode__ = __commentNode__;
-        this.__name__ = __name__;
-        this.__children__ = [];
-        this.__actionNode__ = __commentNode__.parentNode;
-        this.__parent__ = parent;
-        this.__proto__ = parent;
-        __commentNode__.parentNode.__scope__ = this;
-        parent.__children__.push(this);
-        if (__name__) {
-            parent[__name__] = this;
-        }
-    }
-    return Scope;
-}());
-var ClientHelper = (function () {
-    function ClientHelper() {
-        this.data = {};
-        this.isListen = false;
-        this.events = [];
-        this.setSizeProperty('onResize', function () {
-            return {
-                width: document.documentElement.clientWidth,
-                height: document.documentElement.clientHeight
-            };
-        });
-        this.setSizeProperty('width', function () {
-            return document.documentElement.clientWidth;
-        });
-        this.setSizeProperty('height', function () {
-            return document.documentElement.clientHeight;
-        });
-        this.setSizeProperty('left', function () {
-            return document.documentElement.clientLeft;
-        });
-        this.setSizeProperty('top', function () {
-            return document.documentElement.clientTop;
-        });
-        this.setSizeProperty('right', function () {
-            return document.documentElement.clientLeft + document.documentElement.clientWidth;
-        });
-        this.setSizeProperty('bottom', function () {
-            return document.documentElement.clientTop + document.documentElement.clientHeight;
-        });
-    }
-    ClientHelper.prototype.emit = function () {
-        for (var i = 0; i < this.events.length; i++) {
-            this.events[i]();
-        }
-    };
-    ClientHelper.prototype.setSizeProperty = function (name, fn) {
-        this.data[name] = undefined;
-        this[name] = function (v) {
-            /*此属性用于被绑定*/
-            if (this.data[name] === undefined && this.__bind__) {
-                if (this.isListen === false) {
-                    this.isListen = true;
-                    window.addEventListener('resize', this.emit);
-                }
-                var bind = this.__bind__;
-                var getV = function () {
-                    this[name] = fn();
-                };
-                this.data[name] = fn();
-                this.events.push(getV);
-            }
-            if (v) {
-                this.data[name] = v;
-            }
-            return this.data[name];
-        };
-    };
-    return ClientHelper;
-}());
-var $clientHelper = new ClientHelper;
-var Store = (function () {
-    function Store() {
-    }
-    return Store;
-}());
-var StoreManage = (function () {
-    function StoreManage() {
-    }
-    StoreManage.take = function (data, name) {
-        if (data.hasOwnProperty(name)) {
-            var ret = data[name];
-            delete data[name];
-            if (ret.childNodes.length > 1) {
-                return ret.childNodes;
-            }
-            else {
-                return ret.childNodes[0];
-            }
-        }
-        return null;
-    };
-    StoreManage.takeElem = function (data, name) {
-        if (data.hasOwnProperty(name)) {
-            var ret = data[name];
-            delete data[name];
-            if (ret.children.length > 1) {
-                return ret.children;
-            }
-            else {
-                return ret.children[0];
-            }
-        }
-        return null;
-    };
-    return StoreManage;
-}());
 var Service = (function (_super) {
     __extends(Service, _super);
     function Service(serv) {
@@ -3320,10 +3189,6 @@ var Part = (function (_super) {
         _this.props = props;
         /** DOM节点存储数组 */
         _this.nodeStore = [];
-        /**
-         * 缓存事件管理器
-         */
-        _this.eventHelpers = {};
         //事件管理器
         /**resize事件管理器*/
         _this.$resize = _this.getEventHelper("resize");
@@ -3380,16 +3245,6 @@ var Part = (function (_super) {
         _this.$init.emit(_this);
         return _this;
     }
-    /**
-     * 生成或获取一个事件管理器
-     */
-    Part.prototype.getEventHelper = function (type) {
-        var eventHelper = this.eventHelpers[type];
-        if (!eventHelper) {
-            eventHelper = this.eventHelpers[type] = new EventHelper(this, type);
-        }
-        return eventHelper;
-    };
     Object.defineProperty(Part.prototype, "child", {
         /**即时子Part数组 */
         get: function () { return getParts(this.elements); },
@@ -3689,7 +3544,199 @@ var Part = (function (_super) {
         }
     };
     return Part;
-}(EventEmitter));
+}(EventEmitterEx));
+var $rootScope;
+var RootScope = (function () {
+    function RootScope() {
+        this.__actionNode__ = document.documentElement;
+        this.__children__ = [];
+        document['scope'] = this;
+    }
+    return RootScope;
+}());
+var DOMScope = (function () {
+    function DOMScope() {
+        this.stack = [$rootScope];
+    }
+    /**
+     * 在dom节点上创建变量作用域对象
+     * @param {INode} node - dom节点
+     * @param {string} name - 名称
+     */
+    DOMScope.prototype.create = function (node, name) {
+        var scope = this.get(node);
+        if (node.parentNode !== scope.__actionNode__) {
+            scope = new Scope(node, scope, name);
+            this.stack.push(scope);
+        }
+        else {
+            throwError('当前层不允许重复定义scope:' + name);
+        }
+        return scope;
+    };
+    /**
+     * 获取变量作用域对象
+     * @param {INode} node - dom节点
+     */
+    DOMScope.prototype.get = function (node) {
+        if (!node) {
+            return $rootScope;
+        }
+        while (node != null) {
+            if (node.__scope__) {
+                return node.__scope__;
+            }
+            node = node.parentNode;
+        }
+        return $rootScope;
+    };
+    /**
+     * 切断dom节点和变量作用域对象的链接
+     * @param {Scope} scopeVarObject - 变量作用域对象
+     */
+    DOMScope.prototype.unlink = function (scope) {
+        var p = scope.__parent__;
+        if (p) {
+            scope.__parent__ = null;
+            removeItem(p.__children__, scope);
+            var name = scope.__name__;
+            if (!isUndefined(name)) {
+                delete p[name];
+            }
+        }
+    };
+    /**
+     * 链接dom节点和变量作用域对象
+     * @param {Scope} scopeVarObject - 变量作用域对象
+     * @param {INode} node - dom节点
+     */
+    DOMScope.prototype.link = function (scope, node) {
+        var p = $t.domScope.get(node);
+        if (!p) {
+            return;
+        }
+        scope.__parent__ = p;
+        p.__children__.push(scope);
+        if (scope.__name__) {
+            p[scope.__name__] = scope;
+        }
+    };
+    return DOMScope;
+}());
+/// <reference path='RootScope.ts'/>
+/// <reference path='DOMScope.ts'/>
+var Scope = (function () {
+    function Scope(__commentNode__, parent, __name__) {
+        this.__commentNode__ = __commentNode__;
+        this.__name__ = __name__;
+        this.__children__ = [];
+        this.__actionNode__ = __commentNode__.parentNode;
+        this.__parent__ = parent;
+        this.__proto__ = parent;
+        __commentNode__.parentNode.__scope__ = this;
+        parent.__children__.push(this);
+        if (__name__) {
+            parent[__name__] = this;
+        }
+    }
+    return Scope;
+}());
+var ClientHelper = (function () {
+    function ClientHelper() {
+        this.data = {};
+        this.isListen = false;
+        this.events = [];
+        this.setSizeProperty('onResize', function () {
+            return {
+                width: document.documentElement.clientWidth,
+                height: document.documentElement.clientHeight
+            };
+        });
+        this.setSizeProperty('width', function () {
+            return document.documentElement.clientWidth;
+        });
+        this.setSizeProperty('height', function () {
+            return document.documentElement.clientHeight;
+        });
+        this.setSizeProperty('left', function () {
+            return document.documentElement.clientLeft;
+        });
+        this.setSizeProperty('top', function () {
+            return document.documentElement.clientTop;
+        });
+        this.setSizeProperty('right', function () {
+            return document.documentElement.clientLeft + document.documentElement.clientWidth;
+        });
+        this.setSizeProperty('bottom', function () {
+            return document.documentElement.clientTop + document.documentElement.clientHeight;
+        });
+    }
+    ClientHelper.prototype.emit = function () {
+        for (var i = 0; i < this.events.length; i++) {
+            this.events[i]();
+        }
+    };
+    ClientHelper.prototype.setSizeProperty = function (name, fn) {
+        this.data[name] = undefined;
+        this[name] = function (v) {
+            /*此属性用于被绑定*/
+            if (this.data[name] === undefined && this.__bind__) {
+                if (this.isListen === false) {
+                    this.isListen = true;
+                    window.addEventListener('resize', this.emit);
+                }
+                var bind = this.__bind__;
+                var getV = function () {
+                    this[name] = fn();
+                };
+                this.data[name] = fn();
+                this.events.push(getV);
+            }
+            if (v) {
+                this.data[name] = v;
+            }
+            return this.data[name];
+        };
+    };
+    return ClientHelper;
+}());
+var $clientHelper = new ClientHelper;
+var Store = (function () {
+    function Store() {
+    }
+    return Store;
+}());
+var StoreManage = (function () {
+    function StoreManage() {
+    }
+    StoreManage.take = function (data, name) {
+        if (data.hasOwnProperty(name)) {
+            var ret = data[name];
+            delete data[name];
+            if (ret.childNodes.length > 1) {
+                return ret.childNodes;
+            }
+            else {
+                return ret.childNodes[0];
+            }
+        }
+        return null;
+    };
+    StoreManage.takeElem = function (data, name) {
+        if (data.hasOwnProperty(name)) {
+            var ret = data[name];
+            delete data[name];
+            if (ret.children.length > 1) {
+                return ret.children;
+            }
+            else {
+                return ret.children[0];
+            }
+        }
+        return null;
+    };
+    return StoreManage;
+}());
 var Ready = (function () {
     function Ready() {
         this._isReady = false;
@@ -3721,13 +3768,23 @@ var Ready = (function () {
     });
     return Ready;
 }());
-/// <reference path='./core/core.ts'/>
-/// <reference path='./part/Template.ts'/>
-/// <reference path='./scope/Scope.ts'/>
+var Config = (function () {
+    function Config() {
+        this.baseUIPath = baseUIPath;
+        this.baseServicePath = 'service';
+        this.debugMode = 2;
+    }
+    return Config;
+}());
+/// <reference path='../core/core.ts'/>
+/// <reference path='../part/Template.ts'/>
+/// <reference path='../part/Part.ts'/>
+/// <reference path='../scope/Scope.ts'/>
 /// <reference path='ClientHelper.ts'/>
-/// <reference path='store.ts'/>
-/// <reference path='./part/Part.ts'/>
+/// <reference path='Store.ts'/>
 /// <reference path='Ready.ts'/>
+/// <reference path='Config.ts'/>
+/// <reference path='lib.ts'/>
 var readyRE = /complete|loaded|interactive/;
 function renderTemplate(tp) {
     var sHTML = getTemplate(tp);
@@ -3742,43 +3799,6 @@ function renderTemplate(tp) {
     replaceNodeByNodes(tp, takeChildNodes(vDOM.toDOM()));
     //vDOM.innerHTML='';
 }
-var Config = (function () {
-    function Config() {
-        this.baseUIPath = baseUIPath;
-        this.baseServicePath = 'service';
-        this.debugMode = 2;
-    }
-    return Config;
-}());
-function getQueryString(name) {
-    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-    var r = location.search.substr(1).match(reg);
-    if (r != null) {
-        return unescape(r[2]);
-    }
-    return null;
-}
-var getNameByURL = (function () {
-    var RE1 = /[a-zA-Z\d\._]+\.[a-zA-Z\d]+$/;
-    var RE2 = /\.[a-zA-Z\d]+$/;
-    return function (url) {
-        return url.match(RE1)[0].replace(RE2, '');
-    };
-}());
-var getFileNameByURL = (function () {
-    var RE = /[a-zA-Z\d\._]+\.[a-zA-Z\d]+$/;
-    return function (url) {
-        return url.match(RE)[0];
-    };
-}());
-function appendQueryString(name, value) {
-    if (location.search) {
-        return location.href + '&' + name + '=' + value;
-    }
-    else {
-        return location.href + '?' + name + '=' + value;
-    }
-}
 var Turtle = (function (_super) {
     __extends(Turtle, _super);
     function Turtle() {
@@ -3791,10 +3811,6 @@ var Turtle = (function (_super) {
         _this.service = new Service;
         _this.store = new Store;
         _this.readyByRenderDocument = new Ready;
-        /**
-         * 缓存事件管理器
-         */
-        _this.eventHelpers = {};
         /**error事件管理器*/
         _this.$error = _this.getEventHelper("error");
         _this.parts = {};
@@ -3888,16 +3904,6 @@ var Turtle = (function (_super) {
         }
         return _this;
     }
-    /**
-     * 生成或获取一个事件管理器
-     */
-    Turtle.prototype.getEventHelper = function (type) {
-        var eventHelper = this.eventHelpers[type];
-        if (!eventHelper) {
-            eventHelper = this.eventHelpers[type] = new EventHelper(this, type);
-        }
-        return eventHelper;
-    };
     Turtle.prototype.getScriptNode = function () {
         return document.scripts[document.scripts.length - 1];
     };
@@ -4008,8 +4014,8 @@ var Turtle = (function (_super) {
         return this;
     };
     return Turtle;
-}(EventEmitter));
-/// <reference path='turtle.ts'/>
+}(EventEmitterEx));
+/// <reference path='./main/Turtle.ts'/>
 if (!$DOM) {
     $DOM = function (html) {
         var elem = document.createElement('ui:dom');
