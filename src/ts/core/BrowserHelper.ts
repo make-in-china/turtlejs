@@ -5,7 +5,12 @@ interface Window {
 interface Node {
     insertBefore2(newChild: INode, refChild: INode): INode;
 }
-let isIE = !!window.ActiveXObject || "ActiveXObject" in window;
+let isIE:boolean
+try{
+    isIE = !!(typeof window !=="undefined"&&window.ActiveXObject || "ActiveXObject" in window);
+}catch(e){
+    isIE=false;
+}
 (function () {
     var insertBefore = Node.prototype.insertBefore;
     if (isIE) {

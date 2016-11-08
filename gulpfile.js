@@ -18,10 +18,10 @@ function tsc(event){
          tsResult.js.pipe(gulp.dest('dest')),
          tsResult.dts.pipe(gulp.dest('dest'))])   
          
-    var tsResult=gulp.src('src/ts/virtual/VDOM.ts')
+    var tsResult=gulp.src('src/ts/virtual/UIHelper.ts')
         .pipe(ts({
             target: 'es5',//把typescript转换成es5标准的js文件,也可以是es6,但这个node版本不支持
-            outFile:'virtual/VDOM.0.1.js',
+            outFile:'virtual/UIHelper.0.1.js',
             "declaration": true
             })
         );
@@ -60,8 +60,19 @@ function tscui(event){
         })(0);  
     });   
 }
+function uibuild(path){
+    var UIHealper=require('./dest/virtual/UIHelper.0.1.js');
+    UIHealper.makeClass(path);
+    // console.log('\n['+moment().format("HH:mm:ss")+']\n'+path.replace(/\\\\/g,'\\'));
+}
+function uiwatch(event){
+    gulp.watch('src/ui/**/*.html', function(event){
+        uibuild(event.path);
+    });
+}
 gulp.task('tsc', tsc);
 gulp.task('tscui',tscui);
+gulp.task('ui:w',uiwatch);
 gulp.task('tsc:w', function () {
     gulp.watch('src/ts/*.ts', function(event){
         console.log('\n['+moment().format("HH:mm:ss")+']\n'+event.path.replace(/\\\\/g,'\\'));

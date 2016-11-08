@@ -1,14 +1,21 @@
 
-/// <reference path='../lib/lib.ts'/>
 /// <reference path='VNameNodeMap.ts'/>
 /// <reference path='VStyle.ts'/>
 /// <reference path='../lib/HashObject.ts'/>
 /// <reference path='../lib/Encode.ts'/>
 /// <reference path='../lib/ClassList.ts'/>
 /// <reference path='../core/Node.ts'/>
-/// <reference path='../main/Bind.ts'/>
-let styleListRE = /\s*([\w\-]+)\s*\:\s*(.*?)\s*[;$]/g;
-
+let 
+        emptyTextNodeRE = /^\s*$/,
+        styleListRE = /\s*([\w\-]+)\s*\:\s*(.*?)\s*[;$]/g,
+        stringNode = {
+            SCRIPT: /^\/script[>\s]/i,
+            TEMPLATE: /^\/template[>\s]/i,
+            STYLE: /^\/style[>\s]/i,
+            TITLE: /^\/title[>\s]/i,
+            TEXTAREA: /^\/textarea[>\s]/i,
+            XMP: /^\/xmp[>\s]/i
+        }
 
 interface IVText extends IVNode {
     value: string
@@ -573,7 +580,7 @@ let VNode: IVNode = <any>(function () {
         if (this.nodeName in stringNode) {
             this.appendChild(VNode(s, 3));
         } else {
-            new VDOM(s, this);
+            VDOM(s, this);
         }
     }
     function getinnerHTML() {

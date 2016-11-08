@@ -1,6 +1,9 @@
 interface Window {
     ActiveXObject?: Object;
 }
+interface Node {
+    insertBefore2(newChild: INode, refChild: INode): INode;
+}
 declare let isIE: boolean;
 declare class ArrayEx<T> extends Array<T> {
     last(): T | undefined;
@@ -756,9 +759,6 @@ interface Object {
     __proto__?: Object;
 }
 interface INode {
-    insertBefore2(newChild: INode, refChild: INode): INode;
-}
-interface Node {
     insertBefore2(newChild: INode, refChild: INode): INode;
 }
 interface Node {
