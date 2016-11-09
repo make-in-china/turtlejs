@@ -24,7 +24,7 @@ namespace Component{
         if(!isString(html)){
             html=html.toString();
         }
-        var data=VDOM(html).toJS;
+        var data=VDOM(html).toJS();
         console.log(data);
     }
 }

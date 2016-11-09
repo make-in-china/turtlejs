@@ -78,6 +78,59 @@ interface IVNode {
     toDOM(): Node
 }
 let VNode: IVNode = <any>(function () {
+    /**用于返回给VNode的函数对象 */
+    function newVNode(name: string, nodeType: number = 1): IVNode {
+        //console.log(name);
+        let t: IVNode = <any>function (name: string, nodeType: number) {
+            if (name) {
+                return t.append(name, nodeType);
+            } else {
+                t.__isClose__ = true;
+                return t.parentNode;
+            }
+        }
+        t.__ = {};
+        t.childNodes = [];
+        t.nodeType = nodeType;
+        if (isVText(t)) {
+            t.__proto__ = textNodePrototype;
+            t.nodeName = '#text';
+            if (isString(name)) {
+                t.value = name//decodeHTML(name);    
+                // } else {
+                //     t.value = name.toString();
+            }
+            t.__isClose__ = true;
+        } else if (isVElement(t)) {
+            t.nodeName = name.toUpperCase();
+            t.attributes = new VNamedNodeMap();
+            t.children = [];
+            t.__events__ = [];
+            t.__isClose__ = t.__closeSelf__ = name in closeSelf;
+            t.style = new VStyle(t, t.attributes);
+
+            setClassName(t);
+            defineClassList(t);
+            if (t.nodeName in htmlNodeInfo) {
+                setProto(t);
+            } else {
+                t.__proto__ = prototype;
+            }
+        } else
+            if (isVComment(t)) {
+                t.nodeName = '#comment';
+                t.value = t.data = name;
+                t.__proto__ = prototype;
+                t.__isClose__ = true;
+            } else
+                if (isVDocType(t)) {
+                    t.nodeName = 'html';
+                    t.__proto__ = prototype;
+                    t.__isClose__ = true;
+                }
+        t.parentNode = null;
+        return t;
+    }
     function __VNode(this: IVNode) {
         this.setAttribute = setAttribute;
         this._ = _;
@@ -358,74 +411,22 @@ let VNode: IVNode = <any>(function () {
             }
         });
     }
-//用于返回给VNode的函数对象
-    function newVNode(name: string, nodeType: number=1): IVNode {
-        //console.log(name);
-        let t: IVNode = <any>function (name: string, nodeType: number) {
-            if (name) {
-                return t.append(name, nodeType);
-            } else {
-                t.__isClose__ = true;
-                return t.parentNode;
-            }
-        }
-        t.__ = {};
-        t.childNodes = [];
-        nodeType = nodeType;
-        if (isVText(t)) {
-            t.__proto__ = textNodePrototype;
-            t.nodeName = '#text';
-            if (isString(name)) {
-                t.value = name//decodeHTML(name);    
-                // } else {
-                //     t.value = name.toString();
-            }
-            t.__isClose__ = true;
-        } else if (isVElement(t)) {
-                t.nodeName = name.toUpperCase();
-                t.attributes = new VNamedNodeMap();
-                t.children = [];
-                t.__events__ = [];
-                t.__isClose__ = t.__closeSelf__ = name in closeSelf;
-                t.style = new VStyle(t, t.attributes);
+    
 
-                setClassName(t);
-                defineClassList(t);
-                if (t.nodeName in htmlNodeInfo) {
-                    setProto(t);
-                } else {
-                    t.__proto__ = prototype;
-                }
-            } else
-                if (isVComment(t)) {
-                    t.nodeName = '#comment';
-                    t.value = t.data = name;
-                    t.__proto__ = prototype;
-                    t.__isClose__ = true;
-                } else
-                    if (isVDocType(t)) {
-                        t.nodeName = 'html';
-                        t.__proto__ = prototype;
-                        t.__isClose__ = true;
-                    }
-        t.parentNode = null;
-        return t;
-    }
-
-//VNode的函数定义
+    //VNode的函数定义
     function append(name: string, nodeType: number): IVNode {
         return _appendChild.call(this, newVNode(name, nodeType));
     }
     function appendChild(this: IVNode, vNode: IVNode): IVNode {
         let idx = this.childNodes.indexOf(vNode);
-        if (idx === -1) {  
+        if (idx === -1) {
             return _appendChild.call(this, vNode);
         } else {
             return vNode;
         }
     }
-    function _appendChild(this:IVNode,vNode: IVNode) {
-        if (vNode instanceof Node) { 
+    function _appendChild(this: IVNode, vNode: IVNode) {
+        if (vNode instanceof Node) {
             throw new Error('虚拟DOM只能插入虚拟节点！');
         }
         this.childNodes.push(vNode);
@@ -725,7 +726,7 @@ let VNode: IVNode = <any>(function () {
             sEnd = '()';
         }
         if (this.parentNode === null) {
-            sBegin = '$VNode';
+            sBegin = 'VNode';
         }
         if (this.nodeType === 1) {
             sBegin += '("' + this.nodeName + '")';
@@ -879,7 +880,7 @@ let VNode: IVNode = <any>(function () {
         return elem;
     }
 
-//VNode的模拟继承
+    //VNode的模拟继承
     function VtextNode() {
         this.__proto__ = prototype;
         this.__value__ = '';

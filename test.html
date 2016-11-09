@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Turtlejs</title>
+    <meta charset="utf-8">
+    <script src="dest/virtual/UIHelper.0.1.js"></script>
+</head>
+
+<body>
+    <xmp ui="test">
+        12345
+    </xmp>
+    <xmp>
+        <ui:test></ui:test>
+    </xmp>
+    <script>
+        var data=VDOM(document.body.innerHTML).toJS();
+        console.log("<js:>\n",data);
+        var dom=eval(data);
+        console.log("<dom:>\n",dom);
+        console.log("<dom.innerHTML:>\n",dom.innerHTML);
+    </script>
+</body>
+</html>
