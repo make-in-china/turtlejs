@@ -1,5 +1,7 @@
 /// <reference path="../lib/is.ts"/>
+/// <reference path="VAttr.ts"/>
 class VNamedNodeMap{
+    [index:number]:VAttr
     private _length:number=0;
     indexOfName(name:string) {
         var l = this._length;
@@ -19,7 +21,8 @@ class VNamedNodeMap{
         }
         return -1;
     }
-    getNamedItem(name:string) {
+    getNamedItem(name:string):VAttr|null
+    {
         var idx = this.indexOfName(name);
         if (idx === -1) {
             return null;
@@ -28,7 +31,7 @@ class VNamedNodeMap{
         }
     }
     //getNamedItemNS: getNamedItemNS()
-    item(index) {
+    item(index:number):VAttr|undefined {
         return this[index];
     }
     get length() {
@@ -55,24 +58,26 @@ class VNamedNodeMap{
         }
     }
     //removeNamedItemNS: removeNamedItemNS()
-    setNamedItem(name:string,value) {
-        if (!isString(value)) {
-            if (isObject(value)) {
-                value = value.toString();
-            } else if (value === undefined) {
-                value = "";
-            }
-        }
+    setNamedItem(arg:VAttr) {
+        var name=arg.name;
         var idx = this.indexOfName(name);
+        // if (!isString(value)) {
+        //     if (isObject(value)) {
+        //         value = value.toString();
+        //     } else if (value === undefined) {
+        //         value = "";
+        //     }
+        // }
         if (idx === -1) {
-            this[this._length] = { name: name, value: value };
+            this[this._length] = arg;
             this._length++;
         } else {
-            this[idx].value = value;
+            this[idx] = arg;
         }
+
         var hideValueName = '__' + name + '__';
         if (hideValueName in this) {
-            this[hideValueName] = value;
+            this[hideValueName] = arg;
         }
     }
     //setNamedItemNS: setNamedItemNS()

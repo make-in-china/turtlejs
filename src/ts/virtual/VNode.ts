@@ -1,10 +1,13 @@
 
+/// <reference path='.d.ts'/>
 /// <reference path='VNameNodeMap.ts'/>
 /// <reference path='VStyle.ts'/>
 /// <reference path='../lib/HashObject.ts'/>
 /// <reference path='../lib/Encode.ts'/>
 /// <reference path='../lib/ClassList.ts'/>
 /// <reference path='../lib/lib.ts'/>
+/// <reference path='Is.ts'/>
+/// <reference path='VAttr.ts'/>
 let
     emptyTextNodeRE = /^\s*$/,
     styleListRE = /\s*([\w\-]+)\s*\:\s*(.*?)\s*[;$]/g,
@@ -17,66 +20,6 @@ let
         XMP: /^\/xmp[>\s]/i
     }
 
-interface IVText extends IVNode {
-    value: string
-}
-
-interface IVElement extends IVNode {
-    innerHTML: string
-    innerText: string
-    outerHTML: string
-}
-
-interface IVComment extends IVNode {
-    value: string
-    __dbplus__: boolean
-}
-interface IVDocType extends IVNode {
-}
-interface Node {
-    __vdomNode__: IVNode
-}
-interface IVNode {
-    (name: string, nodeType: 8): IVComment;
-    (name: string, nodeType: 3): IVText;
-    (name: string, nodeType: 1): IVElement;
-    (name: string, nodeType?: number): IVNode;
-    __?: Object;
-    __closeSelf__?: boolean
-    __events__: [string, EventListenerOrEventListenerObject | undefined, boolean][]
-    __isClose__: boolean;
-    __domNode__: Node
-    nodeType: number;
-    data: string
-    nodeName: string
-    childNodes: IVNode[]
-    children: IVNode[]
-    parentNode: IVNode | null
-    attributes: VNamedNodeMap;
-    style: VStyle
-    createElement(name: string): IVElement
-    createTextNode(value: string): IVText
-    createComment(value: string): IVComment
-    append(name: string, nodeType: number): IVNode
-    appendChild(vNode: IVNode): IVNode
-    removeChild(vNode: IVNode): IVNode
-    _(name: string, value?): IVNode | null;
-    setAttribute(name: string, value): IVNode
-    hasAttribute(name: string): boolean
-    removeAttribute(name: string): void
-    removeAttributeNode(item: Object): void
-    getAttribute(name: string): any
-    insertBefore(newNode: IVNode, node: IVNode): void
-    insertBefore2(newNode: IVNode, node: IVNode): void
-    addEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void
-    removeEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void
-    cloneNode(): IVNode
-    text(...agrs): IVNode
-    text2(fn: Function): IVNode
-    toXMLNodeString(): string[]
-    toJS(): string
-    toDOM(): Node
-}
 let VNode: IVNode = <any>(function () {
     /**用于返回给VNode的函数对象 */
     function newVNode(name: string, nodeType: number = 1): IVNode {
@@ -119,7 +62,7 @@ let VNode: IVNode = <any>(function () {
         } else
             if (isVComment(t)) {
                 t.nodeName = '#comment';
-                t.value = t.data = name;
+                t.data = name;
                 t.__proto__ = prototype;
                 t.__isClose__ = true;
             } else
@@ -379,18 +322,6 @@ let VNode: IVNode = <any>(function () {
             }
         });
     }
-    function isVText(node: IVNode): node is IVText {
-        return node.nodeType === 3
-    }
-    function isVElement(node: IVNode): node is IVElement {
-        return node.nodeType === 1
-    }
-    function isVComment(node: IVNode): node is IVComment {
-        return node.nodeType === 8
-    }
-    function isVDocType(node: IVNode): node is IVDocType {
-        return node.nodeType === 10
-    }
 
     function defineClassList(object) {
         Object.defineProperty(object, 'classList', {
@@ -414,7 +345,7 @@ let VNode: IVNode = <any>(function () {
     
 
     //VNode的函数定义
-    function append(name: string, nodeType: number): IVNode {
+    function append(this:IVNode,name: string, nodeType: number): IVNode {
         return _appendChild.call(this, newVNode(name, nodeType));
     }
     function appendChild(this: IVNode, vNode: IVNode): IVNode {
@@ -426,9 +357,9 @@ let VNode: IVNode = <any>(function () {
         }
     }
     function _appendChild(this: IVNode, vNode: IVNode) {
-        if (vNode instanceof Node) {
-            throw new Error('虚拟DOM只能插入虚拟节点！');
-        }
+        // if (vNode instanceof Node) {
+        //     throw new Error('虚拟DOM只能插入虚拟节点！');
+        // }
         this.childNodes.push(vNode);
         if (vNode.nodeType === 1) {
             this.children.push(vNode);
@@ -440,7 +371,7 @@ let VNode: IVNode = <any>(function () {
         vNode.parentNode = this;
         return vNode;
     }
-    function removeChild(vNode: IVNode): IVNode {
+    function removeChild(this:IVNode,vNode: IVNode): IVNode {
         if (!vNode || this.childNodes.length === 0) {
             return vNode;
         }
@@ -467,25 +398,25 @@ let VNode: IVNode = <any>(function () {
     function removeAttributeNode(this: IVNode, item: Object): void {
         this.attributes.removeNamedItem(item);
     }
-    function hasAttribute(name: string): boolean {
+    function hasAttribute(this:IVNode,name: string): boolean {
         return this.attributes.indexOfName(name) !== -1;
     }
-    function setAttribute(name: string, value): IVNode {
+    function setAttribute(this:IVNode,name: string, value:string): IVNode {
         if (name && !emptyTextNodeRE.test(name)) {
-            this.attributes.setNamedItem(name, value);
+            this.attributes.setNamedItem(new VAttr(name, value));
             return <any>getBind(this, setAttribute);
         } else {
             return this;
         }
     }
-    function _(this: IVNode, name: string, value?): IVNode | null {
+    function _(this: IVNode, name: string, value?:string): IVNode | null {
         if (name) {
             return setAttribute.call(this, name, value);
         } else {
             return this.parentNode;
         }
     }
-    function getAttribute(name: string) {
+    function getAttribute(this: IVNode,name: string) {
         let item = this.attributes.getNamedItem(name);
         if (item) {
             return item.value;
@@ -493,16 +424,25 @@ let VNode: IVNode = <any>(function () {
             return null;
         }
     }
-    function valueOf() {
+    function valueOf(this:IVNode) {
         if (this.__domNode__) {
             return this.__domNode__;
         } else {
             return this;
         }
     }
-    function cloneNode(): IVNode {
+    function getNodeData(node:IVNode):string{
+        if(isVElement(node)){
+            return node.outerHTML;
+        }else if(isVText(node)||isVComment(node)){
+            return node.data;
+        }else{
+            return ""
+        }
+    }
+    function cloneNode(this:IVNode): IVNode {
         if (this.nodeType !== 1) {
-            return newVNode(this.data, this.nodeType);
+            return newVNode(getNodeData(this), this.nodeType);
         }
         let node = newVNode(this.nodeName, this.nodeType);
         let attrs = this.attributes;
@@ -514,9 +454,9 @@ let VNode: IVNode = <any>(function () {
         return node;
     }
     function insertBefore(this: IVNode, newNode: IVNode, node: IVNode): void {
-        if (newNode instanceof Node) {
-            throw new Error('虚拟DOM只能插入虚拟节点！');
-        }
+        // if (newNode instanceof Node) {
+        //     throw new Error('虚拟DOM只能插入虚拟节点！');
+        // }
         let p1 = node.parentNode;
         if (!p1) {
             return;
@@ -564,7 +504,7 @@ let VNode: IVNode = <any>(function () {
         }
         return s;
     }
-    function setinnerText(s) {
+    function setinnerText(this:IVNode,s:string) {
         let chds;
         chds = this.children;
         for (let i in chds) {
@@ -576,7 +516,7 @@ let VNode: IVNode = <any>(function () {
         }
         this.appendChild(newVNode(decodeHTML(s), 3));
     }
-    function setinnerHTML(s) {
+    function setinnerHTML(this:IVNode,s:any) {
         this.children.length = 0;
         this.childNodes.length = 0;
         if (!isString(s)) {
@@ -588,25 +528,25 @@ let VNode: IVNode = <any>(function () {
             VDOM(s, this);
         }
     }
-    function getinnerHTML() {
+    function getinnerHTML(this:IVNode) {
         let
             cs = this.childNodes,
             data = [];
         if (cs) {
             for (let i = 0; i < cs.length; i++) {
-                data.push(cs[i].outerHTML);
+                data.push(getNodeData(cs[i]));
             }
         }
         return data.join('');
     }
-    function connectParent(self, elem) {
+    function connectParent(self:IVNode, elem:Node) {
         let p = self.parentNode;
         if (p && p.__domNode__) {
             let pE = p.__domNode__;
             if (pE.childNodes.length === 0) {
                 pE.appendChild(elem);
             } else {
-                let node = self;
+                let node:IVNode|null = self;
                 while (true) {
                     /*
                      * 向前找
@@ -634,9 +574,9 @@ let VNode: IVNode = <any>(function () {
                                     if (elem2.parentNode) {
                                         pE.insertBefore2(elem, elem2);
                                         break;
-                                    } else {
-                                        console.log(elem2.innerHTML);
-                                        debugger;
+                                    // } else {
+                                        // console.log(elem2.innerHTML);
+                                        // debugger;
                                         /*这里怎么处理好呢*/
                                     }
                                 }
@@ -728,11 +668,12 @@ let VNode: IVNode = <any>(function () {
         if (this.parentNode === null) {
             sBegin = 'VNode';
         }
-        if (this.nodeType === 1) {
-            sBegin += '("' + this.nodeName + '")';
-            if (this.attributes.length > 0) {
+        let me=this;
+        if (isVElement(me)) {
+            sBegin += '("' + me.nodeName + '")';
+            if (me.attributes.length > 0) {
                 sAttr = '._';
-                let attrs = this.attributes;
+                let attrs = me.attributes;
                 for (let i = 0; i < attrs.length; i++) {
                     sAttr += '("' + attrs[i].name;
                     if (attrs[i].value) {
@@ -743,14 +684,14 @@ let VNode: IVNode = <any>(function () {
                 }
                 sAttr += '()';
             }
-            let chds = this.childNodes;
+            let chds = me.childNodes;
             if (chds.length > 0) {
                 for (let i = 0; i < chds.length; i++) {
                     sInner += chds[i].toJS();
                 }
             }
-        } else {
-            s = this.data;
+        } else if(isVText(me)||isVComment(me)){
+            s = me.data;
             s = s.replace(/[\'\"\r\n]/g, function (s: string) {
                 switch (s) {
                     case '\'':
@@ -763,51 +704,47 @@ let VNode: IVNode = <any>(function () {
                 }
                 return "";
             });
-            sBegin += '("' + s + '",' + this.nodeType + ')';
+            sBegin += '("' + s + '",' + me.nodeType + ')';
         }
         return sBegin + sAttr + sInner + sEnd;
     }
     function toDOM(this: IVNode): Node {
         let elem: Node;
-        let toHelp = document.createElement('用于创建VStyle和toDom支持');
-        switch (this.nodeType) {
-            case 1:
-                if (this.__domNode__) {
-                    elem = this.__domNode__;
-                    return elem;
-                }
-                elem = document.createElement(this.nodeName);
-                this.__domNode__ = elem;
-                break;
-            case 3:
-                if (this.__domNode__) {
-                    return this.__domNode__;
-                }
-                if (this.data !== "") {
-                    toHelp.innerHTML = this.data;
-                    elem = toHelp.removeChild(toHelp.childNodes[0]);
-                    //elem=document.createTextNode(this.data);不用这句的原因是为了转码
-                } else {
-                    elem = document.createTextNode('');
-                }
-                this.__domNode__ = elem;
-                break;
-            case 8:
-                if (this.__domNode__) {
-                    return this.__domNode__;
-                }
-                elem = document.createComment(this.data);
-                this.__domNode__ = elem;
-                break;
-            case 10:
-            default:
-                if (this.__domNode__) {
-                    return this.__domNode__;
-                }
-                // toHelp.innerHTML = this.outerHTML;
-                toHelp.innerHTML = this.data;
+        let toHelp = document.createElement('__Turtle__');//用于创建VStyle和toDom支持
+        let me=this;
+        if(isVElement(me)){
+            if (me.__domNode__) {
+                elem = me.__domNode__;
+                return elem;
+            }
+            elem = document.createElement(me.nodeName);
+            me.__domNode__ = elem;
+        }else if(isVText(me)){
+            if (me.__domNode__) {
+                return me.__domNode__;
+            }
+            if (me.data !== "") {
+                toHelp.innerHTML = me.data;
                 elem = toHelp.removeChild(toHelp.childNodes[0]);
-                this.__domNode__ = elem;
+                //elem=document.createTextNode(this.data);不用这句的原因是为了转码
+            } else {
+                elem = document.createTextNode('');
+            }
+            me.__domNode__ = elem;
+        }else if(isVComment(me)){
+            if (me.__domNode__) {
+                return me.__domNode__;
+            }
+            elem = document.createComment(me.data);
+            me.__domNode__ = elem;
+        }else{
+            if (me.__domNode__) {
+                return me.__domNode__;
+            }
+            // toHelp.innerHTML = this.outerHTML;
+            toHelp.innerHTML = me.__data;
+            elem = toHelp.removeChild(toHelp.childNodes[0]);
+            me.__domNode__ = elem;
         }
         for (let i in this) {
             switch (i) {
@@ -866,7 +803,7 @@ let VNode: IVNode = <any>(function () {
         if (isVElement(this)) {
             if (this.nodeName === 'PRE') {
                 if (this.childNodes.length > 0) {
-                    (<Element>elem).innerHTML = decodeHTML(this.childNodes[0].data);
+                    (<Element>elem).innerHTML = decodeHTML(getNodeData(this.childNodes[0]));
                 }
             } else {
                 let chds = this.childNodes;

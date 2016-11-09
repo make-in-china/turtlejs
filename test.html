@@ -8,14 +8,9 @@
 </head>
 
 <body>
-    <xmp ui="test">
-        12345
-    </xmp>
-    <xmp>
-        <ui:test></ui:test>
-    </xmp>
+    
     <script>
-        var data=VDOM(document.body.innerHTML).toJS();
+        var data=VDOM(document.documentElement.innerHTML).toJS();
         console.log("<js:>\n",data);
         var dom=eval(data);
         console.log("<dom:>\n",dom);

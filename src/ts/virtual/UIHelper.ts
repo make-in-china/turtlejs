@@ -1,5 +1,6 @@
 
 /// <reference path='VDOM.ts'/>
+/// <reference path='../lib/TreeEach.ts'/>
 
 class UIHelper{
     static fs=require('fs');
@@ -24,8 +25,25 @@ namespace Component{
         if(!isString(html)){
             html=html.toString();
         }
-        var data=VDOM(html).toJS();
-        console.log(data);
+        var dom=VDOM(html);
+
+        var refs:string[]=[];
+        treeEach(dom.childNodes,"childNodes",(node,step)=>{
+            if(isVText(node)){
+                //不处理咯
+            }else if(isVComment(node)){
+                //解析命令
+            }else if(isVElement(node)){
+                let v=node.getAttribute("ref")
+                if(v!==undefined){
+                    
+                }
+                //解析ref
+                //解析class
+            }
+
+        })
+        //mixin .css  to  变量
     }
 }
 exports.UIHelper=UIHelper;
