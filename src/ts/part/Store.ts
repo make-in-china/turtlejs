@@ -7,7 +7,7 @@ class Store{
     [index:string]:IHTMLElement
 }
 class StoreManage{
-    static take(data:Store,name:string):INode|INodeArray|null{
+    static take(data:Store,name:string):INode|INodeList|undefined{
         if(data.hasOwnProperty(name)){
             let ret=data[name];
             delete data[name];
@@ -17,9 +17,8 @@ class StoreManage{
                 return ret.childNodes[0];
             }
         }
-        return null;
     }
-    static takeElem(data:Store,name:string):IHTMLElement|IHTMLCollection|null{
+    static takeElem(data:Store,name:string):IHTMLElement|IHTMLCollection|undefined{
         if(data.hasOwnProperty(name)){
             let ret:IHTMLElement=data[name];
             delete data[name];
@@ -29,6 +28,6 @@ class StoreManage{
                 return ret.children[0];
             }
         }
-        return null;
+        return undefined;
     }
 }

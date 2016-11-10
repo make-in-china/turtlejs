@@ -106,7 +106,8 @@ function parseCommentOrderBlock(node:INode,outerChildNodes,outerElement,props,pa
         alert(msg);
         return eTreeEach.c_stopEach;
     }
-    return treeEach(node.parentNode.childNodes,'childNodes',function(node,step){
+
+    return treeEach(<INode[]><any>(<INode>node.parentNode).childNodes,'childNodes',function(node,step){
         if(!isCommentNode(node)){
             return;
         }
@@ -222,7 +223,7 @@ function parseIfOrder(info,node,outerChildNodes,outerElement,props,part){
                     }
                     /*保留hit到break之间的内容*/
                     let ns=takeBlockBetween(this.hit,this.endHit);
-                    insertNodesBefore(this.node,ns);
+                    if(ns)insertNodesBefore(this.node,ns);
                     
                     /*全部删除*/
                     removeBlockBetween(this.node,this.endNode);
@@ -295,7 +296,7 @@ function parseAsyncOrder(info,node,outerChildNodes,outerElement,props,part){
                     let p=mark.parentNode;
                     replaceNodeByNode(mark,elem);
                     // mark=null;
-                    appendNodes(ns,elem);
+                    if(ns)appendNodes(ns,elem);
                     let chds=elem.childNodes;
                     initHTML(chds,outerChildNodes,outerElement,props,part);
                     takeOutChildNodes(elem);
@@ -373,7 +374,7 @@ function parseSwitchOrder(info,node,outerChildNodes,outerElement,props,part){
                     removeBlockBetween(this.node,this.hit);
                     //外置hit的数据
                     let ns=takeBlockBetween(this.hit,this.endHit);
-                    insertNodesBefore(this.node,ns);
+                    if(ns)insertNodesBefore(this.node,ns);
                     
                     removeNode(this.hit);
                     

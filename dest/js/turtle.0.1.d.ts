@@ -788,9 +788,9 @@ declare function removeClasses(elem: any, clses: any): void;
 declare function replaceClass(sel: any, a: any, b: any): void;
 declare function toggleClass(sel: any, a: any, t: any, f: any): void;
 /**判断是否注释节点 */
-declare function isCommentNode(node: INode): node is IComment;
+declare function isCommentNode(node: INode | Node): node is IComment;
 /**判断是否文本节点 */
-declare function isTextNode(node: INode): node is IText;
+declare function isTextNode(node: INode | Node): node is IText;
 declare let arrayConstructor: Array<any>, objectConstructor: ObjectConstructor, stringConstructor: String, toStr: () => string, slice: (start?: number, end?: number) => any[], push: (...items: any[]) => number, splice: {
     (start: number): any[];
     (start: number, deleteCount: number, ...items: any[]): any[];
@@ -907,7 +907,7 @@ interface Window {
     ActiveXObject?: Object;
 }
 interface Node {
-    insertBefore2(newChild: INode, refChild: INode): INode;
+    insertBefore2<T extends INode | Node>(newNode: T, node: T): T;
 }
 declare let isIE: boolean;
 declare class TemplateList extends EventEmitter {

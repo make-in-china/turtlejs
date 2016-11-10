@@ -8,62 +8,21 @@ interface IExp{
 
 interface INodeList {
     length: number;
-    item(index: number): INode;
-    [index: number]: INode;
+    item(index: number): INode|undefined;
+    [index: number]: INode|undefined;
 }
-type INodeArray=INodeList|ArrayEx<INode>|INode[]|IHTMLCollection;
+// type INodeArray=INodeList|ArrayEx<INode>|INode[]|IHTMLCollection;
 interface INode extends EventTarget {
-    valueOf():INode
     attributes: NamedNodeMap;
-    baseURI: string;
-    childNodes: INodeList;
-    firstChild: INode;
-    lastChild: INode;
-    localName: string;
-    namespaceURI: string;
-    nextSibling: INode;
+    readonly childNodes: INodeList;
+    previousSibling: INode|null;
+    nextSibling: INode|null;
+    parentNode: INode|null;
     nodeName: string;
     nodeType: number;
-    nodeValue: string;
-    ownerDocument: Document;
-    parentElement: IHTMLElement;
-    parentNode: INode;
-    prefix: string;
-    previousSibling: INode;
-    textContent: string;
     appendChild(newChild: INode): INode;
-    cloneNode(deep?: boolean): INode;
-    compareDocumentPosition(other: INode): number;
-    hasAttributes(): boolean;
-    hasChildNodes(): boolean;
-    insertBefore(newChild: INode, refChild?: INode): INode;
-    isDefaultNamespace(namespaceURI: string): boolean;
-    isEqualNode(arg: INode): boolean;
-    isSameNode(other: INode): boolean;
-    lookupNamespaceURI(prefix: string): string;
-    lookupPrefix(namespaceURI: string): string;
-    normalize(): void;
     removeChild(oldChild: INode): INode;
-    replaceChild(newChild: INode, oldChild: INode): INode;
-    contains(INode: INode): boolean;
-    ATTRIBUTE_NODE: number;
-    CDATA_SECTION_NODE: number;
-    COMMENT_NODE: number;
-    DOCUMENT_FRAGMENT_NODE: number;
-    DOCUMENT_NODE: number;
-    DOCUMENT_POSITION_CONTAINED_BY: number;
-    DOCUMENT_POSITION_CONTAINS: number;
-    DOCUMENT_POSITION_DISCONNECTED: number;
-    DOCUMENT_POSITION_FOLLOWING: number;
-    DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: number;
-    DOCUMENT_POSITION_PRECEDING: number;
-    DOCUMENT_TYPE_NODE: number;
-    ELEMENT_NODE: number;
-    ENTITY_NODE: number;
-    ENTITY_REFERENCE_NODE: number;
-    NOTATION_NODE: number;
-    PROCESSING_INSTRUCTION_NODE: number;
-    TEXT_NODE: number;
+    cloneNode(deep?: boolean): INode;
 }
 interface IElementTraversal {
     childElementCount: number;
@@ -406,12 +365,12 @@ interface IHTMLCollection {
     /**
       * Retrieves an object from various collections.
       */
-    item(nameOrIndex?: any, optionalIndex?: any): IHTMLElement;
+    item(nameOrIndex?: any, optionalIndex?: any): IHTMLElement|undefined;
     /**
       * Retrieves a select object or an object from an options collection.
       */
     namedItem(name: string): IHTMLElement;
-    [index: number]: IHTMLElement;
+    [index: number]: IHTMLElement|undefined;
 }
 interface IHTMLElement extends IElement {
     accessKey: string;

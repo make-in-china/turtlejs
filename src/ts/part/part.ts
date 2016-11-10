@@ -65,7 +65,7 @@ class Part extends EventEmitterEx {
         (this: void, part: Part) => boolean>("offline");
 
     /**初始化对象 */
-    constructor(public template: PartTemplate, public props: Object, html: string, outerChildNodes: INodeArray, outerElement: IHTMLCollection) {
+    constructor(public template: PartTemplate, public props: Object, html: string, outerChildNodes: INode[], outerElement: IHTMLCollection) {
         // constructor(public template: PartTemplate, extPart: Part | undefined, public props: Object, html: string, outerChildNodes: INodeArray, outerElement: IHTMLCollection) {
         super();
         this.$ = new Service(template.service);
@@ -139,7 +139,7 @@ class Part extends EventEmitterEx {
                 let elements = new ArrayEx<INode>();
                 let node = this.refs.begin.nextSibling;
                 let end = this.refs.end;
-                while (node !== end) {
+                while (node&&node !== end) {
                     elements.push(node);
                     node = node.nextSibling;
                 }

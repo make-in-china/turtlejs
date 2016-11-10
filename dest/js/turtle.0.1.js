@@ -683,7 +683,7 @@ catch (e) {
             var n;
             if (isTextNode(newNode)) {
                 if (newNode.data === "") {
-                    return;
+                    return newNode;
                 }
             }
             else if (isCommentNode(newNode)) {
@@ -702,6 +702,7 @@ catch (e) {
             else {
                 return insertBefore.call(this, newNode, node);
             }
+            return newNode;
         };
     }
     else {

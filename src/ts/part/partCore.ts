@@ -298,7 +298,7 @@ function parseUI(node: IHTMLElement, uiInfo, step, part) {
     outerElement = slice.call(node.children);
     let chds = node.childNodes;
     for (let i = chds.length; i > 0; i--) {
-        node.removeChild(chds[0]);
+        node.removeChild(<INode>chds[0]);
     }
 
     cpn = ui.render(node, node.parentNode, outerChildNodes, outerElement, null, part, partName, reExtends);
@@ -340,7 +340,8 @@ function parseSet(node: IHTMLElement, outerChildNodes: INode[], outerElement: IE
             if (isHTMLElement(chds)) {
                 node.appendChild(chds);
             } else {
-                appendNodes(<IHTMLCollection>chds, node.children[0]);
+                let n=node.children[0];
+                if(n)appendNodes(<IHTMLCollection>chds, n);
             }
 
             takeOutChildNodes(node);
@@ -363,9 +364,10 @@ function parseSet(node: IHTMLElement, outerChildNodes: INode[], outerElement: IE
         node.removeAttribute('append');
         let attr = node.attributes;
         for (let j = 0; j < ns.length; j++) {
+            let nd=<IHTMLElement>ns[j];
             if (isAppend) {
                 for (let i = 0; i < attr.length; i++) {
-                    ns[j].setAttribute(attr[i].name, attr[i].value);
+                    nd.setAttribute(attr[i].name, attr[i].value);
                 }
             } else {
                 for (let i = 0; i < attr.length; i++) {
@@ -373,20 +375,20 @@ function parseSet(node: IHTMLElement, outerChildNodes: INode[], outerElement: IE
                     let value2: string;
                     switch (attr[i].name) {
                         case 'class':
-                            value2 = ns[j].getAttribute(attr[i].name);
+                            value2 = nd.getAttribute(attr[i].name);
                             if (value2) {
                                 value += (/ $/.test(value) ? '' : ' ') + value2;
                             }
                             break;
                         case 'style':
-                            value2 = ns[j].getAttribute(attr[i].name);
+                            value2 = nd.getAttribute(attr[i].name);
                             if (value2) {
                                 value += (/; *$/.test(value) ? '' : ';') + value2;
                             }
 
                             break;
                     }
-                    ns[j].setAttribute(attr[i].name, value);
+                    nd.setAttribute(attr[i].name, value);
                 }
             }
         }
@@ -747,7 +749,7 @@ class AttributeParser {
 };
 let elementParser = new ElementParser;
 let attributeParser = new AttributeParser;
-function initHTML(arr: INodeArray, outerChildNodes?, outerElement?, props?, part?) {
+function initHTML(arr: INode[]|INodeList, outerChildNodes?, outerElement?, props?, part?) {
     treeEach(arr, 'childNodes', function (node: IHTMLElement, step) {
         if (node.nodeType === 8) {
             // try {
@@ -789,7 +791,7 @@ function initHTML(arr: INodeArray, outerChildNodes?, outerElement?, props?, part
         }
     });
 }
-function getParts(childNodes: INodeArray): Part[] {
+function getParts(childNodes: INode[]): Part[] {
     let child: Part[] = [];
     let cpn:Part|undefined;
     treeEach(childNodes, "childNodes", function (node: INode) {

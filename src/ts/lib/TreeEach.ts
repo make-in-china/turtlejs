@@ -34,14 +34,13 @@ function treeEach<T>(array:T[]|IArray,propertyName:string,fn:(node:T,step:ITreeE
         return;
     }
     let 
-        arr=array,
-        i=beginIndex,
-        stack:[T[]|IArray,number]=<any>[],
-        obj,
-        obj2,
-        state:eTreeEach|undefined,
-        step:ITreeEachStep={next:1};
-        
+        arr                             =array,
+        i                               =beginIndex,
+        stack:[T[]|IArray,number]       =<any>[],
+        step:ITreeEachStep              ={next:1},
+        obj:T,
+        obj2:T,
+        state:eTreeEach|undefined;
     while(true){
         if(i<arr.length){
             obj=arr[i];
