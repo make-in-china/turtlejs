@@ -59,21 +59,24 @@ function insertNode(node, childNode) {
     parent.insertBefore2(childNode, node);
     return 0;
 }
-function deepClone(node) {
-    var n = node.cloneNode();
-    var ns = node.childNodes;
-    for (var i = 0; i < ns.length; i++) {
-        n.appendChild(deepClone(ns[i]));
-    }
-    return n;
-}
+// function deepClone(node: INode) {
+//     let n = node.cloneNode();
+//     let ns = node.childNodes;
+//     for (let n of ns) {
+//         n.appendChild(deepClone(ns[i]));
+//     }
+//     return n;
+// }
 function cloneBetween(node1, node2) {
     var nodes = [];
     var l1 = getNodeIndex2(node1);
     var l2 = getNodeIndex2(node2);
     var p1 = node1.parentNode;
+    if (!p1) {
+        return null;
+    }
     for (var i = l1 + 1; i < l2; i++) {
-        nodes.push(deepClone(p1.childNodes[i]));
+        nodes.push(p1.childNodes[i].cloneNode(true));
     }
     return nodes;
 }
@@ -81,8 +84,11 @@ function removeBlockBetween(node1, node2) {
     var p1 = node1.parentNode;
     var l1 = getNodeIndex2(node1) + 1;
     var l2 = getNodeIndex2(node2);
+    if (!p1) {
+        return null;
+    }
     for (var i = l1; i < l2; i++) {
-        p1.removeChild(p1.childNodes[l1]);
+        p1.removeChild(p1.childNodes[i]);
     }
 }
 function replaceNodeByNode(node, node2) {
@@ -123,6 +129,9 @@ function takeOutChildNodes(node) {
 }
 function takeBlockBetween(node1, node2) {
     var p1 = node1.parentNode;
+    if (!p1) {
+        return null;
+    }
     var ns1 = p1.childNodes;
     var l1 = getNodeIndex2(node1) + 1;
     var l2 = getNodeIndex2(node2);
@@ -158,18 +167,18 @@ function getNodesLength2(node) {
         return node.parentNode.childNodes.length;
     }
     var index = getNodeIndex2(node) - 1;
-    node = node.nextSibling;
-    while (node != null) {
-        node = node.nextSibling;
+    var nextNode = node.nextSibling;
+    while (nextNode != null) {
+        nextNode = nextNode.nextSibling;
         index++;
     }
     return index;
 }
 function getNodeIndex2(node) {
     var index = 0;
-    node = node.previousSibling;
-    while (node != null) {
-        node = node.previousSibling;
+    var preNode = node.previousSibling;
+    while (preNode != null) {
+        preNode = preNode.previousSibling;
         index++;
     }
     return index;
@@ -632,7 +641,7 @@ function treeEach(array, propertyName, fn, beginIndex) {
     if (!isArrayLike(array)) {
         return;
     }
-    var arr = array, i = beginIndex, stack = [], obj, obj2, state, step = { next: 1 };
+    var arr = array, i = beginIndex, stack = [], step = { next: 1 }, obj, obj2, state;
     while (true) {
         if (i < arr.length) {
             obj = arr[i];
@@ -678,7 +687,7 @@ catch (e) {
 (function () {
     var insertBefore = Node.prototype.insertBefore;
     if (isIE) {
-        Node.prototype.insertBefore2 = function (newNode, node) {
+        Node.prototype.insertBefore2 = function (newNode, refChild) {
             var reAppend = [];
             var n;
             if (isTextNode(newNode)) {
@@ -687,6 +696,10 @@ catch (e) {
                 }
             }
             else if (isCommentNode(newNode)) {
+                var node = refChild ? refChild : this.childNodes[0];
+                if (!node) {
+                    return newNode;
+                }
                 n = node.nextSibling;
                 while (n !== null) {
                     reAppend.push(this.removeChild(n));
@@ -700,6 +713,10 @@ catch (e) {
                 return newNode;
             }
             else {
+                var node = refChild ? refChild : this.childNodes[0];
+                if (!node) {
+                    return newNode;
+                }
                 return insertBefore.call(this, newNode, node);
             }
             return newNode;
@@ -924,10 +941,12 @@ var Scope = (function () {
         this.__commentNode__ = __commentNode__;
         this.__name__ = __name__;
         this.__children__ = [];
-        this.__actionNode__ = __commentNode__.parentNode;
+        var p = __commentNode__.parentNode;
+        this.__actionNode__ = p;
         this.__parent__ = parent;
         this.__proto__ = parent;
-        __commentNode__.parentNode.__scope__ = this;
+        if (p)
+            p.__scope__ = this;
         parent.__children__.push(this);
         if (__name__) {
             parent[__name__] = this;
@@ -1532,7 +1551,8 @@ function parseIfOrder(info, node, outerChildNodes, outerElement, props, part) {
                     }
                     /*保留hit到break之间的内容*/
                     var ns = takeBlockBetween(this.hit, this.endHit);
-                    insertNodesBefore(this.node, ns);
+                    if (ns)
+                        insertNodesBefore(this.node, ns);
                     /*全部删除*/
                     removeBlockBetween(this.node, this.endNode);
                     p.removeChild(this.node);
@@ -1604,7 +1624,8 @@ function parseAsyncOrder(info, node, outerChildNodes, outerElement, props, part)
                     var p = mark.parentNode;
                     replaceNodeByNode(mark, elem);
                     // mark=null;
-                    appendNodes(ns, elem);
+                    if (ns)
+                        appendNodes(ns, elem);
                     var chds = elem.childNodes;
                     initHTML(chds, outerChildNodes, outerElement, props, part);
                     takeOutChildNodes(elem);
@@ -1687,7 +1708,8 @@ function parseSwitchOrder(info, node, outerChildNodes, outerElement, props, part
                     removeBlockBetween(this.node, this.hit);
                     //外置hit的数据
                     var ns = takeBlockBetween(this.hit, this.endHit);
-                    insertNodesBefore(this.node, ns);
+                    if (ns)
+                        insertNodesBefore(this.node, ns);
                     removeNode(this.hit);
                     if (this.hit.order === 'case break' /*已终止选择*/ || this.endHit === this.endNode /*已结束*/) {
                         /*全部删除*/
@@ -1929,7 +1951,6 @@ var StoreManage = (function () {
                 return ret.childNodes[0];
             }
         }
-        return null;
     };
     StoreManage.takeElem = function (data, name) {
         if (data.hasOwnProperty(name)) {
@@ -1942,7 +1963,7 @@ var StoreManage = (function () {
                 return ret.children[0];
             }
         }
-        return null;
+        return undefined;
     };
     return StoreManage;
 }());
@@ -2265,7 +2286,9 @@ function parseSet(node, outerChildNodes, outerElement, props, part) {
                 node.appendChild(chds);
             }
             else {
-                appendNodes(chds, node.children[0]);
+                var n = node.children[0];
+                if (n)
+                    appendNodes(chds, n);
             }
             takeOutChildNodes(node);
         }
@@ -2291,9 +2314,10 @@ function parseSet(node, outerChildNodes, outerElement, props, part) {
         node.removeAttribute('append');
         var attr = node.attributes;
         for (var j = 0; j < ns.length; j++) {
+            var nd = ns[j];
             if (isAppend) {
                 for (var i = 0; i < attr.length; i++) {
-                    ns[j].setAttribute(attr[i].name, attr[i].value);
+                    nd.setAttribute(attr[i].name, attr[i].value);
                 }
             }
             else {
@@ -2302,19 +2326,19 @@ function parseSet(node, outerChildNodes, outerElement, props, part) {
                     var value2 = void 0;
                     switch (attr[i].name) {
                         case 'class':
-                            value2 = ns[j].getAttribute(attr[i].name);
+                            value2 = nd.getAttribute(attr[i].name);
                             if (value2) {
                                 value += (/ $/.test(value) ? '' : ' ') + value2;
                             }
                             break;
                         case 'style':
-                            value2 = ns[j].getAttribute(attr[i].name);
+                            value2 = nd.getAttribute(attr[i].name);
                             if (value2) {
                                 value += (/; *$/.test(value) ? '' : ';') + value2;
                             }
                             break;
                     }
-                    ns[j].setAttribute(attr[i].name, value);
+                    nd.setAttribute(attr[i].name, value);
                 }
             }
         }
@@ -3433,7 +3457,7 @@ var Part = (function (_super) {
                     var elements = new ArrayEx();
                     var node = this.refs.begin.nextSibling;
                     var end = this.refs.end;
-                    while (node !== end) {
+                    while (node && node !== end) {
                         elements.push(node);
                         node = node.nextSibling;
                     }

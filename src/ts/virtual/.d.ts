@@ -1,4 +1,7 @@
 
+interface Node {
+    insertBefore2<T extends INode|Node>(newNode: T, node?: T): T;
+}
 interface IVText extends IVNode {
     value: string;
     data: string;

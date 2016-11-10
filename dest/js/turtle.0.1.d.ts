@@ -8,62 +8,20 @@ interface IExp {
 }
 interface INodeList {
     length: number;
-    item(index: number): INode;
-    [index: number]: INode;
+    item(index: number): INode | undefined;
+    [index: number]: INode | undefined;
 }
-declare type INodeArray = INodeList | ArrayEx<INode> | INode[] | IHTMLCollection;
 interface INode extends EventTarget {
-    valueOf(): INode;
     attributes: NamedNodeMap;
-    baseURI: string;
-    childNodes: INodeList;
-    firstChild: INode;
-    lastChild: INode;
-    localName: string;
-    namespaceURI: string;
-    nextSibling: INode;
+    readonly childNodes: INodeList;
+    previousSibling: INode | null;
+    nextSibling: INode | null;
+    parentNode: INode | null;
     nodeName: string;
     nodeType: number;
-    nodeValue: string;
-    ownerDocument: Document;
-    parentElement: IHTMLElement;
-    parentNode: INode;
-    prefix: string;
-    previousSibling: INode;
-    textContent: string;
     appendChild(newChild: INode): INode;
-    cloneNode(deep?: boolean): INode;
-    compareDocumentPosition(other: INode): number;
-    hasAttributes(): boolean;
-    hasChildNodes(): boolean;
-    insertBefore(newChild: INode, refChild?: INode): INode;
-    isDefaultNamespace(namespaceURI: string): boolean;
-    isEqualNode(arg: INode): boolean;
-    isSameNode(other: INode): boolean;
-    lookupNamespaceURI(prefix: string): string;
-    lookupPrefix(namespaceURI: string): string;
-    normalize(): void;
     removeChild(oldChild: INode): INode;
-    replaceChild(newChild: INode, oldChild: INode): INode;
-    contains(INode: INode): boolean;
-    ATTRIBUTE_NODE: number;
-    CDATA_SECTION_NODE: number;
-    COMMENT_NODE: number;
-    DOCUMENT_FRAGMENT_NODE: number;
-    DOCUMENT_NODE: number;
-    DOCUMENT_POSITION_CONTAINED_BY: number;
-    DOCUMENT_POSITION_CONTAINS: number;
-    DOCUMENT_POSITION_DISCONNECTED: number;
-    DOCUMENT_POSITION_FOLLOWING: number;
-    DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: number;
-    DOCUMENT_POSITION_PRECEDING: number;
-    DOCUMENT_TYPE_NODE: number;
-    ELEMENT_NODE: number;
-    ENTITY_NODE: number;
-    ENTITY_REFERENCE_NODE: number;
-    NOTATION_NODE: number;
-    PROCESSING_INSTRUCTION_NODE: number;
-    TEXT_NODE: number;
+    cloneNode(deep?: boolean): INode;
 }
 interface IElementTraversal {
     childElementCount: number;
@@ -402,12 +360,12 @@ interface IHTMLCollection {
     /**
       * Retrieves an object from various collections.
       */
-    item(nameOrIndex?: any, optionalIndex?: any): IHTMLElement;
+    item(nameOrIndex?: any, optionalIndex?: any): IHTMLElement | undefined;
     /**
       * Retrieves a select object or an object from an options collection.
       */
     namedItem(name: string): IHTMLElement;
-    [index: number]: IHTMLElement;
+    [index: number]: IHTMLElement | undefined;
 }
 interface IHTMLElement extends IElement {
     accessKey: string;
@@ -759,18 +717,17 @@ interface Node {
     valueOf(): Node;
 }
 declare let vNodesToDOM: (nodes: INode[]) => INode[];
-declare function insertNodesBefore(node: INode, nodes: INodeArray): void;
-declare function removeNode(node: INode): INode;
-declare function replaceNodeByNodes(node: INode, nodes: INodeArray): void;
+declare function insertNodesBefore(node: INode, nodes: INode[]): void;
+declare function removeNode(this: void, node: INode): INode | null;
+declare function replaceNodeByNodes(node: INode, nodes: INode[]): void;
 declare function insertNode(node: INode, childNode: any): number;
-declare function deepClone(node: INode): INode;
-declare function cloneBetween(node1: INode, node2: INode): INode[];
-declare function removeBlockBetween(node1: INode, node2: INode): void;
+declare function cloneBetween(node1: INode, node2: INode): INode[] | null;
+declare function removeBlockBetween(node1: INode, node2: INode): any;
 declare function replaceNodeByNode(node: INode, node2: INode): void;
-declare function appendNodes(nodes: INodeArray, parent: INode): void;
-declare function takeChildNodes(node: INode): INodeArray;
+declare function appendNodes(nodes: INode[] | INodeList | IHTMLCollection, parent: INode): void;
+declare function takeChildNodes(node: INode): INode[];
 declare function takeOutChildNodes(node: INode): number;
-declare function takeBlockBetween(node1: INode, node2: INode): INodeArray;
+declare function takeBlockBetween(node1: INode, node2: INode): INode[] | null;
 declare function getNodesLength(node: IElement): number;
 declare function getNodeIndex(node: IElement): number;
 declare function getNodesLength2(node: INode): number;
@@ -788,9 +745,9 @@ declare function removeClasses(elem: any, clses: any): void;
 declare function replaceClass(sel: any, a: any, b: any): void;
 declare function toggleClass(sel: any, a: any, t: any, f: any): void;
 /**判断是否注释节点 */
-declare function isCommentNode(node: INode | Node): node is IComment;
+declare function isCommentNode(node: INode): node is IComment;
 /**判断是否文本节点 */
-declare function isTextNode(node: INode | Node): node is IText;
+declare function isTextNode(node: INode): node is IText;
 declare let arrayConstructor: Array<any>, objectConstructor: ObjectConstructor, stringConstructor: String, toStr: () => string, slice: (start?: number, end?: number) => any[], push: (...items: any[]) => number, splice: {
     (start: number): any[];
     (start: number, deleteCount: number, ...items: any[]): any[];
@@ -907,7 +864,7 @@ interface Window {
     ActiveXObject?: Object;
 }
 interface Node {
-    insertBefore2<T extends INode | Node>(newNode: T, node: T): T;
+    insertBefore2<T extends INode | Node>(newNode: T, node?: T): T;
 }
 declare let isIE: boolean;
 declare class TemplateList extends EventEmitter {
@@ -957,8 +914,8 @@ declare class TemplateConfig {
 declare let templateConfig: TemplateConfig;
 declare let baseUIPath: BasePath;
 declare let withthis: string, _execValueByScope: Function, _execByScope: Function, _execExpressionsByScope: Function;
-declare function execValueByScope(node: INode, s: string, v: any, scope: Scope, outerChildNodes: INodeArray, outerElement: IHTMLElement[], props: any, part: Part): any;
-declare let execTemplateScript: (s: string, node: INode, outerChildNodes: INodeArray, outerElement: any, props: any, part: any) => string;
+declare function execValueByScope(node: INode, s: string, v: any, scope: Scope, outerChildNodes: INode[], outerElement: IHTMLElement[], props: any, part: Part): any;
+declare let execTemplateScript: (s: string, node: INode, outerChildNodes: INode[], outerElement: any, props: any, part: any) => string;
 declare class RootScope {
     __actionNode__: HTMLElement;
     __children__: Scope[];
@@ -971,7 +928,7 @@ interface INode {
 declare class Scope {
     __commentNode__: INode;
     __name__: string;
-    __actionNode__: INode;
+    __actionNode__: INode | null;
     __parent__: Scope | RootScope | null;
     __children__: Scope[];
     __proto__: Object | Scope;
@@ -1161,8 +1118,8 @@ declare class Store {
     [index: string]: IHTMLElement;
 }
 declare class StoreManage {
-    static take(data: Store, name: string): INode | INodeArray | null;
-    static takeElem(data: Store, name: string): IHTMLElement | IHTMLCollection | null;
+    static take(data: Store, name: string): INode | INodeList | undefined;
+    static takeElem(data: Store, name: string): IHTMLElement | IHTMLCollection | undefined;
 }
 interface ITurtle {
     config: Config;
@@ -1261,8 +1218,8 @@ declare class AttributeParser {
 }
 declare let elementParser: ElementParser;
 declare let attributeParser: AttributeParser;
-declare function initHTML(arr: INodeArray, outerChildNodes?: any, outerElement?: any, props?: any, part?: any): void;
-declare function getParts(childNodes: INodeArray): Part[];
+declare function initHTML(arr: INode[] | INodeList, outerChildNodes?: any, outerElement?: any, props?: any, part?: any): void;
+declare function getParts(childNodes: INode[]): Part[];
 declare function getService(serviceName: string): any;
 declare function nodesToString(nodes: INode[]): string;
 /**
@@ -1420,7 +1377,7 @@ declare class Part extends EventEmitterEx {
     /**remove事件管理器 */
     $offline: EventHelper<(this: void, part: Part) => void, (this: void, part: Part) => boolean>;
     /**初始化对象 */
-    constructor(template: PartTemplate, props: Object, html: string, outerChildNodes: INodeArray, outerElement: IHTMLCollection);
+    constructor(template: PartTemplate, props: Object, html: string, outerChildNodes: INode[], outerElement: IHTMLCollection);
     /**即时子Part数组 */
     readonly child: Part[];
     /**子节点数目 */
