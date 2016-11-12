@@ -4,8 +4,8 @@
 
 class VNodeList{
     length: number;
-    item(index: number): VNode|undefined{
+    item(index: number): VNode&IVNodeMethod|undefined{
         return this[index];
     }
-    [index: number]: VNode|undefined;
+    [index: number]: VNode&IVNodeMethod|undefined;
 }

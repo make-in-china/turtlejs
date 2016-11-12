@@ -7,6 +7,7 @@ interface Node {
 }
 
 interface IVNodeMethod{
+    (name: string, nodeType: 10): VDocumentType&IVNodeMethod;
     (name: string, nodeType: 8): VComment&IVNodeMethod;
     (name: string, nodeType: 3): VText&IVNodeMethod;
     (name: string, nodeType: 1): VElement&IVNodeMethod;

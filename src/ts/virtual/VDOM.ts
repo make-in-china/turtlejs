@@ -20,11 +20,7 @@ interface IMember {
     commentStart: number
 }
 interface IVDOMBuilder{
-    (html:string, vNode?:VNode):VNode&IVNodeMethod
-    (html:string, vNode?:VNode):VNode&IVNodeMethod
-    (html:string, vNode?:VNode):VNode&IVNodeMethod
-    (html:string, vNode?:VNode):VNode&IVNodeMethod
-    (html:string, vNode?:VNode):VNode&IVNodeMethod
+    (html:string, vNode?:VNode):(VNode&IVNodeMethod)|VChildNode
 }
 let VDOM:IVDOMBuilder,
     VTemplate:IVDOMBuilder;

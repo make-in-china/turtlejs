@@ -551,9 +551,26 @@ abstract class VNode extends EventEmitterEx implements INode{
         ret.push(this.__data__);
         return ret;
     }
-    previousSibling:VNode&IVNodeMethod|null
-    nextSibling:VNode&IVNodeMethod|null
-
+    get previousSibling():VNode&IVNodeMethod|null{
+        let p = this.parentNode;
+        if (!p) {
+            return null;
+        }
+        let chds = p.childNodes;
+        let idx:number =Array.prototype.indexOf.call(chds,this);
+        let node = chds[idx - 1];
+        return node ? node : null;
+    }
+    get nextSibling():VNode&IVNodeMethod|null{
+        let p = this.parentNode;
+        if (!p) {
+            return null;
+        }
+        let chds = p.childNodes;
+        let idx:number = Array.prototype.indexOf.call(chds,this);
+        let node = chds[idx + 1];
+        return node ? node : null;
+    }
 }
 let VNodeHelp:IVNodeMethod & VNode=(function(){
     let ret:IVNodeMethod&VNode=<any><IVNodeMethod>

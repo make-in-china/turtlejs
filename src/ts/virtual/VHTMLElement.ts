@@ -2,6 +2,7 @@
 /// <reference path='VNode.ts'/>
 /// <reference path='../lib/Encode.ts'/>
 class VHTMLElement extends VElement{
+    version:string
     cloneNode(this:VHTMLElement&IVNodeMethod): VHTMLElement&IVNodeMethod {
         return <VHTMLElement&IVNodeMethod>VDOM(this.getData());
     }
