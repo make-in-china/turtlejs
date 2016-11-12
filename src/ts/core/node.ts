@@ -83,32 +83,30 @@ function replaceNodeByNode(node: INode, node2: INode) {
     parent.removeChild(node);
 }
 function appendNodes(nodes: INode[]|INodeList|IHTMLCollection, parent: INode) {
-    let c: INode[] = slice.call(nodes);
-    for (let i = 0; i < c.length; i++) {
-        parent.appendChild(c[i]);
+    let cds: INode[] = slice.call(nodes);
+    for(const c of cds){
+        parent.appendChild(c);
     }
 }
 function takeChildNodes(node: INode): INode[] {
-    let c = node.childNodes;
-    let length = c.length;
+    let cds = node.childNodes;
+    let length = cds.length;
     let ret = [];
     for (let i = length; i > 0; i--) {
-        ret.push(node.removeChild(<INode>c[0]));
+        ret.push(node.removeChild(<INode>cds[0]));
     }
     return ret;
 }
-function takeOutChildNodes(node: INode): number {
+function takeOutChildNodes(node: INode): void {
     let parent = node.parentNode;
     if (parent == null) {
-        return 0;
+        return;
     }
     let c = node.childNodes;
-    let i = 0;
     for (let j = c.length - 1; j > -1; j--) {
         parent.insertBefore2(node.removeChild(<INode>c[0]), node);
     }
     parent.removeChild(node);
-    return i;
 }
 function takeBlockBetween(node1: INode, node2: INode): INode[]|null {
     let p1 = node1.parentNode;

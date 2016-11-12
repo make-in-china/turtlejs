@@ -2,12 +2,12 @@
 /// <reference path='VNode.ts'/>
 interface IMember {
     index: number
-    node: IVNode
+    node: VNode&IVNodeMethod
     action: string
     length: number
     textNodeStart: number
-    xmlNodeStart: number
-    xmlNodeNameStart: number
+    htmlNodeStart: number
+    htmlNodeNameStart: number
     attrStart: number
     attrNameEnd: number
     equlIndex: number
@@ -19,10 +19,17 @@ interface IMember {
     stringNodeKeyLength: number
     commentStart: number
 }
-let VDOM:(html:string, vNode?:IVNode)=>IVNode,
-    VTemplate:(html:string, vNode?:IVNode)=>IVNode
+interface IVDOMBuilder{
+    (html:string, vNode?:VNode):VNode&IVNodeMethod
+    (html:string, vNode?:VNode):VNode&IVNodeMethod
+    (html:string, vNode?:VNode):VNode&IVNodeMethod
+    (html:string, vNode?:VNode):VNode&IVNodeMethod
+    (html:string, vNode?:VNode):VNode&IVNodeMethod
+}
+let VDOM:IVDOMBuilder,
+    VTemplate:IVDOMBuilder;
 (function () {
-    let xmlwordRE = /[a-zA-Z\/\!]/;
+    let htmlwordRE = /[a-zA-Z\/\!]/;
     let htmlParse = {
         '': function (html: string, m: IMember) {
             let nodeName = m.node.nodeName;
@@ -48,7 +55,7 @@ let VDOM:(html:string, vNode?:IVNode)=>IVNode,
             let data;
             switch (html[m.index]) {
                 case '<':
-                    if (m.index < m.length + 1 && xmlwordRE.test(html[m.index + 1])) {
+                    if (m.index < m.length + 1 && htmlwordRE.test(html[m.index + 1])) {
 
                         if (m.textNodeStart !== m.index) {
                             data = html.substring(m.textNodeStart, m.index);
@@ -57,9 +64,9 @@ let VDOM:(html:string, vNode?:IVNode)=>IVNode,
                             }
                             m.textNodeStart = 0;
                         }
-                        m.xmlNodeStart = m.index;
+                        m.htmlNodeStart = m.index;
                         m.index++;
-                        m.action = 'xmlNode';
+                        m.action = 'htmlNode';
                     } else {
                         m.index++;
                     }
@@ -68,21 +75,21 @@ let VDOM:(html:string, vNode?:IVNode)=>IVNode,
                     m.index++;
             }
         },
-        createXMLNode: function (html: string, m: IMember) {
-            m.xmlNodeStart = 0;
-            if (m.xmlNodeNameStart > 0) {
+        createHTMLNode: function (html: string, m: IMember) {
+            m.htmlNodeStart = 0;
+            if (m.htmlNodeNameStart > 0) {
                 //无属性标签
-                let nodeName = html.substring(m.xmlNodeNameStart, m.index);
+                let nodeName = html.substring(m.htmlNodeNameStart, m.index);
                 m.node = m.node(nodeName);
-                m.xmlNodeNameStart = 0;
+                m.htmlNodeNameStart = 0;
                 m.index++;
             }
             m.action = '';
 
         },
-        setXMLNodeClose: function (html: string, m: IMember) {
+        setHTMLNodeClose: function (html: string, m: IMember) {
             let n = m.node;
-            let name = trim(html.substring(m.xmlNodeNameStart, m.index)).toUpperCase();
+            let name = trim(html.substring(m.htmlNodeNameStart, m.index)).toUpperCase();
             while (n) {
                 if (!n.parentNode) {
                     throw new Error("渲染出错！");
@@ -91,7 +98,7 @@ let VDOM:(html:string, vNode?:IVNode)=>IVNode,
                     n.__isClose__ = true;
                     m.node = n.parentNode;
                     m.action = '';
-                    m.xmlNodeNameStart = 0;
+                    m.htmlNodeNameStart = 0;
                     return;
                 }
                 n = n.parentNode;
@@ -109,38 +116,38 @@ let VDOM:(html:string, vNode?:IVNode)=>IVNode,
             m.stringStart = 0;
             m.stringStartChar = '';
         },
-        xmlNode: function (html: string, m: IMember) {
+        htmlNode: function (html: string, m: IMember) {
             switch (html[m.index]) {
                 case '>':
-                    this.createXMLNode(html, m);
+                    this.createHTMLNode(html, m);
                     break;
                 case ' ':
-                    this.createXMLNode(html, m);
+                    this.createHTMLNode(html, m);
                     m.action = 'attributes';
                     break;
                 case '!':
-                    if (m.xmlNodeStart === m.index - 1) {
+                    if (m.htmlNodeStart === m.index - 1) {
                         m.action = 'comment';
                     }
                     m.index++;
                     break;
                 case '/':
-                    if (m.xmlNodeStart === m.index - 1) {
+                    if (m.htmlNodeStart === m.index - 1) {
                         m.action = 'endXmlNode';
                         m.index++;
-                        m.xmlNodeNameStart = m.index;
+                        m.htmlNodeNameStart = m.index;
                         return;
                     } else if (m.length >= m.index + 1) {
                         if (html.substr(m.index + 1, 1) === '>') {
-                            this.createXMLNode(html, m);
+                            this.createHTMLNode(html, m);
                             m.index++;
                             return;
                         }
                     }
                     break;
                 default:
-                    if (m.xmlNodeNameStart === 0) {
-                        m.xmlNodeNameStart = m.index;
+                    if (m.htmlNodeNameStart === 0) {
+                        m.htmlNodeNameStart = m.index;
                     }
                     m.index++;
             }
@@ -148,7 +155,7 @@ let VDOM:(html:string, vNode?:IVNode)=>IVNode,
         endXmlNode: function (html: string, m: IMember) {
             switch (html[m.index]) {
                 case '>':
-                    this.setXMLNodeClose(html, m);
+                    this.setHTMLNodeClose(html, m);
                     m.index++;
                     break;
                 default:
@@ -368,7 +375,7 @@ let VDOM:(html:string, vNode?:IVNode)=>IVNode,
                     if (m.stringNodeRegExp && m.stringNodeRegExp.test(html.substr(m.index + 1, m.stringNodeKeyLength))) {
                         let s = html.substring(m.stringNodeStart, m.index);
                         if (!emptyTextNodeRE.test(s)) {
-                            m.node.text(s);
+                            m.node.addText(s);
                         }
                         m.stringNodeStart = 0;
                         m.stringNodeRegExp = null;
@@ -461,9 +468,9 @@ let VDOM:(html:string, vNode?:IVNode)=>IVNode,
             }
         }
     }
-    function getInitData(vNode: IVNode|undefined, length: number): IMember {
+    function getInitData(vNode: VNode&IVNodeMethod|undefined, length: number): IMember {
         if (!vNode) {
-            vNode = VNode('document');
+            vNode = VNodeHelp(' ',1);
             vNode.__isClose__ = true;
         }
         return {
@@ -472,8 +479,8 @@ let VDOM:(html:string, vNode?:IVNode)=>IVNode,
             action: '',
             length: length,
             textNodeStart: 0,
-            xmlNodeStart: 0,
-            xmlNodeNameStart: 0,
+            htmlNodeStart: 0,
+            htmlNodeNameStart: 0,
             attrStart: 0,
             attrNameEnd: 0,
             equlIndex: 0,
@@ -486,7 +493,7 @@ let VDOM:(html:string, vNode?:IVNode)=>IVNode,
             commentStart: 0
         };
     }
-    VTemplate = function (html:string, vNode?:IVNode):IVNode {
+    VTemplate = function (html:string, vNode?:VNode&IVNodeMethod):VNode&IVNodeMethod {
         let m = getInitData(vNode, html.length);
         vNode = m.node;
         while (m.index < html.length) {
@@ -495,7 +502,7 @@ let VDOM:(html:string, vNode?:IVNode)=>IVNode,
         htmlParseT.checkEnd(html, m);
         return vNode;
     }
-    VDOM = function (html:string, vNode?:IVNode):IVNode {
+    VDOM = function (html:string, vNode?:VNode&IVNodeMethod):VNode&IVNodeMethod {
         let m = getInitData(vNode, html.length);
         vNode = m.node;
         while (m.index < html.length) {

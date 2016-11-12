@@ -24,14 +24,16 @@ class DOMScope{
      * @param {INode} node - dom节点
      */
     static get(node:INode):Scope|RootScope{
+        var nd:INode|null;
         if(!node){
             return $rootScope;
         }
-        while(node!=null){
-            if(node.__scope__){
-                return node.__scope__;
+        nd=node;
+        while(nd!=null){
+            if(nd.__scope__){
+                return nd.__scope__;
             }
-            node=node.parentNode;
+            nd=nd.parentNode;
         }
         return $rootScope;
     }

@@ -1,4 +1,4 @@
-class VAttr{
+class IAttr{
     readonly name: string;
     // readonly ownerElement: Element;
     // readonly prefix: string | null;

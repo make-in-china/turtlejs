@@ -14,8 +14,8 @@ try{
 (function () {
     let insertBefore = Node.prototype.insertBefore;
     if (isIE) {
-        Node.prototype.insertBefore2 = function(this:INode,newNode: INode, refChild?: INode): INode {
             let reAppend:INode[] = [];
+        Node.prototype.insertBefore2 = function(this:INode,newNode: INode, refChild?: INode): INode {
             let n:INode|null;
             if (isTextNode(newNode)) {
                 if (newNode.data === "") {

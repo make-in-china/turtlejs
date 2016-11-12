@@ -1,3 +1,5 @@
+
+let styleListRE = /\s*([\w\-]+)\s*\:\s*(.*?)\s*[;$]/g;
 class VStyle {
     constructor(elem, attrs) {
         var

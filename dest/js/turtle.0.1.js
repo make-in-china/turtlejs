@@ -21,7 +21,258 @@ var ArrayEx = (function (_super) {
     };
     return ArrayEx;
 }(Array));
+var arrayConstructor = Array.prototype, objectConstructor = Object.prototype, stringConstructor = String.prototype, toStr = objectConstructor.toString, slice = arrayConstructor.slice, push = arrayConstructor.push, splice = arrayConstructor.splice, getPrototypeOf = objectConstructor.getPrototypeOf, replace = stringConstructor.replace;
+function extend(elem, elemEx) {
+    for (var e in elemEx) {
+        elem[e] = elemEx[e];
+    }
+    return elem;
+}
+function merge(elem, elemEx) {
+    for (var e in elemEx) {
+        if (!elem.hasOwnProperty(e)) {
+            elem[e] = elemEx[e];
+        }
+    }
+    return elem;
+}
+function removeItem(arr, obj) {
+    var index = Array.prototype.indexOf.call(arr, obj);
+    if (index != -1) {
+        Array.prototype.splice.call(arr, index, 1);
+    }
+}
+function persentToFloat(s) {
+    var v = persentRE.exec(s);
+    if (v) {
+        return parseInt(v[1]) / 100;
+    }
+}
+function parseBool(v) {
+    if (typeof v == 'string') {
+        v = v.replace(/[\s]/g, '').toLowerCase();
+        if (v && (v == 'false' || v == '0' || v == 'null' || v == 'undefined')) {
+            v = false;
+        }
+        else if (v) {
+            v = true;
+        }
+    }
+    return !!v;
+}
+function trim(s) { return s.replace(/^\s*|\s*$/g, ""); }
+function HTMLTrim(s) { return s.replace(/^[\s\r\n]*|[\s\r\n]*$/g, ""); }
+function trimLine(s) { return s.replace(/^\s*/g, "").replace(/\s*$/g, "").replace(/\s*[\r\n]\s*/g, ""); }
+var dateFormat = (function () {
+    return function (format, d) {
+        'use strict';
+        var o = {
+            "M+": d.getMonth() + 1,
+            "d+": d.getDate(),
+            "h+": d.getHours(),
+            "m+": d.getMinutes(),
+            "s+": d.getSeconds(),
+            "q+": Math.floor((d.getMonth() + 3) / 3),
+            "S": d.getMilliseconds() //millisecond
+        };
+        if (/(y+)/.test(format)) {
+            format = format.replace(RegExp.$1, (d.getFullYear() + "").substr(4 - RegExp.$1.length));
+        }
+        for (var k in o) {
+            if (new RegExp("(" + k + ")").test(format)) {
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+            }
+        }
+        return format;
+    };
+})();
+var camelCaseRE = /-(\w)/g, camelizeRE = /-+(.)?/g, deCamelizeRE = /[A-Z]/g;
+function camelCase(s) {
+    return s.replace(camelCaseRE, function (s, s1) {
+        return s1.toUpperCase();
+    });
+}
+function camelize(str) {
+    return str.replace(camelizeRE, function (match, chr) {
+        return chr ? chr.toUpperCase() : '';
+    });
+}
+function decamelize(str) {
+    return str.replace(deCamelizeRE, function (match) {
+        return '-' + match.toLowerCase();
+    });
+}
+function splitByOnce(s, split) {
+    var index = s.indexOf(split), arr = [];
+    if (index != -1) {
+        arr.push(s.substring(0, index));
+        arr.push(s.substring(index + split.length, s.length));
+    }
+    else {
+        arr.push(s);
+    }
+    return arr;
+}
+// function newKeyArrayObject<T>(type:string):KeyArrayObject<T>{
+//     return create(type,KeyArrayObject);
+// }
+// function newHashObject(type:string):HashObject<any>{
+//     return create(type,HashObject);
+// }
+// function create(type:string,tsClass?:Constructor):any{
+//     let s='let '+type+'=function(){};';
+//     if(isObject((tsClass).prototype)){
+//         s+=type+'.prototype=proto;';
+//     }
+//     s+='return new '+type+'();';
+//     return Function('proto',s)((<any>tsClass).prototype);
+// }
+// let newArrayObject=(function(){
+//     return function(type:string):ArrayEx<any>{
+//         return create(type,ArrayEx);
+//     }
+// }());
+function getBind(obj, fn) {
+    return function () {
+        return fn.apply(obj, arguments);
+    };
+}
+/// <reference path="../lib/TypeHelper.ts"/>
+var persentRE = /^\s*([\d.]+)%\s*$/;
+function isNull(p) {
+    return p == null;
+}
+function isUndefined(p) {
+    return p === void 0;
+}
+function isObject(p) {
+    var type = typeof p;
+    return type === 'function' || type === 'object' && !!p;
+}
+function isRegExp(a) {
+    return "[object RegExp]" === toStr.call(a);
+}
+function isDate(a) {
+    return "[object Date]" === toStr.call(a);
+}
+function isNumber(a) {
+    return "[object Number]" === toStr.call(a);
+}
+function isString(a) {
+    return "[object String]" === toStr.call(a);
+}
+function isFunction(a) {
+    return "[object Function]" === toStr.call(a);
+}
+// function isFinite(obj) {
+//     return isFinite(obj) && !isNaN(parseFloat(obj));
+// }
+var isArray = Array.isArray || function (a) {
+    return "[object Array]" === toStr.call(a);
+};
+function isPersent(s) {
+    return persentRE.test(s);
+}
+function isArrayLike(a) { return typeof a.length == 'number'; }
+var IAttr = (function () {
+    function IAttr(name, value) {
+        this.name = name;
+        this.value = value;
+    }
+    return IAttr;
+}());
+/// <reference path="../lib/is.ts"/>
+/// <reference path="IAttr.ts"/>
+var INamedNodeMap = (function () {
+    function INamedNodeMap() {
+        this._length = 0;
+        //setNamedItemNS: setNamedItemNS()
+    }
+    INamedNodeMap.prototype.indexOfName = function (name) {
+        var l = this._length;
+        for (var i = 0; i < l; i++) {
+            if (this[i].name === name) {
+                return i;
+            }
+        }
+        return -1;
+    };
+    INamedNodeMap.prototype.indexOf = function (o) {
+        var l = this._length;
+        for (var i = 0; i < l; i++) {
+            if (this[i] === o) {
+                return i;
+            }
+        }
+        return -1;
+    };
+    INamedNodeMap.prototype.getNamedItem = function (name) {
+        var idx = this.indexOfName(name);
+        if (idx === -1) {
+            return null;
+        }
+        else {
+            return this[idx];
+        }
+    };
+    //getNamedItemNS: getNamedItemNS()
+    INamedNodeMap.prototype.item = function (index) {
+        return this[index];
+    };
+    Object.defineProperty(INamedNodeMap.prototype, "length", {
+        get: function () {
+            return this._length;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    INamedNodeMap.prototype.removeNamedItem = function (v) {
+        if (isString(v)) {
+            var idx = this.indexOfName(v);
+        }
+        else {
+            var idx = this.indexOf(v);
+        }
+        if (idx !== -1) {
+            var l = this._length;
+            for (var i = idx; i < l; i++) {
+                this[i] = this[i + 1];
+            }
+            this._length--;
+            delete this[this._length];
+            var hideValueName = '__' + v + '__';
+            if (hideValueName in this) {
+                this[hideValueName] = "";
+            }
+        }
+    };
+    //removeNamedItemNS: removeNamedItemNS()
+    INamedNodeMap.prototype.setNamedItem = function (arg) {
+        var name = arg.name;
+        var idx = this.indexOfName(name);
+        // if (!isString(value)) {
+        //     if (isObject(value)) {
+        //         value = value.toString();
+        //     } else if (value === undefined) {
+        //         value = "";
+        //     }
+        // }
+        if (idx === -1) {
+            this[this._length] = arg;
+            this._length++;
+        }
+        else {
+            this[idx] = arg;
+        }
+        var hideValueName = '__' + name + '__';
+        if (hideValueName in this) {
+            this[hideValueName] = arg;
+        }
+    };
+    return INamedNodeMap;
+}());
 /// <reference path="../lib/ArrayEx.ts"/>
+/// <reference path="INamedNodeMap.ts"/>
 /// <reference path="../lib/lib.ts" />
 Node.prototype.toDOM =
     Node.prototype.valueOf = function () {
@@ -100,32 +351,31 @@ function replaceNodeByNode(node, node2) {
     parent.removeChild(node);
 }
 function appendNodes(nodes, parent) {
-    var c = slice.call(nodes);
-    for (var i = 0; i < c.length; i++) {
-        parent.appendChild(c[i]);
+    var cds = slice.call(nodes);
+    for (var _i = 0, cds_1 = cds; _i < cds_1.length; _i++) {
+        var c = cds_1[_i];
+        parent.appendChild(c);
     }
 }
 function takeChildNodes(node) {
-    var c = node.childNodes;
-    var length = c.length;
+    var cds = node.childNodes;
+    var length = cds.length;
     var ret = [];
     for (var i = length; i > 0; i--) {
-        ret.push(node.removeChild(c[0]));
+        ret.push(node.removeChild(cds[0]));
     }
     return ret;
 }
 function takeOutChildNodes(node) {
     var parent = node.parentNode;
     if (parent == null) {
-        return 0;
+        return;
     }
     var c = node.childNodes;
-    var i = 0;
     for (var j = c.length - 1; j > -1; j--) {
         parent.insertBefore2(node.removeChild(c[0]), node);
     }
     parent.removeChild(node);
-    return i;
 }
 function takeBlockBetween(node1, node2) {
     var p1 = node1.parentNode;
@@ -293,159 +543,6 @@ function isCommentNode(node) {
 function isTextNode(node) {
     return node.nodeType === Node.TEXT_NODE;
 }
-var arrayConstructor = Array.prototype, objectConstructor = Object.prototype, stringConstructor = String.prototype, toStr = objectConstructor.toString, slice = arrayConstructor.slice, push = arrayConstructor.push, splice = arrayConstructor.splice, getPrototypeOf = objectConstructor.getPrototypeOf, replace = stringConstructor.replace;
-function extend(elem, elemEx) {
-    for (var e in elemEx) {
-        elem[e] = elemEx[e];
-    }
-    return elem;
-}
-function merge(elem, elemEx) {
-    for (var e in elemEx) {
-        if (!elem.hasOwnProperty(e)) {
-            elem[e] = elemEx[e];
-        }
-    }
-    return elem;
-}
-function removeItem(arr, obj) {
-    var index = arr.indexOf(obj);
-    if (index != -1) {
-        arr.splice(index, 1);
-    }
-}
-function persentToFloat(s) {
-    var v = persentRE.exec(s);
-    if (v) {
-        return parseInt(v[1]) / 100;
-    }
-}
-function parseBool(v) {
-    if (typeof v == 'string') {
-        v = v.replace(/[\s]/g, '').toLowerCase();
-        if (v && (v == 'false' || v == '0' || v == 'null' || v == 'undefined')) {
-            v = false;
-        }
-        else if (v) {
-            v = true;
-        }
-    }
-    return !!v;
-}
-function trim(s) { return s.replace(/^\s*|\s*$/g, ""); }
-function HTMLTrim(s) { return s.replace(/^[\s\r\n]*|[\s\r\n]*$/g, ""); }
-function trimLine(s) { return s.replace(/^\s*/g, "").replace(/\s*$/g, "").replace(/\s*[\r\n]\s*/g, ""); }
-var dateFormat = (function () {
-    return function (format, d) {
-        'use strict';
-        var o = {
-            "M+": d.getMonth() + 1,
-            "d+": d.getDate(),
-            "h+": d.getHours(),
-            "m+": d.getMinutes(),
-            "s+": d.getSeconds(),
-            "q+": Math.floor((d.getMonth() + 3) / 3),
-            "S": d.getMilliseconds() //millisecond
-        };
-        if (/(y+)/.test(format)) {
-            format = format.replace(RegExp.$1, (d.getFullYear() + "").substr(4 - RegExp.$1.length));
-        }
-        for (var k in o) {
-            if (new RegExp("(" + k + ")").test(format)) {
-                format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
-            }
-        }
-        return format;
-    };
-})();
-var camelCaseRE = /-(\w)/g, camelizeRE = /-+(.)?/g, deCamelizeRE = /[A-Z]/g;
-function camelCase(s) {
-    return s.replace(camelCaseRE, function (s, s1) {
-        return s1.toUpperCase();
-    });
-}
-function camelize(str) {
-    return str.replace(camelizeRE, function (match, chr) {
-        return chr ? chr.toUpperCase() : '';
-    });
-}
-function decamelize(str) {
-    return str.replace(deCamelizeRE, function (match) {
-        return '-' + match.toLowerCase();
-    });
-}
-function splitByOnce(s, split) {
-    var index = s.indexOf(split), arr = [];
-    if (index != -1) {
-        arr.push(s.substring(0, index));
-        arr.push(s.substring(index + split.length, s.length));
-    }
-    else {
-        arr.push(s);
-    }
-    return arr;
-}
-// function newKeyArrayObject<T>(type:string):KeyArrayObject<T>{
-//     return create(type,KeyArrayObject);
-// }
-// function newHashObject(type:string):HashObject<any>{
-//     return create(type,HashObject);
-// }
-// function create(type:string,tsClass?:Constructor):any{
-//     let s='let '+type+'=function(){};';
-//     if(isObject((tsClass).prototype)){
-//         s+=type+'.prototype=proto;';
-//     }
-//     s+='return new '+type+'();';
-//     return Function('proto',s)((<any>tsClass).prototype);
-// }
-// let newArrayObject=(function(){
-//     return function(type:string):ArrayEx<any>{
-//         return create(type,ArrayEx);
-//     }
-// }());
-function getBind(obj, fn) {
-    return function () {
-        return fn.apply(obj, arguments);
-    };
-}
-/// <reference path="../lib/TypeHelper.ts"/>
-var persentRE = /^\s*([\d.]+)%\s*$/;
-function isNull(p) {
-    return p == null;
-}
-function isUndefined(p) {
-    return p === void 0;
-}
-function isObject(p) {
-    var type = typeof p;
-    return type === 'function' || type === 'object' && !!p;
-}
-function isRegExp(a) {
-    return "[object RegExp]" === toStr.call(a);
-}
-function isDate(a) {
-    return "[object Date]" === toStr.call(a);
-}
-function isNumber(a) {
-    return "[object Number]" === toStr.call(a);
-}
-function isString(a) {
-    return "[object String]" === toStr.call(a);
-}
-function isFunction(a) {
-    return "[object Function]" === toStr.call(a);
-}
-// function isFinite(obj) {
-//     return isFinite(obj) && !isNaN(parseFloat(obj));
-// }
-var isArray = Array.isArray || function (a) {
-    return "[object Array]" === toStr.call(a);
-};
-function isPersent(s) {
-    return persentRE.test(s);
-}
-function isArrayLike(a) { return typeof a.length == 'number'; }
 /// <reference path="../lib/is.ts" />
 var EventEmitter = (function () {
     function EventEmitter() {
@@ -980,14 +1077,16 @@ var DOMScope = (function () {
      * @param {INode} node - dom节点
      */
     DOMScope.get = function (node) {
+        var nd;
         if (!node) {
             return $rootScope;
         }
-        while (node != null) {
-            if (node.__scope__) {
-                return node.__scope__;
+        nd = node;
+        while (nd != null) {
+            if (nd.__scope__) {
+                return nd.__scope__;
             }
-            node = node.parentNode;
+            nd = nd.parentNode;
         }
         return $rootScope;
     };
@@ -1197,7 +1296,7 @@ var bindProperty = (function () {
         else if (bindInfo1) {
             var e = bindInfo1.event;
             addBindInfo(obj2, name2, obj, name, e);
-            e.list.push(obj2);
+            Array.prototype.push.call(e.list, obj2);
             if (type != 2) {
                 onPropertyChange(obj2, name2, e);
                 e.isBinding = true;
@@ -1208,7 +1307,7 @@ var bindProperty = (function () {
         else if (bindInfo2) {
             var e = bindInfo2.event;
             addBindInfo(obj, name, obj2, name2, e);
-            e.list.push(obj);
+            Array.prototype.push.call(e.list, obj);
             //if(type!=2){
             onPropertyChange(obj, name, e);
             e.isBinding = true;

@@ -131,7 +131,7 @@ interface IBindFunction {
     (name: string)
     isBinding: boolean;
     removeObject: Function;
-    list: Array<Object>;
+    list: {length:number};
 }
 function bindPropertyByName(obj: Object, name: string, obj2: Object, name2: string): IBindFunction {
     let t: IBindFunction = <any>function (name) {
@@ -181,7 +181,7 @@ let bindProperty = (function () {
         } else if (bindInfo1) {
             let e = bindInfo1.event;
             addBindInfo(obj2, name2, obj, name, e);
-            e.list.push(obj2);
+            Array.prototype.push.call(e.list,obj2);
             if (type != 2) {
                 onPropertyChange(obj2, name2, e);
                 e.isBinding = true;
@@ -191,7 +191,7 @@ let bindProperty = (function () {
         } else if (bindInfo2) {
             let e = bindInfo2.event;
             addBindInfo(obj, name, obj2, name2, e);
-            e.list.push(obj);
+            Array.prototype.push.call(e.list,obj);
             //if(type!=2){
             onPropertyChange(obj, name, e);
             e.isBinding = true;

@@ -1,7 +1,7 @@
 /// <reference path="../lib/is.ts"/>
-/// <reference path="VAttr.ts"/>
-class VNamedNodeMap{
-    [index:number]:VAttr
+/// <reference path="IAttr.ts"/>
+class INamedNodeMap{
+    [index:number]:IAttr
     private _length:number=0;
     indexOfName(name:string) {
         var l = this._length;
@@ -21,7 +21,7 @@ class VNamedNodeMap{
         }
         return -1;
     }
-    getNamedItem(name:string):VAttr|null
+    getNamedItem(name:string):IAttr|null
     {
         var idx = this.indexOfName(name);
         if (idx === -1) {
@@ -31,7 +31,7 @@ class VNamedNodeMap{
         }
     }
     //getNamedItemNS: getNamedItemNS()
-    item(index:number):VAttr|undefined {
+    item(index:number):IAttr|undefined {
         return this[index];
     }
     get length() {
@@ -58,7 +58,7 @@ class VNamedNodeMap{
         }
     }
     //removeNamedItemNS: removeNamedItemNS()
-    setNamedItem(arg:VAttr) {
+    setNamedItem(arg:IAttr) {
         var name=arg.name;
         var idx = this.indexOfName(name);
         // if (!isString(value)) {

@@ -10,6 +10,7 @@ let
     slice                                       =   arrayConstructor.slice,
     push                                        =   arrayConstructor.push,
     splice                                      =   arrayConstructor.splice,
+    indexOf                                     =   arrayConstructor.indexOf,
     getPrototypeOf                              =   objectConstructor.getPrototypeOf,
     replace                                     =   stringConstructor.replace;
 
@@ -32,10 +33,14 @@ function merge<T>(elem:T,elemEx):T{
     }
     return elem;
 }
-function removeItem<T>(arr:T[],obj:T){
-    let index=arr.indexOf(obj);
+
+function removeItem<T>(arr:{
+    [index:number]:T
+    length:number
+},obj:T):void{
+    let index=Array.prototype.indexOf.call(arr,obj);
     if(index!=-1){
-        arr.splice(index, 1);
+        Array.prototype.splice.call(arr,index, 1);
     }
 }
 

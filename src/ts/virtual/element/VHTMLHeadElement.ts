@@ -1,0 +1,3 @@
+class  VHTMLHeadElement extends VHTMLElement{
+    
+}

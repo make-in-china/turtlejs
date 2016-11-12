@@ -28,13 +28,13 @@ namespace Component{
         var dom=VDOM(html);
 
         var refs:string[]=[];
-        treeEach(dom.childNodes,"childNodes",(node,step)=>{
+        treeEach(<VNode[]><any>dom.childNodes,"childNodes",(node,step)=>{
             if(isVText(node)){
                 //不处理咯
             }else if(isVComment(node)){
                 //解析命令
-            }else if(isVElement(node)){
-                let v=node.getAttribute("ref")
+            }else if(isVHTMLElement(node)){
+                let v=node.getAttribute("ref");
                 if(v!==undefined){
                     
                 }

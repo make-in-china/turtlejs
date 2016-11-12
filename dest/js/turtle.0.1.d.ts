@@ -2,6 +2,64 @@ declare class ArrayEx<T> extends Array<T> {
     last(): T | undefined;
     clear(): void;
 }
+declare let arrayConstructor: Array<any>, objectConstructor: ObjectConstructor, stringConstructor: String, toStr: () => string, slice: (start?: number, end?: number) => any[], push: (...items: any[]) => number, splice: {
+    (start: number): any[];
+    (start: number, deleteCount: number, ...items: any[]): any[];
+}, getPrototypeOf: (o: any) => any, replace: {
+    (searchValue: string, replaceValue: string): string;
+    (searchValue: string, replacer: (substring: string, ...args: any[]) => string): string;
+    (searchValue: RegExp, replaceValue: string): string;
+    (searchValue: RegExp, replacer: (substring: string, ...args: any[]) => string): string;
+};
+interface Constructor {
+    prototype: Object;
+}
+declare function extend<T>(elem: T, elemEx: any): T;
+declare function merge<T>(elem: T, elemEx: any): T;
+declare function removeItem<T>(arr: {
+    [index: number]: T;
+    length: number;
+}, obj: T): void;
+declare function persentToFloat(s: string): number | undefined;
+declare function parseBool(v: any): boolean;
+declare function trim(s: any): any;
+declare function HTMLTrim(s: any): any;
+declare function trimLine(s: any): any;
+declare let dateFormat: (format: any, d: any) => any;
+declare let camelCaseRE: RegExp, camelizeRE: RegExp, deCamelizeRE: RegExp;
+declare function camelCase(s: any): any;
+declare function camelize(str: string): string;
+declare function decamelize(str: string): string;
+declare function splitByOnce(s: string, split: string): Array<string>;
+declare function getBind(obj: Object, fn: Function): () => any;
+declare let persentRE: RegExp;
+declare function isNull<T>(p: T | null): p is null;
+declare function isUndefined<T>(p: T | undefined): p is undefined;
+declare function isObject<T>(p: any): p is Object;
+declare function isRegExp(a: any): a is RegExp;
+declare function isDate(a: any): a is Date;
+declare function isNumber(a: any): a is number;
+declare function isString(a: any): a is string;
+declare function isFunction(a: any): a is Function;
+declare let isArray: (a: any) => boolean;
+declare function isPersent(s: any): boolean;
+declare function isArrayLike(a: any): boolean;
+declare class IAttr {
+    readonly name: string;
+    value: string;
+    constructor(name: string, value: string);
+}
+declare class INamedNodeMap {
+    [index: number]: IAttr;
+    private _length;
+    indexOfName(name: string): number;
+    indexOf(o: any): number;
+    getNamedItem(name: string): IAttr | null;
+    item(index: number): IAttr | undefined;
+    readonly length: number;
+    removeNamedItem(v: string | Object): void;
+    setNamedItem(arg: IAttr): void;
+}
 interface IExp {
     (...arg: any[]): any;
     __me__: IExp;
@@ -12,7 +70,7 @@ interface INodeList {
     [index: number]: INode | undefined;
 }
 interface INode extends EventTarget {
-    attributes: NamedNodeMap;
+    attributes: INamedNodeMap;
     readonly childNodes: INodeList;
     previousSibling: INode | null;
     nextSibling: INode | null;
@@ -92,8 +150,8 @@ interface IElement extends INode, GlobalEventHandlers, IElementTraversal, INodeS
     innerHTML: string;
     getAttribute(name?: string): string;
     getAttributeNS(namespaceURI: string, localName: string): string;
-    getAttributeNode(name: string): Attr;
-    getAttributeNodeNS(namespaceURI: string, localName: string): Attr;
+    getAttributeNode(name: string): IAttr;
+    getAttributeNodeNS(namespaceURI: string, localName: string): IAttr;
     getBoundingClientRect(): ClientRect;
     getClientRects(): ClientRectList;
     getElementsByTagName(name: "a"): NodeListOf<HTMLAnchorElement>;
@@ -282,13 +340,13 @@ interface IElement extends INode, GlobalEventHandlers, IElementTraversal, INodeS
     releasePointerCapture(pointerId: number): void;
     removeAttribute(name?: string): void;
     removeAttributeNS(namespaceURI: string, localName: string): void;
-    removeAttributeNode(oldAttr: Attr): Attr;
+    removeAttributeNode(oldAttr: IAttr): IAttr;
     requestFullscreen(): void;
     requestPointerLock(): void;
     setAttribute(name: string, value: string): void;
     setAttributeNS(namespaceURI: string, qualifiedName: string, value: string): void;
-    setAttributeNode(newAttr: Attr): Attr;
-    setAttributeNodeNS(newAttr: Attr): Attr;
+    setAttributeNode(newAttr: IAttr): IAttr;
+    setAttributeNodeNS(newAttr: IAttr): IAttr;
     setPointerCapture(pointerId: number): void;
     webkitMatchesSelector(selectors: string): boolean;
     webkitRequestFullScreen(): void;
@@ -726,7 +784,7 @@ declare function removeBlockBetween(node1: INode, node2: INode): any;
 declare function replaceNodeByNode(node: INode, node2: INode): void;
 declare function appendNodes(nodes: INode[] | INodeList | IHTMLCollection, parent: INode): void;
 declare function takeChildNodes(node: INode): INode[];
-declare function takeOutChildNodes(node: INode): number;
+declare function takeOutChildNodes(node: INode): void;
 declare function takeBlockBetween(node1: INode, node2: INode): INode[] | null;
 declare function getNodesLength(node: IElement): number;
 declare function getNodeIndex(node: IElement): number;
@@ -748,45 +806,6 @@ declare function toggleClass(sel: any, a: any, t: any, f: any): void;
 declare function isCommentNode(node: INode): node is IComment;
 /**判断是否文本节点 */
 declare function isTextNode(node: INode): node is IText;
-declare let arrayConstructor: Array<any>, objectConstructor: ObjectConstructor, stringConstructor: String, toStr: () => string, slice: (start?: number, end?: number) => any[], push: (...items: any[]) => number, splice: {
-    (start: number): any[];
-    (start: number, deleteCount: number, ...items: any[]): any[];
-}, getPrototypeOf: (o: any) => any, replace: {
-    (searchValue: string, replaceValue: string): string;
-    (searchValue: string, replacer: (substring: string, ...args: any[]) => string): string;
-    (searchValue: RegExp, replaceValue: string): string;
-    (searchValue: RegExp, replacer: (substring: string, ...args: any[]) => string): string;
-};
-interface Constructor {
-    prototype: Object;
-}
-declare function extend<T>(elem: T, elemEx: any): T;
-declare function merge<T>(elem: T, elemEx: any): T;
-declare function removeItem<T>(arr: T[], obj: T): void;
-declare function persentToFloat(s: string): number | undefined;
-declare function parseBool(v: any): boolean;
-declare function trim(s: any): any;
-declare function HTMLTrim(s: any): any;
-declare function trimLine(s: any): any;
-declare let dateFormat: (format: any, d: any) => any;
-declare let camelCaseRE: RegExp, camelizeRE: RegExp, deCamelizeRE: RegExp;
-declare function camelCase(s: any): any;
-declare function camelize(str: string): string;
-declare function decamelize(str: string): string;
-declare function splitByOnce(s: string, split: string): Array<string>;
-declare function getBind(obj: Object, fn: Function): () => any;
-declare let persentRE: RegExp;
-declare function isNull<T>(p: T | null): p is null;
-declare function isUndefined<T>(p: T | undefined): p is undefined;
-declare function isObject<T>(p: any): p is Object;
-declare function isRegExp(a: any): a is RegExp;
-declare function isDate(a: any): a is Date;
-declare function isNumber(a: any): a is number;
-declare function isString(a: any): a is string;
-declare function isFunction(a: any): a is Function;
-declare let isArray: (a: any) => boolean;
-declare function isPersent(s: any): boolean;
-declare function isArrayLike(a: any): boolean;
 interface ICallBack {
     (this: void, ...arg: any[]): void;
 }
@@ -977,7 +996,9 @@ interface IBindFunction {
     (name: string): any;
     isBinding: boolean;
     removeObject: Function;
-    list: Array<Object>;
+    list: {
+        length: number;
+    };
 }
 declare function bindPropertyByName(obj: Object, name: string, obj2: Object, name2: string): IBindFunction;
 declare let bindProperty: (obj: Object, name: string, obj2: Object, name2: string, type?: number) => void;

@@ -1,11 +1,11 @@
 
 /// <reference path="../lib/ArrayEx.ts"/>
+/// <reference path="INamedNodeMap.ts"/>
 
 interface IExp{
     (...arg):any
     __me__:IExp
 }
-
 interface INodeList {
     length: number;
     item(index: number): INode|undefined;
@@ -13,7 +13,7 @@ interface INodeList {
 }
 // type INodeArray=INodeList|ArrayEx<INode>|INode[]|IHTMLCollection;
 interface INode extends EventTarget {
-    attributes: NamedNodeMap;
+    attributes: INamedNodeMap;
     readonly childNodes: INodeList;
     previousSibling: INode|null;
     nextSibling: INode|null;
@@ -96,8 +96,8 @@ interface IElement extends INode, GlobalEventHandlers, IElementTraversal, INodeS
     innerHTML: string;
     getAttribute(name?: string): string;
     getAttributeNS(namespaceURI: string, localName: string): string;
-    getAttributeNode(name: string): Attr;
-    getAttributeNodeNS(namespaceURI: string, localName: string): Attr;
+    getAttributeNode(name: string): IAttr;
+    getAttributeNodeNS(namespaceURI: string, localName: string): IAttr;
     getBoundingClientRect(): ClientRect;
     getClientRects(): ClientRectList;
     getElementsByTagName(name: "a"): NodeListOf<HTMLAnchorElement>;
@@ -286,13 +286,13 @@ interface IElement extends INode, GlobalEventHandlers, IElementTraversal, INodeS
     releasePointerCapture(pointerId: number): void;
     removeAttribute(name?: string): void;
     removeAttributeNS(namespaceURI: string, localName: string): void;
-    removeAttributeNode(oldAttr: Attr): Attr;
+    removeAttributeNode(oldAttr: IAttr): IAttr;
     requestFullscreen(): void;
     requestPointerLock(): void;
     setAttribute(name: string, value: string): void;
     setAttributeNS(namespaceURI: string, qualifiedName: string, value: string): void;
-    setAttributeNode(newAttr: Attr): Attr;
-    setAttributeNodeNS(newAttr: Attr): Attr;
+    setAttributeNode(newAttr: IAttr): IAttr;
+    setAttributeNodeNS(newAttr: IAttr): IAttr;
     setPointerCapture(pointerId: number): void;
     webkitMatchesSelector(selectors: string): boolean;
     webkitRequestFullScreen(): void;

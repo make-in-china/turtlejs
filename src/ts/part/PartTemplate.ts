@@ -125,7 +125,7 @@ class PartTemplate implements IPartTemplate{
         
         let 
             ext,
-            attrs:NamedNodeMap,
+            attrs:INamedNodeMap,
             len,
             html;
             
