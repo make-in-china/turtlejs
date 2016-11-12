@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "img", nodeType: 1): VImgElement&IVNodeMethod;
 }
-class  VImgElement extends VElement{
+class  VImgElement extends VHTMLElement{
     alt:string
     src:string
     srcset:string

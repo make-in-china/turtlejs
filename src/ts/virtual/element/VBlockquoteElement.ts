@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "blockquote", nodeType: 1): VBlockquoteElement&IVNodeMethod;
 }
-class  VBlockquoteElement extends VElement{
+class  VBlockquoteElement extends VHTMLElement{
     cite:string
 }
 VAP.decorate(<any>VBlockquoteElement,["cite"]);

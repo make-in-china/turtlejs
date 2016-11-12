@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "caption", nodeType: 1): VCaptionElement&IVNodeMethod;
 }
-class  VCaptionElement extends VElement{
+class  VCaptionElement extends VHTMLElement{
     align:string
 }
 VAP.decorate(<any>VCaptionElement,["align"]);

@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "ol", nodeType: 1): VOlElement&IVNodeMethod;
 }
-class  VOlElement extends VElement{
+class  VOlElement extends VHTMLElement{
     reversed:string
     start:string
     type:string

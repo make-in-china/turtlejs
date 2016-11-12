@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "input", nodeType: 1): VInputElement&IVNodeMethod;
 }
-class  VInputElement extends VElement{
+class  VInputElement extends VHTMLElement{
     accept:string
     alt:string
     autocomplete:string

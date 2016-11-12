@@ -1,6 +1,6 @@
 
 /// <reference path='VNode.ts'/>
-class VElement extends VNode{
+abstract class VElement extends VNode{
     children=new VHTMLCollection();
     set innerHTML(this: VElement&IVNodeMethod, s: string) {
         this.children.length = 0;
@@ -33,4 +33,16 @@ class VElement extends VNode{
         vNode.parentNode = null;
         return vNode;
     }
+
+
+    onpointercancel: (this: this, ev: PointerEvent) => any;
+    onpointerdown: (this: this, ev: PointerEvent) => any;
+    onpointerenter: (this: this, ev: PointerEvent) => any;
+    onpointerleave: (this: this, ev: PointerEvent) => any;
+    onpointermove: (this: this, ev: PointerEvent) => any;
+    onpointerout: (this: this, ev: PointerEvent) => any;
+    onpointerover: (this: this, ev: PointerEvent) => any;
+    onpointerup: (this: this, ev: PointerEvent) => any;
+    onwheel: (this: this, ev: WheelEvent) => any;
+
 }

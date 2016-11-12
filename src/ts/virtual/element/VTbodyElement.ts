@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "tbody", nodeType: 1): VTbodyElement&IVNodeMethod;
 }
-class  VTbodyElement extends VElement{
+class  VTbodyElement extends VHTMLElement{
     align:string
     vAlign:string
 }

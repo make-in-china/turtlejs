@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "optgroup", nodeType: 1): VOptgroupElement&IVNodeMethod;
 }
-class  VOptgroupElement extends VElement{
+class  VOptgroupElement extends VHTMLElement{
     disabled:string
     label:string
 }

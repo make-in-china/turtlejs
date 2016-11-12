@@ -3,7 +3,7 @@
 interface IVNodeMethod{
     (name: "a", nodeType: 1): VAElement&IVNodeMethod;
 }
-class  VAElement extends VElement{
+class  VAElement extends VHTMLElement{
     target:string
     download:string
     ping:string

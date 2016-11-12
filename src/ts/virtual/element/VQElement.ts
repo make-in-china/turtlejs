@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "q", nodeType: 1): VQElement&IVNodeMethod;
 }
-class  VQElement extends VElement{
+class  VQElement extends VHTMLElement{
     cite:string
 }
 VAP.decorate(<any>VQElement,["cite"]);

@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "li", nodeType: 1): VLiElement&IVNodeMethod;
 }
-class  VLiElement extends VElement{
+class  VLiElement extends VHTMLElement{
     value:string
     type:string
 }

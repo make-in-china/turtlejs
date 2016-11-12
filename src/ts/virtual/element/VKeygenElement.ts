@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "keygen", nodeType: 1): VKeygenElement&IVNodeMethod;
 }
-class  VKeygenElement extends VElement{
+class  VKeygenElement extends VHTMLElement{
     autofocus:string
     challenge:string
     disabled:string

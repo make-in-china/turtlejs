@@ -509,7 +509,6 @@ let VDOM:IVDOMBuilder,
     }
 } ());
 
-
     // $VDOM=VDOM;
     // $VNode=newVNode;
     // if(mode===1){

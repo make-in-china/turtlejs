@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "option", nodeType: 1): VOptionElement&IVNodeMethod;
 }
-class  VOptionElement extends VElement{
+class  VOptionElement extends VHTMLElement{
     disabled:string
     label:string
     selected:string

@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "link", nodeType: 1): VLinkElement &IVNodeMethod;
 }
-class  VLinkElement extends VElement{
+class  VLinkElement extends VHTMLElement{
     disabled:string
     href:string
     crossOrigin:string

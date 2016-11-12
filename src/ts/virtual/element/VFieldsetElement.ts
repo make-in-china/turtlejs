@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "fieldset", nodeType: 1): VFieldsetElement&IVNodeMethod;
 }
-class  VFieldsetElement extends VElement{
+class  VFieldsetElement extends VHTMLElement{
     disabled:string
     name:string
 }

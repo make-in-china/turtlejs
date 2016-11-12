@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "iframe", nodeType: 1): VIrameElement&IVNodeMethod;
 }
-class  VIrameElement extends VElement{
+class  VIrameElement extends VHTMLElement{
     src:string
     srcdoc:string
     name:string

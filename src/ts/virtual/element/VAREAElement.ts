@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "area", nodeType: 1): VAREAElement&IVNodeMethod;
 }
-class  VAREAElement extends VElement{
+class  VAREAElement extends VHTMLElement{
     alt:string
     coords:string
     shape:string

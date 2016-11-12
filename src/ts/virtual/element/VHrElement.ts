@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "hr", nodeType: 1): VHrElement&IVNodeMethod;
 }
-class  VHrElement extends VElement{
+class  VHrElement extends VHTMLElement{
     align:string
     color:string
     noShade:string

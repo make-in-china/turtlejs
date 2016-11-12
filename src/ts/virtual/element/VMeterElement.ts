@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "meter", nodeType: 1): VMeterElement&IVNodeMethod;
 }
-class  VMeterElement extends VElement{
+class  VMeterElement extends VHTMLElement{
     value:string
     min:string
     max:string

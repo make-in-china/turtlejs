@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "base", nodeType: 1): VBaseElement&IVNodeMethod;
 }
-class  VBaseElement extends VElement{
+class  VBaseElement extends VHTMLElement{
     href:string
     target:string
 }

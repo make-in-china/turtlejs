@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "ins", nodeType: 1): VInsElement&IVNodeMethod;
 }
-class  VInsElement extends VElement{
+class  VInsElement extends VHTMLElement{
     cite:string
     dateTime:string
 }

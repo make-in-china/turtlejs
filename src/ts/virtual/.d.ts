@@ -5,12 +5,13 @@ interface Node {
 interface Node {
     __vdomNode__: VNode&IVNodeMethod
 }
-
+type VNodeType=1|3|8|10;
 interface IVNodeMethod{
     (name: string, nodeType: 10): VDocumentType&IVNodeMethod;
     (name: string, nodeType: 8): VComment&IVNodeMethod;
     (name: string, nodeType: 3): VText&IVNodeMethod;
-    (name: string, nodeType: 1): VElement&IVNodeMethod;
+    (name: string, nodeType?: 1): VHTMLElement&IVNodeMethod;
+    (name: string, nodeType: VNodeType): VNode&IVNodeMethod;
     // (name: string, nodeType: undefined): VElement&IVNodeMethod;
     // (name: string, nodeType?: number): VNode&IVNodeMethod;
 }

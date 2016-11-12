@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "meta", nodeType: 1): VMetaElement&IVNodeMethod;
 }
-class  VMetaElement extends VElement{
+class  VMetaElement extends VHTMLElement{
     name:string
     content:string
     scheme:string

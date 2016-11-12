@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "br", nodeType: 1): VBrElement&IVNodeMethod;
 }
-class  VBrElement extends VElement{
+class  VBrElement extends VHTMLElement{
     clear:string
 }
 VAP.decorate(<any>VBrElement,["clear"]);

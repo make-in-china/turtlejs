@@ -32,4 +32,16 @@ class VComment extends VNode{
         }
         return ret;
     }
+    __domNode__:Comment;
+    protected doToDOM():Comment{
+        if (this.__domNode__) {
+            return this.__domNode__;
+        }
+        let elem = document.createComment(this.data);
+        return elem;
+    }
+    /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
+    protected emulation():void{
+
+    }
 }

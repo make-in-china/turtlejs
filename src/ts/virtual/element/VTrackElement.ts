@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "track", nodeType: 1): VTrackElement&IVNodeMethod;
 }
-class  VTrackElement extends VElement{
+class  VTrackElement extends VHTMLElement{
     kind:string
     src:string
     srclang:string

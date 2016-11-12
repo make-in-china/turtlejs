@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "style", nodeType: 1): VStyleElement&IVNodeMethod;
 }
-class  VStyleElement extends VElement{
+class  VStyleElement extends VHTMLElement{
     media:string
     type:string
 }

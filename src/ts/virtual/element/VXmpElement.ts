@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "xmp", nodeType: 1): VXmpElement&IVNodeMethod;
 }
-class  VXmpElement extends VElement{
+class  VXmpElement extends VHTMLElement{
     width:string
 }
 VAP.decorate(<any>VXmpElement,["width"]);

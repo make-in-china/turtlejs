@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "tfoot", nodeType: 1): VTfootElement&IVNodeMethod;
 }
-class  VTfootElement extends VElement{
+class  VTfootElement extends VHTMLElement{
     align:string
     vAlign:string
 }

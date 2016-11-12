@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "colgroup", nodeType: 1): VColgroupElement&IVNodeMethod;
 }
-class  VColgroupElement extends VElement{
+class  VColgroupElement extends VHTMLElement{
     span:string
     align:string
     vAlign:string

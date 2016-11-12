@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "h5", nodeType: 1): VH5Element&IVNodeMethod;
 }
-class  VH5Element extends VElement{
+class  VH5Element extends VHTMLElement{
     align:string
 }
 VAP.decorate(<any>VH5Element,["align"]);

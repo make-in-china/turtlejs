@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "param", nodeType: 1): VParamElement&IVNodeMethod;
 }
-class  VParamElement extends VElement{
+class  VParamElement extends VHTMLElement{
     name:string
     value:string
     type:string

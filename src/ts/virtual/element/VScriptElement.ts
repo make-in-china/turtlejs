@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "script", nodeType: 1): VScriptElement&IVNodeMethod;
 }
-class  VScriptElement extends VElement{
+class  VScriptElement extends VHTMLElement{
     src:string
     type:string
     charset:string

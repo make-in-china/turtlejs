@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "col", nodeType: 1): VColElement&IVNodeMethod;
 }
-class  VColElement extends VElement{
+class  VColElement extends VHTMLElement{
     span:string
     align:string
     vAlign:string

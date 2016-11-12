@@ -34,7 +34,7 @@ abstract class VNode extends EventEmitterEx implements INode{
     /**是否自闭和 */
     __closeSelf__?: boolean;
     attributes=new INamedNodeMap();
-    nodeType: number;
+    nodeType: VNodeType;
     nodeName: string;
     childNodes: VNodeList;
     parentNode: VNode&IVNodeMethod | null;
@@ -71,7 +71,7 @@ abstract class VNode extends EventEmitterEx implements INode{
         this.appendChild(t);
         return this;
     }
-    append(this: VNode, name: string, nodeType: number): VNode&IVNodeMethod {
+    append(this: VNode, name: string, nodeType: VNodeType): VNode&IVNodeMethod {
         return this.doAppendChild(VNodeHelp(name, nodeType));
     }
     appendChild(this: VNode, vNode: VNode&IVNodeMethod): VNode&IVNodeMethod {
@@ -249,80 +249,42 @@ abstract class VNode extends EventEmitterEx implements INode{
         }
         return sBegin + sAttr + sInner + sEnd;
     }
-    toDOM(this: VNode): Node {
-        let elem: Node;
-        let toHelp = document.createElement('__Turtle__');//用于创建VStyle和toDom支持
-        let me = this;
-        if (isVHTMLElement(me)) {
-            if (me.__domNode__) {
-                elem = me.__domNode__;
-                return elem;
-            }
-            elem = document.createElement(me.nodeName);
-            me.__domNode__ = elem;
-        } else if (isVText(me)) {
-            if (me.__domNode__) {
-                return me.__domNode__;
-            }
-            if (me.data !== "") {
-                toHelp.innerHTML = me.data;
-                elem = toHelp.removeChild(toHelp.childNodes[0]);
-                //elem=document.createTextNode(this.data);不用这句的原因是为了转码
-            } else {
-                elem = document.createTextNode('');
-            }
-            me.__domNode__ = elem;
-        } else if (isVComment(me)) {
-            if (me.__domNode__) {
-                return me.__domNode__;
-            }
-            elem = document.createComment(me.data);
-            me.__domNode__ = elem;
-        } else {
-            if (me.__domNode__) {
-                return me.__domNode__;
-            }
-            // toHelp.innerHTML = this.outerHTML;
-            toHelp.innerHTML = me.__data__;
-            elem = toHelp.removeChild(toHelp.childNodes[0]);
-            me.__domNode__ = elem;
+    toDOM():Node{
+        if (this.__domNode__) {
+            return this.__domNode__;
         }
+        let elem=this.doToDOM();
+        this.copyPropertyToNode(elem);
+        this.__domNode__ = elem;
+        this.connectParent(elem);
+        this.emulation();
+        elem.__vdomNode__ = <any>this;
+        return elem;
+    }
+    protected doToDOM(): Node{
+        let toHelp = document.createElement('__Turtle__');//用于创建
+        toHelp.innerHTML = this.__data__;
+        let elem = toHelp.removeChild(toHelp.childNodes[0]);
+        return elem;
+    }
+    private copyPropertyToNode(elem:Node){
         for (let i in this) {
             switch (i) {
-                case 'attributes':
-                    let attrs = this.attributes;
-                    for (let j = 0; j < attrs.length; j++) {
-                        (<any>elem).setAttribute(attrs[j].name, attrs[j].value);
-                    }
-                    break;
-
-                case '__events__':
-                    let arr = this.__events__;
-                    for (let j in arr) {
-                        let e = arr[j];
-                        elem.addEventListener(e[0], e[1], e[2]);
-                    }
-                    break;
                 case '__':
-                    let obj = this.__;
-                    if (obj) {
-                        for (let j in obj) {
-                            elem[j] = obj[j];
-                        }
-                    }
-                    break;
-                case 'children':
-                case 'childNodes':
-                case '__proto__':
+                case '__events__':
                 case '__isClose__':
                 case '__domNode__':
+                case "__closeSelf__":
+                case '__proto__':
+                case 'children':
+                case 'childNodes':
                 case 'nodeType':
                 case 'nodeName':
                 case 'parentNode':
-                case "__closeSelf__":
                 case "style":
                 case "classList":
                 case "className":
+                case 'attributes':
                     break;
                 default:
                     if (!this.hasOwnProperty(i)) {
@@ -340,24 +302,7 @@ abstract class VNode extends EventEmitterEx implements INode{
                     }
             }
         }
-        this.connectParent(elem);
-        if (isVHTMLElement(me)) {
-            if (me.nodeName === 'PRE') {
-                if (me.childNodes.length > 0) {
-                    (<Element>elem).innerHTML = decodeHTML((<VNode>me.childNodes[0]).getData());
-                }
-            } else {
-                let chds = me.childNodes;
-                for (let j = 0; j < chds.length; j++) {
-                    (<VNode>chds[j]).toDOM();
-                }
-            }
-        }
-        this.emulation();
-        elem.__vdomNode__ = <any>this;
-        return elem;
     }
-    
     /**与真实DOM交互 */
     protected connectParent<T extends IVNodeMethod>(this: VNode, elem: Node) {
         let p:VNode|null = this.parentNode;
@@ -473,62 +418,8 @@ abstract class VNode extends EventEmitterEx implements INode{
             }
         });
     }
-    protected emulation(this:VNode) {
-        let me=this;
-        if(me instanceof VHTMLElement){
-            this.createBridgeFunction("setAttribute");
-            this.createBridgeFunction("hasAttribute");
-            this.createBridgeFunction("removeAttribute");
-            this.createBridgeFunction("removeAttributeNode");
-            this.createBridgeFunction("toString");
-            this.createBridgeFunction("addEventListener");
-            this.createBridgeFunction("removeEventListener");
-            
-            this.createHomologyFunction("insertBefore");
-            this.createHomologyFunction("insertBefore2");
-            this.createHomologyFunction("appendChild");
-            this.createHomologyFunction("removeChild");
-
-            this.setBridgeGet("style");
-            this.setBridgeGet("classList");
-            this.setBridgeGet("attributes");
-
-            this.setBridgeGet("offsetTop");
-            this.setBridgeGet("offsetLeft");
-            this.setBridgeGet("offsetWidth");
-            this.setBridgeGet("offsetHeight");
-
-            switch (me.nodeName) {
-                case "INPUT":
-                case "SELECT":
-                case "TEXTAREA":
-                    this.setBridgeGetSet("value");
-                case "INPUT":
-                    this.setBridgeGetSet("checked");
-                    break;
-            }
-        } else if (me instanceof VText) {
-            debugger;
-            Object.defineProperty(me, 'data', {
-                get: function () {
-                    return this.__value__;
-                },
-                set: function (s) {
-                    this.__value__ = s;
-                    this.__domNode__.data = s;
-                }
-            });
-            Object.defineProperty(me, 'value', {
-                get: function () {
-                    return this.__value__;
-                },
-                set: function (s) {
-                    this.__value__ = s;
-                    this.__domNode__.value = s;
-                }
-            });
-        }
-    }
+    /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
+    protected abstract emulation():void;
     toXMLNodeString(this: VNode): string[] {
         let
             ret: string[] = [],

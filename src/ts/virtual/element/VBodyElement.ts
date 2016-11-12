@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "body", nodeType: 1): VBodyElement&IVNodeMethod;
 }
-class  VBodyElement extends VElement{
+class  VBodyElement extends VHTMLElement{
     text:string
     link:string
     vLink:string

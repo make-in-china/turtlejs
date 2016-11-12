@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "ul", nodeType: 1): VUlElement&IVNodeMethod;
 }
-class  VUlElement extends VElement{
+class  VUlElement extends VHTMLElement{
     compact:string
     type:string
 }

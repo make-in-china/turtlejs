@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "th", nodeType: 1): VThElement&IVNodeMethod;
 }
-class  VThElement extends VElement{
+class  VThElement extends VHTMLElement{
     colSpan:string
     rowSpan:string
     headers:string

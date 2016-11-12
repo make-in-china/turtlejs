@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "progress", nodeType: 1): VProgressElement&IVNodeMethod;
 }
-class  VProgressElement extends VElement{
+class  VProgressElement extends VHTMLElement{
     value:string
     max:string
 }

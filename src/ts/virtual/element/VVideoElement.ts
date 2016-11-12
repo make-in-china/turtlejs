@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "video", nodeType: 1): VVideoElement&IVNodeMethod;
 }
-class  VVideoElement extends VElement{
+class  VVideoElement extends VHTMLElement{
     width:string
     height:string
     poster:string

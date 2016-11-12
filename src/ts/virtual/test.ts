@@ -977,3 +977,5 @@ let VNodeXXX: IVNode =(function () {
     }
     return newVNode;
 })();
+
+Element.prototype.onwheel

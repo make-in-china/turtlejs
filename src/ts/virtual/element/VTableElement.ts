@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "table", nodeType: 1): VTableElement&IVNodeMethod;
 }
-class  VTableElement extends VElement{
+class  VTableElement extends VHTMLElement{
     align:string
     border:string
     frame:string

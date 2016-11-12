@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "source", nodeType: 1): VSourceElement&IVNodeMethod;
 }
-class  VSourceElement extends VElement{
+class  VSourceElement extends VHTMLElement{
     src:string
     type:string
     srcset:string

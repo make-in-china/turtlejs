@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "canvas", nodeType: 1): VCanvasElement&IVNodeMethod;
 }
-class  VCanvasElement extends VElement{
+class  VCanvasElement extends VHTMLElement{
     width:string
     height:string
 }

@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "tr", nodeType: 1): VTrElement&IVNodeMethod;
 }
-class  VTrElement extends VElement{
+class  VTrElement extends VHTMLElement{
     align:string
     vAlign:string
     bgColor:string

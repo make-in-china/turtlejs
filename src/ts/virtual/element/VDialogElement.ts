@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "dialog", nodeType: 1): VDialogElement&IVNodeMethod;
 }
-class  VDialogElement extends VElement{
+class  VDialogElement extends VHTMLElement{
     open:string
 }
 VAP.decorate(<any>VDialogElement,["open"]);

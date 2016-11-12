@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "textarea", nodeType: 1): VTextareaElement&IVNodeMethod;
 }
-class  VTextareaElement extends VElement{
+class  VTextareaElement extends VHTMLElement{
     autofocus:string
     cols:string
     dirName:string

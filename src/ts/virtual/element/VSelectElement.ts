@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "select", nodeType: 1): VSelectElement&IVNodeMethod;
 }
-class  VSelectElement extends VElement{
+class  VSelectElement extends VHTMLElement{
     autofocus:string
     disabled:string
     multiple:string

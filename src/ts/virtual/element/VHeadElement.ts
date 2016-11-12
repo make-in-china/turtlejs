@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "head", nodeType: 1): VHEADElement&IVNodeMethod;
 }
-class  VHEADElement extends VElement{
+class  VHEADElement extends VHTMLElement{
     title:string
     lang:string
     accessKey:string

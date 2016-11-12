@@ -2,7 +2,7 @@
 interface IVNodeMethod{
     (name: "dl", nodeType: 1): VDlElement&IVNodeMethod;
 }
-class  VDlElement extends VElement{
+class  VDlElement extends VHTMLElement{
     compact:string
 }
 VAP.decorate(<any>VDlElement,["compact"]);
