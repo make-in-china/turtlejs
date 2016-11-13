@@ -21,7 +21,7 @@ var ArrayEx = (function (_super) {
     };
     return ArrayEx;
 }(Array));
-var arrayConstructor = Array.prototype, objectConstructor = Object.prototype, stringConstructor = String.prototype, toStr = objectConstructor.toString, slice = arrayConstructor.slice, push = arrayConstructor.push, splice = arrayConstructor.splice, getPrototypeOf = objectConstructor.getPrototypeOf, replace = stringConstructor.replace;
+var arrayConstructor = Array.prototype, objectConstructor = Object.prototype, stringConstructor = String.prototype, toStr = objectConstructor.toString, slice = arrayConstructor.slice, push = arrayConstructor.push, splice = arrayConstructor.splice, indexOf = arrayConstructor.indexOf, getPrototypeOf = objectConstructor.getPrototypeOf, replace = stringConstructor.replace;
 function extend(elem, elemEx) {
     for (var e in elemEx) {
         elem[e] = elemEx[e];
@@ -784,8 +784,8 @@ catch (e) {
 (function () {
     var insertBefore = Node.prototype.insertBefore;
     if (isIE) {
+        var reAppend_1 = [];
         Node.prototype.insertBefore2 = function (newNode, refChild) {
-            var reAppend = [];
             var n;
             if (isTextNode(newNode)) {
                 if (newNode.data === "") {
@@ -799,13 +799,13 @@ catch (e) {
                 }
                 n = node.nextSibling;
                 while (n !== null) {
-                    reAppend.push(this.removeChild(n));
+                    reAppend_1.push(this.removeChild(n));
                     n = node.nextSibling;
                 }
-                reAppend.unshift(this.removeChild(node));
+                reAppend_1.unshift(this.removeChild(node));
                 this.appendChild(newNode);
-                for (var i = 0; i < reAppend.length; i++) {
-                    this.appendChild(reAppend[i]);
+                for (var i = 0; i < reAppend_1.length; i++) {
+                    this.appendChild(reAppend_1[i]);
                 }
                 return newNode;
             }
@@ -2380,7 +2380,7 @@ function parseSet(node, outerChildNodes, outerElement, props, part) {
     if (link) {
         /*设置关联子对象*/
         var chds = StoreManage.takeElem($t.store, link);
-        if (chds !== null) {
+        if (chds) {
             if (isHTMLElement(chds)) {
                 node.appendChild(chds);
             }

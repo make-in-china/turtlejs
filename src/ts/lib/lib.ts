@@ -373,6 +373,7 @@ interface IHTMLCollection {
     [index: number]: IHTMLElement|undefined;
 }
 interface IHTMLElement extends IElement {
+    attributes: INamedNodeMap
     accessKey: string;
     children: IHTMLCollection;
     contentEditable: string;

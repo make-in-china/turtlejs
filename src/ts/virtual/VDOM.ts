@@ -1,5 +1,5 @@
 
-/// <reference path='VNode.ts'/>
+/// <reference path='BaseVNode.ts'/>
 interface IMember {
     index: number
     node: VNode&IVNodeMethod
@@ -204,7 +204,7 @@ let VDOM:IVDOMBuilder,
         comment2: function (html: string, m: IMember) {
             if (html[m.index] === '>') {
                 let vNode = m.node(html.substring(m.commentStart, m.index), 8);
-                vNode.__dbplus__ = false;
+                vNode.vmData.doubleMinus = false;
                 m.commentStart = 0;
                 m.action = '';
             }
@@ -215,7 +215,7 @@ let VDOM:IVDOMBuilder,
                 if (m.length >= m.index + 3) {
                     if (html.substr(m.index + 1, 2) === '->') {
                         let vNode = m.node(html.substring(m.commentStart, m.index), 8);
-                        vNode.__dbplus__ = true;
+                        vNode.vmData.doubleMinus = true;
                         m.commentStart = 0;
                         m.action = '';
                         m.index += 3;

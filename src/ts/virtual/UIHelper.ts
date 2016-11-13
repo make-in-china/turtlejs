@@ -26,27 +26,26 @@ namespace Component{
             html=html.toString();
         }
         let dom=VDOM(html);
-        let chds:IArray | VNode[];
+        let chds:VNode | IArray;
         if(isArray(dom)){
             chds=dom;
         }else{
             chds=dom.childNodes;
         }
         let refs:string[]=[];
-        treeEach(chds,"childNodes",(node,step)=>{
-            if(isVText(node)){
-                //不处理咯
-            }else if(isVComment(node)){
-                //解析命令
-            }else if(isVHTMLElement(node)){
-                let v=node.getAttribute("ref");
-                if(v!==undefined){
+        treeEach(<VNode[]>chds,"childNodes",(node,step)=>{
+            // if(isVText(node)){
+            //     //不处理咯
+            // }else if(isVComment(node)){
+            //     //解析命令
+            // }else if(isVHTMLElement(node)){
+            //     let v=node.getAttribute("ref");
+            //     if(v!==undefined){
                     
-                }
-                //解析ref
-                //解析class
-            }
-
+            //     }
+            //     //解析ref
+            //     //解析class
+            // }
         })
         //mixin .css  to  变量
     }

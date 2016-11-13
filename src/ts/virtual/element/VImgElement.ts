@@ -1,4 +1,4 @@
-/// <reference path="Attribute_Property.ts"/>
+/// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "img", nodeType?: 1): VMElement.VImgElement&IVNodeMethod;
 }

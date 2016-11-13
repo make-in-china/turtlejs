@@ -1,8 +1,18 @@
 
 /// <reference path='VNode.ts'/>
 /// <reference path='../lib/Encode.ts'/>
-abstract class VHTMLElement extends VElement{
+/// <reference path="Attribute_Property.ts"/>
+
+interface IVNodeMethod{
+    (nodeName: string, nodeType?: 1): VHTMLElement&IVNodeMethod;
+}
+
+function isVHTMLElement(node: VNode): node is VHTMLElement {
+    return node.nodeType === 1
+}
+class VHTMLElement extends VElement{
     nodeType:VNodeType=1;
+    nodeName="HTML"
     version:string
     cloneNode(this:VHTMLElement&IVNodeMethod): VHTMLElement&IVNodeMethod {
         return <any>VDOM(this.getData());
@@ -163,6 +173,45 @@ abstract class VHTMLElement extends VElement{
         this.setBridgeGet("offsetLeft");
         this.setBridgeGet("offsetWidth");
         this.setBridgeGet("offsetHeight");
+
+        this.setBridgeGetSet("onwebkitfullscreenerror");
+        this.setBridgeGetSet("onwebkitfullscreenchange");
+        this.setBridgeGetSet("ontouchstart");
+        this.setBridgeGetSet("ontouchmove");
+        this.setBridgeGetSet("ontouchend");
+        this.setBridgeGetSet("ontouchcancel");
+        this.setBridgeGetSet("onmspointerup");
+        this.setBridgeGetSet("onmspointerover");
+        this.setBridgeGetSet("onmspointerout");
+        this.setBridgeGetSet("onmspointermove");
+        this.setBridgeGetSet("onmspointerleave");
+        this.setBridgeGetSet("onmspointerenter");
+        this.setBridgeGetSet("onmspointerdown");
+        this.setBridgeGetSet("onmspointercancel");
+        this.setBridgeGetSet("onmslostpointercapture");
+        this.setBridgeGetSet("onmsinertiastart");
+        this.setBridgeGetSet("onmsgotpointercapture");
+        this.setBridgeGetSet("onmsgesturetap");
+        this.setBridgeGetSet("onmsgesturestart");
+        this.setBridgeGetSet("onmsgesturehold");
+        this.setBridgeGetSet("onmsgestureend");
+        this.setBridgeGetSet("onmsgesturedoubletap");
+        this.setBridgeGetSet("onmsgesturechange");
+        this.setBridgeGetSet("onlostpointercapture");
+        this.setBridgeGetSet("ongotpointercapture");
+        this.setBridgeGetSet("oncommand");
+        this.setBridgeGetSet("onariarequest");
+        this.setBridgeGetSet("onwheel");
+        this.setBridgeGetSet("onpointerup");
+        this.setBridgeGetSet("onpointerover");
+        this.setBridgeGetSet("onpointerout");
+        this.setBridgeGetSet("onpointermove");
+        this.setBridgeGetSet("onpointerleave");
+        this.setBridgeGetSet("onpointerenter");
+        this.setBridgeGetSet("onpointerdown");
+        this.setBridgeGetSet("onpointercancel");
+    
+        
     }
     get outerHTML() {
         let
@@ -204,4 +253,10 @@ abstract class VHTMLElement extends VElement{
         p.insertBefore(vText,this);
         p.removeChild(this);
     }
+    title:string
+    lang:string
+    titaccessKeyle:string
+    webkitdropzone:string
+    id:string
 }
+VAP.decorate(<any>VHTMLElement,["title", "lang", "accessKey", "webkitdropzone", "id"]);

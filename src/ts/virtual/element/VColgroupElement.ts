@@ -1,4 +1,4 @@
-/// <reference path="Attribute_Property.ts"/>
+/// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "colgroup", nodeType?: 1): VMElement.VColgroupElement&IVNodeMethod;
 }

@@ -5857,7 +5857,7 @@ var turtle,$t,
             this.toString=function(){
                 return "[object HTML"+this.nodeName[0]+this.nodeName.substring(1).toLowerCase()+"Element]";
             }
-            this.toXMLNodeString=function(){
+            this.toHTMLString=function(){
                 var 
                     ret=[],
                     sAttr='',
@@ -6085,7 +6085,7 @@ var turtle,$t,
             Object.defineProperty(this,'outerHTML',{
                 get:function(){
                     var 
-                        xmlNode=this.toXMLNodeString(),
+                        xmlNode=this.toHTMLString(),
                         cs=this.childNodes,
                         data=[xmlNode[0]];
                     if(cs){

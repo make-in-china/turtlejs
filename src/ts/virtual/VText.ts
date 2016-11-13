@@ -1,5 +1,12 @@
 
 /// <reference path='VNode.ts'/>
+interface IVNodeMethod{
+    (nodeName: string, nodeType: 3): VText&IVNodeMethod;
+}
+
+function isVText(node: VNode): node is VText {
+    return node.nodeType === 3
+}
 class VText extends VNode{
     nodeName="#text"
     nodeType:VNodeType=3
@@ -37,7 +44,7 @@ class VText extends VNode{
         });
         return `("${s}",3)`;
     }
-    toXMLNodeString(): string[] {
+    toHTMLString(): string[] {
         return [this.__value__];
     }
     private __value__:string
@@ -57,7 +64,9 @@ class VText extends VNode{
         }
         return elem;
     }
-
+    cloneNode(this:VText&IVNodeMethod):VText&IVNodeMethod{
+        return this(this.data,3);
+    }
     /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
     protected emulation():void{}
 }

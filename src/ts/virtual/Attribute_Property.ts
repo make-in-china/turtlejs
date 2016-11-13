@@ -9,7 +9,7 @@ class VAP{
         }
     }
     static setAttr(node:VHTMLElement,name:string,value:string){
-        debugger;
+        node.setAttribute(name,value);
     }
     static decorate<T extends VHTMLElement>(vclass:T,names:string[]){
         var prototype:Object=(<any>vclass).prototype;
@@ -25,6 +25,7 @@ class VAP{
         }
     }
 }
+
 // function setGetSetPropertyWithAttribute(o, attributes, name) {
 //         let hideValueName = '__' + name + '__';
 //         Object.defineProperty(attributes, hideValueName, {

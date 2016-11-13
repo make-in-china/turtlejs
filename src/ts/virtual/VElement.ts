@@ -15,12 +15,12 @@ abstract class VElement extends VNode{
     hasAttribute( name: string): boolean {
         return this.attributes.indexOfName(name) !== -1;
     }
-    setAttribute(this: VElement&IVNodeMethod, name: string, value: string): VElement&IVNodeMethod {
+    setAttribute(name: string, value: string): VElement&IVNodeMethod {
         if (name && !emptyTextNodeRE.test(name)) {
             this.attributes.setNamedItem(new IAttr(name, value));
             return <any>getBind(this, this.setAttribute);
         } else {
-            return this;
+            return <any>this;
         }
     }
     _(name: string, value?: string): VNode&IVNodeMethod | null {
@@ -102,5 +102,32 @@ abstract class VElement extends VNode{
     onpointerover: (this: this, ev: PointerEvent) => any;
     onpointerup: (this: this, ev: PointerEvent) => any;
     onwheel: (this: this, ev: WheelEvent) => any;
-
+    
+    onariarequest: (this: this, ev: AriaRequestEvent) => any;
+    oncommand: (this: this, ev: CommandEvent) => any;
+    ongotpointercapture: (this: this, ev: PointerEvent) => any;
+    onlostpointercapture: (this: this, ev: PointerEvent) => any;
+    onmsgesturechange: (this: this, ev: MSGestureEvent) => any;
+    onmsgesturedoubletap: (this: this, ev: MSGestureEvent) => any;
+    onmsgestureend: (this: this, ev: MSGestureEvent) => any;
+    onmsgesturehold: (this: this, ev: MSGestureEvent) => any;
+    onmsgesturestart: (this: this, ev: MSGestureEvent) => any;
+    onmsgesturetap: (this: this, ev: MSGestureEvent) => any;
+    onmsgotpointercapture: (this: this, ev: MSPointerEvent) => any;
+    onmsinertiastart: (this: this, ev: MSGestureEvent) => any;
+    onmslostpointercapture: (this: this, ev: MSPointerEvent) => any;
+    onmspointercancel: (this: this, ev: MSPointerEvent) => any;
+    onmspointerdown: (this: this, ev: MSPointerEvent) => any;
+    onmspointerenter: (this: this, ev: MSPointerEvent) => any;
+    onmspointerleave: (this: this, ev: MSPointerEvent) => any;
+    onmspointermove: (this: this, ev: MSPointerEvent) => any;
+    onmspointerout: (this: this, ev: MSPointerEvent) => any;
+    onmspointerover: (this: this, ev: MSPointerEvent) => any;
+    onmspointerup: (this: this, ev: MSPointerEvent) => any;
+    ontouchcancel: (ev: TouchEvent) => any;
+    ontouchend: (ev: TouchEvent) => any;
+    ontouchmove: (ev: TouchEvent) => any;
+    ontouchstart: (ev: TouchEvent) => any;
+    onwebkitfullscreenchange: (this: this, ev: Event) => any;
+    onwebkitfullscreenerror: (this: this, ev: Event) => any;
 }

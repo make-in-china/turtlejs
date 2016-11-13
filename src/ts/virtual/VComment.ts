@@ -1,10 +1,15 @@
 
 /// <reference path='VNode.ts'/>
+interface IVNodeMethod{
+    (nodeName: string, nodeType: 8): VComment&IVNodeMethod;
+}
+function isVComment(node: VNode): node is VComment {
+    return node.nodeType === 8
+}
 class VComment extends VNode{
     nodeName="#Comment"
     nodeType:VNodeType=8
     data=""
-    __dbplus__:boolean=false;
     getData():string{
         return this.data;
     }
@@ -27,7 +32,7 @@ class VComment extends VNode{
     toHTMLString(): string[] {
         let
             ret: string[] = [];
-        if (this.__dbplus__) {
+        if (this.vmData.doubleMinus) {
             ret.push('<!--' + this.data + '-->');
         } else {
             ret.push('<!' + this.data + '>');
@@ -39,7 +44,9 @@ class VComment extends VNode{
         return elem;
     }
     /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
-    protected emulation():void{
-
+    protected emulation():void{}
+    
+    cloneNode(this:VComment&IVNodeMethod):VComment&IVNodeMethod{
+        return this(this.data,8);
     }
 }

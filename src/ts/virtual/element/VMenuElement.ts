@@ -1,4 +1,4 @@
-/// <reference path="Attribute_Property.ts"/>
+/// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "menu", nodeType?: 1): VMElement.VMenuElement&IVNodeMethod;
 }

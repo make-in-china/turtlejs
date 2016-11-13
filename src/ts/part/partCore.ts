@@ -336,7 +336,7 @@ function parseSet(node: IHTMLElement, outerChildNodes: INode[], outerElement: IE
         /*设置关联子对象*/
         let chds = StoreManage.takeElem($t.store, link);
 
-        if (chds !== null) {
+        if (chds) {
             if (isHTMLElement(chds)) {
                 node.appendChild(chds);
             } else {

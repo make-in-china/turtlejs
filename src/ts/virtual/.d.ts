@@ -2,19 +2,6 @@
 interface Node {
     insertBefore2<T extends INode|Node>(newNode: T, node?: T): T;
 }
-interface Node {
-    __vdomNode__: VNode&IVNodeMethod
-}
-type VNodeType=1|3|8|10;
-interface IVNodeMethod{
-    (nodeName: string, nodeType: 10): VDocumentType&IVNodeMethod;
-    (nodeName: string, nodeType: 8): VComment&IVNodeMethod;
-    (nodeName: string, nodeType: 3): VText&IVNodeMethod;
-    (nodeName: string, nodeType?: 1): VHTMLElement&IVNodeMethod;
-    (nodeName: string, nodeType: VNodeType): VNode&IVNodeMethod;
-    // (nodeName: string, nodeType: undefined): VElement&IVNodeMethod;
-    // (nodeName: string, nodeType?: number): VNode&IVNodeMethod;
-}
 // interface IVNode extends INode {
 //     /**private */__data:string;
 //     /**private */__: Object;
@@ -47,7 +34,7 @@ interface IVNodeMethod{
 //     cloneNode(): IVNode;
 //     text(...agrs): IVNode;
 //     text2(fn: Function): IVNode;
-//     toXMLNodeString(): string[];
+//     toHTMLString(): string[];
 //     toJS(): string;
 //     toDOM(): Node;
 //     previousSibling:IVNode|null

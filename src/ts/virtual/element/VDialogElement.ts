@@ -1,4 +1,4 @@
-/// <reference path="Attribute_Property.ts"/>
+/// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "dialog", nodeType?: 1): VMElement.VDialogElement&IVNodeMethod;
 }

@@ -6,10 +6,17 @@
 /// <reference path='../lib/ClassList.ts'/>
 /// <reference path='../lib/Lib.ts'/>
 /// <reference path='../lib/TypeHelper.ts'/>
-/// <reference path='Is.ts'/>
 /// <reference path='../lib/INamedNodeMap.ts'/>
 /// <reference path='VNodeList.ts'/>
 /// <reference path='VHTMLCollection.ts'/>
+
+interface Node {
+    __vdomNode__: VNode&IVNodeMethod
+}
+type VNodeType=1|3|8|10;
+interface IVNodeMethod{
+    (nodeName: string, nodeType: VNodeType): VNode&IVNodeMethod;
+}
 let emptyTextNodeRE = /^\s*$/,
     stringNode = {
         SCRIPT: /^\/script[>\s]/i,
@@ -29,10 +36,12 @@ interface VNodeVMData{
     __:Object
     events:[string, EventListenerOrEventListenerObject | undefined, boolean][]
     domNode?:Node
-    // /**是否自闭合 */
+    /**是否自闭合 */
     closeSelf?:boolean
-    // /**是否闭合 */
+    /**是否闭合 */
     isClose?:boolean
+    /**是否有两个- */
+    doubleMinus?:boolean;
 }
 abstract class VNode extends EventEmitterEx implements INode{
     vmData:VNodeVMData={
@@ -128,23 +137,7 @@ abstract class VNode extends EventEmitterEx implements INode{
     getData(this: VNode): string {
         return this.vmData.data;
     }
-    cloneNode(this:VNode&IVNodeMethod): VNode&IVNodeMethod {
-        debugger;
-        // let me=this;
-        // if(isVHTMLElement(me)){
-        //     return <any>VNodeHelp((<any>this).getData(), me.nodeType);
-        // }
-        // let node = VNodeHelp(this.nodeName, this.nodeType);
-        // let attrs = this.attributes;
-        // for (let i = 0; i < attrs.length; i++) {
-        //     node.setAttribute(attrs[i].name, attrs[i].value);
-        // }
-        //     node.__isClose__ = this.__isClose__;
-        //     node.__closeSelf__ = this.__closeSelf__;
-
-        // return node;
-        return this;
-    }
+    abstract cloneNode(): VNode&IVNodeMethod 
     
     abstract toHTMLString():string[];
     // createElement(name: string): IVElement;

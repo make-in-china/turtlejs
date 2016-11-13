@@ -5,7 +5,7 @@ declare class ArrayEx<T> extends Array<T> {
 declare let arrayConstructor: Array<any>, objectConstructor: ObjectConstructor, stringConstructor: String, toStr: () => string, slice: (start?: number, end?: number) => any[], push: (...items: any[]) => number, splice: {
     (start: number): any[];
     (start: number, deleteCount: number, ...items: any[]): any[];
-}, getPrototypeOf: (o: any) => any, replace: {
+}, indexOf: (searchElement: any, fromIndex?: number) => number, getPrototypeOf: (o: any) => any, replace: {
     (searchValue: string, replaceValue: string): string;
     (searchValue: string, replacer: (substring: string, ...args: any[]) => string): string;
     (searchValue: RegExp, replaceValue: string): string;
@@ -70,7 +70,6 @@ interface INodeList {
     [index: number]: INode | undefined;
 }
 interface INode extends EventTarget {
-    attributes: INamedNodeMap;
     readonly childNodes: INodeList;
     previousSibling: INode | null;
     nextSibling: INode | null;
@@ -426,6 +425,7 @@ interface IHTMLCollection {
     [index: number]: IHTMLElement | undefined;
 }
 interface IHTMLElement extends IElement {
+    attributes: INamedNodeMap;
     accessKey: string;
     children: IHTMLCollection;
     contentEditable: string;

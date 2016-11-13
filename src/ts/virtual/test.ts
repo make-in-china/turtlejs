@@ -77,7 +77,7 @@ let VNodeXXX: IVNode =(function () {
         this.toString = function () {
             return "[object HTML" + this.nodeName[0] + this.nodeName.substring(1).toLowerCase() + "Element]";
         }
-        this.toXMLNodeString = toXMLNodeString
+        this.toHTMLString = toHTMLString
         this.addEventListener = addEventListener
         this.removeEventListener = removeEventListener
         this.toJS = toJS
@@ -85,7 +85,7 @@ let VNodeXXX: IVNode =(function () {
         // Object.defineProperty(this, 'outerHTML', {
         //     get: function (this:IVNode) {
         //         let
-        //             xmlNode = this.toXMLNodeString(),
+        //             xmlNode = this.toHTMLString(),
         //             cs = this.childNodes,
         //             data = [xmlNode[0]];
         //         if (cs) {
@@ -579,7 +579,7 @@ let VNodeXXX: IVNode =(function () {
             }
         }
     }
-    function toXMLNodeString(this: IVNode): string[] {
+    function toHTMLString(this: IVNode): string[] {
         let
             ret: string[] = [],
             sAttr = '',
