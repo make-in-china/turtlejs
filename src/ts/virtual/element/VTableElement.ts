@@ -1,16 +1,20 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "table", nodeType: 1): VTableElement&IVNodeMethod;
+    (nodeName: "table", nodeType?: 1): VMElement.VTableElement&IVNodeMethod;
 }
-class  VTableElement extends VHTMLElement{
-    align:string
-    border:string
-    frame:string
-    rules:string
-    summary:string
-    width:string
-    bgColor:string
-    cellPadding:string
-    cellSpacing:string
+
+namespace VMElement{
+    export class  VTableElement extends VHTMLElement{
+        nodeName="TABLE";
+        align:string
+        border:string
+        frame:string
+        rules:string
+        summary:string
+        width:string
+        bgColor:string
+        cellPadding:string
+        cellSpacing:string
+    }
+    VAP.decorate(<any>VTableElement,["align","border","frame","rules","summary","width","bgColor","cellPadding","cellSpacing"]);
 }
-VAP.decorate(<any>VTableElement,["align","border","frame","rules","summary","width","bgColor","cellPadding","cellSpacing"]);

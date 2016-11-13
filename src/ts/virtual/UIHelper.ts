@@ -21,14 +21,19 @@ namespace Component{
     }
 }`
     static makeClass(path:string){
-        var html=this.fs.readFileSync(path);
+        let html=this.fs.readFileSync(path);
         if(!isString(html)){
             html=html.toString();
         }
-        var dom=VDOM(html);
-
-        var refs:string[]=[];
-        treeEach(<VNode[]><any>dom.childNodes,"childNodes",(node,step)=>{
+        let dom=VDOM(html);
+        let chds:IArray | VNode[];
+        if(isArray(dom)){
+            chds=dom;
+        }else{
+            chds=dom.childNodes;
+        }
+        let refs:string[]=[];
+        treeEach(chds,"childNodes",(node,step)=>{
             if(isVText(node)){
                 //不处理咯
             }else if(isVComment(node)){

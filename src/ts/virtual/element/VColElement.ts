@@ -1,11 +1,15 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "col", nodeType: 1): VColElement&IVNodeMethod;
+    (nodeName: "col", nodeType?: 1): VMElement.VColElement&IVNodeMethod;
 }
-class  VColElement extends VHTMLElement{
-    span:string
-    align:string
-    vAlign:string
-    width:string
+namespace VMElement{
+    export class  VColElement extends VHTMLElement{
+        nodeName="COL";
+        __closeSelf__=true;
+        span:string
+        align:string
+        vAlign:string
+        width:string
+    }
+    VAP.decorate(<any>VColElement,["span","align","vAlign","width"]);
 }
-VAP.decorate(<any>VColElement,["span","align","vAlign","width"]);

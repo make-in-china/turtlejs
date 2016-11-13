@@ -15,7 +15,7 @@ let vNodesToDOM = function (nodes: INode[]) {
     return nodes
 }
 
-function insertNodesBefore(node: INode, nodes: INode[]) {
+function insertNodesBefore(node: INode, nodes:INode[]) {
     let parent = node.parentNode;
     if (parent == null) {
         return;
@@ -33,7 +33,7 @@ function removeNode(this:void,node: INode):INode | null {
     }
 }
 function replaceNodeByNodes(node: INode, nodes: INode[]) {
-    insertNodesBefore(node, nodes)
+    insertNodesBefore(node, nodes);
     removeNode(node);
 }
 function insertNode(node: INode, childNode) {

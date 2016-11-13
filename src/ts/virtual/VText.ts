@@ -1,6 +1,8 @@
 
 /// <reference path='VNode.ts'/>
 class VText extends VNode{
+    nodeName="#text"
+    nodeType:VNodeType=3
     get data() {
         return this.__value__;
     }
@@ -18,6 +20,25 @@ class VText extends VNode{
         if(this.__domNode__){
             this.__domNode__.data = s;
         }
+    }
+    protected toJS():string{
+        let s = this.__value__;
+        s = s.replace(/[\'\"\r\n]/g, function (s: string) {
+            switch (s) {
+                case '\'':
+                case '\"':
+                    return '\\' + s;
+                case '\r':
+                    return '\\r';
+                case '\n':
+                    return '\\n';
+            }
+            return "";
+        });
+        return `("${s}",3)`;
+    }
+    toXMLNodeString(): string[] {
+        return [this.__value__];
     }
     private __value__:string
     getData():string{

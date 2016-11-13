@@ -1,8 +1,11 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "div", nodeType: 1): VDivElement&IVNodeMethod;
+    (nodeName: "div", nodeType?: 1): VMElement.VDivElement&IVNodeMethod;
 }
-class  VDivElement extends VHTMLElement{
-    align:string
+namespace VMElement{
+    export class  VDivElement extends VHTMLElement{
+        nodeName="DIV"
+        align:string
+    }
+    VAP.decorate(<any>VDivElement,["align"]);
 }
-VAP.decorate(<any>VDivElement,["align"]);

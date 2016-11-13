@@ -1,12 +1,16 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "hr", nodeType: 1): VHrElement&IVNodeMethod;
+    (nodeName: "hr", nodeType?: 1): VMElement.VHrElement&IVNodeMethod;
 }
-class  VHrElement extends VHTMLElement{
-    align:string
-    color:string
-    noShade:string
-    size:string
-    width:string
+namespace VMElement{
+    export class VHrElement extends VHTMLElement{
+        nodeName="HR";
+        __closeSelf__=true;
+        align:string
+        color:string
+        noShade:string
+        size:string
+        width:string
+    }
+    VAP.decorate(<any>VHrElement,["align","color","noShade","size","width"]);
 }
-VAP.decorate(<any>VHrElement,["align","color","noShade","size","width"]);

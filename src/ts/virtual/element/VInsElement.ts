@@ -1,9 +1,13 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "ins", nodeType: 1): VInsElement&IVNodeMethod;
+    (nodeName: "ins", nodeType?: 1): VMElement.VInsElement&IVNodeMethod;
 }
-class  VInsElement extends VHTMLElement{
-    cite:string
-    dateTime:string
+
+namespace VMElement{
+    export class  VInsElement extends VHTMLElement{
+        nodeName="INS";
+        cite:string
+        dateTime:string
+    }
+    VAP.decorate(<any>VInsElement,["cite","dateTime"]);
 }
-VAP.decorate(<any>VInsElement,["cite","dateTime"]);

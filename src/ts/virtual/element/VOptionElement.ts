@@ -1,11 +1,15 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "option", nodeType: 1): VOptionElement&IVNodeMethod;
+    (nodeName: "option", nodeType?: 1): VMElement.VOptionElement&IVNodeMethod;
 }
-class  VOptionElement extends VHTMLElement{
-    disabled:string
-    label:string
-    selected:string
-    value:string
+
+namespace VMElement{
+    export class  VOptionElement extends VHTMLElement{
+        nodeName="OPTION";
+        disabled:string
+        label:string
+        selected:string
+        value:string
+    }
+    VAP.decorate(<any>VOptionElement,["disabled","label","selected","value"]);
 }
-VAP.decorate(<any>VOptionElement,["disabled","label","selected","value"]);

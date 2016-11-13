@@ -1,9 +1,13 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "optgroup", nodeType: 1): VOptgroupElement&IVNodeMethod;
+    (nodeName: "optgroup", nodeType?: 1): VMElement.VOptgroupElement&IVNodeMethod;
 }
-class  VOptgroupElement extends VHTMLElement{
-    disabled:string
-    label:string
+
+namespace VMElement{
+    export class  VOptgroupElement extends VHTMLElement{
+        nodeName="OPTGROUP";
+        disabled:string
+        label:string
+    }
+    VAP.decorate(<any>VOptgroupElement,["disabled","label"]);
 }
-VAP.decorate(<any>VOptgroupElement,["disabled","label"]);

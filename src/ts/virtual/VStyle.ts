@@ -1,7 +1,8 @@
 
 let styleListRE = /\s*([\w\-]+)\s*\:\s*(.*?)\s*[;$]/g;
 class VStyle {
-    constructor(elem, attrs) {
+    constructor(elem:VElement) {
+        let attrs=elem.attributes;
         var
             style = "",
             isLock = 0,

@@ -1,9 +1,13 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "tbody", nodeType: 1): VTbodyElement&IVNodeMethod;
+    (nodeName: "tbody", nodeType?: 1): VMElement.VTbodyElement&IVNodeMethod;
 }
-class  VTbodyElement extends VHTMLElement{
-    align:string
-    vAlign:string
+
+namespace VMElement{
+    export class  VTbodyElement extends VHTMLElement{
+        nodeName="TBODY";
+        align:string
+        vAlign:string
+    }
+    VAP.decorate(<any>VTbodyElement,["align","vAlign"]);
 }
-VAP.decorate(<any>VTbodyElement,["align","vAlign"]);

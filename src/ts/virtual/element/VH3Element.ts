@@ -1,8 +1,11 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "h3", nodeType: 1): VH3Element&IVNodeMethod;
+    (nodeName: "h3", nodeType?: 1): VMElement.VH3Element&IVNodeMethod;
 }
-class  VH3Element extends VHTMLElement{
-    align:string
+namespace VMElement{
+    export class  VH3Element extends VHTMLElement{
+        nodeName="H3";
+        align:string
+    }
+    VAP.decorate(<any>VH3Element,["align"]);
 }
-VAP.decorate(<any>VH3Element,["align"]);

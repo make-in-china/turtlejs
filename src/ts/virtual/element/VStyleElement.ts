@@ -1,9 +1,13 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "style", nodeType: 1): VStyleElement&IVNodeMethod;
+    (nodeName: "style", nodeType?: 1): VMElement.VStyleElement&IVNodeMethod;
 }
-class  VStyleElement extends VHTMLElement{
-    media:string
-    type:string
+
+namespace VMElement{
+    export class  VStyleElement extends VHTMLElement{
+        nodeName="STYLE";
+        media:string
+        type:string
+    }
+    VAP.decorate(<any>VStyleElement,["media","type"]);
 }
-VAP.decorate(<any>VStyleElement,["media","type"]);

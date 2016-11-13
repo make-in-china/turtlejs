@@ -1,12 +1,16 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "keygen", nodeType: 1): VKeygenElement&IVNodeMethod;
+    (nodeName: "keygen", nodeType?: 1): VMElement.VKeygenElement&IVNodeMethod;
 }
-class  VKeygenElement extends VHTMLElement{
-    autofocus:string
-    challenge:string
-    disabled:string
-    keytype:string
-    name:string
+
+namespace VMElement{
+    export class  VKeygenElement extends VHTMLElement{
+        nodeName="KEYGEN";
+        autofocus:string
+        challenge:string
+        disabled:string
+        keytype:string
+        name:string
+    }
+    VAP.decorate(<any>VKeygenElement,["autofocus","challenge","disabled","keytype","name"]);
 }
-VAP.decorate(<any>VKeygenElement,["autofocus","challenge","disabled","keytype","name"]);

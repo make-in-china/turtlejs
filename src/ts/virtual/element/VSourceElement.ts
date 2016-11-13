@@ -1,12 +1,16 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "source", nodeType: 1): VSourceElement&IVNodeMethod;
+    (nodeName: "source", nodeType?: 1): VMElement.VSourceElement&IVNodeMethod;
 }
-class  VSourceElement extends VHTMLElement{
-    src:string
-    type:string
-    srcset:string
-    sizes:string
-    media:string
+
+namespace VMElement{
+    export class  VSourceElement extends VHTMLElement{
+        nodeName="SOURCE";
+        src:string
+        type:string
+        srcset:string
+        sizes:string
+        media:string
+    }
+    VAP.decorate(<any>VSourceElement,["src","type","srcset","sizes","media"]);
 }
-VAP.decorate(<any>VSourceElement,["src","type","srcset","sizes","media"]);

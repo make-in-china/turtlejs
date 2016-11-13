@@ -1,11 +1,16 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "param", nodeType: 1): VParamElement&IVNodeMethod;
+    (nodeName: "param", nodeType?: 1): VMElement.VParamElement&IVNodeMethod;
 }
-class  VParamElement extends VHTMLElement{
-    name:string
-    value:string
-    type:string
-    valueType:string
+
+namespace VMElement{
+    export class  VParamElement extends VHTMLElement{
+        nodeName="PARAM";
+        __closeSelf__=true;
+        name:string
+        value:string
+        type:string
+        valueType:string
+    }
+    VAP.decorate(<any>VParamElement,["name","value","type","valueType"]);
 }
-VAP.decorate(<any>VParamElement,["name","value","type","valueType"]);

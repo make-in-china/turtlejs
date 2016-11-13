@@ -13,7 +13,7 @@ interface INodeList {
 }
 // type INodeArray=INodeList|ArrayEx<INode>|INode[]|IHTMLCollection;
 interface INode extends EventTarget {
-    attributes: INamedNodeMap;
+    // attributes: INamedNodeMap;
     readonly childNodes: INodeList;
     previousSibling: INode|null;
     nextSibling: INode|null;

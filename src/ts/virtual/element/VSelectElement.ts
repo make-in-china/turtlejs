@@ -1,13 +1,21 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "select", nodeType: 1): VSelectElement&IVNodeMethod;
+    (nodeName: "select", nodeType?: 1): VMElement.VSelectElement&IVNodeMethod;
 }
-class  VSelectElement extends VHTMLElement{
-    autofocus:string
-    disabled:string
-    multiple:string
-    name:string
-    required:string
-    size:string
+
+namespace VMElement{
+    export class  VSelectElement extends VHTMLElement{
+        nodeName="SELECT";
+        autofocus:string
+        disabled:string
+        multiple:string
+        name:string
+        required:string
+        size:string
+        /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
+        protected emulation():void{
+            this.setBridgeGetSet("value");
+        }
+    }
+    VAP.decorate(<any>VSelectElement,["autofocus","disabled","multiple","name","required","size"]);
 }
-VAP.decorate(<any>VSelectElement,["autofocus","disabled","multiple","name","required","size"]);

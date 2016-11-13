@@ -1,9 +1,12 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "canvas", nodeType: 1): VCanvasElement&IVNodeMethod;
+    (nodeName: "canvas", nodeType?: 1): VMElement.VCanvasElement&IVNodeMethod;
 }
-class  VCanvasElement extends VHTMLElement{
-    width:string
-    height:string
+namespace VMElement{
+    export class  VCanvasElement extends VHTMLElement{
+        nodeName="CANVAS";
+        width:string
+        height:string
+    }
+    VAP.decorate(<any>VCanvasElement,["width","height"]);
 }
-VAP.decorate(<any>VCanvasElement,["width","height"]);

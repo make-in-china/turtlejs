@@ -1,9 +1,13 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "base", nodeType: 1): VBaseElement&IVNodeMethod;
+    (nodeName: "base", nodeType?: 1): VMElement.VBaseElement&IVNodeMethod;
 }
-class  VBaseElement extends VHTMLElement{
-    href:string
-    target:string
+namespace VMElement{
+    export class  VBaseElement extends VHTMLElement{
+        nodeName="BASE";
+        __closeSelf__=true;
+        href:string
+        target:string
+    }
+    VAP.decorate(<any>VBaseElement,["href","target"]);
 }
-VAP.decorate(<any>VBaseElement,["href","target"]);

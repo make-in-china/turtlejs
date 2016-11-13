@@ -1,10 +1,14 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "tr", nodeType: 1): VTrElement&IVNodeMethod;
+    (nodeName: "tr", nodeType?: 1): VMElement.VTrElement&IVNodeMethod;
 }
-class  VTrElement extends VHTMLElement{
-    align:string
-    vAlign:string
-    bgColor:string
+
+namespace VMElement{
+    export class  VTrElement extends VHTMLElement{
+        nodeName="TR";
+        align:string
+        vAlign:string
+        bgColor:string
+    }
+    VAP.decorate(<any>VTrElement,["align","vAlign","bgColor"]);
 }
-VAP.decorate(<any>VTrElement,["align","vAlign","bgColor"]);

@@ -1,10 +1,14 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "video", nodeType: 1): VVideoElement&IVNodeMethod;
+    (nodeName: "video", nodeType?: 1): VMElement.VVideoElement&IVNodeMethod;
 }
-class  VVideoElement extends VHTMLElement{
-    width:string
-    height:string
-    poster:string
+
+namespace VMElement{
+    export class  VVideoElement extends VHTMLElement{
+        nodeName="VIDEO";
+        width:string
+        height:string
+        poster:string
+    }
+    VAP.decorate(<any>VVideoElement,["width","height","poster"]);
 }
-VAP.decorate(<any>VVideoElement,["width","height","poster"]);

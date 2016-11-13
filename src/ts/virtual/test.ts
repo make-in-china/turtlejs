@@ -932,6 +932,15 @@ let VNodeXXX: IVNode =(function () {
             });
             switch (o.nodeName) {
                 case "INPUT":
+                    Object.defineProperty(o, 'checked', {
+                        get: function () {
+                            return this.__domNode__.checked;
+                        },
+                        set: function (s) {
+                            this.__domNode__.checked = s;
+                        }
+                    });
+                case "INPUT":
                 case "SELECT":
                 case "TEXTAREA":
                     Object.defineProperty(o, 'value', {
@@ -940,15 +949,6 @@ let VNodeXXX: IVNode =(function () {
                         },
                         set: function (s) {
                             this.__domNode__.value = s;
-                        }
-                    });
-                case "INPUT":
-                    Object.defineProperty(o, 'checked', {
-                        get: function () {
-                            return this.__domNode__.checked;
-                        },
-                        set: function (s) {
-                            this.__domNode__.checked = s;
                         }
                     });
                     break;
@@ -977,5 +977,3 @@ let VNodeXXX: IVNode =(function () {
     }
     return newVNode;
 })();
-
-Element.prototype.onwheel

@@ -1,8 +1,12 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "xmp", nodeType: 1): VXmpElement&IVNodeMethod;
+    (nodeName: "xmp", nodeType?: 1): VMElement.VXmpElement&IVNodeMethod;
 }
-class  VXmpElement extends VHTMLElement{
-    width:string
+
+namespace VMElement{
+    export class  VXmpElement extends VHTMLElement{
+        nodeName="XMP";
+        width:string
+    }
+    VAP.decorate(<any>VXmpElement,["width"]);
 }
-VAP.decorate(<any>VXmpElement,["width"]);

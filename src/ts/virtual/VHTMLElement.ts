@@ -2,9 +2,10 @@
 /// <reference path='VNode.ts'/>
 /// <reference path='../lib/Encode.ts'/>
 abstract class VHTMLElement extends VElement{
+    nodeType:VNodeType=1;
     version:string
     cloneNode(this:VHTMLElement&IVNodeMethod): VHTMLElement&IVNodeMethod {
-        return <VHTMLElement&IVNodeMethod>VDOM(this.getData());
+        return <any>VDOM(this.getData());
     }
     getData():string{
         return this.outerHTML;
@@ -34,19 +35,62 @@ abstract class VHTMLElement extends VElement{
         }
         this.appendChild(VNodeHelp(decodeHTML(s), 3));
     }
-    __domNode__:HTMLElement;
+    insertBefore(newNode:  VNode&IVNodeMethod, refChild:  VNode&IVNodeMethod):  VNode&IVNodeMethod {
+        //添加到childNodes里
+        let chds = this.childNodes;
+        let idx:number = indexOf.call(chds,refChild);
+        if (idx === -1) {
+            return newNode;
+        }
+        let p2 = newNode.parentNode;
+        if (p2) {
+            p2.removeChild(newNode);
+        }
+        splice.call(chds,idx, 0, newNode);
+
+        newNode.parentNode = <any>this;
+
+        //添加到children里
+        if (idx >= chds.length) {
+            push.call(chds,newNode);
+        } else {
+            let chds = this.children;
+            // for (let i = idx; i < chds.length; i++) {
+                // if ((<VElem<IVNodeMethod>>chds[i]).nodeType === 1) {
+                    splice.call(chds,idx, 0, newNode);
+                    return newNode;
+                // }
+            // }
+            // push.call(chds,newNode);
+        }
+        return newNode;
+    }
+    protected doAppendChild(vNode: VNode&IVNodeMethod) {
+
+        Array.prototype.push.call(this.childNodes,vNode);
+        let p = vNode.parentNode;
+        if (p) {
+            p.removeChild(vNode);
+        }
+        vNode.parentNode = <any>this;
+        if (isVHTMLElement(vNode)) {
+            push.call(this.children,vNode);
+        }
+        push.call(this.children,vNode);
+        return vNode;
+    }
     protected doBaseToDOM():HTMLElement{
         let elem= document.createElement(this.nodeName);
         let attrs = this.attributes;
         for (let j = 0; j < attrs.length; j++) {
             (<any>elem).setAttribute(attrs[j].name, attrs[j].value);
         }
-        let arr = this.__events__;
+        let arr = this.vmData.events;
         for (let j in arr) {
             let e = arr[j];
-            elem.addEventListener(e[0], e[1], e[2]);
+            elem.addEventListener(e[0], <any>e[1], e[2]);
         }
-        let obj = this.__;
+        let obj = this.vmData.__;
         if (obj) {
             for (let j in obj) {
                 elem[j] = obj[j];
@@ -62,6 +106,31 @@ abstract class VHTMLElement extends VElement{
         }
         return elem;
     }
+    protected toJS():string{
+        let s=`("${this.nodeName}")`;
+        let sAttr="";
+        let sInner="";
+        let attrs = this.attributes;
+        if (attrs.length > 0) {
+            sAttr = '._';
+            for (let i = 0; i < attrs.length; i++) {
+                sAttr += '("' + attrs[i].name;
+                if (attrs[i].value) {
+                    sAttr += '","' + attrs[i].value + '")';
+                } else {
+                    sAttr += '")';
+                }
+            }
+            sAttr += '()';
+        }
+        let chds = this.childNodes;
+        if (chds.length > 0) {
+            for (let i = 0; i < chds.length; i++) {
+                sInner += (<VNode>chds[i]).toJavaScriptString();
+            }
+        }
+        return sAttr+sInner;
+    }
     /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
     protected emulation():void{
         
@@ -72,11 +141,19 @@ abstract class VHTMLElement extends VElement{
         this.createBridgeFunction("toString");
         this.createBridgeFunction("addEventListener");
         this.createBridgeFunction("removeEventListener");
+
         
         this.createHomologyFunction("insertBefore");
         this.createHomologyFunction("insertBefore2");
         this.createHomologyFunction("appendChild");
         this.createHomologyFunction("removeChild");
+        
+        debugger;
+        this.createHomologyFunction("appendChild");
+        this.createHomologyFunction("removeChild");
+
+
+
 
         this.setBridgeGet("style");
         this.setBridgeGet("classList");
@@ -87,6 +164,44 @@ abstract class VHTMLElement extends VElement{
         this.setBridgeGet("offsetWidth");
         this.setBridgeGet("offsetHeight");
     }
-    outerHTML:string
-    outerText
+    get outerHTML() {
+        let
+            xmlNode = this.toHTMLString(),
+            chds = this.childNodes,
+            data = [xmlNode[0]];
+
+        for (let i = 0; i < chds.length; i++) {
+            let chn:VNode=<VNode>chds[i];
+            data.push(chn.getData());
+        }
+        if (xmlNode.length === 2) {
+            data.push(xmlNode[1]);
+        }
+        return data.join('');
+    }
+    set outerHTML(this:VHTMLElement&IVNodeMethod,v:string){
+        let p=this.parentNode;
+        if(!p){
+            throw new Error("This element has no parent node.");
+        }
+        let vNodes=VDOM(v);
+        if(!isArray(vNodes)){
+            p.insertBefore(vNodes,this);
+        }else{
+            insertNodesBefore(this,vNodes);
+        }
+        p.removeChild(this);
+    }
+    get outerText():string{
+        return this.innerText;
+    }
+    set outerText(this:VHTMLElement&IVNodeMethod,v:string){
+        let p=this.parentNode;
+        if(!p){
+            throw new Error("This element has no parent node.");
+        }
+        let vText=VNodeHelp(v,3);
+        p.insertBefore(vText,this);
+        p.removeChild(this);
+    }
 }

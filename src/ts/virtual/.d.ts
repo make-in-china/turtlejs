@@ -7,13 +7,13 @@ interface Node {
 }
 type VNodeType=1|3|8|10;
 interface IVNodeMethod{
-    (name: string, nodeType: 10): VDocumentType&IVNodeMethod;
-    (name: string, nodeType: 8): VComment&IVNodeMethod;
-    (name: string, nodeType: 3): VText&IVNodeMethod;
-    (name: string, nodeType?: 1): VHTMLElement&IVNodeMethod;
-    (name: string, nodeType: VNodeType): VNode&IVNodeMethod;
-    // (name: string, nodeType: undefined): VElement&IVNodeMethod;
-    // (name: string, nodeType?: number): VNode&IVNodeMethod;
+    (nodeName: string, nodeType: 10): VDocumentType&IVNodeMethod;
+    (nodeName: string, nodeType: 8): VComment&IVNodeMethod;
+    (nodeName: string, nodeType: 3): VText&IVNodeMethod;
+    (nodeName: string, nodeType?: 1): VHTMLElement&IVNodeMethod;
+    (nodeName: string, nodeType: VNodeType): VNode&IVNodeMethod;
+    // (nodeName: string, nodeType: undefined): VElement&IVNodeMethod;
+    // (nodeName: string, nodeType?: number): VNode&IVNodeMethod;
 }
 // interface IVNode extends INode {
 //     /**private */__data:string;

@@ -24,22 +24,30 @@ function getFunctionComment(fn: Function) {
     let s: RegExpExecArray = <RegExpExecArray>functionCommentRE.exec(fn.toString());
     return s[1];
 }
-
+interface VNodeVMData{
+    data:string
+    __:Object
+    events:[string, EventListenerOrEventListenerObject | undefined, boolean][]
+    domNode?:Node
+    // /**是否自闭合 */
+    closeSelf?:boolean
+    // /**是否闭合 */
+    isClose?:boolean
+}
 abstract class VNode extends EventEmitterEx implements INode{
-    protected __data__:string         ="";
-    protected __: Object              ={};
-    protected __events__: [string, EventListenerOrEventListenerObject | undefined, boolean][]=[];
-    protected __domNode__:Node;
-    __isClose__: boolean;
-    /**是否自闭和 */
-    __closeSelf__?: boolean;
-    attributes=new INamedNodeMap();
-    nodeType: VNodeType;
-    nodeName: string;
+    vmData:VNodeVMData={
+        data:"",
+        __:{},
+        events:[]
+    }
+    abstract nodeType: VNodeType;
+    abstract nodeName: string;
     childNodes: VNodeList;
     parentNode: VNode&IVNodeMethod | null;
-    style: VStyle;
-    
+    // constructor(){
+    //     super();
+
+    // }
     addEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void
     {
 
@@ -52,15 +60,8 @@ abstract class VNode extends EventEmitterEx implements INode{
     {
         
     }
-    _(this: VNode&IVNodeMethod, name: string, value?: string): VNode&IVNodeMethod | null {
-        if (name) {
-            return this.setAttribute.call(this, name, value);
-        } else {
-            return this.parentNode;
-        }
-    }
-    addText(this: VNode&IVNodeMethod, ...agrs:string[]): VNode&IVNodeMethod {
-        let s = agrs.join('\r\n');
+    addText(this: VNode&IVNodeMethod, ...args:string[]): VNode&IVNodeMethod {
+        let s = args.join('\r\n');
         let t = this(s, 3);
         this.appendChild(t);
         return this;
@@ -83,45 +84,14 @@ abstract class VNode extends EventEmitterEx implements INode{
         }
     }
     protected doAppendChild(this: VNode, vNode: VNode&IVNodeMethod) {
-        // if (vNode instanceof Node) {
-        //     throw new Error('虚拟DOM只能插入虚拟节点！');
-        // }
+
         Array.prototype.push.call(this.childNodes,vNode);
-        let me=this;
         let p = vNode.parentNode;
         if (p) {
             p.removeChild(vNode);
         }
         vNode.parentNode = <VNode&IVNodeMethod>this;
-        if (isVHTMLElement(me)&&isVHTMLElement(vNode)) {
-            push.call(me.children,vNode);
-        }
         return vNode;
-    }
-    removeAttribute(this: VNode&IVNodeMethod, name: string): void {
-        this.attributes.removeNamedItem(name);
-    }
-    removeAttributeNode(this: VNode&IVNodeMethod, item: Object): void {
-        this.attributes.removeNamedItem(item);
-    }
-    hasAttribute(this: VNode&IVNodeMethod, name: string): boolean {
-        return this.attributes.indexOfName(name) !== -1;
-    }
-    setAttribute(this: VNode&IVNodeMethod, name: string, value: string): VNode&IVNodeMethod {
-        if (name && !emptyTextNodeRE.test(name)) {
-            this.attributes.setNamedItem(new IAttr(name, value));
-            return <any>getBind(this, this.setAttribute);
-        } else {
-            return this;
-        }
-    }
-    getAttribute(this: VNode, name: string):string|null {
-        let item = this.attributes.getNamedItem(name);
-        if (item) {
-            return item.value;
-        } else {
-            return null;
-        }
     }
     insertBefore(this:  VNode&IVNodeMethod, newNode:  VNode&IVNodeMethod, refChild:  VNode&IVNodeMethod):  VNode&IVNodeMethod {
         //添加到childNodes里
@@ -135,32 +105,17 @@ abstract class VNode extends EventEmitterEx implements INode{
             p2.removeChild(newNode);
         }
         splice.call(chds,idx, 0, newNode);
-
         newNode.parentNode = this;
-
-
-        //添加到children里
-        if(isVHTMLElement(newNode)){
-            let me=this;
-            if(isVHTMLElement(me)){
-                if (idx >= chds.length) {
-                    push.call(chds,newNode);
-                } else {
-                    let chds = me.children;
-                    // for (let i = idx; i < chds.length; i++) {
-                        // if ((<VElem<IVNodeMethod>>chds[i]).nodeType === 1) {
-                            splice.call(chds,idx, 0, newNode);
-                            return newNode;
-                        // }
-                    // }
-                    // push.call(chds,newNode);
-                }
-            }
-        }
         return newNode;
     }
     insertBefore2(this:  VNode&IVNodeMethod, newNode:  VNode&IVNodeMethod, node:  VNode&IVNodeMethod):  VNode&IVNodeMethod{
         return this.insertBefore(newNode,node);
+    }
+    remove(this:VNode&IVNodeMethod){
+        let p=this.parentNode;
+        if(p){
+            p.removeChild(this);
+        }
     }
     removeChild(this:  VNode&IVNodeMethod, vNode: VNode&IVNodeMethod): VNode&IVNodeMethod {
         if (!vNode || this.childNodes.length === 0) {
@@ -171,7 +126,7 @@ abstract class VNode extends EventEmitterEx implements INode{
         return vNode;
     }
     getData(this: VNode): string {
-        return this.__data__;
+        return this.vmData.data;
     }
     cloneNode(this:VNode&IVNodeMethod): VNode&IVNodeMethod {
         debugger;
@@ -191,71 +146,23 @@ abstract class VNode extends EventEmitterEx implements INode{
         return this;
     }
     
+    abstract toHTMLString():string[];
     // createElement(name: string): IVElement;
     // createTextNode(value: string): IVText;
     // createComment(value: string): IVComment;
     // addEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
     // removeEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
-    toJS(this:VNode): string {
-        let
-            sBegin = '',
-            sAttr = '',
-            sInner = '',
-            sEnd = '',
-            s;
-        if (this.parentNode !== null && this.__isClose__) {
-            sEnd = '()';
-        }
-        if (this.parentNode === null) {
-            sBegin = 'VNode';
-        }
-        let me = this;
-        if (isVHTMLElement(me)) {
-            sBegin += '("' + me.nodeName + '")';
-            if (me.attributes.length > 0) {
-                sAttr = '._';
-                let attrs = me.attributes;
-                for (let i = 0; i < attrs.length; i++) {
-                    sAttr += '("' + attrs[i].name;
-                    if (attrs[i].value) {
-                        sAttr += '","' + attrs[i].value + '")';
-                    } else {
-                        sAttr += '")';
-                    }
-                }
-                sAttr += '()';
-            }
-            let chds = me.childNodes;
-            if (chds.length > 0) {
-                for (let i = 0; i < chds.length; i++) {
-                    sInner += (<VNode>chds[i]).toJS();
-                }
-            }
-        } else if (isVText(me) || isVComment(me)) {
-            s = me.data;
-            s = s.replace(/[\'\"\r\n]/g, function (s: string) {
-                switch (s) {
-                    case '\'':
-                    case '\"':
-                        return '\\' + s;
-                    case '\r':
-                        return '\\r';
-                    case '\n':
-                        return '\\n';
-                }
-                return "";
-            });
-            sBegin += '("' + s + '",' + me.nodeType + ')';
-        }
-        return sBegin + sAttr + sInner + sEnd;
+    toJavaScriptString():string{
+        return this.parentNode?"":"VNodeHelp"+this.toJS();
     }
+    protected abstract toJS():string;
     toDOM():Node{
-        if (this.__domNode__) {
-            return this.__domNode__;
+        if (this.vmData.domNode) {
+            return this.vmData.domNode;
         }
         let elem=this.doToDOM();
         this.copyPropertyToNode(elem);
-        this.__domNode__ = elem;
+        this.vmData.domNode = elem;
         this.connectParent(elem);
         this.emulation();
         elem.__vdomNode__ = <any>this;
@@ -263,17 +170,18 @@ abstract class VNode extends EventEmitterEx implements INode{
     }
     protected doToDOM(): Node{
         let toHelp = document.createElement('__Turtle__');//用于创建
-        toHelp.innerHTML = this.__data__;
+        toHelp.innerHTML = this.vmData.data;
         let elem = toHelp.removeChild(toHelp.childNodes[0]);
         return elem;
     }
     private copyPropertyToNode(elem:Node){
+        debugger;
         for (let i in this) {
             switch (i) {
                 case '__':
                 case '__events__':
                 case '__isClose__':
-                case '__domNode__':
+                case 'vmData.domNode':
                 case "__closeSelf__":
                 case '__proto__':
                 case 'children':
@@ -306,8 +214,8 @@ abstract class VNode extends EventEmitterEx implements INode{
     /**与真实DOM交互 */
     protected connectParent<T extends IVNodeMethod>(this: VNode, elem: Node) {
         let p:VNode|null = this.parentNode;
-        if (p && p.__domNode__) {
-            let pE = p.__domNode__;
+        if (p && p.vmData.domNode) {
+            let pE = p.vmData.domNode;
             if (pE.childNodes.length === 0) {
                 pE.appendChild(elem);
             } else {
@@ -318,7 +226,7 @@ abstract class VNode extends EventEmitterEx implements INode{
                         */
                     node = node.previousSibling;
                     if (node) {
-                        let elem2 = node.__domNode__;
+                        let elem2 = node.vmData.domNode;
                         if (elem2) {
                             if (elem2.parentNode) {
                                 pE.insertBefore2(elem, elem2);
@@ -334,7 +242,7 @@ abstract class VNode extends EventEmitterEx implements INode{
                                 */
                             node = node.nextSibling;
                             if (node) {
-                                let elem2 = node.__domNode__;
+                                let elem2 = node.vmData.domNode;
                                 if (elem2) {
                                     if (elem2.parentNode) {
                                         pE.insertBefore2(elem, elem2);
@@ -358,7 +266,7 @@ abstract class VNode extends EventEmitterEx implements INode{
         }
     }
     protected createHomologyFunction(name) {
-        return function () {
+        return function (this:VNode&IVNodeMethod) {
             let objects:Node[] = [], 
                 toDOMs:INode[] = [];
             for (let i = 0; i < arguments.length; i++) {
@@ -377,17 +285,17 @@ abstract class VNode extends EventEmitterEx implements INode{
             //仍然调用虚拟dom的函数
             this.__proto__[name].apply(this, arguments);
             //调用真实dom的函数
-            let ret = this.__domNode__[name].apply(this.__domNode__, objects);
+            let ret = (<Node>this.vmData.domNode)[name].apply(this.vmData.domNode, objects);
             //返回值父子关系修正
             for (let i = 0; i < toDOMs.length; i++) {
                 let chds = toDOMs[i].childNodes;
                 for (let j = 0; j < chds.length; j++) {
                     let node:VNode=<VNode>chds[j];
                     let chds2 = node.childNodes;
-                    if (chds2.length !== node.__domNode__.childNodes.length) {
+                    if (chds2.length !== (<Node>this.vmData.domNode).childNodes.length) {
                         for (let k = 0; k < chds2.length; k++) {
-                            if ((<VNode>chds2[k]).__domNode__.parentNode === null) {
-                                this.connectParent(chds2[k], (<VNode>chds2[k]).__domNode__);
+                            if ((<Node>(<VNode>chds2[k]).vmData.domNode).parentNode === null) {
+                                (<any>this).connectParent(chds2[k], (<VNode>chds2[k]).vmData.domNode);
                             }
                         }
                     }
@@ -398,50 +306,28 @@ abstract class VNode extends EventEmitterEx implements INode{
     }
     protected createBridgeFunction(name){
         return function (this:VNode) {
-            return this.__domNode__[name].apply(this.__domNode__, arguments);
+            return (<Node>this.vmData.domNode)[name].apply(this.vmData.domNode, arguments);
         }
     }
     protected setBridgeGet(name){
         Object.defineProperty(this, name, {
             get: function (this:VNode) {
-                return this.__domNode__[name];
+                return (<Node>this.vmData.domNode)[name];
             }
         });
     }
     protected setBridgeGetSet(name){
         Object.defineProperty(this, name, {
             get: function (this:VNode) {
-                return this.__domNode__[name];
+                return (<Node>this.vmData.domNode)[name];
             },
             set: function (this:VNode,v) {
-                this.__domNode__[name]=v;
+                (<Node>this.vmData.domNode)[name]=v;
             }
         });
     }
     /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
     protected abstract emulation():void;
-    toXMLNodeString(this: VNode): string[] {
-        let
-            ret: string[] = [],
-            sAttr = '',
-            arrAttr = [],
-            attr = this.attributes,
-            me = this;
-        if (attr) {
-            for (let i = 0; i < attr.length; i++) {
-                if (attr[i].value) {
-                    arrAttr.push(attr[i].name + '="' + attr[i].value + '"');
-                } else {
-                    arrAttr.push(attr[i].name);
-                }
-            }
-            if (arrAttr.length > 0) {
-                sAttr = ' ' + arrAttr.join(' ');
-            }
-        }
-        ret.push(this.__data__);
-        return ret;
-    }
     get previousSibling():VNode&IVNodeMethod|null{
         let p = this.parentNode;
         if (!p) {
@@ -463,11 +349,32 @@ abstract class VNode extends EventEmitterEx implements INode{
         return node ? node : null;
     }
 }
-let VNodeHelp:IVNodeMethod & VNode=(function(){
-    let ret:IVNodeMethod&VNode=<any><IVNodeMethod>
-    function(name: string, nodeType?: number):IVNodeMethod & VNode{
-        return <any>null;
-    };
-    (<any>VNode).call(ret);
-    return ret;
-}());
+function getVNodeMethod():IVNodeMethod{
+    return <IVNodeMethod>function(typeName: string, nodeType?: number):IVNodeMethod & VNode{
+        if(nodeType===10){
+            let fn=getVNodeMethod();
+            (<any>VDocumentType).call(fn);
+            return <any>fn;
+        }else if(nodeType===8){
+            let fn=getVNodeMethod();
+            (<any>VComment).call(fn);
+            return <any>fn;
+        }else if(nodeType===3){
+            let fn=getVNodeMethod();
+            (<any>VText).call(fn);
+            return <any>fn;
+        }else if(nodeType===1){
+            let name="V"+typeName[0].toUpperCase+typeName.substr(1).toLowerCase()+"Element";
+            if(VMElement.hasOwnProperty(name)){
+                let fn=getVNodeMethod();
+                VMElement[name].call(fn);
+                return <any>fn;
+            }else{
+                throw new Error("unknown nodeName");
+            }
+        }else{
+            throw new Error("unknown nodeType");
+        }
+    }
+}
+let VNodeHelp:IVNodeMethod=getVNodeMethod();

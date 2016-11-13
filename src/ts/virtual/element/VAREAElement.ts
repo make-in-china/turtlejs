@@ -1,14 +1,18 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "area", nodeType: 1): VAREAElement&IVNodeMethod;
+    (nodeName: "area", nodeType?: 1): VMElement.VAreaElement&IVNodeMethod;
 }
-class  VAREAElement extends VHTMLElement{
-    alt:string
-    coords:string
-    shape:string
-    target:string
-    ping:string
-    noHref:string
-    href:string
+namespace VMElement{
+    export class  VAreaElement extends VHTMLElement{
+        nodeName="AREA";
+        __closeSelf__=true;
+        alt:string
+        coords:string
+        shape:string
+        target:string
+        ping:string
+        noHref:string
+        href:string
+    }
+    VAP.decorate(<any>VAreaElement,["alt","coords","shape","target","ping","noHref","href"]);
 }
-VAP.decorate(<any>VAREAElement,["alt","coords","shape","target","ping","noHref","href"]);

@@ -1,8 +1,11 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "dir", nodeType: 1): VDirElement&IVNodeMethod;
+    (nodeName: "dir", nodeType?: 1): VMElement.VDirElement&IVNodeMethod;
 }
-class  VDirElement extends VHTMLElement{
-    compact:string
+namespace VMElement{
+    export class  VDirElement extends VHTMLElement{
+        nodeName="DIR"
+        compact:string
+    }
+    VAP.decorate(<any>VDirElement,["compact"]);
 }
-VAP.decorate(<any>VDirElement,["compact"]);

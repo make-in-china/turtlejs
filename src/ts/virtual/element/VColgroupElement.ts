@@ -1,11 +1,14 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "colgroup", nodeType: 1): VColgroupElement&IVNodeMethod;
+    (nodeName: "colgroup", nodeType?: 1): VMElement.VColgroupElement&IVNodeMethod;
 }
-class  VColgroupElement extends VHTMLElement{
-    span:string
-    align:string
-    vAlign:string
-    width:string
+namespace VMElement{
+    export class  VColgroupElement extends VHTMLElement{
+        nodeName="COLGROUP";
+        span:string
+        align:string
+        vAlign:string
+        width:string
+    }
+    VAP.decorate(<any>VColgroupElement,["span","align","vAlign","width"]);
 }
-VAP.decorate(<any>VColgroupElement,["span","align","vAlign","width"]);

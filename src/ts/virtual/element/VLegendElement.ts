@@ -1,8 +1,12 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "legend", nodeType: 1): VLegendElement&IVNodeMethod;
+    (nodeName: "legend", nodeType?: 1): VMElement.VLegendElement&IVNodeMethod;
 }
-class  VLegendElement extends VHTMLElement{
-    align:string
+
+namespace VMElement{
+    export class  VLegendElement extends VHTMLElement{
+        nodeName="LEGEND";
+        align:string
+    }
+    VAP.decorate(<any>VLegendElement,["align"]);
 }
-VAP.decorate(<any>VLegendElement,["align"]);

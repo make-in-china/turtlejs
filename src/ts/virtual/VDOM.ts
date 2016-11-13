@@ -20,8 +20,10 @@ interface IMember {
     commentStart: number
 }
 interface IVDOMBuilder{
-    (html:string, vNode?:VNode):(VNode&IVNodeMethod)|VChildNode
+    (html:string, vNode?:undefined):VNode&IVNodeMethod|(VNode&IVNodeMethod)[]
+    (html:string, vNode:VNode&IVNodeMethod):VNode&IVNodeMethod
 }
+
 let VDOM:IVDOMBuilder,
     VTemplate:IVDOMBuilder;
 (function () {
@@ -29,7 +31,7 @@ let VDOM:IVDOMBuilder,
     let htmlParse = {
         '': function (html: string, m: IMember) {
             let nodeName = m.node.nodeName;
-            if (m.node.__closeSelf__) {
+            if (m.node.vmData.closeSelf) {
                 if (!m.node.parentNode) {
                     throw new Error("渲染出错！");
                 }
@@ -91,7 +93,7 @@ let VDOM:IVDOMBuilder,
                     throw new Error("渲染出错！");
                 }
                 if (n.nodeName === name) {
-                    n.__isClose__ = true;
+                    n.vmData.isClose = true;
                     m.node = n.parentNode;
                     m.action = '';
                     m.htmlNodeNameStart = 0;
@@ -232,7 +234,7 @@ let VDOM:IVDOMBuilder,
                                 if (m.attrNameEnd === 0) {
                                     m.attrNameEnd = m.index;
                                 }
-                                m.node._(html.substring(m.attrStart, m.attrNameEnd));
+                                (<VElement&IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
                             }
                             m.action = '';
                             m.index += 2;
@@ -248,7 +250,7 @@ let VDOM:IVDOMBuilder,
                         if (m.attrNameEnd === 0) {
                             m.attrNameEnd = m.index;
                         }
-                        m.node._(html.substring(m.attrStart, m.attrNameEnd));
+                        (<VElement&IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
                     }
                     m.attrStart = m.attrNameEnd = 0;
                     m.action = '';
@@ -274,10 +276,10 @@ let VDOM:IVDOMBuilder,
                     if (m.attrStart === 0) {
                         m.attrStart = m.index;
                     } else if (m.equlIndex > 0) {
-                        m.node._(html.substring(m.attrStart, m.attrNameEnd));
+                        (<VElement&IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
                         this.setAttrStart(m);
                     } else if (m.attrNameEnd !== 0) {
-                        m.node._(html.substring(m.attrStart, m.attrNameEnd));
+                        (<VElement&IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
                         this.setAttrStart(m);
                         m.attrStart = m.index;
                     }
@@ -305,14 +307,14 @@ let VDOM:IVDOMBuilder,
                     break;
                 case '>':
                     /*忽略等号*/
-                    m.node._(html.substring(m.attrStart, m.attrNameEnd));
+                    (<VElement&IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
                     m.action = '';
                     m.index++;
                     break;
                 case "/":
                     if (m.length >= m.index + 2) {
                         if (html.substring(m.index + 1, 1) === '>') {
-                            m.node._(html.substring(m.attrStart, m.attrNameEnd));
+                            (<VElement&IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
                             m.action = '';
                             m.index += 2;
                             return;
@@ -329,17 +331,17 @@ let VDOM:IVDOMBuilder,
         atvbetweenSpace: function (html: string, m: IMember) {
             switch (html[m.index]) {
                 case ' ':
-                    m.node._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
+                    (<VElement&IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
                     this.setAttrStart(m);
                     m.index++;
                     break;
                 case '>':
-                    m.node._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
+                    (<VElement&IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
                     this.setAttrStart(m);
                     break;
                 case "/":
                     if (m.length >= m.index + 2) {
-                        m.node._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
+                        (<VElement&IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
                         if (html.substring(m.index + 1, 1) === '>') {
                             this.setAttrStart(m);
                             m.index++;
@@ -357,7 +359,7 @@ let VDOM:IVDOMBuilder,
                     m.index += 2;
                     break;
                 case m.stringStartChar:
-                    m.node._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.stringStart, m.index));
+                    (<VElement&IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.stringStart, m.index));
                     this.setAttrStart(m);
                     m.index++;
                     break;
@@ -376,7 +378,7 @@ let VDOM:IVDOMBuilder,
                         m.stringNodeStart = 0;
                         m.stringNodeRegExp = null;
                         m.action = 'stringNode2';
-                        m.node.__isClose__ = true;
+                        m.node.vmData.isClose = true;
                         if (!m.node.parentNode) {
                             throw new Error("渲染出错！");
                         }
@@ -467,7 +469,7 @@ let VDOM:IVDOMBuilder,
     function getInitData(vNode: VNode&IVNodeMethod|undefined, length: number): IMember {
         if (!vNode) {
             vNode = VNodeHelp(' ',1);
-            vNode.__isClose__ = true;
+            vNode.vmData.isClose = true;
         }
         return {
             index: 0,
@@ -488,25 +490,45 @@ let VDOM:IVDOMBuilder,
             stringNodeKeyLength: 0,
             commentStart: 0
         };
-    }
-    VTemplate = function (html:string, vNode?:VNode&IVNodeMethod):VNode&IVNodeMethod {
+    };
+    VTemplate = <IVDOMBuilder>function (html:string, vNode?:VNode&IVNodeMethod){
         let m = getInitData(vNode, html.length);
-        vNode = m.node;
+        let parent = m.node;
         while (m.index < html.length) {
             htmlParseT[m.action](html, m);
         }
         htmlParseT.checkEnd(html, m);
-        return vNode;
-    }
-    VDOM = function (html:string, vNode?:VNode&IVNodeMethod):VNode&IVNodeMethod {
+        if(vNode){
+            return vNode;
+        }else{
+            if(parent.childNodes.length===1){
+                return parent.childNodes[0];
+            }else{
+                let ret=slice.call(parent.childNodes);
+                ArrayEx.prototype.clear.call(parent.childNodes);
+                return ret;
+            }
+        }
+    };
+    VDOM = <IVDOMBuilder>function (html:string, vNode?:VNode&IVNodeMethod){
         let m = getInitData(vNode, html.length);
-        vNode = m.node;
+        let parent = m.node;
         while (m.index < html.length) {
             htmlParse[m.action](html, m);
         }
         htmlParse.checkEnd(html, m);
-        return vNode;
-    }
+        if(vNode){
+            return vNode;
+        }else{
+            if(parent.childNodes.length===1){
+                return parent.childNodes[0];
+            }else{
+                let ret=slice.call(parent.childNodes);
+                ArrayEx.prototype.clear.call(parent.childNodes);
+                return ret;
+            }
+        }
+    };
 } ());
 
     // $VDOM=VDOM;

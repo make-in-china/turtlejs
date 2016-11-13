@@ -1,9 +1,13 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "ul", nodeType: 1): VUlElement&IVNodeMethod;
+    (nodeName: "ul", nodeType?: 1): VMElement.VUlElement&IVNodeMethod;
 }
-class  VUlElement extends VHTMLElement{
-    compact:string
-    type:string
+
+namespace VMElement{
+    export class  VUlElement extends VHTMLElement{
+        nodeName="UL";
+        compact:string
+        type:string
+    }
+    VAP.decorate(<any>VUlElement,["compact","type"]);
 }
-VAP.decorate(<any>VUlElement,["compact","type"]);

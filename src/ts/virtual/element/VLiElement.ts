@@ -1,9 +1,13 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "li", nodeType: 1): VLiElement&IVNodeMethod;
+    (nodeName: "li", nodeType?: 1): VMElement.VLiElement&IVNodeMethod;
 }
-class  VLiElement extends VHTMLElement{
-    value:string
-    type:string
+
+namespace VMElement{
+    export class  VLiElement extends VHTMLElement{
+        nodeName="LI";
+        value:string
+        type:string
+    }
+    VAP.decorate(<any>VLiElement,["value","type"]);
 }
-VAP.decorate(<any>VLiElement,["value","type"]);

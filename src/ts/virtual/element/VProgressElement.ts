@@ -1,9 +1,13 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "progress", nodeType: 1): VProgressElement&IVNodeMethod;
+    (nodeName: "progress", nodeType?: 1): VMElement.VProgressElement&IVNodeMethod;
 }
-class  VProgressElement extends VHTMLElement{
-    value:string
-    max:string
+
+namespace VMElement{
+    export class  VProgressElement extends VHTMLElement{
+        nodeName="PROGRESS";
+        value:string
+        max:string
+    }
+    VAP.decorate(<any>VProgressElement,["value","max"]);
 }
-VAP.decorate(<any>VProgressElement,["value","max"]);

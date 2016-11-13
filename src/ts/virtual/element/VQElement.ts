@@ -1,8 +1,12 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "q", nodeType: 1): VQElement&IVNodeMethod;
+    (nodeName: "q", nodeType?: 1): VMElement.VQElement&IVNodeMethod;
 }
-class  VQElement extends VHTMLElement{
-    cite:string
+
+namespace VMElement{
+    export class  VQElement extends VHTMLElement{
+        nodeName="Q";
+        cite:string
+    }
+    VAP.decorate(<any>VQElement,["cite"]);
 }
-VAP.decorate(<any>VQElement,["cite"]);

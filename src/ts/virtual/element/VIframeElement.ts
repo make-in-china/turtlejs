@@ -1,20 +1,24 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "iframe", nodeType: 1): VIrameElement&IVNodeMethod;
+    (nodeName: "iframe", nodeType?: 1): VMElement.VIframeElement&IVNodeMethod;
 }
-class  VIrameElement extends VHTMLElement{
-    src:string
-    srcdoc:string
-    name:string
-    sandbox:string
-    allowFullscreen:string
-    width:string
-    height:string
-    align:string
-    scrolling:string
-    frameBorder:string
-    longDesc:string
-    marginHeight:string
-    marginWidth:string
+
+namespace VMElement{
+    export class  VIframeElement extends VHTMLElement{
+        nodeName="IFRAME";
+        src:string
+        srcdoc:string
+        name:string
+        sandbox:string
+        allowFullscreen:string
+        width:string
+        height:string
+        align:string
+        scrolling:string
+        frameBorder:string
+        longDesc:string
+        marginHeight:string
+        marginWidth:string
+    }
+    VAP.decorate(<any>VIframeElement,["src","srcdoc","name","sandbox","allowFullscreen","width","height","align","scrolling","frameBorder","longDesc","marginHeight","marginWidth"]);
 }
-VAP.decorate(<any>VIrameElement,["src","srcdoc","name","sandbox","allowFullscreen","width","height","align","scrolling","frameBorder","longDesc","marginHeight","marginWidth"]);

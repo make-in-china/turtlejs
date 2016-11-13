@@ -1,13 +1,16 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "body", nodeType: 1): VBodyElement&IVNodeMethod;
+    (nodeName: "body", nodeType?: 1): VMElement.VBodyElement&IVNodeMethod;
 }
-class  VBodyElement extends VHTMLElement{
-    text:string
-    link:string
-    vLink:string
-    aLink:string
-    bgColor:string
-    background:string
+namespace VMElement{
+    export class  VBodyElement extends VHTMLElement{
+        nodeName="BODY";
+        text:string
+        link:string
+        vLink:string
+        aLink:string
+        bgColor:string
+        background:string
+    }
+    VAP.decorate(<any>VBodyElement,["text","link","vLink","aLink","bgColor","background"]);
 }
-VAP.decorate(<any>VBodyElement,["text","link","vLink","aLink","bgColor","background"]);

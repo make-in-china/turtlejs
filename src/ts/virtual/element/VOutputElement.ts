@@ -1,8 +1,12 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "output", nodeType: 1): VOutputElement&IVNodeMethod;
+    (nodeName: "output", nodeType?: 1): VMElement.VOutputElement&IVNodeMethod;
 }
-class  VOutputElement extends VHTMLElement{
-    name:string
+
+namespace VMElement{
+    export class  VOutputElement extends VHTMLElement{
+        nodeName="OUTPUT";
+        name:string
+    }
+    VAP.decorate(<any>VOutputElement,["name"]);
 }
-VAP.decorate(<any>VOutputElement,["name"]);

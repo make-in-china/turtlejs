@@ -1,5 +1,0 @@
-class VChildNode {
-    remove(): void{
-        
-    }
-}

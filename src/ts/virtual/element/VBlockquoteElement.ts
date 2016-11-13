@@ -1,8 +1,11 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "blockquote", nodeType: 1): VBlockquoteElement&IVNodeMethod;
+    (nodeName: "blockquote", nodeType?: 1): VMElement.VBlockquoteElement&IVNodeMethod;
 }
-class  VBlockquoteElement extends VHTMLElement{
-    cite:string
+namespace VMElement{
+    export class  VBlockquoteElement extends VHTMLElement{
+        nodeName="BLOCKQUOTE";
+        cite:string
+    }
+    VAP.decorate(<any>VBlockquoteElement,["cite"]);
 }
-VAP.decorate(<any>VBlockquoteElement,["cite"]);

@@ -1,8 +1,11 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "caption", nodeType: 1): VCaptionElement&IVNodeMethod;
+    (nodeName: "caption", nodeType?: 1): VMElement.VCaptionElement&IVNodeMethod;
 }
-class  VCaptionElement extends VHTMLElement{
-    align:string
+namespace VMElement{
+    export class  VCaptionElement extends VHTMLElement{
+        nodeName="CAPTION";
+        align:string
+    }
+    VAP.decorate(<any>VCaptionElement,["align"]);
 }
-VAP.decorate(<any>VCaptionElement,["align"]);

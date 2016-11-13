@@ -1,8 +1,11 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "dialog", nodeType: 1): VDialogElement&IVNodeMethod;
+    (nodeName: "dialog", nodeType?: 1): VMElement.VDialogElement&IVNodeMethod;
 }
-class  VDialogElement extends VHTMLElement{
-    open:string
+namespace VMElement{
+    export class  VDialogElement extends VHTMLElement{
+        nodeName="DIALOG";
+        open:string
+    }
+    VAP.decorate(<any>VDialogElement,["open"]);
 }
-VAP.decorate(<any>VDialogElement,["open"]);

@@ -1,8 +1,13 @@
 /// <reference path="Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (name: "map", nodeType: 1): VMapElement&IVNodeMethod;
+    (nodeName: "map", nodeType?: 1): VMElement.VMapElement&IVNodeMethod;
 }
-class  VMapElement extends VHTMLElement{
-    name:string
+
+namespace VMElement{
+    export class  VMapElement extends VHTMLElement{
+        nodeName="MAP";
+        __closeSelf__=true;
+        name:string
+    }
+    VAP.decorate(<any>VMapElement,["name"]);
 }
-VAP.decorate(<any>VMapElement,["name"]);
