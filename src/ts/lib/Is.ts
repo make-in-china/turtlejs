@@ -34,8 +34,8 @@ function isFunction(a):a is Function{
 // function isFinite(obj) {
 //     return isFinite(obj) && !isNaN(parseFloat(obj));
 // }
-let isArray = Array.isArray || function(a) {
-    return "[object Array]"===toStr.call(a)
+let isArray = Array.isArray || function(arg:any):arg is any[] {
+    return "[object Array]"===toStr.call(arg)
 }
 function isPersent(s){
     return persentRE.test(s);

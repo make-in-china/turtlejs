@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VStyleElement extends VHTMLElement{
+    export class  VStyleElement extends VHtmlElement{
         nodeName="STYLE";
         media:string
         type:string

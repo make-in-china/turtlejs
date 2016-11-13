@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VInsElement extends VHTMLElement{
+    export class  VInsElement extends VHtmlElement{
         nodeName="INS";
         cite:string
         dateTime:string

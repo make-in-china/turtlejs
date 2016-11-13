@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "col", nodeType?: 1): VMElement.VColElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class  VColElement extends VHTMLElement{
+    export class  VColElement extends VHtmlElement{
         nodeName="COL";
         __closeSelf__=true;
         span:string

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VLegendElement extends VHTMLElement{
+    export class  VLegendElement extends VHtmlElement{
         nodeName="LEGEND";
         align:string
     }

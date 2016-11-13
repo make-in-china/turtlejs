@@ -4,7 +4,7 @@ interface IVNodeMethod{
     (nodeName: "a", nodeType?: 1): VMElement.VAElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class VAElement extends VHTMLElement{
+    export class VAElement extends VHtmlElement{
         target:string
         download:string
         ping:string

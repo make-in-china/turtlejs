@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "canvas", nodeType?: 1): VMElement.VCanvasElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class  VCanvasElement extends VHTMLElement{
+    export class  VCanvasElement extends VHtmlElement{
         nodeName="CANVAS";
         width:string
         height:string

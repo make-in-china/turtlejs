@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VImgElement extends VHTMLElement{
+    export class  VImgElement extends VHtmlElement{
         nodeName="IMG";
         __closeSelf__=true;
         alt:string

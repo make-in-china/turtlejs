@@ -5,7 +5,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VTheadElement extends VHTMLElement{
+    export class  VTheadElement extends VHtmlElement{
         align:string
         vAlign:string
     }

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VPElement extends VHTMLElement{
+    export class  VPElement extends VHtmlElement{
         nodeName="P";
         align:string
     }

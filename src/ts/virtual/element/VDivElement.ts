@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "div", nodeType?: 1): VMElement.VDivElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class  VDivElement extends VHTMLElement{
+    export class  VDivElement extends VHtmlElement{
         nodeName="DIV"
         align:string
     }

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VThElement extends VHTMLElement{
+    export class  VThElement extends VHtmlElement{
         nodeName="TH";
         colSpan:string
         rowSpan:string

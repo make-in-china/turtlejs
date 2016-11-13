@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "h6", nodeType?: 1): VMElement.VH6Element&IVNodeMethod;
 }
 namespace VMElement{
-    export class  VH6Element extends VHTMLElement{
+    export class  VH6Element extends VHtmlElement{
         nodeName="H6";
         align:string
     }

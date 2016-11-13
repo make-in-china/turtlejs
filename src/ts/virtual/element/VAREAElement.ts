@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "area", nodeType?: 1): VMElement.VAreaElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class  VAreaElement extends VHTMLElement{
+    export class  VAreaElement extends VHtmlElement{
         nodeName="AREA";
         __closeSelf__=true;
         alt:string

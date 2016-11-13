@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VXmpElement extends VHTMLElement{
+    export class  VXmpElement extends VHtmlElement{
         nodeName="XMP";
         width:string
     }

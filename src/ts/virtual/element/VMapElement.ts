@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VMapElement extends VHTMLElement{
+    export class  VMapElement extends VHtmlElement{
         nodeName="MAP";
         __closeSelf__=true;
         name:string

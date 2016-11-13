@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VParamElement extends VHTMLElement{
+    export class  VParamElement extends VHtmlElement{
         nodeName="PARAM";
         __closeSelf__=true;
         name:string

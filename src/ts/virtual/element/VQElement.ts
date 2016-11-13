@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VQElement extends VHTMLElement{
+    export class  VQElement extends VHtmlElement{
         nodeName="Q";
         cite:string
     }

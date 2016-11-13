@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "frame", nodeType?: 1): VMElement.VFrameElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class VFrameElement extends VHTMLElement{
+    export class VFrameElement extends VHtmlElement{
         nodeName="FRAME"
         __closeSelf__=true;
         name:string

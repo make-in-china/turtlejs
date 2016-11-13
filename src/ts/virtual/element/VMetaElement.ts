@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VMetaElement extends VHTMLElement{
+    export class  VMetaElement extends VHtmlElement{
         nodeName="META";
         __closeSelf__=true;
         name:string

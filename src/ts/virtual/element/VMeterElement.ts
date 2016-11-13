@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VMeterElement extends VHTMLElement{
+    export class  VMeterElement extends VHtmlElement{
         nodeName="METER";
         value:string
         min:string

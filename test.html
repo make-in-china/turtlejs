@@ -10,7 +10,7 @@
 <body>
     
     <script>
-        var data=VDOM(document.documentElement.innerHTML).toJS();
+        var data=VDOM(document.documentElement.outerHTML).toJavaScriptString();
         console.log("<js:>\n",data);
         var dom=eval(data);
         console.log("<dom:>\n",dom);

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VKeygenElement extends VHTMLElement{
+    export class  VKeygenElement extends VHtmlElement{
         nodeName="KEYGEN";
         autofocus:string
         challenge:string

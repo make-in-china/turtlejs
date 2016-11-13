@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "br", nodeType?: 1): VMElement.VBrElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class  VBrElement extends VHTMLElement{
+    export class  VBrElement extends VHtmlElement{
         nodeName="BR";
         __closeSelf__=true;
         clear:string;

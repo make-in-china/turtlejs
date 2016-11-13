@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VTextareaElement extends VHTMLElement{
+    export class  VTextareaElement extends VHtmlElement{
         nodeName="TEXTAREA";
         autofocus:string
         cols:string

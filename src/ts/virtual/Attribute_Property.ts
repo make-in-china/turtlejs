@@ -1,6 +1,6 @@
 
 class VAP{
-    static getAttr(node:VHTMLElement,name:string):string{
+    static getAttr(node:VMElement.VHtmlElement,name:string):string{
         var ret:string|null=node.getAttribute(name);
         if(ret){
             return ret;
@@ -8,10 +8,10 @@ class VAP{
             return ""
         }
     }
-    static setAttr(node:VHTMLElement,name:string,value:string){
+    static setAttr(node:VMElement.VHtmlElement,name:string,value:string){
         node.setAttribute(name,value);
     }
-    static decorate<T extends VHTMLElement>(vclass:T,names:string[]){
+    static decorate<T extends VMElement.VHtmlElement>(vclass:T,names:string[]){
         var prototype:Object=(<any>vclass).prototype;
         for(const name of names){
             Object.defineProperty(prototype,name,{

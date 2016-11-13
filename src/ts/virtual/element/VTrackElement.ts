@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VTrackElement extends VHTMLElement{
+    export class  VTrackElement extends VHtmlElement{
         nodeName="TRACK";
         kind:string
         src:string

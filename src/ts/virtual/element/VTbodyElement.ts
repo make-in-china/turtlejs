@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VTbodyElement extends VHTMLElement{
+    export class  VTbodyElement extends VHtmlElement{
         nodeName="TBODY";
         align:string
         vAlign:string

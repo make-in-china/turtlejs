@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "dialog", nodeType?: 1): VMElement.VDialogElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class  VDialogElement extends VHTMLElement{
+    export class  VDialogElement extends VHtmlElement{
         nodeName="DIALOG";
         open:string
     }

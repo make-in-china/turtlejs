@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VTableElement extends VHTMLElement{
+    export class  VTableElement extends VHtmlElement{
         nodeName="TABLE";
         align:string
         border:string

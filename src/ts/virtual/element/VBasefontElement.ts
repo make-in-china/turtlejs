@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "basefont", nodeType?: 1): VMElement.VBasefontElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class VBasefontElement extends VHTMLElement{
+    export class VBasefontElement extends VHtmlElement{
         nodeName="BASEFONT"
         __closeSelf__=true;
         title:string

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VLiElement extends VHTMLElement{
+    export class  VLiElement extends VHtmlElement{
         nodeName="LI";
         value:string
         type:string

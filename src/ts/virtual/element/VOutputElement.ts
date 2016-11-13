@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VOutputElement extends VHTMLElement{
+    export class  VOutputElement extends VHtmlElement{
         nodeName="OUTPUT";
         name:string
     }

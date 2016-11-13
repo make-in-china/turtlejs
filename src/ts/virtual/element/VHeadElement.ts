@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "head", nodeType?: 1): VMElement.VHeadElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class  VHeadElement extends VHTMLElement{
+    export class  VHeadElement extends VHtmlElement{
         nodeName="HEAD";
         title:string
         lang:string

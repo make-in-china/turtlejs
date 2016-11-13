@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VOlElement extends VHTMLElement{
+    export class  VOlElement extends VHtmlElement{
         nodeName="OL";
         reversed:string
         start:string

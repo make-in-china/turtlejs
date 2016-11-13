@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "caption", nodeType?: 1): VMElement.VCaptionElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class  VCaptionElement extends VHTMLElement{
+    export class  VCaptionElement extends VHtmlElement{
         nodeName="CAPTION";
         align:string
     }

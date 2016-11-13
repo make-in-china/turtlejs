@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VMenuElement extends VHTMLElement{
+    export class  VMenuElement extends VHtmlElement{
         nodeName="MENU";
         compact:string
     }

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VIframeElement extends VHTMLElement{
+    export class  VIframeElement extends VHtmlElement{
         nodeName="IFRAME";
         src:string
         srcdoc:string

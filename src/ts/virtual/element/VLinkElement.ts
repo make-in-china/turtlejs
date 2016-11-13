@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VLinkElement extends VHTMLElement{
+    export class  VLinkElement extends VHtmlElement{
         nodeName="LINK";
         __closeSelf__=true;
         disabled:string

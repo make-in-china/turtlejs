@@ -1,6 +1,7 @@
 
 /// <reference path='VDOM.ts'/>
 /// <reference path='../lib/TreeEach.ts'/>
+/// <reference path='../lib/is.ts'/>
 
 class UIHelper{
     static fs=require('fs');

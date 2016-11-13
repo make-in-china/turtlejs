@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VTfootElement extends VHTMLElement{
+    export class  VTfootElement extends VHtmlElement{
         nodeName="TFOOT";
         align:string
         vAlign:string

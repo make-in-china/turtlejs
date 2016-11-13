@@ -1,5 +1,6 @@
 
 /// <reference path='BaseVNode.ts'/>
+/// <reference path='VDomhelperElement.ts'/>
 interface IMember {
     index: number
     node: VNode&IVNodeMethod
@@ -468,7 +469,7 @@ let VDOM:IVDOMBuilder,
     }
     function getInitData(vNode: VNode&IVNodeMethod|undefined, length: number): IMember {
         if (!vNode) {
-            vNode = VNodeHelp(' ',1);
+            vNode = VNodeHelp('domhelper');
             vNode.vmData.isClose = true;
         }
         return {
@@ -505,7 +506,7 @@ let VDOM:IVDOMBuilder,
                 return parent.childNodes[0];
             }else{
                 let ret=slice.call(parent.childNodes);
-                ArrayEx.prototype.clear.call(parent.childNodes);
+                VNodeList.clear(parent.childNodes);
                 return ret;
             }
         }
@@ -524,7 +525,7 @@ let VDOM:IVDOMBuilder,
                 return parent.childNodes[0];
             }else{
                 let ret=slice.call(parent.childNodes);
-                ArrayEx.prototype.clear.call(parent.childNodes);
+                VNodeList.clear(parent.childNodes);
                 return ret;
             }
         }

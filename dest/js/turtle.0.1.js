@@ -167,8 +167,8 @@ function isFunction(a) {
 // function isFinite(obj) {
 //     return isFinite(obj) && !isNaN(parseFloat(obj));
 // }
-var isArray = Array.isArray || function (a) {
-    return "[object Array]" === toStr.call(a);
+var isArray = Array.isArray || function (arg) {
+    return "[object Array]" === toStr.call(arg);
 };
 function isPersent(s) {
     return persentRE.test(s);

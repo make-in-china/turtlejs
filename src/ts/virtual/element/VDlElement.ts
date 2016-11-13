@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "dl", nodeType?: 1): VMElement.VDlElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class  VDlElement extends VHTMLElement{
+    export class  VDlElement extends VHtmlElement{
         nodeName="DL"
         compact:string
     }

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VInputElement extends VHTMLElement{
+    export class  VInputElement extends VHtmlElement{
         nodeName="INPUT";
         __closeSelf__=true;
         accept:string

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VVideoElement extends VHTMLElement{
+    export class  VVideoElement extends VHtmlElement{
         nodeName="VIDEO";
         width:string
         height:string

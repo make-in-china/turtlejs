@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "base", nodeType?: 1): VMElement.VBaseElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class  VBaseElement extends VHTMLElement{
+    export class  VBaseElement extends VHtmlElement{
         nodeName="BASE";
         __closeSelf__=true;
         href:string

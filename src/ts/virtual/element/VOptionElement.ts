@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VOptionElement extends VHTMLElement{
+    export class  VOptionElement extends VHtmlElement{
         nodeName="OPTION";
         disabled:string
         label:string

@@ -8,4 +8,10 @@ class VNodeList{
         return this[index];
     }
     [index: number]: VNode&IVNodeMethod|undefined;
+    static clear(vNodeList:VNodeList){
+        for(var i=0;i<vNodeList.length;i++){
+            delete vNodeList[i];
+        }
+        vNodeList.length=0;
+    }
 }

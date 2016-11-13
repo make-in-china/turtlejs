@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VSelectElement extends VHTMLElement{
+    export class  VSelectElement extends VHtmlElement{
         nodeName="SELECT";
         autofocus:string
         disabled:string

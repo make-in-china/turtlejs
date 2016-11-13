@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "body", nodeType?: 1): VMElement.VBodyElement&IVNodeMethod;
 }
 namespace VMElement{
-    export class  VBodyElement extends VHTMLElement{
+    export class  VBodyElement extends VHtmlElement{
         nodeName="BODY";
         text:string
         link:string

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VProgressElement extends VHTMLElement{
+    export class  VProgressElement extends VHtmlElement{
         nodeName="PROGRESS";
         value:string
         max:string

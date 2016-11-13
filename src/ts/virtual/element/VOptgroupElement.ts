@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VOptgroupElement extends VHTMLElement{
+    export class  VOptgroupElement extends VHtmlElement{
         nodeName="OPTGROUP";
         disabled:string
         label:string

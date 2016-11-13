@@ -41,7 +41,7 @@ declare function isDate(a: any): a is Date;
 declare function isNumber(a: any): a is number;
 declare function isString(a: any): a is string;
 declare function isFunction(a: any): a is Function;
-declare let isArray: (a: any) => boolean;
+declare let isArray: (arg: any) => arg is any[];
 declare function isPersent(s: any): boolean;
 declare function isArrayLike(a: any): boolean;
 declare class IAttr {

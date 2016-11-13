@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VPreElement extends VHTMLElement{
+    export class  VPreElement extends VHtmlElement{
         nodeName="PRE";
         width:string
         protected doToDOM(): Node {

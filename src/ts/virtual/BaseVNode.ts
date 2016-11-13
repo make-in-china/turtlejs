@@ -1,5 +1,5 @@
 
-/// <reference path='VHTMLElement.ts'/>
+/// <reference path='VHtmlElement.ts'/>
 /// <reference path='VText.ts'/>
 /// <reference path='VComment.ts'/>
 /// <reference path='VDocumentType.ts'/>
@@ -66,3 +66,4 @@
 /// <reference path='./element/VUlElement.ts'/>
 /// <reference path='./element/VVideoElement.ts'/>
 /// <reference path='./element/VXmpElement.ts'/>
+/// <reference path='./element/VTitleElement.ts'/>

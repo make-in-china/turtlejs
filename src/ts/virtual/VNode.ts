@@ -43,7 +43,7 @@ interface VNodeVMData{
     /**是否有两个- */
     doubleMinus?:boolean;
 }
-abstract class VNode extends EventEmitterEx implements INode{
+abstract class VNode implements INode{
     vmData:VNodeVMData={
         data:"",
         __:{},
@@ -51,12 +51,8 @@ abstract class VNode extends EventEmitterEx implements INode{
     }
     abstract nodeType: VNodeType;
     abstract nodeName: string;
-    childNodes: VNodeList;
+    readonly childNodes: VNodeList=new VNodeList;
     parentNode: VNode&IVNodeMethod | null;
-    // constructor(){
-    //     super();
-
-    // }
     addEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void
     {
 
@@ -342,32 +338,41 @@ abstract class VNode extends EventEmitterEx implements INode{
         return node ? node : null;
     }
 }
-function getVNodeMethod():IVNodeMethod{
-    return <IVNodeMethod>function(typeName: string, nodeType?: number):IVNodeMethod & VNode{
-        if(nodeType===10){
-            let fn=getVNodeMethod();
-            (<any>VDocumentType).call(fn);
-            return <any>fn;
-        }else if(nodeType===8){
-            let fn=getVNodeMethod();
-            (<any>VComment).call(fn);
-            return <any>fn;
-        }else if(nodeType===3){
-            let fn=getVNodeMethod();
-            (<any>VText).call(fn);
-            return <any>fn;
-        }else if(nodeType===1){
-            let name="V"+typeName[0].toUpperCase+typeName.substr(1).toLowerCase()+"Element";
-            if(VMElement.hasOwnProperty(name)){
-                let fn=getVNodeMethod();
-                VMElement[name].call(fn);
-                return <any>fn;
-            }else{
-                throw new Error("unknown nodeName");
-            }
+
+function bindClassToFunction(node:IVNodeMethod & VNode,nodeName: string, nodeType?: VNodeType|undefined){
+    if(nodeType===10){
+        node.__proto__=VDocumentType.prototype;
+        (<any>VDocumentType).call(node);
+    }else if(nodeType===8){
+        node.__proto__=VComment.prototype;
+        (<any>VComment).call(node);
+    }else if(nodeType===3){
+        node.__proto__=VText.prototype;
+        (<any>VText).call(node);
+    }else if(nodeType===undefined||nodeType===1){
+        nodeName=nodeName.toLowerCase();
+        let name="V"+nodeName[0].toUpperCase()+nodeName.substr(1).toLowerCase()+"Element";
+        if(VMElement.hasOwnProperty(name)){
+            node.__proto__=VMElement[name].prototype;
+            VMElement[name].call(node);
         }else{
-            throw new Error("unknown nodeType");
+            throw new Error(`unknown nodeName:${nodeName}`);
         }
+    }else{
+        throw new Error(`unknown nodeType:${nodeType}`);
     }
 }
-let VNodeHelp:IVNodeMethod=getVNodeMethod();
+function getVNodeMethod():VNode&IVNodeMethod{
+    let that=<any>function(nodeName: string, nodeType?: VNodeType|undefined):IVNodeMethod & VNode{
+        let fn=getVNodeMethod()
+        bindClassToFunction(fn,nodeName,nodeType);
+        that.appendChild(fn);
+        return fn;
+    }
+    return that;
+}
+let VNodeHelp:IVNodeMethod=<any>function(nodeName: string, nodeType?: VNodeType|undefined):VNode&IVNodeMethod{
+    let that=getVNodeMethod()
+    bindClassToFunction(that,nodeName,nodeType);
+    return that;
+};

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    export class  VSourceElement extends VHTMLElement{
+    export class  VSourceElement extends VHtmlElement{
         nodeName="SOURCE";
         src:string
         type:string
