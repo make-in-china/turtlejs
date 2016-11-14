@@ -821,18 +821,3 @@ function getService(serviceName: string) {
     }
     return $t.service[serviceName];
 }
-function nodesToString(nodes: INode[]) {
-    var s = '';
-    for (var i = 0; i < nodes.length; i++) {
-        if (nodes[i].nodeType === 8) {
-            s += '<!--' + (<IComment>nodes[i]).data + '-->';
-        } else if (nodes[i].nodeType === 3) {
-            try {
-                s += (<IText>nodes[i]).data;
-            } catch (e) { }
-        } else if (nodes[i].nodeType === 1) {
-            s += (<IHTMLElement>nodes[i]).outerHTML;
-        }
-    }
-    return s;
-}

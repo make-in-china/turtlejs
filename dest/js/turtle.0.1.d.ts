@@ -779,6 +779,7 @@ declare function insertNodesBefore(node: INode, nodes: INode[]): void;
 declare function removeNode(this: void, node: INode): INode | null;
 declare function replaceNodeByNodes(node: INode, nodes: INode[]): void;
 declare function insertNode(node: INode, childNode: any): number;
+declare function nodesToString(nodes: INode[]): string;
 declare function cloneBetween(node1: INode, node2: INode): INode[] | null;
 declare function removeBlockBetween(node1: INode, node2: INode): any;
 declare function replaceNodeByNode(node: INode, node2: INode): void;
@@ -1242,7 +1243,6 @@ declare let attributeParser: AttributeParser;
 declare function initHTML(arr: INode[] | INodeList, outerChildNodes?: any, outerElement?: any, props?: any, part?: any): void;
 declare function getParts(childNodes: INode[]): Part[];
 declare function getService(serviceName: string): any;
-declare function nodesToString(nodes: INode[]): string;
 /**
  * 可躲过一些js压缩库console.log;
  */

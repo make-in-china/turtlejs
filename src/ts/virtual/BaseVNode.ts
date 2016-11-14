@@ -69,4 +69,15 @@
 /// <reference path='./element/VTitleElement.ts'/>
 /// <reference path='./element/VSpanElement.ts'/>
 /// <reference path='./element/VEmElement.ts'/>
- 
+/// <reference path='./element/VIElement.ts'/>
+/// <reference path='./element/VBElement.ts'/>
+/// <reference path='./element/VFormElement.ts'/>
+/// <reference path='./element/VLabelElement.ts'/>
+/// <reference path='./element/VDtElement.ts'/>
+/// <reference path='./element/VDdElement.ts'/>
+/// <reference path='./element/VEmbedElement.ts'/>
+/// <reference path='./element/VStrongElement.ts'/>
+/// <reference path='./element/VButtonElement.ts'/>
+/// <reference path='./element/VObjectElement.ts'/>
+/// <reference path='./element/VSvgElement.ts'/>
+/// <reference path='./element/VCircleElement.ts'/>

@@ -310,6 +310,24 @@ function insertNode(node, childNode) {
     parent.insertBefore2(childNode, node);
     return 0;
 }
+function nodesToString(nodes) {
+    var s = '';
+    for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].nodeType === 8) {
+            s += '<!--' + nodes[i].data + '-->';
+        }
+        else if (nodes[i].nodeType === 3) {
+            try {
+                s += nodes[i].data;
+            }
+            catch (e) { }
+        }
+        else if (nodes[i].nodeType === 1) {
+            s += nodes[i].outerHTML;
+        }
+    }
+    return s;
+}
 // function deepClone(node: INode) {
 //     let n = node.cloneNode();
 //     let ns = node.childNodes;
@@ -2873,24 +2891,6 @@ function getService(serviceName) {
         });
     }
     return $t.service[serviceName];
-}
-function nodesToString(nodes) {
-    var s = '';
-    for (var i = 0; i < nodes.length; i++) {
-        if (nodes[i].nodeType === 8) {
-            s += '<!--' + nodes[i].data + '-->';
-        }
-        else if (nodes[i].nodeType === 3) {
-            try {
-                s += nodes[i].data;
-            }
-            catch (e) { }
-        }
-        else if (nodes[i].nodeType === 1) {
-            s += nodes[i].outerHTML;
-        }
-    }
-    return s;
 }
 /**
  * 可躲过一些js压缩库console.log;

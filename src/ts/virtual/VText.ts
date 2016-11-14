@@ -1,19 +1,36 @@
 
 /// <reference path='VNode.ts'/>
 interface IVNodeMethod{
-    (nodeName: string, nodeType: 3): VText&IVNodeMethod;
+    (nodeName: any, nodeType: 3): VText&IVNodeMethod;
 }
 
 function isVText(node: VNode): node is VText {
     return node.nodeType === 3
 }
+let getFunctionBlock=(function(){
+    let re=/(^.*?(function.*?\(.*?\).*?\{)|(\(.*?\)\=>\{))([\s\S\w\W]*)\}$/;
+    return function getFunctionBlock(fn:Function):string{
+        var ret=fn.toString();
+        var match:RegExpMatchArray|null=ret.match(re);
+        if(match){
+            return match[4];
+        }
+        return "";
+    }
+}());
 class VText extends VNode{
     nodeName="#text"
     nodeType:VNodeType=3
     private __value__=""
-    constructor(data:string){
+    constructor(data:any){
         super();
-        this.__value__=data;
+        if(isString(data)){
+            this.__value__=data;
+        }else if(isFunction(data)){
+            this.__value__=getFunctionBlock(data);
+        }else{
+            this.__value__=data.toString();
+        }
     }
     get data() {
         return this.__value__;
