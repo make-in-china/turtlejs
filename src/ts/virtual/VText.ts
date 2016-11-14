@@ -10,13 +10,18 @@ function isVText(node: VNode): node is VText {
 class VText extends VNode{
     nodeName="#text"
     nodeType:VNodeType=3
+    private __value__=""
+    constructor(data:string){
+        super();
+        this.__value__=data;
+    }
     get data() {
         return this.__value__;
     }
     set data(s:string) {
         this.__value__ = s;
-        if(this.__domNode__){
-            this.__domNode__.data = s;
+        if(this.vmData.domNode){
+            (<Text>this.vmData.domNode).data = s;
         }
     }
     get value() {
@@ -24,34 +29,32 @@ class VText extends VNode{
     }
     set value(s:string) {
         this.__value__ = s;
-        if(this.__domNode__){
-            this.__domNode__.data = s;
+        if(this.vmData.domNode){
+            (<Text>this.vmData.domNode).data = s;
         }
     }
-    protected toJS():string{
-        let s = this.__value__;
-        s = s.replace(/[\'\"\r\n]/g, function (s: string) {
-            switch (s) {
-                case '\'':
-                case '\"':
-                    return '\\' + s;
-                case '\r':
-                    return '\\r';
-                case '\n':
-                    return '\\n';
-            }
-            return "";
-        });
-        return `("${s}",3)`;
+    toJS():string{
+        let s ='`'+ this.__value__+'`';
+        // s = s.replace(/[\'\"\r\n]/g, function (s: string) {
+        //     switch (s) {
+        //         case '\'':
+        //         case '\"':
+        //             return '\\' + s;
+        //         case '\r':
+        //             return '\\r';
+        //         case '\n':
+        //             return '\\n';
+        //     }
+        //     return "";
+        // });
+        return `(${s},3).$`;
     }
     toHTMLString(): string[] {
         return [this.__value__];
     }
-    private __value__:string
     getData():string{
         return this.data;
     }
-    __domNode__:Text;
     protected doToDOM():Text{
         let elem:Text;
         if (this.data !== "") {

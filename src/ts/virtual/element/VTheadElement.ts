@@ -6,6 +6,7 @@ interface IVNodeMethod{
 
 namespace VMElement{
     export class  VTheadElement extends VHtmlElement{
+        nodeName="THREAD"
         align:string
         vAlign:string
     }

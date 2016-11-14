@@ -15,6 +15,7 @@ interface Node {
 }
 type VNodeType=1|3|8|10;
 interface IVNodeMethod{
+    // (): VNode&IVNodeMethod;
     (nodeName: string, nodeType: VNodeType): VNode&IVNodeMethod;
 }
 let emptyTextNodeRE = /^\s*$/,
@@ -36,8 +37,6 @@ interface VNodeVMData{
     __:Object
     events:[string, EventListenerOrEventListenerObject | undefined, boolean][]
     domNode?:Node
-    /**是否自闭合 */
-    closeSelf?:boolean
     /**是否闭合 */
     isClose?:boolean
     /**是否有两个- */
@@ -49,10 +48,21 @@ abstract class VNode implements INode{
         __:{},
         events:[]
     }
+    /**是否自闭合 */
+    __closeSelf__?:boolean
     abstract nodeType: VNodeType;
     abstract nodeName: string;
     readonly childNodes: VNodeList=new VNodeList;
     parentNode: VNode&IVNodeMethod | null;
+    get $(): VElement&IVNodeMethod{
+        let p=this.parentNode;
+        this.vmData.isClose=true;
+        if(p){
+            return <VElement&IVNodeMethod>p;
+        }else{
+            throw new Error("parentNode is Null");
+        }
+    }
     addEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void
     {
 
@@ -141,11 +151,11 @@ abstract class VNode implements INode{
     // createComment(value: string): IVComment;
     // addEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
     // removeEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
-    toJavaScriptString():string{
-        return this.parentNode?"":"VNodeHelp"+this.toJS();
+    toJSString():string{
+        return "VNodeHelp"+this.toJS();
     }
-    protected abstract toJS():string;
-    toDOM():Node{
+    abstract toJS(space?:number):string;
+    beDOM():Node{
         if (this.vmData.domNode) {
             return this.vmData.domNode;
         }
@@ -265,7 +275,7 @@ abstract class VNode implements INode{
                 if (o === arguments[i]&&o instanceof VNode) {
                     toDOMs.push(o);
                     //转换为真实Node
-                    objects.push(o.toDOM());
+                    objects.push(o.beDOM());
                 }else{
                     objects.push(<any>o);
                 }
@@ -345,10 +355,10 @@ function bindClassToFunction(node:IVNodeMethod & VNode,nodeName: string, nodeTyp
         (<any>VDocumentType).call(node);
     }else if(nodeType===8){
         node.__proto__=VComment.prototype;
-        (<any>VComment).call(node);
+        (<any>VComment).call(node,nodeName);
     }else if(nodeType===3){
         node.__proto__=VText.prototype;
-        (<any>VText).call(node);
+        (<any>VText).call(node,nodeName);
     }else if(nodeType===undefined||nodeType===1){
         nodeName=nodeName.toLowerCase();
         let name="V"+nodeName[0].toUpperCase()+nodeName.substr(1).toLowerCase()+"Element";

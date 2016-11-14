@@ -9,7 +9,7 @@ function isVDocType(node: VNode): node is VDocumentType {
 class VDocumentType extends VNode{
     nodeType:VNodeType=10
     nodeName="html"
-    protected toJS():string{
+    toJS():string{
         return `("",10)`;
     }
     /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */

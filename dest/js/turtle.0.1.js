@@ -274,7 +274,7 @@ var INamedNodeMap = (function () {
 /// <reference path="../lib/ArrayEx.ts"/>
 /// <reference path="INamedNodeMap.ts"/>
 /// <reference path="../lib/lib.ts" />
-Node.prototype.toDOM =
+Node.prototype.beDOM =
     Node.prototype.valueOf = function () {
         return this;
     };
@@ -3963,11 +3963,11 @@ function renderTemplate(tp) {
     initHTML(vDOM.childNodes);
     if (isFunction(vDOM)) {
         var p = tp.parentNode;
-        replaceNodeByNodes(tp, takeChildNodes(vDOM.toDOM()));
+        replaceNodeByNodes(tp, takeChildNodes(vDOM.beDOM()));
         vDOM.__domNode__ = p;
         return;
     }
-    replaceNodeByNodes(tp, takeChildNodes(vDOM.toDOM()));
+    replaceNodeByNodes(tp, takeChildNodes(vDOM.beDOM()));
     //vDOM.innerHTML='';
 }
 var Turtle = (function (_super) {

@@ -88,7 +88,6 @@ namespace VMElement{
             if (isVHTMLElement(vNode)) {
                 push.call(this.children,vNode);
             }
-            push.call(this.children,vNode);
             return vNode;
         }
         protected doBaseToDOM():HTMLElement{
@@ -114,34 +113,41 @@ namespace VMElement{
             let elem=this.doBaseToDOM();
             let chds = this.childNodes;
             for (let j = 0; j < chds.length; j++) {
-                (<VNode>chds[j]).toDOM();
+                (<VNode>chds[j]).beDOM();
             }
             return elem;
         }
-        protected toJS():string{
-            let s=`("${this.nodeName}")`;
+        toJS(space:number=0):string{
+            let sSpace=(new Array(space+1)).join(" ");
+            let sFn='\n'+sSpace+`("${this.nodeName}")`;
             let sAttr="";
             let sInner="";
             let attrs = this.attributes;
             if (attrs.length > 0) {
-                sAttr = '._';
+                sAttr = '';
                 for (let i = 0; i < attrs.length; i++) {
-                    sAttr += '("' + attrs[i].name;
+                    sAttr += '._("' + attrs[i].name;
                     if (attrs[i].value) {
                         sAttr += '","' + attrs[i].value + '")';
                     } else {
                         sAttr += '")';
                     }
                 }
-                sAttr += '()';
             }
-            let chds = this.childNodes;
-            if (chds.length > 0) {
-                for (let i = 0; i < chds.length; i++) {
-                    sInner += (<VNode>chds[i]).toJavaScriptString();
+            if(this.__closeSelf__){
+                sInner='.$';
+            }else{
+                let chds = this.childNodes;
+                if (chds.length > 0) {
+                    for (let i = 0; i < chds.length; i++) {
+                        sInner +=(<VNode>chds[i]).toJS(space+4);
+                    }
+                }
+                if(this.parentNode){
+                    sInner+='.$';
                 }
             }
-            return sAttr+sInner;
+            return sFn+sAttr+sInner;
         }
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation():void{
@@ -223,7 +229,11 @@ namespace VMElement{
 
             for (let i = 0; i < chds.length; i++) {
                 let chn:VNode=<VNode>chds[i];
-                data.push(chn.getData());
+                if(isVHTMLElement(chn)){
+                    data.push(chn.outerHTML);
+                }else{
+                    data.push(chn.toHTMLString().join(''));
+                }
             }
             if (xmlNode.length === 2) {
                 data.push(xmlNode[1]);

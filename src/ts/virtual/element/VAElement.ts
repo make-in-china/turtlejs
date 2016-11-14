@@ -5,6 +5,7 @@ interface IVNodeMethod{
 }
 namespace VMElement{
     export class VAElement extends VHtmlElement{
+        nodeName="A"
         target:string
         download:string
         ping:string

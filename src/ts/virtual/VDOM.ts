@@ -32,11 +32,8 @@ let VDOM:IVDOMBuilder,
     let htmlParse = {
         '': function (html: string, m: IMember) {
             let nodeName = m.node.nodeName;
-            if (m.node.vmData.closeSelf) {
-                if (!m.node.parentNode) {
-                    throw new Error("渲染出错！");
-                }
-                m.node = m.node.parentNode;
+            if (m.node.__closeSelf__) {
+                m.node = <any>m.node.parentNode;
                 m.action = 'textNode';
                 m.textNodeStart = m.index;
             } else if (stringNode.hasOwnProperty(nodeName)) {
@@ -87,25 +84,22 @@ let VDOM:IVDOMBuilder,
 
         },
         setHTMLNodeClose: function (html: string, m: IMember) {
-            let n = m.node;
+            let n:(VNode & IVNodeMethod)|null = m.node;
             let name = trim(html.substring(m.htmlNodeNameStart, m.index)).toUpperCase();
             while (n) {
-                if (!n.parentNode) {
-                    throw new Error("渲染出错！");
-                }
                 if (n.nodeName === name) {
                     n.vmData.isClose = true;
-                    m.node = n.parentNode;
+                    m.node = <any>n.parentNode;
                     m.action = '';
                     m.htmlNodeNameStart = 0;
                     return;
                 }
                 n = n.parentNode;
             }
-            /*当注释*/
-            console.log('变成注释', name);
-            debugger;
-            m.node(name, 8);
+            throw new Error("Tag is not closed!");
+            //console.log('Tag is not closed!', name,m.htmlNodeNameStart,html.substring(m.htmlNodeNameStart-20, m.index+20));
+            
+            //m.node(name, 8);
         },
         setAttrStart: function (m) {
             m.action = 'attributes';
@@ -502,10 +496,13 @@ let VDOM:IVDOMBuilder,
         if(vNode){
             return vNode;
         }else{
+            let ret;
             if(parent.childNodes.length===1){
-                return parent.childNodes[0];
+                ret=parent.childNodes[0];
+                VNodeList.clear(parent.childNodes);
+                return ret;
             }else{
-                let ret=slice.call(parent.childNodes);
+                ret=slice.call(parent.childNodes);
                 VNodeList.clear(parent.childNodes);
                 return ret;
             }
@@ -521,10 +518,13 @@ let VDOM:IVDOMBuilder,
         if(vNode){
             return vNode;
         }else{
+            let ret;
             if(parent.childNodes.length===1){
-                return parent.childNodes[0];
+                ret=parent.childNodes[0];
+                VNodeList.clear(parent.childNodes);
+                return ret;
             }else{
-                let ret=slice.call(parent.childNodes);
+                ret=slice.call(parent.childNodes);
                 VNodeList.clear(parent.childNodes);
                 return ret;
             }
@@ -543,7 +543,7 @@ let VDOM:IVDOMBuilder,
     //     vNodesToDOM=function(vNodes){
     //         var arr=[];
     //         for(var i=0;i<vNodes.length;i++){
-    //             arr.push(vNodes[i].toDOM());    
+    //             arr.push(vNodes[i].beDOM());    
     //         }
     //         return arr;
     //     }

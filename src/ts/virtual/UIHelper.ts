@@ -4,7 +4,7 @@
 /// <reference path='../lib/is.ts'/>
 
 class UIHelper{
-    static fs=require('fs');
+    static fs=typeof require!== "undefined"&&require('fs');
     static template=`/// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
 /// <reference path="./Script.ts"/>
 namespace Component{
@@ -18,6 +18,9 @@ namespace Component{
         ) {
             super(template,props,html,outerChildNodes,outerElement);
             new ComponentScript.{{className}}(this);
+        }
+        dom={
+            {{vdomJS}}
         }
     }
 }`
@@ -35,20 +38,20 @@ namespace Component{
         }
         let refs:string[]=[];
         treeEach(<VNode[]>chds,"childNodes",(node,step)=>{
-            // if(isVText(node)){
-            //     //不处理咯
-            // }else if(isVComment(node)){
-            //     //解析命令
-            // }else if(isVHTMLElement(node)){
-            //     let v=node.getAttribute("ref");
-            //     if(v!==undefined){
+            if(isVText(node)){
+                //不处理咯
+            }else if(isVComment(node)){
+                //解析命令
+            }else if(isVHTMLElement(node)){
+                let v=node.getAttribute("ref");
+                if(v!==undefined){
                     
-            //     }
-            //     //解析ref
-            //     //解析class
-            // }
+                }
+                //解析ref
+                //解析class
+            }
         })
         //mixin .css  to  变量
     }
 }
-exports.UIHelper=UIHelper;
+typeof exports!=="undefined"&&(exports.UIHelper=UIHelper);

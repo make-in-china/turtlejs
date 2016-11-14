@@ -67,3 +67,6 @@
 /// <reference path='./element/VVideoElement.ts'/>
 /// <reference path='./element/VXmpElement.ts'/>
 /// <reference path='./element/VTitleElement.ts'/>
+/// <reference path='./element/VSpanElement.ts'/>
+/// <reference path='./element/VEmElement.ts'/>
+ 

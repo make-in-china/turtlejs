@@ -8,12 +8,14 @@
 </head>
 
 <body>
-    
+    <!--测试-->
+    <!测试>
     <script>
-        var data=VDOM(document.documentElement.outerHTML).toJavaScriptString();
+        var vdom=VDOM(document.documentElement.outerHTML);
+        var data=vdom.toJSString();
         console.log("<js:>\n",data);
         var dom=eval(data);
-        console.log("<dom:>\n",dom);
+        console.log("<dom:>\n",dom.nodeName);
         console.log("<dom.innerHTML:>\n",dom.innerHTML);
     </script>
 </body>

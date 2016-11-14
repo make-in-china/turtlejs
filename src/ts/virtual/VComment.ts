@@ -10,24 +10,28 @@ class VComment extends VNode{
     nodeName="#Comment"
     nodeType:VNodeType=8
     data=""
+    constructor(data:string){
+        super();
+        this.data=data;
+    }
     getData():string{
         return this.data;
     }
-    protected toJS():string{
-        let s = this.data;
-        s = s.replace(/[\'\"\r\n]/g, function (s: string) {
-            switch (s) {
-                case '\'':
-                case '\"':
-                    return '\\' + s;
-                case '\r':
-                    return '\\r';
-                case '\n':
-                    return '\\n';
-            }
-            return "";
-        });
-        return `("${s}",3)`;
+    toJS():string{
+        let s ='`'+ this.data+'`';
+        // s = s.replace(/[\'\"\r\n]/g, function (s: string) {
+        //     switch (s) {
+        //         case '\'':
+        //         case '\"':
+        //             return '\\' + s;
+        //         case '\r':
+        //             return '\\r';
+        //         case '\n':
+        //             return '\\n';
+        //     }
+        //     return "";
+        // });
+        return `(${s},8).$`;
     }
     toHTMLString(): string[] {
         let

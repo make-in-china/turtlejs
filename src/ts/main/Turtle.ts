@@ -21,11 +21,11 @@ function renderTemplate(tp){
     
     if(isFunction(vDOM)){
         let p=tp.parentNode;
-        replaceNodeByNodes(tp,takeChildNodes(vDOM.toDOM()));
+        replaceNodeByNodes(tp,takeChildNodes(vDOM.beDOM()));
         vDOM.__domNode__=p;
         return;   
     }
-    replaceNodeByNodes(tp,takeChildNodes(vDOM.toDOM()));
+    replaceNodeByNodes(tp,takeChildNodes(vDOM.beDOM()));
     //vDOM.innerHTML='';
 }
 interface IRenderDocument{

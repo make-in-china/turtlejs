@@ -23,12 +23,9 @@ abstract class VElement extends VNode{
             return <any>this;
         }
     }
-    _(name: string, value?: string): VNode&IVNodeMethod | null {
-        if (name) {
-            return this.setAttribute.call(this, name, value);
-        } else {
-            return this.parentNode;
-        }
+    _(this:VElement&IVNodeMethod,name: string, value?: string): VElement&IVNodeMethod{
+        this.setAttribute(name, value?value:"");
+        return this;
     }
     getAttribute( name: string):string|null {
         let item = this.attributes.getNamedItem(name);
@@ -88,7 +85,7 @@ abstract class VElement extends VNode{
         }
         let lowCaseName=this.nodeName.toLowerCase();
         ret.push(`<${lowCaseName}${sAttr}>`);
-        if (!this.vmData.closeSelf && this.vmData.isClose) {
+        if (!this.__closeSelf__ && (this.vmData.isClose||!this.parentNode)) {
             ret.push(`</${lowCaseName}>`);
         }
         return ret;
@@ -102,7 +99,7 @@ abstract class VElement extends VNode{
     onpointerover: (this: this, ev: PointerEvent) => any;
     onpointerup: (this: this, ev: PointerEvent) => any;
     onwheel: (this: this, ev: WheelEvent) => any;
-    
+
     onariarequest: (this: this, ev: AriaRequestEvent) => any;
     oncommand: (this: this, ev: CommandEvent) => any;
     ongotpointercapture: (this: this, ev: PointerEvent) => any;

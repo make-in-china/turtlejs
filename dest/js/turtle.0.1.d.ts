@@ -771,7 +771,7 @@ interface INode {
     insertBefore2(newChild: INode, refChild: INode): INode;
 }
 interface Node {
-    toDOM(): Node;
+    beDOM(): Node;
     valueOf(): Node;
 }
 declare let vNodesToDOM: (nodes: INode[]) => INode[];
