@@ -134,7 +134,7 @@ namespace VMElement{
                     }
                 }
             }
-            if(this.__closeSelf__){
+            if(this.vmData.closeSelf){
                 sInner='.$';
             }else{
                 let chds = this.childNodes;

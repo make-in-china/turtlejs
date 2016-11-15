@@ -7,10 +7,10 @@ interface Node {
     beDOM(): Node
     valueOf(): Node
 }
-Node.prototype.beDOM =
-    Node.prototype.valueOf = function () {
+typeof Node!=="undefined"&&(Node.prototype.beDOM =Node.prototype.valueOf = 
+    function () {
         return this
-    }
+    });
 let vNodesToDOM = function (nodes: INode[]) {
     return nodes
 }

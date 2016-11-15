@@ -1,6 +1,6 @@
 
 /// <reference path='TemplateConfig.ts'/>
-/// <reference path='PartOrderCore.ts'/>
+/// <reference path='../order/Order.ts'/>
 /// <reference path='../core/XHR.ts'/>
 /// <reference path='../lib/instantiation.ts'/>
 /// <reference path='../lib/treeEach.ts'/>
@@ -23,6 +23,19 @@ interface I$Node {
 interface ITurtle {
     xhr: XHR;
     refs: IKeyArrayHashObject<IHTMLElement>;
+    replaceClassStore:IHTMLElement[];
+    defineClassNames:string[];
+}
+function replaceCls(){
+    let arr=$t.replaceClassStore;
+    for(let i=0;i<arr.length;i++){
+        let cls=arr[i].getAttribute('cls');
+        arr[i].removeAttribute('cls');
+        if($t.defineClassNames[cls]){
+            arr[i].className+=' '+$t.defineClassNames[cls].join(" ");
+        }
+    }
+    arr.length=0;
 }
 function getScopeBy(scope, node: INode) {
     if (!scope)

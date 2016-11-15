@@ -355,7 +355,7 @@ interface IText extends ICharacterData {
     splitText(offset: number): Text;
 }
 interface IComment extends ICharacterData {
-    text: string;
+    textContent: string;
 }
 interface IHTMLCollection {
     /**

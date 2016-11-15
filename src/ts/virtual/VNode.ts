@@ -13,7 +13,7 @@
 interface Node {
     __vdomNode__: VNode&IVNodeMethod
 }
-type VNodeType=1|3|8|10;
+type VNodeType=1|3|8|10|20;
 interface IVNodeMethod{
     // (): VNode&IVNodeMethod;
     (nodeName: string, nodeType: VNodeType): VNode&IVNodeMethod;
@@ -35,25 +35,23 @@ function getFunctionComment(fn: Function) {
 interface VNodeVMData{
     data:string
     __:Object
-    events:[string, EventListenerOrEventListenerObject | undefined, boolean][]
     domNode?:Node
     /**是否闭合 */
-    isClose?:boolean
-    /**是否有两个- */
-    doubleMinus?:boolean;
+    isClose:boolean
 }
 abstract class VNode implements INode{
-    vmData:VNodeVMData={
-        data:"",
-        __:{},
-        events:[]
-    }
-    /**是否自闭合 */
-    __closeSelf__?:boolean
+    vmData:VNodeVMData;
     abstract nodeType: VNodeType;
     abstract nodeName: string;
     readonly childNodes: VNodeList=new VNodeList;
     parentNode: VNode&IVNodeMethod | null;
+    constructor(){
+        this.vmData={
+            data:"",
+            __:{},
+            isClose:false
+        }
+    }
     get $(): VElement&IVNodeMethod{
         let p=this.parentNode;
         this.vmData.isClose=true;
@@ -350,7 +348,10 @@ abstract class VNode implements INode{
 }
 
 function bindClassToFunction(node:IVNodeMethod & VNode,nodeName: string, nodeType?: VNodeType|undefined){
-    if(nodeType===10){
+    if(nodeType===20){
+        node.__proto__=VMember.prototype;
+        (<any>VMember).call(node,nodeName);
+    }else if(nodeType===10){
         node.__proto__=VDocumentType.prototype;
         (<any>VDocumentType).call(node);
     }else if(nodeType===8){

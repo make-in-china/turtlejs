@@ -150,3 +150,27 @@ function getBind(obj:Object, fn:Function) {
         return fn.apply(obj, arguments);
     };
 }
+
+/**从注释中读取字符串 */
+let getCommentText=(function(){
+    if(Comment.prototype.hasOwnProperty("text")){
+        let commentDataRE=/^<!--([\s\S]*?)-->$/;
+        let commentDataRE2=/^<!([\s\S]*?)>$/;
+        let commentDataRE3=/^!-?|-?&/;
+        return function(node:IComment):string{
+            let s=node.data;
+            if(commentDataRE.test(s)){
+                return s.substring(4,s.length-3);
+            }else if(commentDataRE2.test(s)){
+                return s.substring(2,s.length-1);
+            }else{
+                return s.replace(commentDataRE3,'');
+            }
+            
+        }
+    }else{
+        return function(node:IComment){
+            return node.data;
+        }
+    }
+}());

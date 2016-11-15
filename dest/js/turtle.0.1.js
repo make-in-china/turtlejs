@@ -274,10 +274,10 @@ var INamedNodeMap = (function () {
 /// <reference path="../lib/ArrayEx.ts"/>
 /// <reference path="INamedNodeMap.ts"/>
 /// <reference path="../lib/lib.ts" />
-Node.prototype.beDOM =
-    Node.prototype.valueOf = function () {
+typeof Node !== "undefined" && (Node.prototype.beDOM = Node.prototype.valueOf =
+    function () {
         return this;
-    };
+    });
 var vNodesToDOM = function (nodes) {
     return nodes;
 };

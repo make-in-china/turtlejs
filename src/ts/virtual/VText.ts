@@ -32,6 +32,10 @@ class VText extends VNode{
             this.__value__=data.toString();
         }
     }
+    
+    // wholeText: string;
+    // replaceWholeText(content: string): Text;
+    // splitText(offset: number): Text;
     get data() {
         return this.__value__;
     }
@@ -45,10 +49,7 @@ class VText extends VNode{
         return this.__value__;
     }
     set value(s:string) {
-        this.__value__ = s;
-        if(this.vmData.domNode){
-            (<Text>this.vmData.domNode).data = s;
-        }
+        this.data=s
     }
     toJS():string{
         let s ='`'+ this.__value__+'`';
@@ -68,9 +69,6 @@ class VText extends VNode{
     }
     toHTMLString(): string[] {
         return [this.__value__];
-    }
-    getData():string{
-        return this.data;
     }
     protected doToDOM():Text{
         let elem:Text;

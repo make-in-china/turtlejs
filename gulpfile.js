@@ -62,7 +62,6 @@ function tscui(event){
 }
 function uibuild(path){
     var UIHelper=require('./dest/virtual/UIHelper.0.1.js').UIHelper;
-    console.log(UIHelper);
     UIHelper.makeClass(path);
     // console.log('\n['+moment().format("HH:mm:ss")+']\n'+path.replace(/\\\\/g,'\\'));
 }
@@ -71,9 +70,21 @@ function uiwatch(event){
         uibuild(event.path);
     });
 }
+function buildProjects(event){
+    var args=process.argv.slice(3);
+    var UIHelper=require('./dest/virtual/UIHelper.0.1.js').UIHelper;
+    for(const arg of args){
+        let name=arg.replace(/^\-/,'');
+        let path='src/ui/'+name;
+        UIHelper.buildProject(name,path);
+    }
+}
+
 gulp.task('tsc', tsc);
 gulp.task('tscui',tscui);
 gulp.task('ui:w',uiwatch);
+gulp.task('project',buildProjects);
+
 gulp.task('tsc:w', function () {
     gulp.watch('src/ts/*.ts', function(event){
         console.log('\n['+moment().format("HH:mm:ss")+']\n'+event.path.replace(/\\\\/g,'\\'));

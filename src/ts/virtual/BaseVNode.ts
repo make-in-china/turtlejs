@@ -81,3 +81,6 @@
 /// <reference path='./element/VObjectElement.ts'/>
 /// <reference path='./element/VSvgElement.ts'/>
 /// <reference path='./element/VCircleElement.ts'/>
+/// <reference path='./element/VHeaderElement.ts'/>
+/// <reference path='./element/VFooterElement.ts'/>
+ 

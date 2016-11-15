@@ -1,11 +1,20 @@
 
 /// <reference path='VNode.ts'/>
+interface VElementVMData extends VNodeVMData{
+    events:[string, EventListenerOrEventListenerObject | undefined, boolean][]
+    /**是否自闭合 */
+    closeSelf?:boolean
+}
 abstract class VElement extends VNode{
-    
+    vmData:VElementVMData
     attributes:INamedNodeMap=new INamedNodeMap;
     style: VStyle=new VStyle(this);
     children=new VHTMLCollection();
-    
+    constructor(){
+        super();
+        this.vmData.closeSelf=false;
+        this.vmData.events=[];
+    }
     removeAttribute( name: string): void {
         this.attributes.removeNamedItem(name);
     }
@@ -85,7 +94,7 @@ abstract class VElement extends VNode{
         }
         let lowCaseName=this.nodeName.toLowerCase();
         ret.push(`<${lowCaseName}${sAttr}>`);
-        if (!this.__closeSelf__ && (this.vmData.isClose||!this.parentNode)) {
+        if (!this.vmData.closeSelf && (this.vmData.isClose||!this.parentNode)) {
             ret.push(`</${lowCaseName}>`);
         }
         return ret;

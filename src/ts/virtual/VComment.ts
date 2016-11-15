@@ -1,21 +1,33 @@
 
-/// <reference path='VNode.ts'/>
+/// <reference path='VCharacterData.ts'/>
 interface IVNodeMethod{
     (nodeName: string, nodeType: 8): VComment&IVNodeMethod;
 }
 function isVComment(node: VNode): node is VComment {
     return node.nodeType === 8
 }
-class VComment extends VNode{
+interface VNodeVMData{
+    /**是否有两个- */
+    doubleMinus?:boolean;
+}
+class VComment extends VCharacterData{
     nodeName="#Comment"
     nodeType:VNodeType=8
-    data=""
-    constructor(data:string){
-        super();
-        this.data=data;
+    private __value__=""
+    get data() {
+        return this.__value__;
     }
-    getData():string{
-        return this.data;
+    set data(s:string) {
+        this.__value__ = s;
+        if(this.vmData.domNode){
+            (<Text>this.vmData.domNode).data = s;
+        }
+    }
+    get textContent() {
+        return this.__value__;
+    }
+    set textContent(s:string) {
+        this.data=s
     }
     toJS():string{
         let s ='`'+ this.data+'`';
