@@ -2,10 +2,7 @@
 /// <reference path="../scope/execute.ts"/>
 /// <reference path="../main/bind.ts"/>
 let 
-    orderRE                 =	/^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|let|=)(\s|$)/g,
-    orderCaseRE             =   /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
-    parseForOrderRE2        =   /^.*;.*;.*$/,
-    orderStack              =   new ArrayEx<VOrderData>();
+    parseForOrderRE2        =   /^.*;.*;.*$/;
 
 interface IHTMLBreakElement extends IComment{
     source?:{run}

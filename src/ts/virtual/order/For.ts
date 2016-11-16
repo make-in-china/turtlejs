@@ -4,8 +4,8 @@ let parseForOrderRE         =   /[a-zA-Z\d] in .*/;
 class For extends VOrder {
     name = "for"
     isLogic = true
-    parse(info: ICommentOrderInfo, node: IComment): IOrderParseReturn | undefined {
-        return this.addOrderToNode(info, node, () => {
+    parse(info: ICommentOrderInfo, node: IComment,orderStack:VOrderData[]): VOrderData {
+        return this.addOrderToNode(info, node,orderStack, () => {
             let d = new VForOrderData(this.name, node, info.condition, function () {
                 let p=<INode>node.parentNode;
                 let ret=d.check();

@@ -137,6 +137,31 @@ function getBind(obj, fn) {
         return fn.apply(obj, arguments);
     };
 }
+/**从注释中读取字符串 */
+var getCommentText = (function () {
+    if (typeof Comment !== 'undefined' && Comment.prototype.hasOwnProperty("text")) {
+        var commentDataRE_1 = /^<!--([\s\S]*?)-->$/;
+        var commentDataRE2_1 = /^<!([\s\S]*?)>$/;
+        var commentDataRE3_1 = /^!-?|-?&/;
+        return function (node) {
+            var s = node.data;
+            if (commentDataRE_1.test(s)) {
+                return s.substring(4, s.length - 3);
+            }
+            else if (commentDataRE2_1.test(s)) {
+                return s.substring(2, s.length - 1);
+            }
+            else {
+                return s.replace(commentDataRE3_1, '');
+            }
+        };
+    }
+    else {
+        return function (node) {
+            return node.data;
+        };
+    }
+}());
 /// <reference path="../lib/TypeHelper.ts"/>
 var persentRE = /^\s*([\d.]+)%\s*$/;
 function isNull(p) {
@@ -1472,524 +1497,496 @@ function bindExpressionsByOrder(node, condition) {
 }
 /// <reference path="../scope/execute.ts"/>
 /// <reference path="../main/bind.ts"/>
-var orderRE = /^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|let|=)(\s|$)/g, orderCaseRE = /^\s?(else if|else|case break|case|default|end)(\s|$)/g, parseForOrderRE = /[a-zA-Z\d] in .*/, parseForOrderRE2 = /^.*;.*;.*$/, SetParseError = function (msg) {
-    SetParseError.isError = true;
-    alert(msg);
-    return 1 /* c_stopEach */;
-}, orderStack = new ArrayEx();
-SetParseError.isError = false;
-function replaceCls() {
-    var arr = $t.replaceClassStore;
-    for (var i = 0; i < arr.length; i++) {
-        var cls = arr[i].getAttribute('cls');
-        arr[i].removeAttribute('cls');
-        if ($t.defineClassNames[cls]) {
-            arr[i].className += ' ' + $t.defineClassNames[cls].join(" ");
-        }
-    }
-    arr.length = 0;
-}
-/**从注释中读取命令 */
-function getCommentStringInfo(s) {
-    var order = s.match(orderRE);
-    if (order) {
-        return { order: trim(order[0]), condition: s.substring(order[0].length, s.length) };
-    }
-    else {
-        var orderCase = s.match(orderCaseRE);
-        if (orderCase) {
-            return { orderCase: trim(orderCase[0]), condition: s.substring(orderCase[0].length, s.length) };
-        }
-    }
-    return null;
-}
-/**从注释中读取字符串 */
-var getCommentText = (function () {
-    if (Comment.prototype.hasOwnProperty("text")) {
-        var commentDataRE_1 = /^<!--([\s\S]*?)-->$/;
-        var commentDataRE2_1 = /^<!([\s\S]*?)>$/;
-        var commentDataRE3_1 = /^!-?|-?&/;
-        return function (node) {
-            var s = node.text;
-            if (commentDataRE_1.test(s)) {
-                return s.substring(4, s.length - 3);
-            }
-            else if (commentDataRE2_1.test(s)) {
-                return s.substring(2, s.length - 1);
-            }
-            else {
-                return s.replace(commentDataRE3_1, '');
-            }
-        };
-    }
-    else {
-        return function (node) {
-            return node.data;
-        };
-    }
-}());
-function parseScopeOrder(info, node, outerChildNodes, outerElement, props, part) {
-    var condition = splitByOnce(info.condition, "|");
-    if (condition.length == 2) {
-        DOMScope.create(node, condition[0]);
-        execScope(condition[1], node, outerChildNodes, outerElement, props, part);
-    }
-    else {
-        DOMScope.create(node, condition[0]);
-    }
-    removeNode(node);
-}
-function parseCommentOrderNoScript(info, node, outerChildNodes, outerElement, props, part) {
-    /*不渲染，纯找结构*/
-    switch (info.order) {
-        case 'while':
-            return parseWhileOrder(info, node, outerChildNodes, outerElement, props, part);
-        case 'if':
-            return parseIfOrder(info, node, outerChildNodes, outerElement, props, part);
-        case 'for':
-            return parseForOrder(info, node, outerChildNodes, outerElement, props, part);
-        case 'switch':
-            return parseSwitchOrder(info, node, outerChildNodes, outerElement, props, part);
-        case 'async':
-            return parseAsyncOrder(info, node, outerChildNodes, outerElement, props, part);
-    }
-}
-function parseCommentOrderBlock(node, outerChildNodes, outerElement, props, part) {
-    var i = getNodeIndex2(node);
-    var isError = false;
-    var error = function (msg) {
-        isError = true;
-        alert(msg);
-        return 1 /* c_stopEach */;
-    };
-    return treeEach(node.parentNode.childNodes, 'childNodes', function (node, step) {
-        if (!isCommentNode(node)) {
-            return;
-        }
-        var info = getCommentStringInfo(getCommentText(node));
-        if (!info) {
-            return;
-        }
-        if (info.order) {
-            var ret = parseCommentOrderNoScript(info, node, outerChildNodes, outerElement, props, part);
-            if (ret) {
-                step.next = ret.index - getNodeIndex2(node) + 1;
-            }
-            return 8 /* c_noRepeat */ & 4 /* c_noIn */;
-        }
-        if (info.orderCase === 'end') {
-            if (orderStack.length > 0) {
-                orderStack.pop().endNode = node;
+var parseForOrderRE2 = /^.*;.*;.*$/;
+var Order = (function () {
+    function Order() {
+        this.SetParseError = (function () {
+            var SetParseError = function (msg) {
+                SetParseError.isError = true;
+                alert(msg);
                 return 1 /* c_stopEach */;
-            }
-            else {
-                return error('语法错误：多余的end');
+            };
+            SetParseError.isError = false;
+            return SetParseError;
+        }());
+    }
+    /**从注释中读取命令 */
+    Order.prototype.getCommentStringInfo = function (s) {
+        var order = s.match(orderRE);
+        if (order) {
+            return { order: trim(order[0]), condition: s.substring(order[0].length, s.length) };
+        }
+        else {
+            var orderCase = s.match(orderCaseRE);
+            if (orderCase) {
+                return { orderCase: trim(orderCase[0]), condition: s.substring(orderCase[0].length, s.length) };
             }
         }
-        return 4 /* c_noIn */;
-    }, i + 1);
-}
-function addOrderToNode(node, info, outerChildNodes, outerElement, props, part, fnGetOrder) {
-    var order;
-    if (!node.__order__) {
-        order = fnGetOrder();
-        node.__order__ = order;
-        order.name = info.order;
-        order.node = node;
-        order.endNode = null;
-        order.condition = info.condition;
-        orderStack.push(order);
-        order.parseCommentOrderBlockReturnValue = parseCommentOrderBlock(node, outerChildNodes, outerElement, props, part);
-    }
-    else {
-        order = node.__order__;
-    }
-    return order.parseCommentOrderBlockReturnValue;
-}
-function parseIfOrder(info, node, outerChildNodes, outerElement, props, part) {
-    return addOrderToNode(node, info, outerChildNodes, outerElement, props, part, function () {
-        var scope = DOMScope.get(node);
-        return {
-            endHit: null,
-            hit: null,
-            hasElse: false,
-            run: function () {
-                var order = this;
-                order.hit = parseBool(execByScope(node, this.condition, scope, outerChildNodes, outerElement, props, part)) ? this.node : null;
-                treeEach(node.parentNode.childNodes, 'childNodes', function (node, step) {
-                    if (!isCommentNode(node)) {
-                        return;
-                    }
-                    var info = getCommentStringInfo(getCommentText(node));
-                    if (!info)
-                        return;
-                    if (node.__order__ && node.__order__.node) {
-                        step.next = getNodeIndex2(node.__order__.node) - getNodeIndex2(node);
-                        return;
-                    }
-                    switch (info.orderCase) {
-                        case 'else':
-                        case 'else if':
-                            if (!order.hasElse) {
-                                if (info.orderCase == 'else') {
-                                    order.hasElse = true;
-                                }
-                                if (!order.endHit) {
-                                    if (order.hit) {
-                                        order.endHit = node;
+        return null;
+    };
+    Order.prototype.parseScopeOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+        var condition = splitByOnce(info.condition, "|");
+        if (condition.length == 2) {
+            DOMScope.create(node, condition[0]);
+            execScope(condition[1], node, outerChildNodes, outerChildren, props, part);
+        }
+        else {
+            DOMScope.create(node, condition[0]);
+        }
+        removeNode(node);
+    };
+    Order.prototype.parseCommentOrderNoScript = function (info, node, outerChildNodes, outerChildren, props, part) {
+        /*不渲染，纯找结构*/
+        switch (info.order) {
+            case 'while':
+                return this.parseWhileOrder(info, node, outerChildNodes, outerChildren, props, part);
+            case 'if':
+                return this.parseIfOrder(info, node, outerChildNodes, outerChildren, props, part);
+            case 'for':
+                return this.parseForOrder(info, node, outerChildNodes, outerChildren, props, part);
+            case 'switch':
+                return this.parseSwitchOrder(info, node, outerChildNodes, outerChildren, props, part);
+            case 'async':
+                return this.parseAsyncOrder(info, node, outerChildNodes, outerChildren, props, part);
+        }
+    };
+    Order.prototype.parseCommentOrderBlock = function (node, outerChildNodes, outerChildren, props, part) {
+        var i = getNodeIndex2(node);
+        var isError = false;
+        var error = function (msg) {
+            isError = true;
+            alert(msg);
+            return 1 /* c_stopEach */;
+        };
+        return treeEach(node.parentNode.childNodes, 'childNodes', function (node, step) {
+            if (!isCommentNode(node)) {
+                return;
+            }
+            var info = this.getCommentStringInfo(getCommentText(node));
+            if (!info) {
+                return;
+            }
+            if (info.order) {
+                var ret = this.parseCommentOrderNoScript(info, node, outerChildNodes, outerChildren, props, part);
+                if (ret) {
+                    step.next = ret.index - getNodeIndex2(node) + 1;
+                }
+                return 8 /* c_noRepeat */ & 4 /* c_noIn */;
+            }
+            if (info.orderCase === 'end') {
+                if (orderStack.length > 0) {
+                    orderStack.pop().endNode = node;
+                    return 1 /* c_stopEach */;
+                }
+                else {
+                    return error('语法错误：多余的end');
+                }
+            }
+            return 4 /* c_noIn */;
+        }, i + 1);
+    };
+    Order.prototype.addOrderToNode = function (node, info, outerChildNodes, outerChildren, props, part, fnGetOrder) {
+        var order;
+        if (!node.__order__) {
+            order = fnGetOrder();
+            node.__order__ = order;
+            order.name = info.order;
+            order.node = node;
+            order.endNode = null;
+            order.condition = info.condition;
+            orderStack.push(order);
+            order.parseBlockResult = this.parseCommentOrderBlock(node, outerChildNodes, outerChildren, props, part);
+        }
+        else {
+            order = node.__order__;
+        }
+        return order.parseBlockResult;
+    };
+    Order.prototype.parseIfOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+        return this.addOrderToNode(node, info, outerChildNodes, outerChildren, props, part, function () {
+            var scope = DOMScope.get(node);
+            return {
+                endHit: null,
+                hit: null,
+                hasElse: false,
+                run: function () {
+                    var order = this;
+                    order.hit = parseBool(execByScope(node, this.condition, scope, outerChildNodes, outerChildren, props, part)) ? this.node : null;
+                    treeEach(node.parentNode.childNodes, 'childNodes', function (node, step) {
+                        if (!isCommentNode(node)) {
+                            return;
+                        }
+                        var info = this.getCommentStringInfo(getCommentText(node));
+                        if (!info)
+                            return;
+                        if (node.__order__ && node.__order__.node) {
+                            step.next = getNodeIndex2(node.__order__.node) - getNodeIndex2(node);
+                            return;
+                        }
+                        switch (info.orderCase) {
+                            case 'else':
+                            case 'else if':
+                                if (!order.hasElse) {
+                                    if (info.orderCase == 'else') {
+                                        order.hasElse = true;
                                     }
-                                    else {
-                                        if (info.orderCase == 'else' || parseBool(execByScope(node, this.condition, scope, outerChildNodes, outerElement, props, part))) {
-                                            order.hit = node;
+                                    if (!order.endHit) {
+                                        if (order.hit) {
+                                            order.endHit = node;
                                         }
                                         else {
-                                            /*删除else if*/
-                                            removeNode(node);
+                                            if (info.orderCase == 'else' || parseBool(execByScope(node, this.condition, scope, outerChildNodes, outerChildren, props, part))) {
+                                                order.hit = node;
+                                            }
+                                            else {
+                                                /*删除else if*/
+                                                removeNode(node);
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            else {
-                                return SetParseError('语法错误：else或else if不能出现在else后');
-                            }
-                            break;
-                    }
-                }, getNodeIndex2(node) + 1);
-                var p = this.node.parentNode;
-                if (!this.hit) {
-                    /*全部删除*/
-                    removeBlockBetween(this.node, this.endNode);
-                    p.removeChild(this.node);
-                    p.removeChild(this.endNode);
-                }
-                else {
-                    if (!this.endHit) {
-                        this.endHit = this.endNode;
-                    }
-                    /*保留hit到break之间的内容*/
-                    var ns = takeBlockBetween(this.hit, this.endHit);
-                    if (ns)
-                        insertNodesBefore(this.node, ns);
-                    /*全部删除*/
-                    removeBlockBetween(this.node, this.endNode);
-                    p.removeChild(this.node);
-                    p.removeChild(this.endNode);
-                }
-            }
-        };
-    });
-}
-function parseBreakOrder(info, node, outerChildNodes, outerElement, props, part) {
-    /*删除后面节点,父节点后面节点,父父节点后面节点直至__break__*/
-    var _node = node.previousSibling;
-    if (!_node)
-        _node = node.parentNode;
-    removeNode(node);
-    var p = _node.parentNode;
-    while (_node.nodeName != '__BREAK__') {
-        var cs = p.childNodes;
-        var length_1 = cs.length;
-        var index = getNodeIndex2(_node) + 1;
-        for (var i = index; i < length_1; i++) {
-            p.removeChild(cs[index]);
-        }
-        _node = p;
-        p = p.parentNode;
-    }
-    _node.source.onBreak();
-}
-function parseWhileOrder(info, node, outerChildNodes, outerElement, props, part) {
-    return addOrderToNode(node, info, outerChildNodes, outerElement, props, part, function () {
-        return {
-            run: function () {
-                var p = this.node.parentNode;
-                if (this.isBreak || !parseBool(execByScope(this.node, this.condition, null, outerChildNodes, outerElement, props, part))) {
-                    //全部删除
-                    removeBlockBetween(this.node, this.endNode);
-                    p.removeChild(this.node);
-                    p.removeChild(this.endNode);
-                }
-                else {
-                    var nodes = cloneBetween(this.node, this.endNode);
-                    this.node.parentNode.insertBefore2(createBreakElement(nodes, this), this.node);
-                }
-            },
-            onBreak: function () {
-                this.isBreak = true;
-            },
-            isBreak: false
-        };
-    });
-}
-function parseAsyncOrder(info, node, outerChildNodes, outerElement, props, part) {
-    return addOrderToNode(node, info, outerChildNodes, outerElement, props, part, function () {
-        return {
-            run: function () {
-                var order = this;
-                var ns = takeBlockBetween(this.node, this.endNode);
-                var delay = parseInt(this.condition);
-                if (delay === NaN) {
-                    delay = 0;
-                }
-                removeNode(this.endNode);
-                var mark = $node('async', 8);
-                replaceNodeByNode(this.node, mark);
-                this.endNode = null;
-                this.node = null;
-                setTimeout(function () {
-                    var elem = $node('div');
-                    var p = mark.parentNode;
-                    replaceNodeByNode(mark, elem);
-                    // mark=null;
-                    if (ns)
-                        appendNodes(ns, elem);
-                    var chds = elem.childNodes;
-                    initHTML(chds, outerChildNodes, outerElement, props, part);
-                    takeOutChildNodes(elem);
-                    // elem=null;
-                    replaceCls();
-                }, delay);
-            }
-        };
-    });
-}
-function parseSwitchOrder(info, node, outerChildNodes, outerElement, props, part) {
-    return addOrderToNode(node, info, outerChildNodes, outerElement, props, part, function () {
-        return {
-            value: execByScope(node, info.condition, null, outerChildNodes, outerElement, props, part),
-            hit: null,
-            needBreak: false,
-            endHit: null,
-            hasDefault: false,
-            run: function () {
-                var order = this;
-                var scope = DOMScope.get(node);
-                treeEach(node.parentNode.childNodes, 'childNodes', function (node, step) {
-                    if (!isCommentNode(node)) {
-                        return;
-                    }
-                    var info = getCommentStringInfo(getCommentText(node));
-                    if (!info) {
-                        return;
-                    }
-                    if (node.__order__ && node.__order__.endNode) {
-                        step.next = getNodeIndex2(node.__order__.endNode) - getNodeIndex2(node);
-                        return;
-                    }
-                    switch (info.orderCase) {
-                        case 'case':
-                        case 'case break':
-                            if (order.hasDefault) {
-                                return SetParseError('语法错误：default后不应出现case/case break');
-                            }
-                            else if (!order.hit) {
-                                var isPass = order.value == execByScope(node, info.condition, scope, outerChildNodes, outerElement, props, part);
-                                if (isPass) {
-                                    order.hit = node;
-                                    node.__order__ = info.orderCase;
+                                else {
+                                    return this.SetParseError('语法错误：else或else if不能出现在else后');
                                 }
-                            }
-                            else if (!order.endHit) {
-                                order.endHit = node;
-                            }
-                            break;
-                        case 'default':
-                            if (order.hasDefault) {
-                                return SetParseError('语法错误：多余的default');
-                            }
-                            else {
-                                order.hasDefault = true;
-                                if (!order.hit) {
-                                    order.hit = node;
-                                    node.__order__ = info.orderCase;
-                                }
-                                else if (!order.endHit) {
-                                    order.endHit = node;
-                                }
-                            }
-                            break;
+                                break;
+                        }
+                    }, getNodeIndex2(node) + 1);
+                    var p = this.node.parentNode;
+                    if (!this.hit) {
+                        /*全部删除*/
+                        removeBlockBetween(this.node, this.endNode);
+                        p.removeChild(this.node);
+                        p.removeChild(this.endNode);
                     }
-                }, getNodeIndex2(node) + 1);
-                var p = this.node.parentNode;
-                if (!this.hit) {
-                    /*全部删除*/
-                    removeBlockBetween(this.node, node);
-                    p.removeChild(this.node);
-                    p.removeChild(this.endNode);
-                }
-                else {
-                    if (!this.endHit) {
-                        this.endHit = this.endNode;
-                    }
-                    //删除hit前的数据
-                    removeBlockBetween(this.node, this.hit);
-                    //外置hit的数据
-                    var ns = takeBlockBetween(this.hit, this.endHit);
-                    if (ns)
-                        insertNodesBefore(this.node, ns);
-                    removeNode(this.hit);
-                    if (this.hit.order === 'case break' /*已终止选择*/ || this.endHit === this.endNode /*已结束*/) {
+                    else {
+                        if (!this.endHit) {
+                            this.endHit = this.endNode;
+                        }
+                        /*保留hit到break之间的内容*/
+                        var ns = takeBlockBetween(this.hit, this.endHit);
+                        if (ns)
+                            insertNodesBefore(this.node, ns);
                         /*全部删除*/
                         removeBlockBetween(this.node, this.endNode);
                         p.removeChild(this.node);
                         p.removeChild(this.endNode);
                     }
                 }
-                delete this.node.order;
-            }
-        };
-    });
-}
-function parseForOrder(info, node, outerChildNodes, outerElement, props, part) {
-    return addOrderToNode(node, info, outerChildNodes, outerElement, props, part, function () {
-        var check;
-        if (parseForOrderRE.test(info.condition)) {
-            check = (function () {
-                var s = info.condition.split(' in '), index = 0, names = [], source;
-                return function () {
-                    if (!source) {
-                        source = execByScope(node, s[1], null, outerChildNodes, outerElement, props, part);
-                        if (!source) {
-                            return { result: false, params: null };
-                        }
-                        for (var i in source) {
-                            names.push(i);
-                        }
-                        if (names.length == 0) {
-                            return { result: false, params: null };
-                        }
-                    }
-                    if (index < names.length) {
-                        execByScope(node, s[0] + '=\'' + names[index] + '\';', null, outerChildNodes, outerElement, props, part);
-                        index++;
-                        return { result: true, params: null };
-                    }
-                    else {
-                        return { result: false, params: null };
-                    }
-                };
-            }());
-        }
-        else if (parseForOrderRE2.test(info.condition)) {
-            check = (function () {
-                var isFirst = true;
-                var s = info.condition.split(';');
-                if (s.length == 2) {
-                    return function () {
-                        return { result: false, params: null };
-                    };
-                }
-                return function () {
-                    if (isFirst) {
-                        isFirst = false;
-                        execByScope(node, s[0], null, outerChildNodes, outerElement, props, part);
-                    }
-                    else {
-                        execByScope(node, s[2], null, outerChildNodes, outerElement, props, part);
-                    }
-                    return { result: execByScope(node, s[1], null, outerChildNodes, outerElement, props, part), params: null };
-                };
-            }());
-        }
-        else {
-            check = function () {
-                return { result: false, params: null };
             };
+        });
+    };
+    Order.prototype.parseBreakOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+        /*删除后面节点,父节点后面节点,父父节点后面节点直至__break__*/
+        var _node = node.previousSibling;
+        if (!_node)
+            _node = node.parentNode;
+        removeNode(node);
+        var p = _node.parentNode;
+        while (_node.nodeName != '__BREAK__') {
+            var cs = p.childNodes;
+            var length_1 = cs.length;
+            var index = getNodeIndex2(_node) + 1;
+            for (var i = index; i < length_1; i++) {
+                p.removeChild(cs[index]);
+            }
+            _node = p;
+            p = p.parentNode;
         }
-        return {
-            check: check,
-            run: function () {
-                var p = this.node.parentNode;
-                var ret = this.check();
-                if (this.isBreak || !ret.result) {
-                    //全部删除
-                    removeBlockBetween(this.node, this.endNode);
-                    p.removeChild(this.node);
-                    p.removeChild(this.endNode);
+        _node.source.onBreak();
+    };
+    Order.prototype.parseWhileOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+        return this.addOrderToNode(node, info, outerChildNodes, outerChildren, props, part, function () {
+            return {
+                run: function () {
+                    var p = this.node.parentNode;
+                    if (this.isBreak || !parseBool(execByScope(this.node, this.condition, null, outerChildNodes, outerChildren, props, part))) {
+                        //全部删除
+                        removeBlockBetween(this.node, this.endNode);
+                        p.removeChild(this.node);
+                        p.removeChild(this.endNode);
+                    }
+                    else {
+                        var nodes = cloneBetween(this.node, this.endNode);
+                        this.node.parentNode.insertBefore2(this.createBreakElement(nodes, this), this.node);
+                    }
+                },
+                onBreak: function () {
+                    this.isBreak = true;
+                },
+                isBreak: false
+            };
+        });
+    };
+    Order.prototype.parseAsyncOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+        return this.addOrderToNode(node, info, outerChildNodes, outerChildren, props, part, function () {
+            return {
+                run: function () {
+                    var order = this;
+                    var ns = takeBlockBetween(this.node, this.endNode);
+                    var delay = parseInt(this.condition);
+                    if (delay === NaN) {
+                        delay = 0;
+                    }
+                    removeNode(this.endNode);
+                    var mark = $node('async', 8);
+                    replaceNodeByNode(this.node, mark);
+                    this.endNode = null;
+                    this.node = null;
+                    setTimeout(function () {
+                        var elem = $node('div');
+                        var p = mark.parentNode;
+                        replaceNodeByNode(mark, elem);
+                        // mark=null;
+                        if (ns)
+                            appendNodes(ns, elem);
+                        var chds = elem.childNodes;
+                        initHTML(chds, outerChildNodes, outerChildren, props, part);
+                        takeOutChildNodes(elem);
+                        // elem=null;
+                        replaceCls();
+                    }, delay);
                 }
-                else {
-                    var nodes = cloneBetween(this.node, this.endNode);
-                    this.node.parentNode.insertBefore2(createBreakElement(nodes, this), this.node);
+            };
+        });
+    };
+    Order.prototype.parseSwitchOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+        return this.addOrderToNode(node, info, outerChildNodes, outerChildren, props, part, function () {
+            return {
+                value: execByScope(node, info.condition, null, outerChildNodes, outerChildren, props, part),
+                hit: null,
+                needBreak: false,
+                endHit: null,
+                hasDefault: false,
+                run: function () {
+                    var order = this;
+                    var scope = DOMScope.get(node);
+                    treeEach(node.parentNode.childNodes, 'childNodes', function (node, step) {
+                        if (!isCommentNode(node)) {
+                            return;
+                        }
+                        var info = this.getCommentStringInfo(getCommentText(node));
+                        if (!info) {
+                            return;
+                        }
+                        if (node.__order__ && node.__order__.endNode) {
+                            step.next = getNodeIndex2(node.__order__.endNode) - getNodeIndex2(node);
+                            return;
+                        }
+                        switch (info.orderCase) {
+                            case 'case':
+                            case 'case break':
+                                if (order.hasDefault) {
+                                    return this.SetParseError('语法错误：default后不应出现case/case break');
+                                }
+                                else if (!order.hit) {
+                                    var isPass = order.value == execByScope(node, info.condition, scope, outerChildNodes, outerChildren, props, part);
+                                    if (isPass) {
+                                        order.hit = node;
+                                        node.__order__ = info.orderCase;
+                                    }
+                                }
+                                else if (!order.endHit) {
+                                    order.endHit = node;
+                                }
+                                break;
+                            case 'default':
+                                if (order.hasDefault) {
+                                    return this.SetParseError('语法错误：多余的default');
+                                }
+                                else {
+                                    order.hasDefault = true;
+                                    if (!order.hit) {
+                                        order.hit = node;
+                                        node.__order__ = info.orderCase;
+                                    }
+                                    else if (!order.endHit) {
+                                        order.endHit = node;
+                                    }
+                                }
+                                break;
+                        }
+                    }, getNodeIndex2(node) + 1);
+                    var p = this.node.parentNode;
+                    if (!this.hit) {
+                        /*全部删除*/
+                        removeBlockBetween(this.node, node);
+                        p.removeChild(this.node);
+                        p.removeChild(this.endNode);
+                    }
+                    else {
+                        if (!this.endHit) {
+                            this.endHit = this.endNode;
+                        }
+                        //删除hit前的数据
+                        removeBlockBetween(this.node, this.hit);
+                        //外置hit的数据
+                        var ns = takeBlockBetween(this.hit, this.endHit);
+                        if (ns)
+                            insertNodesBefore(this.node, ns);
+                        removeNode(this.hit);
+                        if (this.hit.order === 'case break' /*已终止选择*/ || this.endHit === this.endNode /*已结束*/) {
+                            /*全部删除*/
+                            removeBlockBetween(this.node, this.endNode);
+                            p.removeChild(this.node);
+                            p.removeChild(this.endNode);
+                        }
+                    }
+                    delete this.node.order;
                 }
-            },
-            onBreak: function () {
-                this.isBreak = true;
-            },
-            isBreak: false
-        };
-    });
-}
-function createBreakElement(nodes, order) {
-    var breakElement = $node('__break__');
-    for (var i = 0; i < nodes.length; i++) {
-        breakElement.appendChild(nodes[i]);
-    }
-    breakElement.source = order;
-    return breakElement;
-}
-function parseCommentOrder(info, node, outerChildNodes, outerElement, props, part) {
-    switch (info.order) {
-        case 'scope':
-            parseScopeOrder(info, node, outerChildNodes, outerElement, props, part);
-            break;
-        case 'let':
-            execScope(info.condition, node, outerChildNodes, outerElement, props, part);
-            removeNode(node);
-            break;
-        case 'bind':
-            bindPropertyByOrder(node, info.condition);
-            break;
-        case '-':
-            bindExpressionsByOrder(node, info.condition);
-            break;
-        case '!':
-            execByScope(node, info.condition, null, outerChildNodes, outerElement, props, part);
-            removeNode(node);
-            break;
-        case '=':
-            var v = execByScope(node, info.condition, null, outerChildNodes, outerElement, props, part);
-            if (isObject(v) && v.nodeType) {
-                replaceNodeByNode(node, v);
+            };
+        });
+    };
+    Order.prototype.parseForOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+        return this.addOrderToNode(node, info, outerChildNodes, outerChildren, props, part, function () {
+            var check;
+            if (parseForOrderRE.test(info.condition)) {
+                check = (function () {
+                    var s = info.condition.split(' in '), index = 0, names = [], source;
+                    return function () {
+                        if (!source) {
+                            source = execByScope(node, s[1], null, outerChildNodes, outerChildren, props, part);
+                            if (!source) {
+                                return { result: false, params: null };
+                            }
+                            for (var i in source) {
+                                names.push(i);
+                            }
+                            if (names.length == 0) {
+                                return { result: false, params: null };
+                            }
+                        }
+                        if (index < names.length) {
+                            execByScope(node, s[0] + '=\'' + names[index] + '\';', null, outerChildNodes, outerChildren, props, part);
+                            index++;
+                            return { result: true, params: null };
+                        }
+                        else {
+                            return { result: false, params: null };
+                        }
+                    };
+                }());
+            }
+            else if (parseForOrderRE2.test(info.condition)) {
+                check = (function () {
+                    var isFirst = true;
+                    var s = info.condition.split(';');
+                    if (s.length == 2) {
+                        return function () {
+                            return { result: false, params: null };
+                        };
+                    }
+                    return function () {
+                        if (isFirst) {
+                            isFirst = false;
+                            execByScope(node, s[0], null, outerChildNodes, outerChildren, props, part);
+                        }
+                        else {
+                            execByScope(node, s[2], null, outerChildNodes, outerChildren, props, part);
+                        }
+                        return { result: execByScope(node, s[1], null, outerChildNodes, outerChildren, props, part), params: null };
+                    };
+                }());
             }
             else {
-                replaceNodeByNode(node, $node(v, 3));
+                check = function () {
+                    return { result: false, params: null };
+                };
             }
-            break;
-        case 'content':
-            replaceNodeByNodes(node, outerChildNodes);
-            break;
-        case 'elements':
-            replaceNodeByNodes(node, outerElement);
-            break;
-        case 'while':
-            return parseWhileOrder(info, node, outerChildNodes, outerElement, props, part);
-        case 'if':
-            return parseIfOrder(info, node, outerChildNodes, outerElement, props, part);
-        case 'break':
-            return parseBreakOrder(info, node, outerChildNodes, outerElement, props, part);
-        case 'for':
-            return parseForOrder(info, node, outerChildNodes, outerElement, props, part);
-        case 'switch':
-            return parseSwitchOrder(info, node, outerChildNodes, outerElement, props, part);
-        case 'async':
-            return parseAsyncOrder(info, node, outerChildNodes, outerElement, props, part);
-    }
-}
-function parseComment(node, outerChildNodes, outerElement, props, part) {
-    var info = getCommentStringInfo(getCommentText(node));
-    if (!info)
-        return;
-    if (!info.order) {
-        alert("语法错误：不恰当的" + info.orderCase);
-        return;
-    }
-    parseCommentOrder(info, node, outerChildNodes, outerElement, props, part);
-    if (node.order) {
-        if (node.order.endNode) {
-            node.order.run();
+            return {
+                check: check,
+                run: function () {
+                    var p = this.node.parentNode;
+                    var ret = this.check();
+                    if (this.isBreak || !ret.result) {
+                        //全部删除
+                        removeBlockBetween(this.node, this.endNode);
+                        p.removeChild(this.node);
+                        p.removeChild(this.endNode);
+                    }
+                    else {
+                        var nodes = cloneBetween(this.node, this.endNode);
+                        this.node.parentNode.insertBefore2(this.createBreakElement(nodes, this), this.node);
+                    }
+                },
+                onBreak: function () {
+                    this.isBreak = true;
+                },
+                isBreak: false
+            };
+        });
+    };
+    Order.prototype.createBreakElement = function (nodes, order) {
+        var breakElement = $node('__break__');
+        for (var i = 0; i < nodes.length; i++) {
+            breakElement.appendChild(nodes[i]);
         }
-    }
-}
+        breakElement.source = order;
+        return breakElement;
+    };
+    Order.prototype.parseCommentOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+        switch (info.order) {
+            case 'scope':
+                this.parseScopeOrder(info, node, outerChildNodes, outerChildren, props, part);
+                break;
+            case 'let':
+                execScope(info.condition, node, outerChildNodes, outerChildren, props, part);
+                removeNode(node);
+                break;
+            case 'bind':
+                bindPropertyByOrder(node, info.condition);
+                break;
+            case '-':
+                bindExpressionsByOrder(node, info.condition);
+                break;
+            case '!':
+                execByScope(node, info.condition, null, outerChildNodes, outerChildren, props, part);
+                removeNode(node);
+                break;
+            case '=':
+                var v = execByScope(node, info.condition, null, outerChildNodes, outerChildren, props, part);
+                if (isObject(v) && v.nodeType) {
+                    replaceNodeByNode(node, v);
+                }
+                else {
+                    replaceNodeByNode(node, $node(v, 3));
+                }
+                break;
+            case 'content':
+                replaceNodeByNodes(node, outerChildNodes);
+                break;
+            case 'elements':
+                replaceNodeByNodes(node, outerChildren);
+                break;
+            case 'while':
+                return this.parseWhileOrder(info, node, outerChildNodes, outerChildren, props, part);
+            case 'if':
+                return this.parseIfOrder(info, node, outerChildNodes, outerChildren, props, part);
+            case 'break':
+                return this.parseBreakOrder(info, node, outerChildNodes, outerChildren, props, part);
+            case 'for':
+                return this.parseForOrder(info, node, outerChildNodes, outerChildren, props, part);
+            case 'switch':
+                return this.parseSwitchOrder(info, node, outerChildNodes, outerChildren, props, part);
+            case 'async':
+                return this.parseAsyncOrder(info, node, outerChildNodes, outerChildren, props, part);
+        }
+    };
+    Order.prototype.parseComment = function (node, outerChildNodes, outerChildren, props, part) {
+        var info = this.getCommentStringInfo(getCommentText(node));
+        if (!info)
+            return;
+        if (!info.order) {
+            throw new Error("语法错误：不恰当的" + info.orderCase);
+        }
+        this.parseCommentOrder(info, node, outerChildNodes, outerChildren, props, part);
+        if (node.__order__) {
+            if (node.__order__.endNode) {
+                node.__order__.run();
+            }
+        }
+    };
+    return Order;
+}());
 var XHR = (function () {
     function XHR() {
     }
@@ -2093,7 +2090,7 @@ var Config = (function () {
     return Config;
 }());
 /// <reference path='TemplateConfig.ts'/>
-/// <reference path='PartOrderCore.ts'/>
+/// <reference path='../order/Order.ts'/>
 /// <reference path='../core/XHR.ts'/>
 /// <reference path='../lib/instantiation.ts'/>
 /// <reference path='../lib/treeEach.ts'/>
@@ -2101,6 +2098,17 @@ var Config = (function () {
 /// <reference path='Store.ts'/>
 /// <reference path='../main/Config.ts'/>
 var $DOM, $node, operatorRE = /\!=|==|=|<|>|\|/;
+function replaceCls() {
+    var arr = $t.replaceClassStore;
+    for (var i = 0; i < arr.length; i++) {
+        var cls = arr[i].getAttribute('cls');
+        arr[i].removeAttribute('cls');
+        if ($t.defineClassNames[cls]) {
+            arr[i].className += ' ' + $t.defineClassNames[cls].join(" ");
+        }
+    }
+    arr.length = 0;
+}
 function getScopeBy(scope, node) {
     if (!scope)
         return DOMScope.get(node);

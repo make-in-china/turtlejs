@@ -3,8 +3,8 @@
 class While extends VOrder {
     name = "while"
     isLogic = true
-    parse(info: ICommentOrderInfo, node: IComment): IOrderParseReturn | undefined {
-        return this.addOrderToNode(info, node, () => {
+    parse(info: ICommentOrderInfo, node: IComment,orderStack:VOrderData[]): VOrderData {
+        return this.addOrderToNode(info, node ,orderStack, () => {
             let d = new VWhileOrderData(this.name, node, info.condition, function () {
                 let p: INode = <INode>node.parentNode;
                 if (d.isBreak || !parseBool(VOrderHelper.exec(node, d.condition))) {

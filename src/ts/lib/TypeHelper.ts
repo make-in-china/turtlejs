@@ -153,7 +153,7 @@ function getBind(obj:Object, fn:Function) {
 
 /**从注释中读取字符串 */
 let getCommentText=(function(){
-    if(Comment.prototype.hasOwnProperty("text")){
+    if(typeof Comment!=='undefined'&&Comment.prototype.hasOwnProperty("text")){
         let commentDataRE=/^<!--([\s\S]*?)-->$/;
         let commentDataRE2=/^<!([\s\S]*?)>$/;
         let commentDataRE3=/^!-?|-?&/;

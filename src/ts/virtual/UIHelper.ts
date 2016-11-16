@@ -59,6 +59,19 @@ namespace ComponentView{
         this.makeClass(htmlPath,className);
         // this.fs.writeFileSync(viewPath,this.template.view.replace(/\{\{className\}\}/g,className).replace('{{propertyInfo}}','tops:[]'));
     }
+    static toClassName(node:VNode):string{
+        if(isVComment(node)){
+            return "VComment&IVNodeMethod"
+        }else if(isVText(node)){
+            return "VText&IVNodeMethod"
+        }else if(isVDocType(node)){
+            return "VDocumentType&IVNodeMethod"
+        }else{
+            let nodeName=node.nodeName;
+            nodeName=nodeName[0]+nodeName.substr(1).toLowerCase();
+            return 'VMElement.V'+nodeName+'Element&IVNodeMethod';
+        }
+    }
     static makeClass(path:string,className?:string){
         if(!className){
             className=path.match(/[\s\S]*[\/\\](.*?)[\/\\].*?$/)[1];
@@ -78,13 +91,17 @@ namespace ComponentView{
             chds=dom.childNodes;
             tops=[dom];
         }
-        let refs:[string,VNode][]=[];
+        let refs:[string,VMElement.VHtmlElement][]=[];
         treeEach(<VNode[]>chds,"childNodes",(node,step)=>{
             if(isVText(node)){
                 //不处理咯
             }else if(node instanceof VComment){
-                parseComment(node, outerChildNodes, outerElement, props, part);
-                // } catch (e) { _catch(e) }
+                //解析注释里的命令
+                let orderData=VOrderHelper.parseComment(node);
+                if(orderData){
+                    //剪切命令块
+                };
+                
                 return eTreeEach.c_noIn;
                 //解析命令
             }else if(isVHTMLElement(node)){
@@ -112,21 +129,22 @@ namespace ComponentView{
             let refInfo=refs[i];
             let name=refInfo[0];
             let refNode=refInfo[1];
-            let typeName=refNode.nodeName;
-            typeName=typeName[0]+typeName.substr(1).toLowerCase();
-            propertys.push(name+':VMElement.V'+typeName+'Element&IVNodeMethod=<any>'+refNode.toJSString());
+            propertys.push(name+':'+this.toClassName(refNode)+'=<any>'+refNode.toJSString());
         }
         let topsJS:string[]=[];
+        let topsType:string[]=[];
         for(const top of tops){
             topsJS.push(top.toJSString());
+            topsType.push(this.toClassName(top));
         }
-        propertys.push('tops=['+topsJS.join(',            ')+']');
+        if(topsJS.length>0){
+            propertys.push('tops:['+topsType.join('\n,')+']=[<any>'+topsJS.join(',<any>')+']');
+        }
         let propertyInfo:string=propertys.join(';\n        ');
         let view:string=this.template.view
         .replace('{{propertyInfo}}',propertyInfo)
         .replace('{{className}}',className);
         this.fs.writeFileSync(path.replace(/View\.html$/,'View.ts'),view);
-        console.log(path.replace(/View\.html$/,'View.ts'));
         //mixin .css  to  变量
     }
 }

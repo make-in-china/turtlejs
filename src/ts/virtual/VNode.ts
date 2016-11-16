@@ -9,6 +9,7 @@
 /// <reference path='../lib/INamedNodeMap.ts'/>
 /// <reference path='VNodeList.ts'/>
 /// <reference path='VHTMLCollection.ts'/>
+/// <reference path='VNodeVMData.ts'/>
 
 interface Node {
     __vdomNode__: VNode&IVNodeMethod
@@ -32,26 +33,13 @@ function getFunctionComment(fn: Function) {
     let s: RegExpExecArray = <RegExpExecArray>functionCommentRE.exec(fn.toString());
     return s[1];
 }
-interface VNodeVMData{
-    data:string
-    __:Object
-    domNode?:Node
-    /**是否闭合 */
-    isClose:boolean
-}
 abstract class VNode implements INode{
-    vmData:VNodeVMData;
+    vmData:VNodeVMData=new VNodeVMData();
     abstract nodeType: VNodeType;
     abstract nodeName: string;
     readonly childNodes: VNodeList=new VNodeList;
     parentNode: VNode&IVNodeMethod | null;
-    constructor(){
-        this.vmData={
-            data:"",
-            __:{},
-            isClose:false
-        }
-    }
+
     get $(): VElement&IVNodeMethod{
         let p=this.parentNode;
         this.vmData.isClose=true;
@@ -387,3 +375,4 @@ let VNodeHelp:IVNodeMethod=<any>function(nodeName: string, nodeType?: VNodeType|
     bindClassToFunction(that,nodeName,nodeType);
     return that;
 };
+

@@ -32,7 +32,7 @@ let VDOM:IVDOMBuilder,
     let htmlParse = {
         '': function (html: string, m: IMember) {
             let nodeName = m.node.nodeName;
-            if (m.node.__closeSelf__) {
+            if (m.node.vmData.closeSelf) {
                 m.node = <any>m.node.parentNode;
                 m.action = 'textNode';
                 m.textNodeStart = m.index;

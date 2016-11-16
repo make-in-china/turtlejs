@@ -32,7 +32,7 @@ namespace VMElement{
                     }
                 }
             }
-            if(this.__closeSelf__){
+            if(this.vmData.closeSelf){
                 sInner='.$';
             }else{
                 sInner+=this.toScriptText();

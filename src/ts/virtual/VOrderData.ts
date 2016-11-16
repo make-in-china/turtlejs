@@ -1,6 +1,6 @@
 class VOrderData{
     endNode:INode|null=null
-    parseBlockResult:IOrderParseReturn | undefined
+    parseBlockResult:ITreeEachReturn
     constructor(
         public name:string,
         public node:IComment,

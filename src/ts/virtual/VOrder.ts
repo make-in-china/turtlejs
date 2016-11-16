@@ -2,12 +2,6 @@
 
 /// <reference path='VOrderData.ts'/>
 /// <reference path='VOrderHelper.ts'/>
-interface IOrderParseReturn {
-    stack: [IArray | INode[], number];
-    state: eTreeEach | undefined;
-    array: IArray | INode[];
-    index: number;
-}
 
 interface ICommentOrderInfo{
     order?: string;
@@ -22,6 +16,9 @@ interface VNodeVMData{
 interface INode{
     __order__?:VOrderData
 }
+let 
+    orderCaseRE             =   /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
+    orderRE                 =	/^\s?(if|while|for|switch|async|break|-|scope|content|elements|bind|!|let|=)(\s|$)/g;
 /**从注释中读取命令 */
 function getCommentStringInfo(s:string):ICommentOrderInfo|null{
     let order=s.match(orderRE);
@@ -38,31 +35,27 @@ function getCommentStringInfo(s:string):ICommentOrderInfo|null{
 abstract class VOrder{
     abstract name:string
     abstract isLogic:boolean
-    abstract parse(info:ICommentOrderInfo,node:IComment):IOrderParseReturn|undefined;
-    addOrderToNode(info:ICommentOrderInfo,node:INode,fnGetOrder:()=>VOrderData){
+    abstract parse(info:ICommentOrderInfo,node:IComment,orderStack:VOrderData[]):VOrderData;
+    addOrderToNode(info:ICommentOrderInfo,node:IComment,orderStack:VOrderData[],fnGetOrder:()=>VOrderData):VOrderData{
         let order:VOrderData;
         if(!node.__order__){
             order=fnGetOrder();
             node.__order__=order;
-            order.name=<string>info.order;
-            order.node=node;
-            order.endNode=null;
-            order.condition=info.condition;
             orderStack.push(order);
-            order.parseBlockResult=this.parseBlock(node);
+            order.parseBlockResult=this.parseBlock(node,orderStack);
         }else{
             order=node.__order__;
         }
-        return order.parseBlockResult;
+        return order;
     }
-    private parseLogic(info:ICommentOrderInfo,node:IComment){
+    private parseLogic(info:ICommentOrderInfo,node:IComment,orderStack:VOrderData[]){
         /*不渲染，纯找结构*/
         let orderName:string=<string>info.order;
         if(orderName in VOrderHelper.logicOrders){
-            return this.parse(info,node);
+            return this.parse(info,node,orderStack);
         }
     }
-    parseBlock(node:INode){
+    parseBlock(node:INode,orderStack){
         let i=getNodeIndex2(node);
         let isError=false;
         let error=function(msg){
@@ -75,14 +68,14 @@ abstract class VOrder{
             if(!isCommentNode(node)){
                 return;
             }
-            let info=getCommentStringInfo(getCommentText(node));
+            let info=getCommentStringInfo(node.data);
             if(!info){
                 return;
             }
             if(info.order){
-                let ret=this.parseLogic(info,node);
+                let ret=this.parseLogic(info,node,orderStack);
                 if(ret){
-                    step.next=ret.index-getNodeIndex2(node)+1;
+                    step.next=ret.parseBlockResult.index-getNodeIndex2(node)+1;
                 }
                 return eTreeEach.c_noRepeat&eTreeEach.c_noIn;
             }

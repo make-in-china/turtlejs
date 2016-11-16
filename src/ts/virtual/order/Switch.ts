@@ -3,15 +3,15 @@
 class Switch extends VOrder {
     name = "switch"
     isLogic = true
-    parse(info: ICommentOrderInfo, node: IComment): IOrderParseReturn | undefined {
-        return this.addOrderToNode(info, node, () => {
+    parse(info: ICommentOrderInfo, node: IComment, orderStack: VOrderData[]): VOrderData {
+        return this.addOrderToNode(info, node, orderStack, () => {
             let d = new VSwitchOrderData(this.name, node, info.condition, function () {
-                let p=<INode>node.parentNode;
+                let p = <INode>node.parentNode;
                 treeEach(p.childNodes, 'childNodes', function (node: IComment, step) {
                     if (!isCommentNode(node)) {
                         return;
                     }
-                    let info = getCommentStringInfo(getCommentText(node));
+                    let info = getCommentStringInfo(node.data);
                     if (!info) {
                         return;
                     }
@@ -28,7 +28,7 @@ class Switch extends VOrder {
                                 let isPass = d.value == VOrderHelper.exec(node, info.condition);
                                 if (isPass) {
                                     d.hit = node;
-                                    node.__order__ = info.orderCase;
+                                    d.hitBy = info.orderCase;
                                 }
                             } else if (!d.endHit) {
                                 d.endHit = node;
@@ -41,7 +41,7 @@ class Switch extends VOrder {
                                 d.hasDefault = true;
                                 if (!d.hit) {
                                     d.hit = node;
-                                    node.__order__ = info.orderCase;
+                                    d.hitBy = info.orderCase;
                                 } else if (!d.endHit) {
                                     d.endHit = node;
                                 }
@@ -66,7 +66,7 @@ class Switch extends VOrder {
 
                     removeNode(d.hit);
 
-                    if ((<VOrderData>d.hit.__order__).name === 'case break'/*已终止选择*/ || d.endHit === d.endNode/*已结束*/) {
+                    if (d.hitBy === 'case break'/*已终止选择*/ || d.endHit === d.endNode/*已结束*/) {
                         /*全部删除*/
                         removeBlockBetween(this.node, this.endNode);
                         p.removeChild(this.node);

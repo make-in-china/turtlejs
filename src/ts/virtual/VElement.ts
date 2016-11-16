@@ -2,8 +2,6 @@
 /// <reference path='VNode.ts'/>
 interface VElementVMData extends VNodeVMData{
     events:[string, EventListenerOrEventListenerObject | undefined, boolean][]
-    /**是否自闭合 */
-    closeSelf?:boolean
 }
 abstract class VElement extends VNode{
     vmData:VElementVMData
@@ -12,7 +10,6 @@ abstract class VElement extends VNode{
     children=new VHTMLCollection();
     constructor(){
         super();
-        this.vmData.closeSelf=false;
         this.vmData.events=[];
     }
     removeAttribute( name: string): void {

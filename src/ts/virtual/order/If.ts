@@ -3,15 +3,15 @@
 class If extends VOrder {
     name = "if"
     isLogic = true
-    parse(info: ICommentOrderInfo, node: IComment): IOrderParseReturn | undefined {
-        return this.addOrderToNode(info, node, () => {
+    parse(info: ICommentOrderInfo, node: IComment,orderStack:VOrderData[]): VOrderData {
+        return this.addOrderToNode(info, node,orderStack, () => {
             let d = new VIfOrderData(this.name, node, info.condition, function () {
                 d.hit = parseBool(VOrderHelper.exec(node, d.condition)) ? this.node : null;
                 treeEach((<INode>node.parentNode).childNodes, 'childNodes', function (node: INode, step) {
                     if (!isCommentNode(node)) {
                         return;
                     }
-                    let info = this.getCommentStringInfo(getCommentText(node));
+                    let info = this.getCommentStringInfo(node.data);
                     if (!info) return;
                     if (node.__order__ && node.__order__.node) {
                         step.next = getNodeIndex2(node.__order__.node) - getNodeIndex2(node);

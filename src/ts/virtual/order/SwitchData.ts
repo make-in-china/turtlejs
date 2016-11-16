@@ -1,6 +1,7 @@
 class VSwitchOrderData extends VOrderData{
     value:any
     hit:INode|null=null
+    hitBy:string
     needBreak:boolean=false
     endHit:INode|null=null
     hasDefault:boolean=false

@@ -1,6 +1,5 @@
 class VWhileOrderData extends VOrderData{
-    isBreak:boolean=false;
-    endNode:INode|null=null
+    isBreak:boolean=false
     onBreak(){
         this.isBreak=true;
     }

@@ -21,6 +21,12 @@ interface IArray{
     length:number
 }
 
+interface ITreeEachReturn {
+    stack: [IArray | INode[], number];
+    state: eTreeEach | undefined;
+    array: IArray | INode[];
+    index: number;
+}
 
 /**
  * 遍历树
@@ -29,7 +35,7 @@ interface IArray{
  * @param {(node:T,step?:ITreeEachStep)=>eTreeEach|undefined} fn 回调函数
  * @param {number} beginIndex 遍历起始位置
  */
-function treeEach<T>(array:T[]|IArray,propertyName:string,fn:(node:T,step:ITreeEachStep)=>(eTreeEach|void),beginIndex:number=0){
+function treeEach<T>(array:T[]|IArray,propertyName:string,fn:(node:T,step:ITreeEachStep)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
     if(!isArrayLike(array)){
         return;
     }
