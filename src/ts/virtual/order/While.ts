@@ -8,6 +8,14 @@ namespace Order {
         onBreak() {
             this.isBreak = true;
         }
+        get canPrebuild():boolean{
+            try {
+                exec(this.node, this.condition);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
         run() {
 
             let p: INode = <INode>this.node.parentNode;
