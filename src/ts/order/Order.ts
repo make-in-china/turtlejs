@@ -1,13 +1,11 @@
 
 /// <reference path="../scope/execute.ts"/>
 /// <reference path="../main/bind.ts"/>
-let 
-    parseForOrderRE2        =   /^.*;.*;.*$/;
 
 interface IHTMLBreakElement extends IComment{
     source?:{run}
 }
-class Order{
+class xxxxOrder{
     
     /**从注释中读取命令 */
     getCommentStringInfo(s:string):ICommentOrderInfo|null{

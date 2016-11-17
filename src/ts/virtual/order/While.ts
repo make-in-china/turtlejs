@@ -3,7 +3,7 @@
 class While extends VOrder {
     name = "while"
     isLogic = true
-    parse(info: ICommentOrderInfo, node: IComment,orderStack:VOrderData[]): VOrderData {
+    parse(info: ICommentOrderInfo, node: IComment,orderStack:VOrder[]):void {
         return this.addOrderToNode(info, node ,orderStack, () => {
             let d = new VWhileOrderData(this.name, node, info.condition, function () {
                 let p: INode = <INode>node.parentNode;
@@ -22,7 +22,7 @@ class While extends VOrder {
     }
 }
 
-function createBreakElement(nodes, order: { run }) {
+function createBreakElement(nodes,order:VOrder) {
     let breakElement: IHTMLBreakElement = $node('__break__');
     for (let i = 0; i < nodes.length; i++) {
         breakElement.appendChild(nodes[i]);

@@ -1,83 +1,144 @@
 
 /// <reference path='VOrder.ts'/>
-let parseForOrderRE         =   /[a-zA-Z\d] in .*/;
-class For extends VOrder {
-    name = "for"
-    isLogic = true
-    condition:string
-    get canPrebuild():boolean{
-        
+namespace Order {
+    let parseForOrderRE = /[a-zA-Z\d] in .*/,
+        parseForOrderRE2 = /^.*;.*;.*$/;
+    const enum eForMode {
+        forIn = 0,
+        forSplit = 1
     }
-    parse(info: ICommentOrderInfo, node: IComment,orderStack:VOrderData[]): VOrderData {
-        
-        return this.addOrderToNode(info, node,orderStack, () => {
-            let d = new VForOrderData(this.name, node, info.condition, function () {
-                let p=<INode>node.parentNode;
-                let ret=d.check();
-                if(d.isBreak||!ret.result){
-                    //全部删除
-                    removeBlockBetween(node,<INode>d.endNode);
-                    p.removeChild(node);
-                    p.removeChild(<INode>d.endNode);
-                }else{
-                    let nodes=cloneBetween(node,<INode>d.endNode);
-                    p.insertBefore2(createBreakElement(nodes,d),node);
+    export class For extends VOrder {
+        static name = "for"
+        static isLogic = true
+        onBreak() {
+            this.isBreak = true;
+        }
+        isBreak: boolean
+        get canPrebuild(): boolean {
+            if (this.forMode === eForMode.forIn) {
+                return this.canPrebuildForIn();
+            } else {
+                return this.canPrebuildForSplit();
+            }
+        }
+        private forMode: eForMode;
+        constructor(node: VComment, condition: string) {
+            super(node, condition);
+
+            if (parseForOrderRE.test(condition)/**for in */) {
+                this.forMode = eForMode.forIn;
+                let s = condition.split(' in ');
+                this.forIn = {
+                    var: s[0],
+                    object: s[1],
+                    names: [],
+                    source: null,
+                    index: 0
                 }
-            });
-            if(parseForOrderRE.test(info.condition)){
-                d.check=(function(){
-                    let s=info.condition.split(' in '),
-                        index=0,
-                        names=[],
-                        source;
-                    return function(){
-                        if(!source){
-                            source=VOrderHelper.exec(node,s[1]);
-                            if(!source){
-                                return {result:false,params:null}
-                            }
-                            for(let i in source){
-                                names.push(i);
-                            }
-                            if(names.length==0){
-                                return {result:false,params:null}
-                            }
-                        }
-                        if(index<names.length){
-                            VOrderHelper.exec(node,s[0]+'=\''+names[index]+'\';');
-                            index++;
-                            return {result:true,params:null}
-                        }else{
-                            return {result:false,params:null}
-                        }
-                    }
-                }());
-            }else if(parseForOrderRE2.test(info.condition)){
-                d.check=(function(){
-                    let isFirst=true;
-                    let s=info.condition.split(';');
-                    if(s.length==2){
-                        return function(){
-                            return {result:false,params:null};
-                        }
-                    }
-                    return function(){
-                        if(isFirst){
-                            isFirst=false;
-                            VOrderHelper.exec(node,s[0]);
-                        }else{
-                            VOrderHelper.exec(node,s[2]);
-                        }
-                        return {result:VOrderHelper.exec(node,s[1]),params:null};
-                    }
-                }());
-            }else{
-                d.check=function(){
-                    return {result:false,params:null};
+            } else if (parseForOrderRE2.test(condition)/**for i;i;i++ */) {
+                this.forMode = eForMode.forSplit;
+
+                let s = condition.split(';');
+                if (s.length !== 2) {
+                    throw new Error("错误的for表达式！");
+                }
+                this.forSplit = {
+                    pre: s[0],
+                    exec: s[1],
+                    step: s[2],
+                    isFirst: true
+                }
+            } else {
+                throw new Error("错误的for表达式！");
+            }
+        }
+
+        private forSplit: {
+            pre: string
+            exec: string
+            step: string
+            isFirst: boolean
+        }
+
+        private canPrebuildForSplit(): boolean {
+            try {
+                VOrder.exec(this.node, this.forSplit.pre);
+                VOrder.exec(this.node, this.forSplit.step);
+                VOrder.exec(this.node, this.forSplit.exec);
+            } catch (error) {
+                return false;
+            }
+            return true;
+        }
+        private checkForSplit(): boolean {
+            if (this.forSplit.isFirst) {
+                this.forSplit.isFirst = false;
+                VOrder.exec(this.node, this.forSplit.pre);
+            } else {
+                VOrder.exec(this.node, this.forSplit.step);
+            }
+            return VOrder.exec(this.node, this.forSplit.exec);
+        }
+
+        private forIn: {
+            source: any
+            var: string
+            object: string
+            names: string[]
+            index: number
+        }
+        private canPrebuildForIn(): boolean {
+            try {
+                VOrder.exec(this.node, this.forIn.object)
+            } catch (error) {
+                return false;
+            }
+            return true;
+        }
+        private initForInSourceData(): boolean {
+            if (!this.forIn.source) {
+                this.forIn.source = VOrder.exec(this.node, this.forIn.object);
+                if (!this.forIn.source) {
+                    return false;
+                }
+                for (let i in this.forIn.source) {
+                    this.forIn.names.push(i);
                 }
             }
-            return d;
-        });
-    }
-}
+            return true
+        }
+        private checkForIn(): boolean {
+            if (!this.initForInSourceData()) {
+                throw new Error("计算出错！");
+            }
+            if (this.forIn.index < this.forIn.names.length) {
+                VOrder.exec(this.node, this.forIn.var + '=\'' + this.forIn.names[this.forIn.index] + '\';');
+                this.forIn.index++;
+                return true
+            } else {
+                return false
+            }
+        }
+        run() {
+            let p = <INode>this.node.parentNode;
+            let ret: boolean
+            if (this.forMode === eForMode.forIn) {
+                ret = this.checkForIn();
+            } else {
+                ret = this.checkForSplit();
+            }
+            if (this.isBreak || !ret) {
+                //全部删除
+                removeBlockBetween(this.node, <INode>this.endNode);
+                p.removeChild(this.node);
+                p.removeChild(<INode>this.endNode);
+            } else {
 
+                let nodes = cloneBetween(this.node, <INode>this.endNode);
+                //放到前面再来
+                p.insertBefore2(createBreakElement(nodes, this), this.node);
+            }
+        }
+    }
+    VOrder.register(For);
+}
