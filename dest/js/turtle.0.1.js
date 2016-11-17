@@ -563,19 +563,24 @@ function removeClasses(elem, clses) {
             lst.remove(clses[i]);
     }
 }
-function replaceClass(sel, a, b) { if (sel && a && b)
-    sel.className = sel.className.replace(a, b); }
-function toggleClass(sel, a, t, f) {
-    if (sel && a)
-        if (sel.className.indexOf(a) >= 0) {
-            sel.className = sel.className.replace(a, "");
-            if (f)
+function replaceClass(elem, a, b) {
+    if (elem && a && b) {
+        elem.className = elem.className.replace(a, b);
+    }
+}
+function toggleClass(elem, a, t, f) {
+    if (elem && a)
+        if (elem.className.indexOf(a) >= 0) {
+            elem.className = elem.className.replace(a, "");
+            if (f) {
                 f();
+            }
         }
         else {
-            sel.className += " " + a;
-            if (t)
+            elem.className += " " + a;
+            if (t) {
                 t();
+            }
         }
 }
 /**判断是否注释节点 */
@@ -1376,13 +1381,13 @@ function bindElementProperty(obj, name, obj2, name2) {
 function bindNodeProperty(node, proName, condition) {
     var cdtn = splitByOnce(condition, "|"), name, scope, obj, obj2 = node, bindVar = cdtn[0], arrBindVar, exp, name2 = camelCase(proName);
     if (name2.indexOf(".") != -1) {
-        name2 = name2.split(".");
-        for (var i = 0; i < name2.length - 1; i++) {
-            obj2 = obj2[name2[i]];
+        var nameArr = name2.split(".");
+        for (var i = 0; i < nameArr.length - 1; i++) {
+            obj2 = obj2[nameArr[i]];
             if (!obj2)
                 return;
         }
-        name2 = name2[name2.length - 1];
+        name2 = nameArr[nameArr.length - 1];
     }
     if (bindVar.indexOf(".") != -1) {
         arrBindVar = bindVar.split(".");

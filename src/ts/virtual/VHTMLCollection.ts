@@ -1,4 +1,4 @@
-
+HTMLCollection
 /// <reference path='.d.ts'/>
 class VHTMLCollection {
     /**
@@ -8,27 +8,25 @@ class VHTMLCollection {
     /**
       * Retrieves an object from various collections.
       */
-    item(nameOrIndex?: string|number, optionalIndex?: number): VElement&IVNodeMethod|null{
-        if(!nameOrIndex){
+    item(index:number): VElement&IVNodeMethod|null{
+        let ret=this[index];
+        if(ret){
+            return ret;
+        }else{
             return null;
         }
-        var ret=this[nameOrIndex];
-        if(ret){
-            return ret;
-        }
-        if(optionalIndex){
-            ret=this[optionalIndex];
-        }
-        if(ret){
-            return ret;
-        }
-        return null;
     }
     /**
       * Retrieves a select object or an object from an options collection.
       */
-    namedItem(name: string): VElement&IVNodeMethod{
-        return this[name];
+    namedItem(name: string): VElement&IVNodeMethod|null{
+        for(let i=0;i<this.length;i++){
+            let element:VElement&IVNodeMethod=<VElement&IVNodeMethod>this[i];
+            if(element.getAttribute("name")===name){
+                return element;
+            }
+        }
+        return null;
     }
     [index: number]: VElement&IVNodeMethod|undefined;
 }

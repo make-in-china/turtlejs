@@ -10,7 +10,6 @@
 /// <reference path='VNodeList.ts'/>
 /// <reference path='VHTMLCollection.ts'/>
 /// <reference path='VNodeVMData.ts'/>
-
 interface Node {
     __vdomNode__: VNode&IVNodeMethod
 }
@@ -250,7 +249,7 @@ abstract class VNode implements INode{
             }
         }
     }
-    protected createHomologyFunction(name) {
+    protected createHomologyFunction(name:string) {
         return function (this:VNode&IVNodeMethod) {
             let objects:Node[] = [], 
                 toDOMs:INode[] = [];
@@ -289,19 +288,19 @@ abstract class VNode implements INode{
             return ret;
         }
     }
-    protected createBridgeFunction(name){
+    protected createBridgeFunction(name:string){
         return function (this:VNode) {
             return (<Node>this.vmData.domNode)[name].apply(this.vmData.domNode, arguments);
         }
     }
-    protected setBridgeGet(name){
+    protected setBridgeGet(name:string){
         Object.defineProperty(this, name, {
             get: function (this:VNode) {
                 return (<Node>this.vmData.domNode)[name];
             }
         });
     }
-    protected setBridgeGetSet(name){
+    protected setBridgeGetSet(name:string){
         Object.defineProperty(this, name, {
             get: function (this:VNode) {
                 return (<Node>this.vmData.domNode)[name];

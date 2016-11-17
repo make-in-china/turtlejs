@@ -1,5 +1,5 @@
 
-/// <reference path='../VOrder.ts'/>
+/// <reference path='VOrder.ts'/>
 class While extends VOrder {
     name = "while"
     isLogic = true

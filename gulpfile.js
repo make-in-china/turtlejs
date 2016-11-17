@@ -67,6 +67,7 @@ function uibuild(path){
 }
 function uiwatch(event){
     gulp.watch('src/ui/**/*.html', function(event){
+        console.log(global);
         uibuild(event.path);
     });
 }

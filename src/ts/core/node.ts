@@ -36,7 +36,7 @@ function replaceNodeByNodes(node: INode, nodes: INode[]) {
     insertNodesBefore(node, nodes);
     removeNode(node);
 }
-function insertNode(node: INode, childNode) {
+function insertNode(node: INode, childNode:INode) {
     let parent = node.parentNode;
     if (parent == null) return 0;
     parent.insertBefore2(childNode, node)
@@ -198,7 +198,7 @@ function getAttr<T extends string | null>(node: IElement, attrName: string, defa
 }
 
 let addStyleRE = /;\s*$/
-function addStyle(elem, style) {
+function addStyle(elem:IElement, style:string) {
     if (!style) {
         return;
     }
@@ -213,7 +213,7 @@ function addStyle(elem, style) {
     elem.setAttribute('style', style);
 }
 let addClassNameRE = /\s+$/;
-function addClassName(elem, className) {
+function addClassName(elem:IElement, className:string) {
     if (!className) {
         return;
     }
@@ -227,10 +227,10 @@ function addClassName(elem, className) {
     }
     elem.setAttribute('class', className);
 }
-function addClass(elem, ...arg) {
+function addClass(elem:IElement, ...arg:any[]) {
     addClasses(elem, arg);
 }
-function addClasses(elem, clses) {
+function addClasses(elem:IElement, clses:string[]) {
     var lst;
     if (!elem)
         return;
@@ -240,7 +240,7 @@ function addClasses(elem, clses) {
             lst.add(clses[i]);
     }
 }
-function removeClass(elem, cls) {
+function removeClass(elem:IElement, cls:string) {
     var lst;
     if (!elem) {
         return;
@@ -250,7 +250,7 @@ function removeClass(elem, cls) {
         lst.remove(cls);
     }
 }
-function removeClasses(elem, clses) {
+function removeClasses(elem:IElement, clses:string[]) {
     var lst;
     if (!elem)
         return;
@@ -261,15 +261,23 @@ function removeClasses(elem, clses) {
     }
 }
 
-function replaceClass(sel, a, b) { if (sel && a && b) sel.className = sel.className.replace(a, b); }
-function toggleClass(sel, a, t, f) {
-    if (sel && a)
-        if (sel.className.indexOf(a) >= 0) {
-            sel.className = sel.className.replace(a, "");
-            if (f) f();
+function replaceClass(elem:IElement, a:string, b:string) {
+     if (elem && a && b){
+         elem.className = elem.className.replace(a, b); 
+     } 
+}
+function toggleClass(elem:IElement, a:string, t:Function, f:Function) {
+    if (elem && a)
+        if (elem.className.indexOf(a) >= 0) {
+            elem.className = elem.className.replace(a, "");
+            if (f){
+                f();
+            }
         } else {
-            sel.className += " " + a;
-            if (t) t();
+            elem.className += " " + a;
+            if (t){
+                t();
+            } 
         }
 }
 /**判断是否注释节点 */

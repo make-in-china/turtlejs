@@ -77,7 +77,7 @@ namespace VMElement{
             }
             return newNode;
         }
-        protected doAppendChild(vNode: VNode&IVNodeMethod) {
+        protected doAppendChild(vNode: VNode&IVNodeMethod):VNode & IVNodeMethod {
 
             Array.prototype.push.call(this.childNodes,vNode);
             let p = vNode.parentNode;

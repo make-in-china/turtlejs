@@ -16,19 +16,19 @@ function isObject<T>(p:any): p is Object {
     let type = typeof p;
     return type === 'function' || type === 'object' && !!p;
 }
-function isRegExp(a):a is RegExp{
+function isRegExp(a:any):a is RegExp{
     return "[object RegExp]" === toStr.call(a)
 }
-function isDate(a):a is Date{
+function isDate(a:any):a is Date{
     return "[object Date]" === toStr.call(a)
 }
-function isNumber(a):a is number{
+function isNumber(a:any):a is number{
     return "[object Number]" === toStr.call(a)
 }
-function isString(a):a is string{
+function isString(a:any):a is string{
     return "[object String]" === toStr.call(a)
 }
-function isFunction(a):a is Function{
+function isFunction(a:any):a is Function{
     return "[object Function]" === toStr.call(a)
 }
 // function isFinite(obj) {
@@ -37,7 +37,7 @@ function isFunction(a):a is Function{
 let isArray = Array.isArray || function(arg:any):arg is any[] {
     return "[object Array]"===toStr.call(arg)
 }
-function isPersent(s){
+function isPersent(s:any){
     return persentRE.test(s);
 }
 

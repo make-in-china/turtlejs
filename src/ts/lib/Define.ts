@@ -1,12 +1,12 @@
-function __merge(source,merge):any{
+function __merge(source:Function,merge:Function):any{
     return function(){
         var ret=source.apply(this.arguments);
         Object.keys(merge.call(ret)).forEach((key,v) => {
-            source[key] = v;
+            (<any>source)[key] = v;
         });
     };
 }
-export function CPN<T,U>(fn:(...arg)=>T,intface:U, merge:(this:T & U)=>U):new (...arg)=> T & U {
+export function CPN<T,U>(fn:(...arg:any[])=>T,intface:U, merge:(this:T & U)=>U):new (...arg:any[])=> T & U {
     return __merge(fn,merge);
 }
 export function CP1<T,U,P1>(fn:(p1:P1)=>T,intface:U, merge:(this:T & U)=>U):new (p1:P1)=> T & U {

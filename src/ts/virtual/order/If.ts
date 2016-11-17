@@ -1,5 +1,5 @@
 
-/// <reference path='../VOrder.ts'/>
+/// <reference path='VOrder.ts'/>
 class If extends VOrder {
     name = "if"
     isLogic = true

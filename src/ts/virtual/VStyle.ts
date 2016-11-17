@@ -65,7 +65,7 @@ class VStyle {
     }
 }
 
-function indexOfStyleName(t, name) {
+function indexOfStyleName(t, name:string) {
     for (let i = 0; i < t.length; i++) {
         if (t[i] === name) {
             return i;

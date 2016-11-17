@@ -35,6 +35,16 @@ function getCommentStringInfo(s:string):ICommentOrderInfo|null{
 abstract class VOrder{
     abstract name:string
     abstract isLogic:boolean
+    node:IComment;
+    condition:string;
+    abstract canPrebuild:boolean;
+    abstract run:()=>void
+    endNode:INode|null=null
+    parseBlockResult:ITreeEachReturn|undefined
+    constructor(node:IComment,condition:string){
+        this.node=node;
+        this.condition=condition;
+    }
     abstract parse(info:ICommentOrderInfo,node:IComment,orderStack:VOrderData[]):VOrderData;
     addOrderToNode(info:ICommentOrderInfo,node:IComment,orderStack:VOrderData[],fnGetOrder:()=>VOrderData):VOrderData{
         let order:VOrderData;
@@ -55,10 +65,10 @@ abstract class VOrder{
             return this.parse(info,node,orderStack);
         }
     }
-    parseBlock(node:INode,orderStack){
+    parseBlock(node:INode,orderStack:VOrderData[]):ITreeEachReturn|undefined{
         let i=getNodeIndex2(node);
         let isError=false;
-        let error=function(msg){
+        let error=function(msg:string){
             isError=true;
             alert(msg);
             return eTreeEach.c_stopEach;
@@ -75,7 +85,7 @@ abstract class VOrder{
             if(info.order){
                 let ret=this.parseLogic(info,node,orderStack);
                 if(ret){
-                    step.next=ret.parseBlockResult.index-getNodeIndex2(node)+1;
+                    step.next=(<ITreeEachReturn>ret.parseBlockResult).index-getNodeIndex2(node)+1;
                 }
                 return eTreeEach.c_noRepeat&eTreeEach.c_noIn;
             }

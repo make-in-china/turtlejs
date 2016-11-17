@@ -19,13 +19,13 @@ interface Constructor{
     prototype:Object
 }
     
-function extend<T>(elem:T,elemEx):T{
+function extend<T>(elem:T,elemEx:any):T{
     for(let e in elemEx){
         elem[e]=elemEx[e];
     }
     return elem;
 }
-function merge<T>(elem:T,elemEx):T{
+function merge<T>(elem:T,elemEx:any):T{
     for(let e in elemEx){
         if(!elem.hasOwnProperty(e)){
             elem[e]=elemEx[e];
@@ -51,7 +51,7 @@ function persentToFloat(s:string):number|undefined{
     }
 }
 
-function parseBool(v):boolean {
+function parseBool(v:any):boolean {
     if ( typeof v == 'string') {
         v = v.replace(/[\s]/g, '').toLowerCase();
         if(v&&(v=='false'||v =='0'||v=='null'||v =='undefined')){
@@ -63,11 +63,11 @@ function parseBool(v):boolean {
     return !!v;
 }
 
-function trim(s){return s.replace(/^\s*|\s*$/g,"");}
-function HTMLTrim(s){return s.replace(/^[\s\r\n]*|[\s\r\n]*$/g,"");}
-function trimLine(s){return s.replace(/^\s*/g,"").replace(/\s*$/g,"").replace(/\s*[\r\n]\s*/g,"");}
+function trim(s:string){return s.replace(/^\s*|\s*$/g,"");}
+function HTMLTrim(s:string){return s.replace(/^[\s\r\n]*|[\s\r\n]*$/g,"");}
+function trimLine(s:string){return s.replace(/^\s*/g,"").replace(/\s*$/g,"").replace(/\s*[\r\n]\s*/g,"");}
 let dateFormat=(function(){
-    return function(format,d){
+    return function(format:string,d:Date){
         'use strict' 
         let o = {
             "M+" : d.getMonth() + 1, //month
@@ -93,8 +93,8 @@ let
     camelCaseRE             =   /-(\w)/g,
     camelizeRE              =   /-+(.)?/g,
     deCamelizeRE            =   /[A-Z]/g
-function camelCase(s){
-    return s.replace(camelCaseRE,function(s,s1){
+function camelCase(s:string){
+    return s.replace(camelCaseRE,function(s:string,s1:string){
         return s1.toUpperCase();
     })
 }

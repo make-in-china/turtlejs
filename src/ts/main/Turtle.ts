@@ -14,7 +14,7 @@
 let 
         readyRE                 =   /complete|loaded|interactive/;
 
-function renderTemplate(tp){
+function renderTemplate(tp:IHTMLElement){
     let sHTML=getTemplate(tp);
     let vDOM=$DOM(sHTML);
     initHTML(vDOM.childNodes);
@@ -183,7 +183,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
     
     private r1(scriptNode:IHTMLScriptElement,compileuilist:string|undefined,compileName:string|undefined,compileInfo:{isOn?:boolean,url?:string},compile:string|undefined){
         this.ready(function() {
-            this.compileDocument(scriptNode,compileuilist,function(html,compileJS,importScripts){
+            this.compileDocument(scriptNode,compileuilist,function(html:string,compileJS:{name:string,path:string,script:string}[],importScripts:string){
                 if(compileName===""){
                     compileName=getNameByURL(getFileNameByURL(location.href));
                     if(/\./.test(compileName)){
@@ -202,7 +202,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
                         html='<xmp><script>'+importScripts+'</script></xmp>'+html.match(/(<body[\s\S]*?>)([\s\S]*?)(<\/body>)/)[2];
                         break;
                 }
-                this.xhr.post(url,html,false,function(text){
+                this.xhr.post(url,html,false,function(text:string){
                     let br= document.createElement('br');
                     let sec=document.createElement('span');
                     let timeout=1000;
@@ -217,7 +217,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
                     c.appendChild(document.createTextNode(text));
                     for(let i=0;i<compileJS.length;i++){
                         let url = compileInfo.url + "?uiName=" + compileJS[i].name + "&uiPath=" + compileJS[i].path;
-                        this.xhr.post(url,compileJS[i].script,false,function(text){
+                        this.xhr.post(url,compileJS[i].script,false,function(text:string){
                             c.appendChild(br.cloneNode());
                             c.appendChild(document.createTextNode(text));
                         });

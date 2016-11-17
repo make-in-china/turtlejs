@@ -39,7 +39,7 @@ let getFileNameByURL = (function () {
         return url.match(RE)[0];
     }
 } ());
-function appendQueryString(name, value) {
+function appendQueryString(name:string, value:string) {
     if (location.search) {
         return location.href + '&' + name + '=' + value;
     } else {

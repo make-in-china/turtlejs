@@ -1,19 +1,19 @@
 
 /// <reference path="../lib/is.ts" />
 interface ICallBack {
-    (this: void, ...arg): void
+    (this: void, ...arg:any[]): void
 }
 
 class EventEmitter{
     protected events: {
         [index: string]: ICallBack | ICallBack[] | undefined
-        error?
+        error?: ICallBack | ICallBack[]
     }
     constructor() {
         this.on = this.addListener;
         this.off = this.removeListener;
     }
-    emit(type: string, ...args): boolean {
+    emit(type: string, ...args:any[]): boolean {
         // If there is no 'error' event listener then throw.
         if (type === 'error') {
             if (!this.events || !this.events.error ||

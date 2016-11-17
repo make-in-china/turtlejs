@@ -7,7 +7,7 @@
 /// <reference path="../part/PartCore.ts"/>
 
 
-function _getBindObject(scope, arrNames: Array<string>) {
+function _getBindObject(scope:Scope|RootScope, arrNames: Array<string>) {
     let i, obj, length = arrNames.length;;
     while (scope) {
         obj = scope;
@@ -53,7 +53,7 @@ function addBindInfo(obj: Object, name: string, target: Object, targetName: stri
     }
     bindInfoHash.push({ name: name, target: target, targetName: targetName, event: event });
 }
-function removeBind(obj, name, targetName): boolean {
+function removeBind(obj:Object, name:string, targetName:string): boolean {
     if (!obj.__bind__) {
         return false;
     }
@@ -71,7 +71,7 @@ function removeBind(obj, name, targetName): boolean {
     }
     return false
 }
-function onPropertyChange(obj, name, fnOnSet) {
+function onPropertyChange(obj:Object, name:string, fnOnSet:Function) {
     let desc: PropertyDescriptor | null = Object.getOwnPropertyDescriptor(obj, name);
     if (!desc) return;
     if (desc.configurable === false)
@@ -80,7 +80,7 @@ function onPropertyChange(obj, name, fnOnSet) {
         throw new Error('绑定失败：原属性' + name + '不可写');
     delete obj[name];
     let newProperty: PropertyDescriptor = { enumerable: desc.enumerable, configurable: true };
-    let value;
+    let value:any;
     if (desc.hasOwnProperty('value')) {
         let _value = desc.value;
         if (isFunction(_value)) {
@@ -119,7 +119,7 @@ function onPropertyChange(obj, name, fnOnSet) {
     Object.defineProperty(obj, name, newProperty);
     desc = null;
 }
-function objectPropertyChange(obj, name, fnOnSet) {
+function objectPropertyChange(obj:Object, name:string, fnOnSet:Function) {
     if (obj.hasOwnProperty(name)) {
         onPropertyChange(obj, name, fnOnSet);
     }
@@ -128,13 +128,16 @@ interface Object {
     __bind__: IBindInfo[]
 }
 interface IBindFunction {
-    (name: string)
+    (name: string):void;
     isBinding: boolean;
     removeObject: Function;
-    list: {length:number};
+    list: {
+        [index:number]:Object;
+        length:number
+    };
 }
 function bindPropertyByName(obj: Object, name: string, obj2: Object, name2: string): IBindFunction {
-    let t: IBindFunction = <any>function (name) {
+    let t: IBindFunction = <any>function (name:string) {
         if (!t.isBinding) {
             t.isBinding = true;
             for (let i = 0; i < t.list.length; i++) {
@@ -154,7 +157,7 @@ function bindPropertyByName(obj: Object, name: string, obj2: Object, name2: stri
         }
     }
     t.isBinding = false;
-    t.removeObject = function (obj) {
+    t.removeObject = function (obj:Object) {
         removeItem(t.list, obj);
     }
     t.list = [obj, obj2];
@@ -219,7 +222,7 @@ function bindNodeProperty(node: INode, proName: string, condition: string) {
     let
         cdtn = splitByOnce(condition, "|"),
         name,
-        scope,
+        scope:Scope|RootScope,
         obj,
         obj2 = node,
         bindVar = cdtn[0],
@@ -227,12 +230,12 @@ function bindNodeProperty(node: INode, proName: string, condition: string) {
         exp: IExp,
         name2 = camelCase(proName);
     if (name2.indexOf(".") != -1) {
-        name2 = name2.split(".");
-        for (let i = 0; i < name2.length - 1; i++) {
-            obj2 = obj2[name2[i]];
+        let nameArr = name2.split(".");
+        for (let i = 0; i < nameArr.length - 1; i++) {
+            obj2 = obj2[nameArr[i]];
             if (!obj2) return;
         }
-        name2 = name2[name2.length - 1];
+        name2 = nameArr[nameArr.length - 1];
     }
     if (bindVar.indexOf(".") != -1) {
         arrBindVar = bindVar.split(".");
@@ -246,7 +249,7 @@ function bindNodeProperty(node: INode, proName: string, condition: string) {
         throw new Error('不能获取绑定属性:' + cdtn[0]);
     }
     if (cdtn.length == 2) {
-        exp = <any>function (v) {
+        exp = <any>function (v:string) {
             obj2[name2] = _execExpressionsByScope(cdtn[1], v, node);
         }
         exp.__me__ = exp;
@@ -271,17 +274,17 @@ function bindElementPropertyByName(node: IHTMLElement, elementValueName: string,
     scope = DOMScope.get(node);
     if (name.indexOf(".") != -1) {
         arrName = name.split(".");
-        obj = _getBindObject(scope, arrName);
+        obj = _getBindObject(<Scope>scope, arrName);
         name = arrName[arrName.length - 1];
     } else {
-        obj = _getBindObject(scope, [name]);
+        obj = _getBindObject(<Scope>scope, [name]);
     }
     if (obj === null) {
         throw new Error('不能获取绑定属性:' + cdtn[0]);
     }
 
     if (cdtn.length == 2) {
-        exp = <any>function (v) {
+        exp = <any>function (v:string) {
             _execExpressionsByScope(cdtn[1], v, node);
         }
         exp.__me__ = exp;
@@ -293,7 +296,7 @@ function bindElementPropertyByName(node: IHTMLElement, elementValueName: string,
         bindProperty(obj, name, node, elementValueName);
     }
 }
-function bindPropertyByOrder(node, condition) {
+function bindPropertyByOrder(node:INode, condition:string) {
     let cdtn = splitByOnce(condition, '|');
     if (cdtn.length < 2) return;
     let
@@ -315,7 +318,7 @@ function bindPropertyByOrder(node, condition) {
     }
     name = bindVar[bindVar.length - 1];
     scope = DOMScope.get(node);
-    obj = _getBindObject(scope, arrBindVar);
+    obj = _getBindObject(<Scope>scope, arrBindVar);
 
     if (bindVar2.indexOf(".") != -1) {
         arrBindVar2 = bindVar2.split(".");
@@ -324,18 +327,18 @@ function bindPropertyByOrder(node, condition) {
     }
     name2 = bindVar2[bindVar2.length - 1];
     scope2 = DOMScope.get(node);
-    obj2 = _getBindObject(scope2, arrBindVar2);
+    obj2 = _getBindObject(<Scope>scope2, arrBindVar2);
 
     bindProperty(obj, name, obj2, name2);
     obj2[name2] = obj[name];
 }
-function bindExpressionsByOrder(node, condition) {
+function bindExpressionsByOrder(node:INode, condition:string) {
     let cdtn = splitByOnce(condition, '|');
     if (cdtn.length < 2)
         cdtn.push('v');
     let
         name,
-        scope,
+        scope:Scope|RootScope,
         obj,
         bindVar = cdtn[0],
         arrBindVar: Array<string>,
@@ -353,7 +356,7 @@ function bindExpressionsByOrder(node, condition) {
     if (obj === null) {
         throw new Error('不能获取绑定属性:' + cdtn[0]);
     }
-    exp = <any>function (v) {
+    exp = <any>function (v:string) {
         // try {
         return _execExpressionsByScope.call(scope, cdtn[1], v, node);
         // } catch (e) { _catch(e) }

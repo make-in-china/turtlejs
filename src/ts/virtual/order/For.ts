@@ -1,10 +1,15 @@
 
-/// <reference path='../VOrder.ts'/>
+/// <reference path='VOrder.ts'/>
 let parseForOrderRE         =   /[a-zA-Z\d] in .*/;
 class For extends VOrder {
     name = "for"
     isLogic = true
+    condition:string
+    get canPrebuild():boolean{
+        
+    }
     parse(info: ICommentOrderInfo, node: IComment,orderStack:VOrderData[]): VOrderData {
+        
         return this.addOrderToNode(info, node,orderStack, () => {
             let d = new VForOrderData(this.name, node, info.condition, function () {
                 let p=<INode>node.parentNode;

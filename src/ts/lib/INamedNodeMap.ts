@@ -12,7 +12,7 @@ class INamedNodeMap{
         }
         return -1;
     }
-    indexOf(o) {
+    indexOf(o:any) {
         var l = this._length;
         for (var i = 0; i < l; i++) {
             if (this[i] === o) {

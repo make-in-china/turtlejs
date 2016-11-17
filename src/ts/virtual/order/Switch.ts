@@ -1,5 +1,5 @@
 
-/// <reference path='../VOrder.ts'/>
+/// <reference path='VOrder.ts'/>
 class Switch extends VOrder {
     name = "switch"
     isLogic = true

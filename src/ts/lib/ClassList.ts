@@ -3,7 +3,7 @@
 let classSplitRE = /\s+/g
 class ClassList {
     constructor(private element: IElement) { }
-    add(value) {
+    add(value:string) {
         let classes = this.element.className.split(classSplitRE);
         let index = classes.indexOf(value);
         if (!~index) {
@@ -12,7 +12,7 @@ class ClassList {
         }
 
     }
-    remove(value) {
+    remove(value:string) {
         let classes = this.element.className.split(classSplitRE);
         let index = classes.indexOf(value);
         if (~index) {
@@ -20,7 +20,7 @@ class ClassList {
             this.element.className = classes.join(' ');
         }
     }
-    toggle(value) {
+    toggle(value:string) {
         let classes = this.element.className.split(classSplitRE);
         let index = classes.indexOf(value);
         if (~index) {
@@ -30,10 +30,10 @@ class ClassList {
         }
         this.element.className = classes.join(' ');
     }
-    contains(value) {
+    contains(value:string) {
         return !!~this.element.className.split(classSplitRE).indexOf(value);
     }
-    item(i) {
+    item(i:number) {
         return this.element.className.split(classSplitRE)[i] || null;
     }
 }
