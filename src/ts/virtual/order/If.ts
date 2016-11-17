@@ -10,14 +10,14 @@ namespace Order {
         endHit:INode|null=null
         get canPrebuild(): boolean {
             try {
-                VOrder.exec(this.node, this.condition);
+                exec(this.node, this.condition);
                 return true;
             } catch (error) {
                 return false
             }
         }
         run() {
-            this.hit = parseBool(VOrder.exec(this.node, this.condition)) ? this.node : null;
+            this.hit = parseBool(exec(this.node, this.condition)) ? this.node : null;
             treeEach((<INode>this.node.parentNode).childNodes, 'childNodes', function (node: INode, step) {
                 if (!isCommentNode(node)) {
                     return;
@@ -39,7 +39,7 @@ namespace Order {
                                 if (this.hit) {
                                     this.endHit = node;
                                 } else {
-                                    if (info.orderCase == 'else' || parseBool(VOrder.exec(node, this.condition))) {
+                                    if (info.orderCase == 'else' || parseBool(exec(node, this.condition))) {
                                         this.hit = node;
                                     } else {
                                         /*删除else if*/
@@ -74,5 +74,5 @@ namespace Order {
             }
         }
     }
-    VOrder.register(If);
+    register(If);
 }

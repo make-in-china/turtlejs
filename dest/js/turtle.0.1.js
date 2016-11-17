@@ -1502,9 +1502,8 @@ function bindExpressionsByOrder(node, condition) {
 }
 /// <reference path="../scope/execute.ts"/>
 /// <reference path="../main/bind.ts"/>
-var parseForOrderRE2 = /^.*;.*;.*$/;
-var Order = (function () {
-    function Order() {
+var xxxxOrder = (function () {
+    function xxxxOrder() {
         this.SetParseError = (function () {
             var SetParseError = function (msg) {
                 SetParseError.isError = true;
@@ -1516,7 +1515,7 @@ var Order = (function () {
         }());
     }
     /**从注释中读取命令 */
-    Order.prototype.getCommentStringInfo = function (s) {
+    xxxxOrder.prototype.getCommentStringInfo = function (s) {
         var order = s.match(orderRE);
         if (order) {
             return { order: trim(order[0]), condition: s.substring(order[0].length, s.length) };
@@ -1529,7 +1528,7 @@ var Order = (function () {
         }
         return null;
     };
-    Order.prototype.parseScopeOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+    xxxxOrder.prototype.parseScopeOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
         var condition = splitByOnce(info.condition, "|");
         if (condition.length == 2) {
             DOMScope.create(node, condition[0]);
@@ -1540,7 +1539,7 @@ var Order = (function () {
         }
         removeNode(node);
     };
-    Order.prototype.parseCommentOrderNoScript = function (info, node, outerChildNodes, outerChildren, props, part) {
+    xxxxOrder.prototype.parseCommentOrderNoScript = function (info, node, outerChildNodes, outerChildren, props, part) {
         /*不渲染，纯找结构*/
         switch (info.order) {
             case 'while':
@@ -1555,7 +1554,7 @@ var Order = (function () {
                 return this.parseAsyncOrder(info, node, outerChildNodes, outerChildren, props, part);
         }
     };
-    Order.prototype.parseCommentOrderBlock = function (node, outerChildNodes, outerChildren, props, part) {
+    xxxxOrder.prototype.parseCommentOrderBlock = function (node, outerChildNodes, outerChildren, props, part) {
         var i = getNodeIndex2(node);
         var isError = false;
         var error = function (msg) {
@@ -1590,7 +1589,7 @@ var Order = (function () {
             return 4 /* c_noIn */;
         }, i + 1);
     };
-    Order.prototype.addOrderToNode = function (node, info, outerChildNodes, outerChildren, props, part, fnGetOrder) {
+    xxxxOrder.prototype.addOrderToNode = function (node, info, outerChildNodes, outerChildren, props, part, fnGetOrder) {
         var order;
         if (!node.__order__) {
             order = fnGetOrder();
@@ -1607,7 +1606,7 @@ var Order = (function () {
         }
         return order.parseBlockResult;
     };
-    Order.prototype.parseIfOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+    xxxxOrder.prototype.parseIfOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
         return this.addOrderToNode(node, info, outerChildNodes, outerChildren, props, part, function () {
             var scope = DOMScope.get(node);
             return {
@@ -1680,7 +1679,7 @@ var Order = (function () {
             };
         });
     };
-    Order.prototype.parseBreakOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+    xxxxOrder.prototype.parseBreakOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
         /*删除后面节点,父节点后面节点,父父节点后面节点直至__break__*/
         var _node = node.previousSibling;
         if (!_node)
@@ -1699,7 +1698,7 @@ var Order = (function () {
         }
         _node.source.onBreak();
     };
-    Order.prototype.parseWhileOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+    xxxxOrder.prototype.parseWhileOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
         return this.addOrderToNode(node, info, outerChildNodes, outerChildren, props, part, function () {
             return {
                 run: function () {
@@ -1722,7 +1721,7 @@ var Order = (function () {
             };
         });
     };
-    Order.prototype.parseAsyncOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+    xxxxOrder.prototype.parseAsyncOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
         return this.addOrderToNode(node, info, outerChildNodes, outerChildren, props, part, function () {
             return {
                 run: function () {
@@ -1754,7 +1753,7 @@ var Order = (function () {
             };
         });
     };
-    Order.prototype.parseSwitchOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+    xxxxOrder.prototype.parseSwitchOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
         return this.addOrderToNode(node, info, outerChildNodes, outerChildren, props, part, function () {
             return {
                 value: execByScope(node, info.condition, null, outerChildNodes, outerChildren, props, part),
@@ -1841,7 +1840,7 @@ var Order = (function () {
             };
         });
     };
-    Order.prototype.parseForOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+    xxxxOrder.prototype.parseForOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
         return this.addOrderToNode(node, info, outerChildNodes, outerChildren, props, part, function () {
             var check;
             if (parseForOrderRE.test(info.condition)) {
@@ -1920,7 +1919,7 @@ var Order = (function () {
             };
         });
     };
-    Order.prototype.createBreakElement = function (nodes, order) {
+    xxxxOrder.prototype.createBreakElement = function (nodes, order) {
         var breakElement = $node('__break__');
         for (var i = 0; i < nodes.length; i++) {
             breakElement.appendChild(nodes[i]);
@@ -1928,7 +1927,7 @@ var Order = (function () {
         breakElement.source = order;
         return breakElement;
     };
-    Order.prototype.parseCommentOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
+    xxxxOrder.prototype.parseCommentOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
         switch (info.order) {
             case 'scope':
                 this.parseScopeOrder(info, node, outerChildNodes, outerChildren, props, part);
@@ -1976,7 +1975,7 @@ var Order = (function () {
                 return this.parseAsyncOrder(info, node, outerChildNodes, outerChildren, props, part);
         }
     };
-    Order.prototype.parseComment = function (node, outerChildNodes, outerChildren, props, part) {
+    xxxxOrder.prototype.parseComment = function (node, outerChildNodes, outerChildren, props, part) {
         var info = this.getCommentStringInfo(getCommentText(node));
         if (!info)
             return;
@@ -1990,7 +1989,7 @@ var Order = (function () {
             }
         }
     };
-    return Order;
+    return xxxxOrder;
 }());
 var XHR = (function () {
     function XHR() {

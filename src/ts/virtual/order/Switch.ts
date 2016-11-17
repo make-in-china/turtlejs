@@ -1,82 +1,93 @@
 
 /// <reference path='VOrder.ts'/>
-class Switch extends VOrder {
-    name = "switch"
-    isLogic = true
-    parse(info: ICommentOrderInfo, node: IComment, orderStack: VOrderData[]): VOrderData {
-        return this.addOrderToNode(info, node, orderStack, () => {
-            let d = new VSwitchOrderData(this.name, node, info.condition, function () {
-                let p = <INode>node.parentNode;
-                treeEach(p.childNodes, 'childNodes', function (node: IComment, step) {
-                    if (!isCommentNode(node)) {
-                        return;
-                    }
-                    let info = getCommentStringInfo(node.data);
-                    if (!info) {
-                        return;
-                    }
-                    if (node.__order__ && node.__order__.endNode) {
-                        step.next = getNodeIndex2(node.__order__.endNode) - getNodeIndex2(node);
-                        return;
-                    }
-                    switch (info.orderCase) {
-                        case 'case':
-                        case 'case break':
-                            if (d.hasDefault) {
-                                return this.SetParseError('语法错误：default后不应出现case/case break');
-                            } else if (!d.hit) {
-                                let isPass = d.value == VOrderHelper.exec(node, info.condition);
-                                if (isPass) {
-                                    d.hit = node;
-                                    d.hitBy = info.orderCase;
-                                }
-                            } else if (!d.endHit) {
-                                d.endHit = node;
-                            }
-                            break;
-                        case 'default':
-                            if (d.hasDefault) {
-                                return this.SetParseError('语法错误：多余的default');
-                            } else {
-                                d.hasDefault = true;
-                                if (!d.hit) {
-                                    d.hit = node;
-                                    d.hitBy = info.orderCase;
-                                } else if (!d.endHit) {
-                                    d.endHit = node;
-                                }
-                            }
-                            break;
-                    }
-                }, getNodeIndex2(node) + 1);
-                if (!d.hit) {
-                    /*全部删除*/
-                    removeBlockBetween(d.node, node);
-                    p.removeChild(node);
-                    p.removeChild(<INode>d.endNode);
-                } else {
-                    if (!d.endHit) {
-                        d.endHit = d.endNode;
-                    }
-                    //删除hit前的数据
-                    removeBlockBetween(node, d.hit);
-                    //外置hit的数据
-                    let ns = takeBlockBetween(d.hit, <INode>d.endHit);
-                    if (ns) insertNodesBefore(d.node, ns);
-
-                    removeNode(d.hit);
-
-                    if (d.hitBy === 'case break'/*已终止选择*/ || d.endHit === d.endNode/*已结束*/) {
-                        /*全部删除*/
-                        removeBlockBetween(this.node, this.endNode);
-                        p.removeChild(this.node);
-                        p.removeChild(this.endNode);
-                    }
+namespace Order {
+    class Switch extends VOrder {
+        static name = "switch"
+        static isLogic = true
+        value: any
+        hit: INode | null = null
+        hitBy: string
+        needBreak: boolean = false
+        endHit: INode | null = null
+        hasDefault: boolean = false
+        get canPrebuild():boolean{
+            try {
+                exec(this.node, this.condition);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+        run() {
+            let p = <INode>this.node.parentNode;
+            treeEach(p.childNodes, 'childNodes', function (node: IComment, step) {
+                if (!isCommentNode(node)) {
+                    return;
                 }
-                delete node.__order__;
-            });
-            return d;
-        });
-    }
-}
+                let info = getCommentStringInfo(node.data);
+                if (!info) {
+                    return;
+                }
+                if (node.__order__ && node.__order__.endNode) {
+                    step.next = getNodeIndex2(node.__order__.endNode) - getNodeIndex2(node);
+                    return;
+                }
+                switch (info.orderCase) {
+                    case 'case':
+                    case 'case break':
+                        if (this.hasDefault) {
+                            return this.SetParseError('语法错误：default后不应出现case/case break');
+                        } else if (!this.hit) {
+                            let isPass = this.value == exec(node, info.condition);
+                            if (isPass) {
+                                this.hit = node;
+                                this.hitBy = info.orderCase;
+                            }
+                        } else if (!this.endHit) {
+                            this.endHit = node;
+                        }
+                        break;
+                    case 'default':
+                        if (this.hasDefault) {
+                            return this.SetParseError('语法错误：多余的default');
+                        } else {
+                            this.hasDefault = true;
+                            if (!this.hit) {
+                                this.hit = node;
+                                this.hitBy = info.orderCase;
+                            } else if (!this.endHit) {
+                                this.endHit = node;
+                            }
+                        }
+                        break;
+                }
+            }, getNodeIndex2(this.node) + 1);
+            if (!this.hit) {
+                /*全部删除*/
+                removeBlockBetween(this.node, this.node);
+                p.removeChild(this.node);
+                p.removeChild(<INode>this.endNode);
+            } else {
+                if (!this.endHit) {
+                    this.endHit = this.endNode;
+                }
+                //删除hit前的数据
+                removeBlockBetween(this.node, this.hit);
+                //外置hit的数据
+                let ns = takeBlockBetween(this.hit, <INode>this.endHit);
+                if (ns) insertNodesBefore(this.node, ns);
 
+                removeNode(this.hit);
+
+                if (this.hitBy === 'case break'/*已终止选择*/ || this.endHit === this.endNode/*已结束*/) {
+                    /*全部删除*/
+                    removeBlockBetween(this.node, <INode>this.endNode);
+                    p.removeChild(this.node);
+                    p.removeChild(<INode>this.endNode);
+                }
+            }
+            delete this.node.__order__;
+        }
+    }
+    register(Switch);
+}

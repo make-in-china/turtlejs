@@ -1,32 +1,34 @@
 
 /// <reference path='VOrder.ts'/>
-class While extends VOrder {
-    name = "while"
-    isLogic = true
-    parse(info: ICommentOrderInfo, node: IComment,orderStack:VOrder[]):void {
-        return this.addOrderToNode(info, node ,orderStack, () => {
-            let d = new VWhileOrderData(this.name, node, info.condition, function () {
-                let p: INode = <INode>node.parentNode;
-                if (d.isBreak || !parseBool(VOrderHelper.exec(node, d.condition))) {
-                    //全部删除
-                    removeBlockBetween(node, <INode>d.endNode);
-                    p.removeChild(node);
-                    p.removeChild(<INode>d.endNode);
-                } else {
-                    let nodes = cloneBetween(node, <INode>d.endNode);
-                    p.insertBefore2(createBreakElement(nodes, d), node);
-                }
-            });
-            return d;
-        });
-    }
-}
+namespace Order {
+    class While extends VOrder {
+        static name = "while"
+        static isLogic = true
+        isBreak: boolean = false
+        onBreak() {
+            this.isBreak = true;
+        }
+        run() {
 
-function createBreakElement(nodes,order:VOrder) {
-    let breakElement: IHTMLBreakElement = $node('__break__');
-    for (let i = 0; i < nodes.length; i++) {
-        breakElement.appendChild(nodes[i]);
+            let p: INode = <INode>this.node.parentNode;
+            if (this.isBreak || !parseBool(exec(this.node, this.condition))) {
+                //全部删除
+                removeBlockBetween(this.node, <INode>this.endNode);
+                p.removeChild(this.node);
+                p.removeChild(<INode>this.endNode);
+            } else {
+                let nodes = cloneBetween(this.node, <INode>this.endNode);
+                p.insertBefore2(createBreakElement(nodes, this), this.node);
+            }
+        }
     }
-    breakElement.source = order;
-    return breakElement;
+    register(While);
+    function createBreakElement(nodes, order: VOrder) {
+        let breakElement: IHTMLBreakElement = $node('__break__');
+        for (let i = 0; i < nodes.length; i++) {
+            breakElement.appendChild(nodes[i]);
+        }
+        breakElement.source = order;
+        return breakElement;
+    }
 }

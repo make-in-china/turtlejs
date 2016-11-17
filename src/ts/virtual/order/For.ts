@@ -62,9 +62,9 @@ namespace Order {
 
         private canPrebuildForSplit(): boolean {
             try {
-                VOrder.exec(this.node, this.forSplit.pre);
-                VOrder.exec(this.node, this.forSplit.step);
-                VOrder.exec(this.node, this.forSplit.exec);
+                exec(this.node, this.forSplit.pre);
+                exec(this.node, this.forSplit.step);
+                exec(this.node, this.forSplit.exec);
             } catch (error) {
                 return false;
             }
@@ -73,11 +73,11 @@ namespace Order {
         private checkForSplit(): boolean {
             if (this.forSplit.isFirst) {
                 this.forSplit.isFirst = false;
-                VOrder.exec(this.node, this.forSplit.pre);
+                exec(this.node, this.forSplit.pre);
             } else {
-                VOrder.exec(this.node, this.forSplit.step);
+                exec(this.node, this.forSplit.step);
             }
-            return VOrder.exec(this.node, this.forSplit.exec);
+            return exec(this.node, this.forSplit.exec);
         }
 
         private forIn: {
@@ -89,7 +89,7 @@ namespace Order {
         }
         private canPrebuildForIn(): boolean {
             try {
-                VOrder.exec(this.node, this.forIn.object)
+                exec(this.node, this.forIn.object)
             } catch (error) {
                 return false;
             }
@@ -97,7 +97,7 @@ namespace Order {
         }
         private initForInSourceData(): boolean {
             if (!this.forIn.source) {
-                this.forIn.source = VOrder.exec(this.node, this.forIn.object);
+                this.forIn.source = exec(this.node, this.forIn.object);
                 if (!this.forIn.source) {
                     return false;
                 }
@@ -112,7 +112,7 @@ namespace Order {
                 throw new Error("计算出错！");
             }
             if (this.forIn.index < this.forIn.names.length) {
-                VOrder.exec(this.node, this.forIn.var + '=\'' + this.forIn.names[this.forIn.index] + '\';');
+                exec(this.node, this.forIn.var + '=\'' + this.forIn.names[this.forIn.index] + '\';');
                 this.forIn.index++;
                 return true
             } else {
@@ -140,5 +140,5 @@ namespace Order {
             }
         }
     }
-    VOrder.register(For);
+    register(For);
 }

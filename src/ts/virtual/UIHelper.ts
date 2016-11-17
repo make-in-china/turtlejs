@@ -4,7 +4,7 @@
 /// <reference path='../lib/is.ts'/>
 /// <reference path='./VElementHelper.ts'/>
 /// <reference path='VMember.ts'/>
-/// <reference path='VOrder.ts'/>
+/// <reference path='order/VOrder.ts'/>
 
 class UIHelper{
     static fs=typeof require!== "undefined"&&require('fs');
@@ -97,7 +97,7 @@ namespace ComponentView{
                 //不处理咯
             }else if(node instanceof VComment){
                 //解析注释里的命令
-                let orderData=VOrderHelper.parseComment(node);
+                let orderData=Order.parseComment(node);
                 if(orderData){
                     //剪切命令块
                 };

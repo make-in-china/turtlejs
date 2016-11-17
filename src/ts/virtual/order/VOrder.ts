@@ -1,5 +1,5 @@
 
-interface IComment{
+interface IComment {
     __order__?: Order.VOrder
 }
 namespace Order {
@@ -40,7 +40,7 @@ namespace Order {
         node: IComment;
         condition: string;
         abstract canPrebuild: boolean;
-        abstract run():void
+        abstract run(): void
         endNode: INode | null = null
         parseBlockResult: ITreeEachReturn | undefined
         constructor(node: IComment, condition: string) {
@@ -53,10 +53,10 @@ namespace Order {
             orderStack.push(this);
             this.parseBlockResult = this.parseBlock(node, orderStack);
         }
-        private parseLogic(info: ICommentOrderInfo, node: IComment, orderStack: VOrder[]):boolean {
+        private parseLogic(info: ICommentOrderInfo, node: IComment, orderStack: VOrder[]): boolean {
             /*不渲染，纯找结构*/
             let orderName: string = <string>info.order;
-            if (orderName in VOrder.logicOrders) {
+            if (orderName in logicOrders) {
                 this.parse(node, orderStack);
                 return true;
             }
@@ -98,42 +98,43 @@ namespace Order {
             }, i + 1);
 
         }
-        static orders: { [index: string]: IOrderConstructor } = {};
-        static logicOrders: { [index: string]: IOrderConstructor } = {};
-        static register(order: IOrderConstructor) {
-            this.orders[order.name] = order;
-            if (order.isLogic) {
-                this.logicOrders[order.name] = order;
-            }
-        }
-        static parseComment(node: IComment, run: boolean = false): VOrder | undefined {
 
-            if (node.__order__) {
-                return node.__order__;
-            }
-            let info = getCommentStringInfo(node.data);
-            if (!info) {
-                return;
-            }
-            if (!info.order) {
-                throw new Error("语法错误：不恰当的" + info.orderCase);
-            }
-            let orderName: string = <string>info.order;
-            if (!(orderName in Order)) {
-                return;
-            }
-            let order: VOrder = new this.orders[orderName](node, info.condition);
-            order.parse(node, []);
-            if (run) {
-                if (order.endNode) {
-                    order.run();
-                }
-            }
-            return order;
+    }
+    let orders: { [index: string]: IOrderConstructor } = {};
+    let logicOrders: { [index: string]: IOrderConstructor } = {};
+    export function register(order: IOrderConstructor) {
+        this.orders[order.name] = order;
+        if (order.isLogic) {
+            this.logicOrders[order.name] = order;
         }
-        private static _exec = <(this: IComment, $$turtle$$: string) => any>Function('$$turtle$$', 'with(this){return eval($$turtle$$)};');
-        static exec(node: IComment, script: string): any {
-            return this._exec.call(node, script);
+    }
+    export function parseComment(node: IComment, run: boolean = false): VOrder | undefined {
+
+        if (node.__order__) {
+            return node.__order__;
         }
+        let info = getCommentStringInfo(node.data);
+        if (!info) {
+            return;
+        }
+        if (!info.order) {
+            throw new Error("语法错误：不恰当的" + info.orderCase);
+        }
+        let orderName: string = <string>info.order;
+        if (!(orderName in Order)) {
+            return;
+        }
+        let order: VOrder = new this.orders[orderName](node, info.condition);
+        order.parse(node, []);
+        if (run) {
+            if (order.endNode) {
+                order.run();
+            }
+        }
+        return order;
+    }
+    let _exec = <(this: IComment, $$turtle$$: string) => any>Function('$$turtle$$', 'with(this){return eval($$turtle$$)};');
+    export function exec(node: IComment, script: string): any {
+        return this._exec.call(node, script);
     }
 }
