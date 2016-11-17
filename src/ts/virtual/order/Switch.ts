@@ -10,7 +10,7 @@ namespace Order {
         needBreak: boolean = false
         endHit: INode | null = null
         hasDefault: boolean = false
-        get canPrebuild():boolean{
+        get canRunInService():boolean{
             try {
                 exec(this.node, this.condition);
                 return true;

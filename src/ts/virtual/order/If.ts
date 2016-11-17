@@ -5,10 +5,10 @@ namespace Order {
         static name = "if"
         static isLogic = true
         
-        hit:INode|null=null
+        hit:VNode|null=null
         hasElse:boolean=false
-        endHit:INode|null=null
-        get canPrebuild(): boolean {
+        endHit:VNode|null=null
+        get canRunInService(): boolean {
             try {
                 exec(this.node, this.condition);
                 return true;
@@ -18,11 +18,11 @@ namespace Order {
         }
         run() {
             this.hit = parseBool(exec(this.node, this.condition)) ? this.node : null;
-            treeEach((<INode>this.node.parentNode).childNodes, 'childNodes', function (node: INode, step) {
-                if (!isCommentNode(node)) {
+            treeEach((<VNode&IVNodeMethod>this.node.parentNode).childNodes, 'childNodes', (node: VNode&IVNodeMethod, step)=> {
+                if (!isVComment(node)) {
                     return;
                 }
-                let info = this.getCommentStringInfo(node.data);
+                let info = getCommentStringInfo(node.data);
                 if (!info) return;
                 if (node.__order__ && node.__order__.node) {
                     step.next = getNodeIndex2(node.__order__.node) - getNodeIndex2(node);
@@ -48,7 +48,7 @@ namespace Order {
                                 }
                             }
                         } else {
-                            return this.SetParseError('语法错误：else或else if不能出现在else后');
+                            return eTreeEach.c_stopEach;//this.SetParseError('语法错误：else或else if不能出现在else后');
                         }
                         break;
                 }

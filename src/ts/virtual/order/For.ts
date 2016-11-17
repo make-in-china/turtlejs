@@ -14,7 +14,7 @@ namespace Order {
             this.isBreak = true;
         }
         isBreak: boolean
-        get canPrebuild(): boolean {
+        get canRunInService(): boolean {
             if (this.forMode === eForMode.forIn) {
                 return this.canPrebuildForIn();
             } else {

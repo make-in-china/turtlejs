@@ -1,4 +1,3 @@
-HTMLCollection
 /// <reference path='.d.ts'/>
 class VHTMLCollection {
     /**

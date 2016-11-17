@@ -8,6 +8,9 @@ namespace ComponentView{
         panel:VMElement.VDivElement&IVNodeMethod=<any>VNodeHelp
 ("DIV").appendChild(this.ok).$;
         tops:[VMElement.VDivElement&IVNodeMethod]=[<any>VNodeHelp
-("DIV").appendChild(this.panel).$]
+("DIV").appendChild(this.panel).$
+    ("DIV")(`
+        if 1
+    `,3).$.$]
     }
 }

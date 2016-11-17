@@ -1,7 +1,11 @@
 
-interface IComment {
+interface VComment {
     __order__?: Order.VOrder
 }
+interface VComment {
+    __order__?:Order.VOrder
+}
+
 namespace Order {
     interface VNodeVMData {
         /**命令 */
@@ -31,29 +35,29 @@ namespace Order {
         condition: string;
     }
     export interface IOrderConstructor {
-        new (node: IComment, condition: string): VOrder
+        new (node: VComment, condition: string): VOrder
         name: string
         isLogic: boolean
     }
 
     export abstract class VOrder {
-        node: IComment;
+        node: VComment;
         condition: string;
-        abstract canPrebuild: boolean;
+        abstract canRunInService: boolean;
         abstract run(): void
-        endNode: INode | null = null
+        endNode: VNode | null = null
         parseBlockResult: ITreeEachReturn | undefined
-        constructor(node: IComment, condition: string) {
+        constructor(node: VComment, condition: string) {
             this.node = node;
             this.condition = condition;
         }
 
-        parse(node: IComment, orderStack: VOrder[]) {
+        parse(node: VComment, orderStack: VOrder[]) {
             node.__order__ = this;
             orderStack.push(this);
             this.parseBlockResult = this.parseBlock(node, orderStack);
         }
-        private parseLogic(info: ICommentOrderInfo, node: IComment, orderStack: VOrder[]): boolean {
+        private parseLogic(info: ICommentOrderInfo, node: VComment, orderStack: VOrder[]): boolean {
             /*不渲染，纯找结构*/
             let orderName: string = <string>info.order;
             if (orderName in logicOrders) {
@@ -62,7 +66,7 @@ namespace Order {
             }
             return false;
         }
-        parseBlock(node: IComment, orderStack: VOrder[]): ITreeEachReturn | undefined {
+        parseBlock(node: VComment, orderStack: VOrder[]): ITreeEachReturn | undefined {
             let i = getNodeIndex2(node);
             let isError = false;
             let error = function (msg: string) {
@@ -71,8 +75,8 @@ namespace Order {
                 return eTreeEach.c_stopEach;
             }
 
-            return treeEach(<INode[]><any>(<INode>node.parentNode).childNodes, 'childNodes', (node, step) => {
-                if (!isCommentNode(node)) {
+            return treeEach(<VNode[]><any>(<VNode>node.parentNode).childNodes, 'childNodes', (node, step) => {
+                if (!isVComment(node)) {
                     return;
                 }
                 let info = getCommentStringInfo(node.data);
@@ -102,13 +106,14 @@ namespace Order {
     }
     let orders: { [index: string]: IOrderConstructor } = {};
     let logicOrders: { [index: string]: IOrderConstructor } = {};
-    export function register(order: IOrderConstructor) {
-        this.orders[order.name] = order;
+    export function register(this:void,order: IOrderConstructor) {
+        let name:string=order.name.toLowerCase();
+        orders[name] = order;
         if (order.isLogic) {
-            this.logicOrders[order.name] = order;
+            logicOrders[name] = order;
         }
     }
-    export function parseComment(node: IComment, run: boolean = false): VOrder | undefined {
+    export function parseComment(this:void,node: VComment, run: boolean = false): VOrder | undefined {
 
         if (node.__order__) {
             return node.__order__;
@@ -120,11 +125,11 @@ namespace Order {
         if (!info.order) {
             throw new Error("语法错误：不恰当的" + info.orderCase);
         }
-        let orderName: string = <string>info.order;
-        if (!(orderName in Order)) {
+        let orderName: string = (<string>info.order).toLowerCase();
+        if (!(orderName in orders)) {
             return;
         }
-        let order: VOrder = new this.orders[orderName](node, info.condition);
+        let order: VOrder = new orders[orderName](node, info.condition);
         order.parse(node, []);
         if (run) {
             if (order.endNode) {
@@ -133,8 +138,8 @@ namespace Order {
         }
         return order;
     }
-    let _exec = <(this: IComment, $$turtle$$: string) => any>Function('$$turtle$$', 'with(this){return eval($$turtle$$)};');
-    export function exec(node: IComment, script: string): any {
-        return this._exec.call(node, script);
+    let _exec = <(this: VComment, $$turtle$$: string) => any>Function('$$turtle$$', 'with(this){return eval($$turtle$$)};');
+    export function exec(this:void,node: VComment, script: string): any {
+        return _exec.call(node, script);
     }
 }

@@ -14,6 +14,10 @@ class VComment extends VCharacterData{
     nodeName="#Comment"
     nodeType:VNodeType=8
     private __value__=""
+    constructor(data:string){
+        super();
+        this.__value__=data;
+    }
     get data() {
         return this.__value__;
     }

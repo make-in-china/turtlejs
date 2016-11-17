@@ -1,10 +1,10 @@
 ﻿
 var gulp = require('gulp');
+var fs=require('fs');
 var ts = require('gulp-typescript');
 var moment=require('moment');
 var sourcemaps = require('gulp-sourcemaps');
 var merge = require('merge2');  // Requires separate installation
-var fs=require('fs');
 function tsc(event){
     var tsResult=gulp.src('src/ts/index.ts')
         .pipe(ts({
@@ -67,7 +67,6 @@ function uibuild(path){
 }
 function uiwatch(event){
     gulp.watch('src/ui/**/*.html', function(event){
-        console.log(global);
         uibuild(event.path);
     });
 }

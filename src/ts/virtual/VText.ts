@@ -1,5 +1,5 @@
 
-/// <reference path='VNode.ts'/>
+/// <reference path='VCharacterData.ts'/>
 interface IVNodeMethod{
     (nodeName: any, nodeType: 3): VText&IVNodeMethod;
 }
@@ -18,7 +18,7 @@ let getFunctionBlock=(function(){
         return "";
     }
 }());
-class VText extends VNode{
+class VText extends VCharacterData{
     nodeName="#text"
     nodeType:VNodeType=3
     private __value__=""

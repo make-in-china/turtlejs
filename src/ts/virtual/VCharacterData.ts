@@ -1,11 +1,7 @@
 
 /// <reference path='VNode.ts'/>
 abstract class VCharacterData extends VNode{
-    data=""
-    constructor(data:string){
-        super();
-        this.data=data;
-    }
+    abstract data:string
     getData():string{
         return this.data;
     }

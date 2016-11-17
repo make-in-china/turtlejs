@@ -8,7 +8,7 @@ namespace Order {
         onBreak() {
             this.isBreak = true;
         }
-        get canPrebuild():boolean{
+        get canRunInService():boolean{
             try {
                 exec(this.node, this.condition);
                 return true;

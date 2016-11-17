@@ -5,14 +5,32 @@
 /// <reference path='./VElementHelper.ts'/>
 /// <reference path='VMember.ts'/>
 /// <reference path='order/VOrder.ts'/>
+/// <reference path='order/If.ts'/>
 
 class UIHelper{
     static fs=typeof require!== "undefined"&&require('fs');
-    static template={
-        class:`/// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
+    static getScriptString(className:string){
+        return `namespace ComponentScript{
+    export class ${className}{
+        constructor(part:Component.${className}){
+            
+        }
+    }
+}`
+    }
+    static getViewString(className:string,propertyInfo:string){
+        return `/// <reference path="../../../dest/virtual/UIHelper.0.1.d.ts"/>
+namespace ComponentView{
+    export class ${className}{
+        ${propertyInfo}
+    }
+}`
+    }
+    static getClassString(className:string){
+        return `/// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
 /// <reference path="./Script.ts"/>
 namespace Component{
-    export class {{className}} extends Part{
+    export class ${className} extends Part{
         constructor(
             template:PartTemplate,
             props:Object,
@@ -21,25 +39,12 @@ namespace Component{
             public outerElement:IHTMLCollection
         ) {
             super(template,props,html,outerChildNodes,outerElement);
-            new ComponentScript.{{className}}(this);
+            new ComponentScript.${className}(this);
         }
-        dom=new ComponentView.{{className}}
-    }
-}`,
-        view:`/// <reference path="../../../dest/virtual/UIHelper.0.1.d.ts"/>
-namespace ComponentView{
-    export class {{className}}{
-        {{propertyInfo}}
-    }
-}`,
-        script:`namespace ComponentScript{
-    export class {{className}}{
-        constructor(part:Component.{{className}}){
-            
-        }
+        dom=new ComponentView.${className}
     }
 }`
-}
+    }
     static buildProject(className:string,path:string){
         if(!this.fs.existsSync(path)){
             this.fs.mkdirSync(path);
@@ -54,8 +59,8 @@ namespace ComponentView{
 `<div>
     <div ref="${className}"></div>
 </div>`);
-        this.fs.writeFileSync(classPath,this.template.class.replace(/\{\{className\}\}/g,className));
-        this.fs.writeFileSync(scriptPath,this.template.script.replace(/\{\{className\}\}/g,className));
+        this.fs.writeFileSync(classPath,this.getClassString(className));
+        this.fs.writeFileSync(scriptPath,this.getScriptString(className));
         this.makeClass(htmlPath,className);
         // this.fs.writeFileSync(viewPath,this.template.view.replace(/\{\{className\}\}/g,className).replace('{{propertyInfo}}','tops:[]'));
     }
@@ -97,14 +102,15 @@ namespace ComponentView{
                 //不处理咯
             }else if(node instanceof VComment){
                 //解析注释里的命令
-                let orderData=Order.parseComment(node);
-                if(orderData){
-                    //剪切命令块
+                let order=Order.parseComment(node);
+                if(order){
+                    if(order.canRunInService){
+                        order.run();
+                    }
                 };
-                
                 return eTreeEach.c_noIn;
                 //解析命令
-            }else if(isVHTMLElement(node)){
+            }else if(node instanceof VMElement.VHtmlElement){
                 //解析ref
                 let v=node.getAttribute("ref");
                 if(v){
@@ -141,10 +147,7 @@ namespace ComponentView{
             propertys.push('tops:['+topsType.join('\n,')+']=[<any>'+topsJS.join(',<any>')+']');
         }
         let propertyInfo:string=propertys.join(';\n        ');
-        let view:string=this.template.view
-        .replace('{{propertyInfo}}',propertyInfo)
-        .replace('{{className}}',className);
-        this.fs.writeFileSync(path.replace(/View\.html$/,'View.ts'),view);
+        this.fs.writeFileSync(path.replace(/View\.html$/,'View.ts'),this.getViewString(className,propertyInfo));
         //mixin .css  to  变量
     }
 }
