@@ -45,21 +45,21 @@ abstract class VElement extends VNode{
         this.children.length = 0;
         this.childNodes.length = 0;
         if (this.nodeName in stringNode) {
-            this.appendChild(VNodeHelp(s, 3));
+            this.appendChild($$$(s, 3));
         } else {
             VDOM(s, this);
         }
     }
     get innerHTML(this: VElement&IVNodeMethod):string {
-        let
-            cs = this.childNodes,
-            data = [];
-        if (cs) {
+        let cs = this.childNodes;
+        if (cs.length>0) {
+            let data:string[] = [];
             for (let i = 0; i < cs.length; i++) {
-                data.push((<VNode>cs[i]).getData());
+                push.apply(data,(<VNode>cs[i]).toHTMLString());
             }
+            return data.join('');
         }
-        return data.join('');
+        return "";
     }
     removeChild(this:  VElement&IVNodeMethod, vNode: VNode&IVNodeMethod): VNode&IVNodeMethod {
         if (!vNode || this.childNodes.length === 0) {
@@ -91,6 +91,13 @@ abstract class VElement extends VNode{
         }
         let lowCaseName=this.nodeName.toLowerCase();
         ret.push(`<${lowCaseName}${sAttr}>`);
+        let cs = this.childNodes;
+        if (cs.length>0) {
+            let data:string[] = [];
+            for (let i = 0; i < cs.length; i++) {
+                push.apply(ret,(<VNode>cs[i]).toHTMLString());
+            }
+        }
         if (!this.vmData.closeSelf && (this.vmData.isClose||!this.parentNode)) {
             ret.push(`</${lowCaseName}>`);
         }

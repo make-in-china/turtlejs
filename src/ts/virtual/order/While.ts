@@ -5,16 +5,9 @@ namespace Order {
         static name = "while"
         static isLogic = true
         isBreak: boolean = false
+        checkConditions:string[]=[this.condition]
         onBreak() {
             this.isBreak = true;
-        }
-        get canRunInService():boolean{
-            try {
-                exec(this.node, this.condition);
-                return true;
-            } catch (error) {
-                return false;
-            }
         }
         run() {
 

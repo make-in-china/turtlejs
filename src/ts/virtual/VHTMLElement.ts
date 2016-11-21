@@ -45,7 +45,7 @@ namespace VMElement{
             for (let i=chdns.length-1;i>=0;i--) {
                 delete chdns[i];
             }
-            this.appendChild(VNodeHelp(decodeHTML(s), 3));
+            this.appendChild($$$(decodeHTML(s), 3));
         }
         insertBefore(newNode:  VNode&IVNodeMethod, refChild:  VNode&IVNodeMethod):  VNode&IVNodeMethod {
             //添加到childNodes里
@@ -261,7 +261,7 @@ namespace VMElement{
             if(!p){
                 throw new Error("This element has no parent node.");
             }
-            let vText=VNodeHelp(v,3);
+            let vText=$$$(v,3);
             p.insertBefore(vText,this);
             p.removeChild(this);
         }

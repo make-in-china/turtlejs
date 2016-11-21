@@ -10,7 +10,7 @@ namespace Order {
         needBreak: boolean = false
         endHit: INode | null = null
         hasDefault: boolean = false
-        get canRunInService():boolean{
+        get canRunAtService():boolean{
             try {
                 exec(this.node, this.condition);
                 return true;
@@ -32,7 +32,7 @@ namespace Order {
                     step.next = getNodeIndex2(node.__order__.endNode) - getNodeIndex2(node);
                     return;
                 }
-                switch (info.orderCase) {
+                switch (info.subOrder) {
                     case 'case':
                     case 'case break':
                         if (this.hasDefault) {
@@ -41,7 +41,7 @@ namespace Order {
                             let isPass = this.value == exec(node, info.condition);
                             if (isPass) {
                                 this.hit = node;
-                                this.hitBy = info.orderCase;
+                                this.hitBy = info.subOrder;
                             }
                         } else if (!this.endHit) {
                             this.endHit = node;
@@ -54,7 +54,7 @@ namespace Order {
                             this.hasDefault = true;
                             if (!this.hit) {
                                 this.hit = node;
-                                this.hitBy = info.orderCase;
+                                this.hitBy = info.subOrder;
                             } else if (!this.endHit) {
                                 this.endHit = node;
                             }

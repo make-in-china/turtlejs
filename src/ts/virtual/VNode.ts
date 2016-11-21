@@ -73,7 +73,7 @@ abstract class VNode implements INode{
         return this;
     }
     append(this: VNode, name: string, nodeType: VNodeType): VNode&IVNodeMethod {
-        return this.doAppendChild(VNodeHelp(name, nodeType));
+        return this.doAppendChild($$$(name, nodeType));
     }
     appendChild(this: VNode, vNode: VNode&IVNodeMethod): VNode&IVNodeMethod {
         let idx =Array.prototype.indexOf.call(this.childNodes,vNode);
@@ -137,7 +137,7 @@ abstract class VNode implements INode{
     // addEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
     // removeEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
     toJSString():string{
-        return "VNodeHelp"+this.toJS();
+        return "$$$"+this.toJS();
     }
     abstract toJS(space?:number):string;
     beDOM():Node{
@@ -374,4 +374,4 @@ let VNodeHelp:IVNodeMethod=<any>function(nodeName: string, nodeType?: VNodeType|
     bindClassToFunction(that,nodeName,nodeType);
     return that;
 };
-
+let $$$:IVNodeMethod=VNodeHelp;

@@ -6,6 +6,7 @@
 /// <reference path='VMember.ts'/>
 /// <reference path='order/VOrder.ts'/>
 /// <reference path='order/If.ts'/>
+/// <reference path='order/Scope.ts'/>
 
 class UIHelper{
     static fs=typeof require!== "undefined"&&require('fs');
@@ -98,19 +99,20 @@ namespace Component{
         }
         let refs:[string,VMElement.VHtmlElement][]=[];
         treeEach(<VNode[]>chds,"childNodes",(node,step)=>{
-            if(isVText(node)){
-                //不处理咯
-            }else if(node instanceof VComment){
+            if(node instanceof VComment){
                 //解析注释里的命令
                 let order=Order.parseComment(node);
-                if(order){
-                    if(order.canRunInService){
+                if(order&&order.run){
+                    if(order.canRunAtService){
                         order.run();
                     }
                 };
                 return eTreeEach.c_noIn;
                 //解析命令
-            }else if(node instanceof VMElement.VHtmlElement){
+            }
+        });
+        treeEach(<VNode[]>chds,"childNodes",(node,step)=>{
+            if(node instanceof VMElement.VHtmlElement){
                 //解析ref
                 let v=node.getAttribute("ref");
                 if(v){
@@ -127,7 +129,7 @@ namespace Component{
             let refNode:VElement&IVNodeMethod=<any>refInfo[1];
             let p=refNode.parentNode;
             if(p){
-                p.insertBefore(VNodeHelp(name,20),refNode);
+                p.insertBefore($$$(name,20),refNode);
                 p.removeChild(refNode);
             }
         }
@@ -152,3 +154,5 @@ namespace Component{
     }
 }
 typeof exports!=="undefined"&&(exports.UIHelper=UIHelper);
+
+

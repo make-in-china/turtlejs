@@ -13,9 +13,9 @@ class xxxxOrder{
         if(order){
             return {order:trim(order[0]),condition:s.substring(order[0].length,s.length)}    
         }else{
-            let orderCase=s.match(orderCaseRE);
-            if(orderCase){
-                return {orderCase:trim(orderCase[0]),condition:s.substring(orderCase[0].length,s.length)}  
+            let subOrder=s.match(orderCaseRE);
+            if(subOrder){
+                return {subOrder:trim(subOrder[0]),condition:s.substring(subOrder[0].length,s.length)}  
             }
         } 
         return null;
@@ -32,16 +32,16 @@ class xxxxOrder{
         SetParseError.isError=false;
         return SetParseError;
     }());
-    parseScopeOrder(info:ICommentOrderInfo,node:IComment,outerChildNodes:INode[],outerChildren:INodeList,props,part){
-        let condition=splitByOnce(info.condition,"|");
-        if(condition.length==2){
-            DOMScope.create(node,condition[0]);
-            execScope(condition[1],node,outerChildNodes,outerChildren,props,part);
-        }else{
-            DOMScope.create(node,condition[0]);
-        }
-        removeNode(node);
-    }
+    // parseScopeOrder(info:ICommentOrderInfo,node:IComment,outerChildNodes:INode[],outerChildren:INodeList,props,part){
+    //     let condition=splitByOnce(info.condition,"|");
+    //     if(condition.length==2){
+    //         DOMScope.create(node,condition[0]);
+    //         execScope(condition[1],node,outerChildNodes,outerChildren,props,part);
+    //     }else{
+    //         DOMScope.create(node,condition[0]);
+    //     }
+    //     removeNode(node);
+    // }
     parseCommentOrderNoScript(info:ICommentOrderInfo,node:IComment,outerChildNodes,outerChildren,props,part){
         /*不渲染，纯找结构*/
         switch(info.order){
@@ -81,7 +81,7 @@ class xxxxOrder{
                 }
                 return eTreeEach.c_noRepeat&eTreeEach.c_noIn;
             }
-            if(info.orderCase==='end'){
+            if(info.subOrder==='end'){
                 if(orderStack.length>0){
                     (<IOrder>orderStack.pop()).endNode=node;
                     
@@ -131,18 +131,18 @@ class xxxxOrder{
                             step.next=getNodeIndex2(node.__order__.node)-getNodeIndex2(node);
                             return;
                         }
-                        switch(info.orderCase){
+                        switch(info.subOrder){
                             case 'else':
                             case 'else if':
                                 if(!order.hasElse){
-                                    if(info.orderCase=='else'){
+                                    if(info.subOrder=='else'){
                                         order.hasElse=true;
                                     }
                                     if(!order.endHit){
                                         if(order.hit){
                                             order.endHit=node;
                                         }else{
-                                            if(info.orderCase=='else'||parseBool(execByScope(node,this.condition,scope,outerChildNodes,outerChildren,props,part))){
+                                            if(info.subOrder=='else'||parseBool(execByScope(node,this.condition,scope,outerChildNodes,outerChildren,props,part))){
                                                 order.hit=node;
                                             }else{
                                                 /*删除else if*/
@@ -275,7 +275,7 @@ class xxxxOrder{
                             step.next=getNodeIndex2(node.__order__.endNode)-getNodeIndex2(node);
                             return;
                         }
-                        switch(info.orderCase){
+                        switch(info.subOrder){
                             case 'case':
                             case 'case break':
                                 if(order.hasDefault){
@@ -284,7 +284,7 @@ class xxxxOrder{
                                     let isPass=order.value==execByScope(node,info.condition,scope,outerChildNodes,outerChildren,props,part);
                                     if(isPass){
                                         order.hit=node;
-                                        node.__order__=info.orderCase;
+                                        node.__order__=info.subOrder;
                                     }
                                 }else if(!order.endHit){
                                     order.endHit=node;
@@ -297,7 +297,7 @@ class xxxxOrder{
                                     order.hasDefault=true;
                                     if(!order.hit){
                                         order.hit=node;
-                                        node.__order__=info.orderCase;
+                                        node.__order__=info.subOrder;
                                     }else if(!order.endHit){
                                         order.endHit=node;
                                     }
@@ -473,7 +473,7 @@ class xxxxOrder{
         let info=this.getCommentStringInfo(getCommentText(node));
         if(!info)return;
         if(!info.order){
-            throw new Error("语法错误：不恰当的"+info.orderCase);
+            throw new Error("语法错误：不恰当的"+info.subOrder);
         }
         this.parseCommentOrder(info,node,outerChildNodes,outerChildren,props,part);
         if(node.__order__){

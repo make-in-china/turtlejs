@@ -43,13 +43,13 @@ function getScopeBy(scope, node: INode) {
     else
         return scope;
 }
-function execByScope(node: INode, s: string, scope, outer, outerElement, props, part) {
-    return _execByScope.call(getScopeBy(scope, node), s, node, outer, outerElement, props, part);
-}
+// function execByScope(node: INode, s: string, scope, outer, outerElement, props, part) {
+//     return _execByScope.call(getScopeBy(scope, node), s, node, outer, outerElement, props, part);
+// }
 
-function execScope(s: string, node: INode, outerChildNodes, outerElement, props, part) {
-    execByScope(node, '$t.extend(this,{' + s + '});', null, outerChildNodes, outerElement, props, part);
-}
+// function execScope(s: string, node: INode, outerChildNodes, outerElement, props, part) {
+//     execByScope(node, '$t.extend(this,{' + s + '});', null, outerChildNodes, outerElement, props, part);
+// }
 
 function setNodeProperty(node, proName, condition, outerChildNodes, outerElement, props, part) {
     let v = execByScope(node, condition, null, outerChildNodes, outerElement, props, part);

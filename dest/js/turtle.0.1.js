@@ -382,7 +382,7 @@ function removeBlockBetween(node1, node2) {
         return null;
     }
     for (var i = l1; i < l2; i++) {
-        p1.removeChild(p1.childNodes[i]);
+        p1.removeChild(p1.childNodes[l1]);
     }
 }
 function replaceNodeByNode(node, node2) {
@@ -1070,6 +1070,7 @@ var execTemplateScript = (function () {
         return s;
     };
 }());
+typeof document === "undefined" && (document = {});
 var RootScope = (function () {
     function RootScope() {
         this.__actionNode__ = document.documentElement;
@@ -1521,24 +1522,23 @@ var xxxxOrder = (function () {
             return { order: trim(order[0]), condition: s.substring(order[0].length, s.length) };
         }
         else {
-            var orderCase = s.match(orderCaseRE);
-            if (orderCase) {
-                return { orderCase: trim(orderCase[0]), condition: s.substring(orderCase[0].length, s.length) };
+            var subOrder = s.match(orderCaseRE);
+            if (subOrder) {
+                return { subOrder: trim(subOrder[0]), condition: s.substring(subOrder[0].length, s.length) };
             }
         }
         return null;
     };
-    xxxxOrder.prototype.parseScopeOrder = function (info, node, outerChildNodes, outerChildren, props, part) {
-        var condition = splitByOnce(info.condition, "|");
-        if (condition.length == 2) {
-            DOMScope.create(node, condition[0]);
-            execScope(condition[1], node, outerChildNodes, outerChildren, props, part);
-        }
-        else {
-            DOMScope.create(node, condition[0]);
-        }
-        removeNode(node);
-    };
+    // parseScopeOrder(info:ICommentOrderInfo,node:IComment,outerChildNodes:INode[],outerChildren:INodeList,props,part){
+    //     let condition=splitByOnce(info.condition,"|");
+    //     if(condition.length==2){
+    //         DOMScope.create(node,condition[0]);
+    //         execScope(condition[1],node,outerChildNodes,outerChildren,props,part);
+    //     }else{
+    //         DOMScope.create(node,condition[0]);
+    //     }
+    //     removeNode(node);
+    // }
     xxxxOrder.prototype.parseCommentOrderNoScript = function (info, node, outerChildNodes, outerChildren, props, part) {
         /*不渲染，纯找结构*/
         switch (info.order) {
@@ -1577,7 +1577,7 @@ var xxxxOrder = (function () {
                 }
                 return 8 /* c_noRepeat */ & 4 /* c_noIn */;
             }
-            if (info.orderCase === 'end') {
+            if (info.subOrder === 'end') {
                 if (orderStack.length > 0) {
                     orderStack.pop().endNode = node;
                     return 1 /* c_stopEach */;
@@ -1627,11 +1627,11 @@ var xxxxOrder = (function () {
                             step.next = getNodeIndex2(node.__order__.node) - getNodeIndex2(node);
                             return;
                         }
-                        switch (info.orderCase) {
+                        switch (info.subOrder) {
                             case 'else':
                             case 'else if':
                                 if (!order.hasElse) {
-                                    if (info.orderCase == 'else') {
+                                    if (info.subOrder == 'else') {
                                         order.hasElse = true;
                                     }
                                     if (!order.endHit) {
@@ -1639,7 +1639,7 @@ var xxxxOrder = (function () {
                                             order.endHit = node;
                                         }
                                         else {
-                                            if (info.orderCase == 'else' || parseBool(execByScope(node, this.condition, scope, outerChildNodes, outerChildren, props, part))) {
+                                            if (info.subOrder == 'else' || parseBool(execByScope(node, this.condition, scope, outerChildNodes, outerChildren, props, part))) {
                                                 order.hit = node;
                                             }
                                             else {
@@ -1776,7 +1776,7 @@ var xxxxOrder = (function () {
                             step.next = getNodeIndex2(node.__order__.endNode) - getNodeIndex2(node);
                             return;
                         }
-                        switch (info.orderCase) {
+                        switch (info.subOrder) {
                             case 'case':
                             case 'case break':
                                 if (order.hasDefault) {
@@ -1786,7 +1786,7 @@ var xxxxOrder = (function () {
                                     var isPass = order.value == execByScope(node, info.condition, scope, outerChildNodes, outerChildren, props, part);
                                     if (isPass) {
                                         order.hit = node;
-                                        node.__order__ = info.orderCase;
+                                        node.__order__ = info.subOrder;
                                     }
                                 }
                                 else if (!order.endHit) {
@@ -1801,7 +1801,7 @@ var xxxxOrder = (function () {
                                     order.hasDefault = true;
                                     if (!order.hit) {
                                         order.hit = node;
-                                        node.__order__ = info.orderCase;
+                                        node.__order__ = info.subOrder;
                                     }
                                     else if (!order.endHit) {
                                         order.endHit = node;
@@ -1980,7 +1980,7 @@ var xxxxOrder = (function () {
         if (!info)
             return;
         if (!info.order) {
-            throw new Error("语法错误：不恰当的" + info.orderCase);
+            throw new Error("语法错误：不恰当的" + info.subOrder);
         }
         this.parseCommentOrder(info, node, outerChildNodes, outerChildren, props, part);
         if (node.__order__) {
@@ -2119,12 +2119,12 @@ function getScopeBy(scope, node) {
     else
         return scope;
 }
-function execByScope(node, s, scope, outer, outerElement, props, part) {
-    return _execByScope.call(getScopeBy(scope, node), s, node, outer, outerElement, props, part);
-}
-function execScope(s, node, outerChildNodes, outerElement, props, part) {
-    execByScope(node, '$t.extend(this,{' + s + '});', null, outerChildNodes, outerElement, props, part);
-}
+// function execByScope(node: INode, s: string, scope, outer, outerElement, props, part) {
+//     return _execByScope.call(getScopeBy(scope, node), s, node, outer, outerElement, props, part);
+// }
+// function execScope(s: string, node: INode, outerChildNodes, outerElement, props, part) {
+//     execByScope(node, '$t.extend(this,{' + s + '});', null, outerChildNodes, outerElement, props, part);
+// }
 function setNodeProperty(node, proName, condition, outerChildNodes, outerElement, props, part) {
     var v = execByScope(node, condition, null, outerChildNodes, outerElement, props, part);
     var name = camelCase(proName.substr(0, proName.length - 1));

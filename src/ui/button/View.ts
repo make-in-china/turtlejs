@@ -1,16 +1,13 @@
 /// <reference path="../../../dest/virtual/UIHelper.0.1.d.ts"/>
 namespace ComponentView{
     export class Button{
-        cancel:VMElement.VInputElement&IVNodeMethod=<any>VNodeHelp
+        cancel:VMElement.VInputElement&IVNodeMethod=<any>$$$
 ("INPUT")._("type")._("name")._("value");
-        ok:VMElement.VInputElement&IVNodeMethod=<any>VNodeHelp
+        ok:VMElement.VInputElement&IVNodeMethod=<any>$$$
 ("INPUT")._("type")._("name")._("value").appendChild(this.cancel).$;
-        panel:VMElement.VDivElement&IVNodeMethod=<any>VNodeHelp
+        panel:VMElement.VDivElement&IVNodeMethod=<any>$$$
 ("DIV").appendChild(this.ok).$;
-        tops:[VMElement.VDivElement&IVNodeMethod]=[<any>VNodeHelp
-("DIV").appendChild(this.panel).$
-    ("DIV")(`
-        if 1
-    `,3).$.$]
+        tops:[VMElement.VDivElement&IVNodeMethod]=[<any>$$$
+("DIV").appendChild(this.panel).$]
     }
 }

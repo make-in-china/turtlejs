@@ -463,7 +463,7 @@ let VDOM:IVDOMBuilder,
     }
     function getInitData(vNode: VNode&IVNodeMethod|undefined, length: number): IMember {
         if (!vNode) {
-            vNode = VNodeHelp('domhelper');
+            vNode = $$$('domhelper');
             vNode.vmData.isClose = true;
         }
         return {

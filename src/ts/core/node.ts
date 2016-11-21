@@ -86,7 +86,7 @@ function removeBlockBetween(node1: INode, node2: INode) {
         return null;
     }
     for (let i = l1; i < l2; i++) {
-        p1.removeChild(<INode>p1.childNodes[i]);
+        p1.removeChild(<INode>p1.childNodes[l1]);
     }
 }
 function replaceNodeByNode(node: INode, node2: INode) {
