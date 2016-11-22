@@ -7,12 +7,31 @@ let
     objectConstructor:ObjectConstructor         =   <any>Object.prototype,
     stringConstructor:String                    =   <any>String.prototype,
     toStr                                       =	objectConstructor.toString,
-    slice                                       =   arrayConstructor.slice,
-    push                                        =   arrayConstructor.push,
-    splice                                      =   arrayConstructor.splice,
-    indexOf                                     =   arrayConstructor.indexOf,
     getPrototypeOf                              =   objectConstructor.getPrototypeOf,
-    replace                                     =   stringConstructor.replace;
+    replace                                     =   stringConstructor.replace,
+    
+    slice:{
+        <T>(start?: number, end?: number): T[]
+        call<T>(arr:IArray,start?: number, end?: number):T[]
+    }
+                                                =   arrayConstructor.slice,
+    
+    push:{
+        <T>(...items: T[]):number
+        apply<T>(arr:IArray,items:T[]):T[]
+        call<T>(arr:IArray,...items:T[]):T[]
+    }                                           =   arrayConstructor.push,
+    
+    splice:{
+        <T>(start: number): T[]
+        call<T>(arr:IArray,start: number):T[]
+        call<T>(arr:IArray,start: number, deleteCount: number, ...items: T[]): T[];
+    }                                           =   arrayConstructor.splice,
+
+    indexOf:{
+        <T>(searchElement: T, fromIndex?: number): number
+        call<T>(arr:IArray,searchElement: T, fromIndex?: number): number
+    }                                           =   arrayConstructor.indexOf;
 
 
 interface Constructor{

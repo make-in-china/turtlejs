@@ -1,4 +1,5 @@
 
+/// <reference path='../../scope/DOMScope.ts'/>
 interface VComment {
     __order__?: Order.VOrder
 }
@@ -18,7 +19,11 @@ namespace Order {
         orderNames:string[]=[],
         orderRE:RegExp;
         //if|while|for|switch|async|break|-|scope|content|elements|bind|!|let|=
-
+    export function addSubOrderName(name:string){
+        if(subOrderNames.indexOf(name)===-1){
+            subOrderNames.push(name);
+        }
+    }
     /**从注释中读取命令 */
     export function getCommentStringInfo(s: string): ICommentOrderInfo | null {
         let order = s.match(orderRE);
@@ -39,18 +44,22 @@ namespace Order {
         condition: string;
     }
     export interface IOrderConstructor {
-        new (node: VComment, condition: string): VOrder;
+        new (node: IComment, condition: string,...args:any[]): VOrder;
         name: string;
         subOrder?:string[];
     }
     export let orders: { [index: string]: IOrderConstructor } = {};
+    
     export function register(this:void,order: IOrderConstructor) {
         let name:string=order.name.toLowerCase();
         orders[name] = order;
         orderNames.push(name);
         orderRE=new RegExp("^\\s*"+orderNames.join("|")+"(?:\\s*|$)");
         if(isArray(order.subOrder)&&order.subOrder.length>0){
-            subOrderNames.push(order.subOrder.join("|"));
+            for(const subOrder of order.subOrder){
+                addSubOrderName(subOrder);
+            }
+            // subOrderNames.push(order.subOrder.join("|"));
             subOrderRE=new RegExp("^\\s*"+subOrderNames.join("|")+"(?:\\s*|$)");
         }
     }
@@ -79,8 +88,8 @@ namespace Order {
         }
         return order;
     }
-    let _exec:(this: VComment, $$turtle$$: string) => any;
-    let env={};
+    let _exec:{call(that:any,$$turtle$$: string,node:IComment):any} = Function('$$turtle$$,node', 'with(this){return eval($$turtle$$)};');;
+    let env:RootScope=$rootScope;
     let envNames=[];
     export function registerEnvVar(name:string,value:any){
         if(name in env){
@@ -88,23 +97,70 @@ namespace Order {
         }
         env[name]=value;
         envNames.push(name);
-        createExec();
+        // createExec();
     }
-    function createExec(){
-        let args=envNames.join(',');
-        if(args.length>0){
-            args='$$turtle$$,$node,'+args;
+    // function createExec(){
+    //     let args=envNames.join(',');
+    //     if(args.length>0){
+    //         args='$$turtle$$,$node,'+args;
+    //     }else{
+    //         args='$$turtle$$,$node';
+    //     }
+    //     _exec = <(this: VComment, $$turtle$$: string) => any>Function(args, 'with(this){return eval($$turtle$$)};');
+    // }
+    // createExec();
+    export function exec(this:void,node: IComment, script: string): any {
+        let that:Scope|RootScope;
+        if(node.__scope__){
+            that=node.__scope__;
         }else{
-            args='$$turtle$$,$node';
+            that=env;
         }
-        _exec = <(this: VComment, $$turtle$$: string) => any>Function(args, 'with(this){return eval($$turtle$$)};');
+        // for(const name of envNames){
+        //     args.push(env[name]);
+        // }
+        let ret=_exec.call(that, script,node);
+        return ret;
     }
-    createExec();
-    export function exec(this:void,node: VComment, script: string,that:any): any {
-        let args=[script,node];
-        for(const name of envNames){
-            args.push(env[name]);
+    export function test(this:void,node: IComment, script: string): any {
+        let that:Scope|RootScope;
+        if(node.__scope__){
+            that=node.__scope__;
+        }else{
+            that=env;
         }
-        return _exec.apply(that, args);
+        let _that={}
+        for(const name of envNames){
+            defineLockProperty(_that,name,that);
+        }
+        return _exec.call(_that,script, node);
+    }
+    function createFakeObject(that:Object):Object{
+        let obj={};
+        for(let name in that){
+            if(that.hasOwnProperty(name)){
+                defineLockProperty(obj,name,that[name]);
+            }
+        }
+        if(that.__proto__!==Object){
+            obj.__proto__=createFakeObject(that.__proto__);
+        }
+        return obj;
+    }
+    function defineLockProperty(that:Object,name:string,source:Object){
+        Object.defineProperty(that,name,{
+            get(){
+                let ret = source[name];
+                if(isObject(ret)){
+                    return createFakeObject(ret);
+                }else{
+                    return ret;
+                }
+            },
+            set(v:any){
+                debugger;
+                // throw new Error("不允许修改外部数据！");
+            }
+        })
     }
 }

@@ -6,6 +6,7 @@
 /// <reference path='VMember.ts'/>
 /// <reference path='order/VOrder.ts'/>
 /// <reference path='order/If.ts'/>
+/// <reference path='order/For.ts'/>
 /// <reference path='order/Scope.ts'/>
 
 class UIHelper{
@@ -101,10 +102,14 @@ namespace Component{
         treeEach(<VNode[]>chds,"childNodes",(node,step)=>{
             if(node instanceof VComment){
                 //解析注释里的命令
+                debugger;
                 let order=Order.parseComment(node);
                 if(order&&order.run){
                     if(order.canRunAtService){
                         order.run();
+                    }else if(order.undo){
+                        //哎呀debugger
+                        order.undo();
                     }
                 };
                 return eTreeEach.c_noIn;

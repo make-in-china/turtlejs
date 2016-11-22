@@ -1,5 +1,5 @@
 
-/// <reference path='VOrder.ts'/>
+/// <reference path='RepeatBlockOrder.ts'/>
 namespace Order {
     let parseForOrderRE = /[a-zA-Z\d] in .*/,
         parseForOrderRE2 = /^.*;.*;.*$/;
@@ -7,24 +7,11 @@ namespace Order {
         forIn = 0,
         forSplit = 1
     }
-    export class For extends VOrder {
+    export class For extends RepeatBlockOrder {
         static name = "for"
-        static isLogic = true
-        onBreak() {
-            this.isBreak = true;
-        }
-        isBreak: boolean
-        get canRunAtService(): boolean {
-            if (this.forMode === eForMode.forIn) {
-                return this.canPrebuildForIn();
-            } else {
-                return this.canPrebuildForSplit();
-            }
-        }
         private forMode: eForMode;
         constructor(node: VComment, condition: string) {
-            super(node, condition);
-
+            super(node, condition,'for');
             if (parseForOrderRE.test(condition)/**for in */) {
                 this.forMode = eForMode.forIn;
                 let s = condition.split(' in ');
@@ -39,7 +26,7 @@ namespace Order {
                 this.forMode = eForMode.forSplit;
 
                 let s = condition.split(';');
-                if (s.length !== 2) {
+                if (s.length !== 3) {
                     throw new Error("错误的for表达式！");
                 }
                 this.forSplit = {
@@ -53,6 +40,13 @@ namespace Order {
             }
         }
 
+        get canRunAtService(): boolean {
+            if (this.forMode === eForMode.forIn) {
+                return this.canPrebuildForIn();
+            } else {
+                return this.canPrebuildForSplit();
+            }
+        }
         private forSplit: {
             pre: string
             exec: string
@@ -62,9 +56,9 @@ namespace Order {
 
         private canPrebuildForSplit(): boolean {
             try {
-                exec(this.node, this.forSplit.pre);
-                exec(this.node, this.forSplit.step);
-                exec(this.node, this.forSplit.exec);
+                test(this.node, this.forSplit.pre);
+                test(this.node, this.forSplit.step);
+                test(this.node, this.forSplit.exec);
             } catch (error) {
                 return false;
             }
@@ -89,7 +83,7 @@ namespace Order {
         }
         private canPrebuildForIn(): boolean {
             try {
-                exec(this.node, this.forIn.object)
+                test(this.node, this.forIn.object)
             } catch (error) {
                 return false;
             }
@@ -119,24 +113,11 @@ namespace Order {
                 return false
             }
         }
-        run() {
-            let p = <INode>this.node.parentNode;
-            let ret: boolean
+        canRepeat():boolean{
             if (this.forMode === eForMode.forIn) {
-                ret = this.checkForIn();
+                return this.checkForIn();
             } else {
-                ret = this.checkForSplit();
-            }
-            if (this.isBreak || !ret) {
-                //全部删除
-                removeBlockBetween(this.node, <INode>this.endNode);
-                p.removeChild(this.node);
-                p.removeChild(<INode>this.endNode);
-            } else {
-
-                let nodes = cloneBetween(this.node, <INode>this.endNode);
-                //放到前面再来
-                p.insertBefore2(createBreakElement(nodes, this), this.node);
+                return this.checkForSplit();
             }
         }
     }

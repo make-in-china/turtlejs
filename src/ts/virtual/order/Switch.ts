@@ -12,7 +12,7 @@ namespace Order {
         hasDefault: boolean = false
         get canRunAtService():boolean{
             try {
-                exec(this.node, this.condition);
+                test(this.node, this.condition,null);
                 return true;
             } catch (error) {
                 return false;

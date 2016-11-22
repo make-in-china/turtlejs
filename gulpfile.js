@@ -19,6 +19,7 @@ function tsc(event){
     //      tsResult.dts.pipe(gulp.dest('dest'))])   
          
     var tsResult=gulp.src('src/ts/virtual/UIHelper.ts')
+        .pipe(sourcemaps.init())
         .pipe(ts({
             target: 'es5',//把typescript转换成es5标准的js文件,也可以是es6,但这个node版本不支持
             outFile:'virtual/UIHelper.0.1.js',
@@ -28,7 +29,7 @@ function tsc(event){
      merge([
          tsResult.js.pipe(gulp.dest('dest')),
          tsResult.dts.pipe(gulp.dest('dest'))])
-         .pipe(sourcemaps.init()).pipe(sourcemaps.write('../maps', {addComment: false}))
+         
 }
 function ui(path,name){
     var tsResult=gulp.src(path+'/Class.ts')

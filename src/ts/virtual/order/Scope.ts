@@ -9,7 +9,8 @@ namespace Order {
             return scope;
     }
     function execByScope(node: VComment, s: string, scope:Scope|null) {
-        return exec(node, s,getScopeBy(scope, node));
+        // return exec(node, s,getScopeBy(scope, node));
+        return exec(node, s);
     }
     function execScope(s: string, node: VComment) {
         execByScope(node, '$t.extend(this,{' + s + '});', null);
@@ -33,5 +34,5 @@ namespace Order {
         }
     }
     register(Scope);
-    registerEnvVar("xx",true);
+    registerEnvVar("xx",0);
 }

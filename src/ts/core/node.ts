@@ -36,10 +36,10 @@ function replaceNodeByNodes(node: INode, nodes: INode[]) {
     insertNodesBefore(node, nodes);
     removeNode(node);
 }
-function insertNode(node: INode, childNode:INode) {
-    let parent = node.parentNode;
+function insertNode(refChilde: INode, newChild:INode) {
+    let parent = refChilde.parentNode;
     if (parent == null) return 0;
-    parent.insertBefore2(childNode, node)
+    parent.insertBefore2(newChild, refChilde)
     return 0;
 }
 function nodesToString(nodes: INode[]) {
@@ -98,7 +98,7 @@ function replaceNodeByNode(node: INode, node2: INode) {
     parent.removeChild(node);
 }
 function appendNodes(nodes: INode[]|INodeList|IHTMLCollection, parent: INode) {
-    let cds: INode[] = slice.call(nodes);
+    let cds = push.apply([],<INode[]>nodes);
     for(const c of cds){
         parent.appendChild(c);
     }
