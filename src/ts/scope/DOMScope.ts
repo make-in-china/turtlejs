@@ -7,7 +7,7 @@ class DOMScope{
      * @param {INode} node - dom节点
      * @param {string} name - 名称
      */
-    static create(node:INode,name:string){
+    static create(node:INode,name:string):Scope{
         let scope=this.get(node);
         if(node.parentNode!==scope.__actionNode__){
             scope=new Scope(node,scope,name);

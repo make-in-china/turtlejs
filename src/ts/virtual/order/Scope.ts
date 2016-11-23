@@ -1,38 +1,47 @@
 /// <reference path='../../scope/Scope.ts'/>
 /// <reference path='VOrder.ts'/>
-
+/// <reference path='../JavaScript.ts'/>
 namespace Order {
-    function getScopeBy(scope:Scope|null, node: VComment) {
-        if (!scope)
-            return DOMScope.get(node);
-        else
-            return scope;
+    
+    export function registerVar(scope:Scope,condition:string){
+        
+        let conditionArr=splitByOnce(condition,"=");
+        //创建变量
+        if(conditionArr.length==2){
+            let statements=JavaScript.parse(conditionArr[1]);
+            // //初始化
+            // let obj=exec(this.node,'({' + conditionArr[1] + '})');
+            // //扩展scope;
+            // for(var name in obj){
+            //     if(scope.hasOwnProperty(name)){
+            //         throw new Error(`不能重复定义变量：${name}到变量域上`);
+            //     }
+            //     scope[name]=obj[name];
+            // }
+        }
     }
-    function execByScope(node: VComment, s: string, scope:Scope|null) {
-        // return exec(node, s,getScopeBy(scope, node));
-        return exec(node, s);
-    }
-    function execScope(s: string, node: VComment) {
-        execByScope(node, '$t.extend(this,{' + s + '});', null);
-    }
-    class Scope extends VOrder {
+    class ScopeOrder extends VOrder {
         static name = "scope";
-        static isLogic = false;
+        node:IComment;
         get canRunAtService():boolean{
             return true;
         }
+        
         constructor(node:VComment , condition:string){
             super(node,condition);
-            let conditionArr=splitByOnce(condition,"|");
-            if(conditionArr.length==2){
-                DOMScope.create(node,conditionArr[0]);
-                execScope(conditionArr[1],node);
-            }else{
-                DOMScope.create(node,conditionArr[0]);
+            removeNode(this.node);
+        }
+        run(){
+            
+            let conditionArr=splitByOnce(this.condition,":");
+            
+            let scope=DOMScope.create(this.node,conditionArr[0]);
+            if(conditionArr.length===2){
+                registerVar(scope,conditionArr[1]);
             }
-            removeNode(node);
+            
         }
     }
-    register(Scope);
-    registerEnvVar("xx",0);
+    register(ScopeOrder);
+    // registerEnvVar("xx",0);
 }
