@@ -1,6 +1,6 @@
 /// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "label", nodeType?: 1): VMElement.VLabelElement&IVNodeMethod;
+    (nodeName: "label", nodeType?: 1): VMElement.VLabelElement&IVNodeMethod
 }
 namespace VMElement{
     export class VLabelElement extends VHtmlElement{
@@ -10,6 +10,15 @@ namespace VMElement{
         accessKey:string
         webkitdropzone:string
         id:string
+        cloneNode(deep:boolean=false):VLabelElement&IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["title","lang","accessKey","webkitdropzone","id"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
+            }
+                return <VLabelElement&IVNodeMethod>newNode;
+        }
     }
     VAP.decorate(<any>VLabelElement,["title","lang","accessKey","webkitdropzone","id"]);
 }

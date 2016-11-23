@@ -18,6 +18,15 @@ namespace VMElement{
         rev:string
         shape:string
         href:string
+        cloneNode(deep:boolean=false):VAElement&IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["target", "download", "ping", "rel", "hreflang", "type", "coords", "charset", "name", "rev", "shape", "href"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
+            }
+            return <VAElement&IVNodeMethod>newNode;
+        }
     }
     VAP.decorate(<any>VAElement,["target", "download", "ping", "rel", "hreflang", "type", "coords", "charset", "name", "rev", "shape", "href"]);
 }

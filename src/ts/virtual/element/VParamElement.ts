@@ -1,6 +1,6 @@
 /// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "param", nodeType?: 1): VMElement.VParamElement&IVNodeMethod;
+    (nodeName: "param", nodeType?: 1): VMElement.VParamElement&IVNodeMethod
 }
 
 namespace VMElement{
@@ -11,6 +11,15 @@ namespace VMElement{
         value:string
         type:string
         valueType:string
+        cloneNode(deep:boolean=false):VParamElement&IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["name","value","type","valueType"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
+            }
+                return <VParamElement&IVNodeMethod>newNode;
+        }
     }
     VAP.decorate(<any>VParamElement,["name","value","type","valueType"]);
 }

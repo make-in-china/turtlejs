@@ -1,6 +1,6 @@
 /// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "source", nodeType?: 1): VMElement.VSourceElement&IVNodeMethod;
+    (nodeName: "source", nodeType?: 1): VMElement.VSourceElement&IVNodeMethod
 }
 
 namespace VMElement{
@@ -11,6 +11,15 @@ namespace VMElement{
         srcset:string
         sizes:string
         media:string
+        cloneNode(deep:boolean=false):VSourceElement&IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["src","type","srcset","sizes","media"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
+            }
+                return <VSourceElement&IVNodeMethod>newNode;
+        }
     }
     VAP.decorate(<any>VSourceElement,["src","type","srcset","sizes","media"]);
 }

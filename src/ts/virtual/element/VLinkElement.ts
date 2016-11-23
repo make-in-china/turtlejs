@@ -1,6 +1,6 @@
 /// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "link", nodeType?: 1): VMElement.VLinkElement &IVNodeMethod;
+    (nodeName: "link", nodeType?: 1): VMElement.VLinkElement &IVNodeMethod
 }
 
 namespace VMElement{
@@ -18,6 +18,15 @@ namespace VMElement{
         rev:string
         target:string
         integrity:string
+        cloneNode(deep:boolean=false):VLinkElement &IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["disabled","href","crossOrigin","rel","media","hreflang","type","charset","rev","target","integrity"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
+            }
+                return <VLinkElement &IVNodeMethod>newNode;
+        }
     }
     VAP.decorate(<any>VLinkElement,["disabled","href","crossOrigin","rel","media","hreflang","type","charset","rev","target","integrity"]);
 }

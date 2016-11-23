@@ -147,6 +147,7 @@ namespace Order {
         }
         return obj;
     }
+    function emptyFunction(){}
     function defineLockProperty(that:Object,name:string,source:Object){
         Object.defineProperty(that,name,{
             get(){
@@ -157,10 +158,7 @@ namespace Order {
                     return ret;
                 }
             },
-            set(v:any){
-                debugger;
-                // throw new Error("不允许修改外部数据！");
-            }
+            set:emptyFunction
         })
     }
 }

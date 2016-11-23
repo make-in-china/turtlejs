@@ -1,6 +1,6 @@
 /// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "frame", nodeType?: 1): VMElement.VFrameElement&IVNodeMethod;
+    (nodeName: "frame", nodeType?: 1): VMElement.VFrameElement&IVNodeMethod
 }
 namespace VMElement{
     export class VFrameElement extends VHtmlElement{
@@ -16,6 +16,15 @@ namespace VMElement{
         accessKey:string
         webkitdropzone:string
         id:string
+        cloneNode(deep:boolean=false):VFrameElement&IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["name","scrolling","frameBorder","marginHeight","marginWidth","title","lang","accessKey","webkitdropzone","id"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
+            }
+                return <VFrameElement&IVNodeMethod>newNode;
+        }
     }
     VAP.decorate(<any>VFrameElement,["name","scrolling","frameBorder","marginHeight","marginWidth","title","lang","accessKey","webkitdropzone","id"]);
 }

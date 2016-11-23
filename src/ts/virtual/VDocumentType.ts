@@ -9,6 +9,9 @@ function isVDocType(node: VNode): node is VDocumentType {
 class VDocumentType extends VNode{
     nodeType:VNodeType=10
     nodeName="html"
+    cloneNode(deep:boolean):VDocumentType&IVNodeMethod{
+        return $$$("",10);
+    }
     toJS():string{
         return `("",10)`;
     }
@@ -16,8 +19,5 @@ class VDocumentType extends VNode{
     protected emulation():void{}
     toHTMLString():string[]{
         return ['<!DOCTYPE html>'];
-    }
-    cloneNode(this:VDocumentType&IVNodeMethod):VDocumentType&IVNodeMethod{
-        return this("",10);
     }
 }

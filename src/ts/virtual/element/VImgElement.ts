@@ -1,6 +1,6 @@
 /// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "img", nodeType?: 1): VMElement.VImgElement&IVNodeMethod;
+    (nodeName: "img", nodeType?: 1): VMElement.VImgElement&IVNodeMethod
 }
 
 namespace VMElement{
@@ -23,6 +23,15 @@ namespace VMElement{
         vspace:string
         longDesc:string
         border:string
+        cloneNode(deep:boolean=false):VImgElement&IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["alt","src","srcset","sizes","crossOrigin","useMap","isMap","width","height","name","lowsrc","align","hspace","vspace","longDesc","border"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
+            }
+                return <VImgElement&IVNodeMethod>newNode;
+        }
     }
     VAP.decorate(<any>VImgElement,["alt","src","srcset","sizes","crossOrigin","useMap","isMap","width","height","name","lowsrc","align","hspace","vspace","longDesc","border"]);
 }

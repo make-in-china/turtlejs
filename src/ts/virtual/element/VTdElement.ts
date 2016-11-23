@@ -1,6 +1,6 @@
 /// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "td", nodeType?: 1): VMElement.VTdElement&IVNodeMethod;
+    (nodeName: "td", nodeType?: 1): VMElement.VTdElement&IVNodeMethod
 }
 
 namespace VMElement{
@@ -18,6 +18,15 @@ namespace VMElement{
         bgColor:string
         abbr:string
         scope:string
+        cloneNode(deep:boolean=false):VTdElement&IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["colSpan","rowSpan","headers","align","axis","height","width","noWrap","vAlign","bgColor","abbr","scope"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
+            }
+                return <VTdElement&IVNodeMethod>newNode;
+        }
     }
     VAP.decorate(<any>VTdElement,["colSpan","rowSpan","headers","align","axis","height","width","noWrap","vAlign","bgColor","abbr","scope"]);
 }

@@ -9,10 +9,14 @@ namespace Order {
         }
         private tempBlocks:INode[]=[];
         private parseRepeatBlock(){
-            let blocks=push.apply([],this.blocks[0].blocks);
-            insertNodesBefore(this.endNode, blocks);
-            let p=this.endNode.parentNode;
-            this.parseOrders(blocks,(node:INode,subOrder,condition,step)=>{
+            let blocks=this.blocks[0].blocks;
+            let cloneBlocks=[];
+            for(var i=0;i<blocks.length;i++){
+                cloneBlocks.push(blocks[i].cloneNode(true));
+            }
+            insertNodesBefore(this.placeholder , cloneBlocks);
+            let p=this.placeholder.parentNode;
+            this.parseOrders(cloneBlocks,(node:INode,subOrder,condition,step)=>{
                 if(subOrder==='break'){
                     this.isBreak=true;
                 }
@@ -35,7 +39,6 @@ namespace Order {
             this.run(true);
         }
         run(isAgain=false){
-            debugger;
             let canRepeat: boolean=this.isBreak?false:true;
             if(canRepeat){
                 canRepeat=this.canRepeat();

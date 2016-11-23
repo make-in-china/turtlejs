@@ -12,7 +12,7 @@ class VAP{
         node.setAttribute(name,value);
     }
     static decorate<T extends VMElement.VHtmlElement>(vclass:T,names:string[]){
-        var prototype:Object=(<any>vclass).prototype;
+        var prototype:any=(<any>vclass).prototype;
         for(const name of names){
             Object.defineProperty(prototype,name,{
                 get:function(this:T):string{

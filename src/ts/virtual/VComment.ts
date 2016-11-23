@@ -14,6 +14,9 @@ class VComment extends VCharacterData{
     nodeName="#Comment"
     nodeType:VNodeType=8
     private __value__=""
+    cloneNode(deep:boolean):VComment&IVNodeMethod{
+        return $$$(this.__value__,8);
+    }
     constructor(data:string){
         super();
         this.__value__=data;
@@ -66,7 +69,4 @@ class VComment extends VCharacterData{
     /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
     protected emulation():void{}
     
-    cloneNode(this:VComment&IVNodeMethod):VComment&IVNodeMethod{
-        return this(this.data,8);
-    }
 }

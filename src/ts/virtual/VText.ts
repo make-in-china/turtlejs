@@ -22,6 +22,9 @@ class VText extends VCharacterData{
     nodeName="#text"
     nodeType:VNodeType=3
     private __value__=""
+    cloneNode(deep:boolean):VText&IVNodeMethod{
+        return $$$(this.__value__,3);
+    }
     constructor(data:any){
         super();
         if(isString(data)){
@@ -81,9 +84,6 @@ class VText extends VCharacterData{
             elem = document.createTextNode('');
         }
         return elem;
-    }
-    cloneNode(this:VText&IVNodeMethod):VText&IVNodeMethod{
-        return this(this.data,3);
     }
     /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
     protected emulation():void{}

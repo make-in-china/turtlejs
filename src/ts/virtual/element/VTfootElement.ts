@@ -1,6 +1,6 @@
 /// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "tfoot", nodeType?: 1): VMElement.VTfootElement&IVNodeMethod;
+    (nodeName: "tfoot", nodeType?: 1): VMElement.VTfootElement&IVNodeMethod
 }
 
 namespace VMElement{
@@ -8,6 +8,15 @@ namespace VMElement{
         nodeName="TFOOT";
         align:string
         vAlign:string
+        cloneNode(deep:boolean=false):VTfootElement&IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["align","vAlign"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
+            }
+                return <VTfootElement&IVNodeMethod>newNode;
+        }
     }
     VAP.decorate(<any>VTfootElement,["align","vAlign"]);
 }

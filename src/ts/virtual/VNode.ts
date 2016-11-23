@@ -128,7 +128,7 @@ abstract class VNode implements INode{
     getData(this: VNode): string {
         return this.vmData.data;
     }
-    abstract cloneNode(): VNode&IVNodeMethod 
+    abstract cloneNode(deep:boolean): VNode&IVNodeMethod 
     
     abstract toHTMLString():string[];
     // createElement(name: string): IVElement;

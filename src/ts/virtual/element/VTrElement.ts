@@ -1,6 +1,6 @@
 /// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "tr", nodeType?: 1): VMElement.VTrElement&IVNodeMethod;
+    (nodeName: "tr", nodeType?: 1): VMElement.VTrElement&IVNodeMethod
 }
 
 namespace VMElement{
@@ -9,6 +9,15 @@ namespace VMElement{
         align:string
         vAlign:string
         bgColor:string
+        cloneNode(deep:boolean=false):VTrElement&IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["align","vAlign","bgColor"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
+            }
+                return <VTrElement&IVNodeMethod>newNode;
+        }
     }
     VAP.decorate(<any>VTrElement,["align","vAlign","bgColor"]);
 }

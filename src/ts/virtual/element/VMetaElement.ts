@@ -1,6 +1,6 @@
 /// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "meta", nodeType?: 1): VMElement.VMetaElement&IVNodeMethod;
+    (nodeName: "meta", nodeType?: 1): VMElement.VMetaElement&IVNodeMethod
 }
 
 namespace VMElement{
@@ -10,6 +10,15 @@ namespace VMElement{
         name:string
         content:string
         scheme:string
+        cloneNode(deep:boolean=false):VMetaElement&IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["name","content","scheme"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
+            }
+                return <VMetaElement&IVNodeMethod>newNode;
+        }
     }
     VAP.decorate(<any>VMetaElement,["name","content","scheme"]);
 }

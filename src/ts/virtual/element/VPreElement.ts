@@ -7,13 +7,14 @@ namespace VMElement{
     export class  VPreElement extends VHtmlElement{
         nodeName="PRE";
         width:string
-        protected doToDOM(): Node {
-            let elem=this.doBaseToDOM();
-            let chds = this.childNodes;
-            if (chds.length > 0) {
-                (<Element>elem).innerHTML = decodeHTML((<VNode>chds[0]).getData());
+        cloneNode(deep:boolean=false):VPreElement&IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["width"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
             }
-            return elem;
+            return <VPreElement&IVNodeMethod>newNode;
         }
     }
     VAP.decorate(<any>VPreElement,["width"]);

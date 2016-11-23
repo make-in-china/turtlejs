@@ -1,6 +1,6 @@
 /// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "input", nodeType?: 1): VMElement.VInputElement&IVNodeMethod;
+    (nodeName: "input", nodeType?: 1): VMElement.VInputElement&IVNodeMethod
 }
 
 namespace VMElement{
@@ -41,6 +41,15 @@ namespace VMElement{
         autocapitalize:string
         webkitdirectory:string
         incremental:string
+        cloneNode(deep:boolean=false):VInputElement&IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["accept","alt","autocomplete","autofocus","checked","dirName","disabled","formAction","formEnctype","formMethod","formNoValidate","formTarget","height","max","maxLength","min","minLength","multiple","name","pattern","placeholder","readOnly","required","size","src","step","type","value","width","align","useMap","autocapitalize","webkitdirectory","incremental"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
+            }
+                return <VInputElement&IVNodeMethod>newNode;
+        }
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation():void{
             this.setBridgeGetSet("value");

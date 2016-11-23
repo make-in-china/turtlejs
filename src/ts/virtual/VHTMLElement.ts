@@ -15,14 +15,35 @@ namespace VMElement{
     export class VHtmlElement extends VElement{
         nodeType:VNodeType=1;
         nodeName="HTML"
-        version:string
-        cloneNode(this:VHtmlElement&IVNodeMethod): VHtmlElement&IVNodeMethod {
-            return <any>VDOM(this.getData());
+        // version:string
+        title:string
+        lang:string
+        titaccessKeyle:string
+        webkitdropzone:string
+        id:string
+        cloneNode(deep:boolean=false): VHtmlElement&IVNodeMethod {
+            let newNode=$$$(this.nodeName);
+            newNode.title=this.title;
+            // newNode.version=this.version;
+            newNode.lang=this.lang;
+            newNode.titaccessKeyle=this.titaccessKeyle;
+            newNode.webkitdropzone=this.webkitdropzone;
+            newNode.id=this.id;
+            let attributes=this.attributes;
+            for(let i=0;i<attributes.length;i++){
+                newNode.setAttribute( attributes[i].name, attributes[i].value);
+            }
+            if(deep){
+                let childNodes=this.childNodes;
+                for(let i=0;i<childNodes.length;i++){
+                    newNode.appendChild((<VNode>childNodes[i]).cloneNode(deep));
+                }
+            }
+            return newNode;
         }
         getData():string{
             return this.outerHTML;
         }
-        // innerText: string
         get innerText(this:VHtmlElement&IVNodeMethod):string {
             let s = "";
             let chdns = this.childNodes;
@@ -265,11 +286,6 @@ namespace VMElement{
             p.insertBefore(vText,this);
             p.removeChild(this);
         }
-        title:string
-        lang:string
-        titaccessKeyle:string
-        webkitdropzone:string
-        id:string
     }
     VAP.decorate(<any>VHtmlElement,["title", "lang", "accessKey", "webkitdropzone", "id"]);
 }

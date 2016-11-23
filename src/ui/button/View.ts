@@ -8,6 +8,11 @@ namespace ComponentView{
         panel:VMElement.VDivElement&IVNodeMethod=<any>$$$
 ("DIV").appendChild(this.ok).$;
         tops:[VMElement.VDivElement&IVNodeMethod]=[<any>$$$
-("DIV").appendChild(this.panel).$]
+("DIV").appendChild(this.panel).$
+    ("DIV")._("title")._("lang")._("webkitdropzone")._("id")._("align").$
+    ("DIV")._("title")._("lang")._("webkitdropzone")._("id")._("align").$
+    ("DIV")._("title")._("lang")._("webkitdropzone")._("id")._("align").$
+    ("DIV")._("title")._("lang")._("webkitdropzone")._("id")._("align").$
+    ("DIV")._("title")._("lang")._("webkitdropzone")._("id")._("align").$]
     }
 }

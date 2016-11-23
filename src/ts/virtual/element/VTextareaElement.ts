@@ -1,6 +1,6 @@
 /// <reference path="../Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "textarea", nodeType?: 1): VMElement.VTextareaElement&IVNodeMethod;
+    (nodeName: "textarea", nodeType?: 1): VMElement.VTextareaElement&IVNodeMethod
 }
 
 namespace VMElement{
@@ -19,6 +19,15 @@ namespace VMElement{
         rows:string
         wrap:string
         autocapitalize:string
+        cloneNode(deep:boolean=false):VTextareaElement&IVNodeMethod{
+            let newNode=super.cloneNode(deep);
+            for(const name of ["autofocus","cols","dirName","disabled","maxLength","minLength","name","placeholder","readOnly","required","rows","wrap","autocapitalize"]){
+                if(this[name]!==undefined){
+                    newNode[name]=this[name];
+                }
+            }
+                return <VTextareaElement&IVNodeMethod>newNode;
+        }
         get value():string{
             return this.innerText;
         }
