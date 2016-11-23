@@ -14,7 +14,8 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VBodyElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["text","link","vLink","aLink","bgColor","background"]){
-                if(this[name]!==undefined){
+                if(this[name]!==""               $1
+                }){
                     newNode[name]=this[name];
                 }
             }

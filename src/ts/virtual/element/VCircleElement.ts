@@ -13,7 +13,8 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VCircleElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["title","lang","accessKey","webkitdropzone","id"]){
-                if(this[name]!==undefined){
+                if(this[name]!==""               $1
+                }){
                     newNode[name]=this[name];
                 }
             }

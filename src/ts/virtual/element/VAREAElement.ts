@@ -16,7 +16,8 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VAreaElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["alt","coords","shape","target","ping","noHref","href"]){
-                if(this[name]!==undefined){
+                if(this[name]!==""               $1
+                }){
                     newNode[name]=this[name];
                 }
             }

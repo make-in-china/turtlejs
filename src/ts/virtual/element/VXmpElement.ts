@@ -10,7 +10,8 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VXmpElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["width"]){
-                if(this[name]!==undefined){
+                if(this[name]!==""               $1
+                }){
                     newNode[name]=this[name];
                 }
             }

@@ -13,7 +13,8 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VMetaElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["name","content","scheme"]){
-                if(this[name]!==undefined){
+                if(this[name]!==""               $1
+                }){
                     newNode[name]=this[name];
                 }
             }

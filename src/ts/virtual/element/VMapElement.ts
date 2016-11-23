@@ -11,7 +11,8 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VMapElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["name"]){
-                if(this[name]!==undefined){
+                if(this[name]!==""               $1
+                }){
                     newNode[name]=this[name];
                 }
             }

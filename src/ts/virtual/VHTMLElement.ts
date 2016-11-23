@@ -23,12 +23,13 @@ namespace VMElement{
         id:string
         cloneNode(deep:boolean=false): VHtmlElement&IVNodeMethod {
             let newNode=$$$(this.nodeName);
-            newNode.title=this.title;
+            
             // newNode.version=this.version;
-            newNode.lang=this.lang;
-            newNode.titaccessKeyle=this.titaccessKeyle;
-            newNode.webkitdropzone=this.webkitdropzone;
-            newNode.id=this.id;
+            for(const name of ["title", "lang", "accessKey", "webkitdropzone", "id"]){
+                if(this[name]!==""){
+                    newNode[name]=this[name];
+                }
+            }
             let attributes=this.attributes;
             for(let i=0;i<attributes.length;i++){
                 newNode.setAttribute( attributes[i].name, attributes[i].value);

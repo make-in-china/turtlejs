@@ -24,7 +24,8 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VObjectElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["type","name","useMap","width","height","align","archive","code","standby","codeType","border","title","lang","accessKey","webkitdropzone","id"]){
-                if(this[name]!==undefined){
+                if(this[name]!==""               $1
+                }){
                     newNode[name]=this[name];
                 }
             }

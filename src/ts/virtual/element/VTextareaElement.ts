@@ -22,7 +22,8 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VTextareaElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["autofocus","cols","dirName","disabled","maxLength","minLength","name","placeholder","readOnly","required","rows","wrap","autocapitalize"]){
-                if(this[name]!==undefined){
+                if(this[name]!==""               $1
+                }){
                     newNode[name]=this[name];
                 }
             }

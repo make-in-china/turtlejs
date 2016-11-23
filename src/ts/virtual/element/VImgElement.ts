@@ -26,7 +26,8 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VImgElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["alt","src","srcset","sizes","crossOrigin","useMap","isMap","width","height","name","lowsrc","align","hspace","vspace","longDesc","border"]){
-                if(this[name]!==undefined){
+                if(this[name]!==""               $1
+                }){
                     newNode[name]=this[name];
                 }
             }

@@ -21,7 +21,8 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VLinkElement &IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["disabled","href","crossOrigin","rel","media","hreflang","type","charset","rev","target","integrity"]){
-                if(this[name]!==undefined){
+                if(this[name]!==""               $1
+                }){
                     newNode[name]=this[name];
                 }
             }

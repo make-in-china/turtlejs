@@ -9,7 +9,8 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VDialogElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["open"]){
-                if(this[name]!==undefined){
+                if(this[name]!==""               $1
+                }){
                     newNode[name]=this[name];
                 }
             }
