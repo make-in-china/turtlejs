@@ -8,7 +8,7 @@ namespace Order {
         forSplit = 1
     }
     export class For extends RepeatBlockOrder {
-        static name = "for"
+        static orderName = "for"
         private forMode: eForMode;
         constructor(node: VComment, condition: string) {
             super(node, condition,'for');

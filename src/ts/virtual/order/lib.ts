@@ -45,13 +45,13 @@ namespace Order {
     }
     export interface IOrderConstructor {
         new (node: IComment, condition: string,...args:any[]): VOrder;
-        name: string;
+        orderName: string;
         subOrder?:string[];
     }
     export let orders: { [index: string]: IOrderConstructor } = {};
     
     export function register(this:void,order: IOrderConstructor) {
-        let name:string=order.name.toLowerCase();
+        let name:string=order.orderName.toLowerCase();
         orders[name] = order;
         orderNames.push(name);
         orderRE=new RegExp("^\\s*"+orderNames.join("|")+"(?:\\s*|$)");

@@ -102,7 +102,6 @@ namespace Component{
         treeEach(<VNode[]>chds,"childNodes",(node,step)=>{
             if(node instanceof VComment){
                 //解析注释里的命令
-                debugger;
                 let order=Order.parseComment(node);
                 if(order&&order.run){
                     if(order.canRunAtService){

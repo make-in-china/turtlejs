@@ -2,7 +2,7 @@
 /// <reference path='VOrder.ts'/>
 namespace Order {
     class Switch extends VOrder {
-        static name = "switch"
+        static orderName = "switch"
         static isLogic = true
         value: any
         hit: INode | null = null

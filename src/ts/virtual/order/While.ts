@@ -2,7 +2,7 @@
 /// <reference path='VOrder.ts'/>
 namespace Order {
     class While extends VOrder {
-        static name = "while"
+        static orderName = "while"
         static isLogic = true
         isBreak: boolean = false
         checkConditions:string[]=[this.condition]

@@ -2,7 +2,7 @@
 /// <reference path='BlockOrder.ts'/>
 namespace Order {
     class If extends BlockOrder {
-        static name = "if"
+        static orderName = "if"
         static subOrder=["else if","else"];
         constructor(node: VComment, condition: string) {
             super(node, condition,'if');
