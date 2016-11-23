@@ -13,8 +13,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VOlElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["reversed","start","type","compact"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

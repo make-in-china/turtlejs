@@ -14,8 +14,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VKeygenElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["autofocus","challenge","disabled","keytype","name"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

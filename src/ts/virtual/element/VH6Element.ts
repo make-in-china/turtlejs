@@ -9,8 +9,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VH6Element&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["align"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

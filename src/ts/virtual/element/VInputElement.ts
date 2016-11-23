@@ -44,8 +44,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VInputElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["accept","alt","autocomplete","autofocus","checked","dirName","disabled","formAction","formEnctype","formMethod","formNoValidate","formTarget","height","max","maxLength","min","minLength","multiple","name","pattern","placeholder","readOnly","required","size","src","step","type","value","width","align","useMap","autocapitalize","webkitdirectory","incremental"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

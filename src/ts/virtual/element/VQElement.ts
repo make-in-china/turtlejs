@@ -10,8 +10,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VQElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["cite"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

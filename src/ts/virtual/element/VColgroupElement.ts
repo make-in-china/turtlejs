@@ -12,8 +12,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VColgroupElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["span","align","vAlign","width"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

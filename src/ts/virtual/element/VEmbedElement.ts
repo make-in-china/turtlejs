@@ -18,8 +18,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VEmbedElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["type","width","height","align","name","title","lang","accessKey","webkitdropzone","id"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

@@ -10,8 +10,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VBrElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["clear"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

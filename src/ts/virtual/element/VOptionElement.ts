@@ -13,8 +13,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VOptionElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["disabled","label","selected","value"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

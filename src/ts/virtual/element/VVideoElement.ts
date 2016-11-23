@@ -12,8 +12,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VVideoElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["width","height","poster"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

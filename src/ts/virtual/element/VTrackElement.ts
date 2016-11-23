@@ -14,8 +14,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VTrackElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["kind","src","srclang","label","default"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

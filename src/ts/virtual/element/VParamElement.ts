@@ -14,8 +14,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VParamElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["name","value","type","valueType"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

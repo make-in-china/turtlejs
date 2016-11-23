@@ -11,8 +11,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VTheadElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["align","vAlign"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

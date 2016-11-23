@@ -14,8 +14,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VSourceElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["src","type","srcset","sizes","media"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

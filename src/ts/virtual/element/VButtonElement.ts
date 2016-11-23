@@ -16,8 +16,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VButtonElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["formTarget","name","value","title","lang","accessKey","webkitdropzone","id"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

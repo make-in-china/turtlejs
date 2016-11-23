@@ -18,8 +18,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VScriptElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["src","type","charset","async","defer","crossOrigin","event","integrity"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

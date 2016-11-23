@@ -15,8 +15,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VSelectElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["autofocus","disabled","multiple","name","required","size"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

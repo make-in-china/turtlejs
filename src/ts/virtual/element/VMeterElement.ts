@@ -15,8 +15,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VMeterElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["value","min","max","low","high","optimum"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

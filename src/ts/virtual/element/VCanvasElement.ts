@@ -10,8 +10,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VCanvasElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["width","height"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }

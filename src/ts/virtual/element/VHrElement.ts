@@ -14,8 +14,7 @@ namespace VMElement{
         cloneNode(deep:boolean=false):VHrElement&IVNodeMethod{
             let newNode=super.cloneNode(deep);
             for(const name of ["align","color","noShade","size","width"]){
-                if(this[name]!==""               $1
-                }){
+                if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }
