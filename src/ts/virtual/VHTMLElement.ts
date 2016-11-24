@@ -13,7 +13,7 @@ function isVHTMLElement(node: VNode): node is VMElement.VHtmlElement {
 }
 namespace VMElement{
     export class VHtmlElement extends VElement{
-        nodeType:VNodeType=1;
+        nodeType:ENodeType=ENodeType.Element;
         nodeName="HTML"
         // version:string
         title:string

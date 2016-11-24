@@ -12,7 +12,7 @@ interface VNodeVMData{
 }
 class VComment extends VCharacterData{
     nodeName="#Comment"
-    nodeType:VNodeType=8
+    nodeType:ENodeType=ENodeType.Comment
     private __value__=""
     cloneNode(deep:boolean):VComment&IVNodeMethod{
         return $$$(this.__value__,8);

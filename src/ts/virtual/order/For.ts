@@ -56,9 +56,9 @@ namespace Order {
 
         private canPrebuildForSplit(): boolean {
             try {
-                test(this.node, this.forSplit.pre);
-                test(this.node, this.forSplit.step);
-                test(this.node, this.forSplit.exec);
+                test(this.placeholder, this.forSplit.pre);
+                test(this.placeholder, this.forSplit.step);
+                test(this.placeholder, this.forSplit.exec);
             } catch (error) {
                 return false;
             }
@@ -67,11 +67,11 @@ namespace Order {
         private checkForSplit(): boolean {
             if (this.forSplit.isFirst) {
                 this.forSplit.isFirst = false;
-                exec(this.node, this.forSplit.pre);
+                exec(this.placeholder, this.forSplit.pre);
             } else {
-                exec(this.node, this.forSplit.step);
+                exec(this.placeholder, this.forSplit.step);
             }
-            return exec(this.node, this.forSplit.exec);
+            return exec(this.placeholder, this.forSplit.exec);
         }
 
         private forIn: {
@@ -83,7 +83,7 @@ namespace Order {
         }
         private canPrebuildForIn(): boolean {
             try {
-                test(this.node, this.forIn.object)
+                test(this.placeholder, this.forIn.object)
             } catch (error) {
                 return false;
             }
@@ -91,7 +91,7 @@ namespace Order {
         }
         private initForInSourceData(): boolean {
             if (!this.forIn.source) {
-                this.forIn.source = exec(this.node, this.forIn.object);
+                this.forIn.source = exec(this.placeholder, this.forIn.object);
                 if (!this.forIn.source) {
                     return false;
                 }
@@ -106,7 +106,7 @@ namespace Order {
                 throw new Error("计算出错！");
             }
             if (this.forIn.index < this.forIn.names.length) {
-                exec(this.node, this.forIn.var + '=\'' + this.forIn.names[this.forIn.index] + '\';');
+                exec(this.placeholder, this.forIn.var + '=\'' + this.forIn.names[this.forIn.index] + '\';');
                 this.forIn.index++;
                 return true
             } else {

@@ -188,7 +188,7 @@ class PartTemplate implements IPartTemplate{
     joinDatasByProps(props:Object):string{
         
         let err=[];
-        let d:ArrayEx<string>=slice.call(this.datas);
+        let d=slice.call(this.datas);
         for(let i=0;i<d.length-1;i+=2){
             let v;
             let p=this.params[i/2];

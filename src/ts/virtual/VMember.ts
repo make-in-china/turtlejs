@@ -5,7 +5,7 @@ interface IVNodeMethod{
 }
 class VMember extends VNode{
     nodeName="#member"
-    nodeType:VNodeType=20
+    nodeType:ENodeType=ENodeType.Member
     data:string
     constructor(data:string){
         super();

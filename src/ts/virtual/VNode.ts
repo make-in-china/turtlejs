@@ -13,10 +13,20 @@
 interface Node {
     __vdomNode__: VNode&IVNodeMethod
 }
-type VNodeType=1|3|8|10|20;
+
+const enum ENodeType{
+    Element=1,
+    Text=3,
+    Comment=8,
+    Document=9,
+    DocumentType=10,
+    DocumentFragment=11,
+    Member=20
+}
+
 interface IVNodeMethod{
     // (): VNode&IVNodeMethod;
-    (nodeName: string, nodeType: VNodeType): VNode&IVNodeMethod;
+    (nodeName: string, nodeType: ENodeType): VNode&IVNodeMethod;
 }
 let emptyTextNodeRE = /^\s*$/,
     stringNode = {
@@ -34,7 +44,7 @@ function getFunctionComment(fn: Function) {
 }
 abstract class VNode implements INode{
     vmData:VNodeVMData=new VNodeVMData();
-    abstract nodeType: VNodeType;
+    abstract nodeType: ENodeType;
     abstract nodeName: string;
     readonly childNodes: VNodeList=new VNodeList;
     parentNode: VNode&IVNodeMethod | null;
@@ -72,7 +82,7 @@ abstract class VNode implements INode{
         this.appendChild(t);
         return this;
     }
-    append(this: VNode, name: string, nodeType: VNodeType): VNode&IVNodeMethod {
+    append(this: VNode, name: string, nodeType: ENodeType): VNode&IVNodeMethod {
         return this.doAppendChild($$$(name, nodeType));
     }
     appendChild(this: VNode, vNode: VNode&IVNodeMethod): VNode&IVNodeMethod {
@@ -334,34 +344,67 @@ abstract class VNode implements INode{
     }
 }
 
-function bindClassToFunction(node:IVNodeMethod & VNode,nodeName: string, nodeType?: VNodeType|undefined){
-    if(nodeType===20){
+function bindClassToFunction(node:IVNodeMethod & VNode,nodeName: string, nodeType?: ENodeType|undefined){
+    if(nodeType===ENodeType.Member){
         node.__proto__=VMember.prototype;
         (<any>VMember).call(node,nodeName);
-    }else if(nodeType===10){
+
+    }else if(nodeType===ENodeType.DocumentType){
         node.__proto__=VDocumentType.prototype;
         (<any>VDocumentType).call(node);
-    }else if(nodeType===8){
+
+    }else if(nodeType===ENodeType.Comment){
         node.__proto__=VComment.prototype;
         (<any>VComment).call(node,nodeName);
-    }else if(nodeType===3){
+
+    }else if(nodeType===ENodeType.Text){
         node.__proto__=VText.prototype;
         (<any>VText).call(node,nodeName);
-    }else if(nodeType===undefined||nodeType===1){
-        nodeName=nodeName.toLowerCase();
-        let name="V"+nodeName[0].toUpperCase()+nodeName.substr(1).toLowerCase()+"Element";
-        if(VMElement.hasOwnProperty(name)){
-            node.__proto__=VMElement[name].prototype;
-            VMElement[name].call(node);
+
+    }else if(nodeType===ENodeType.Document){
+        node.__proto__=VDocument.prototype;
+        (<any>VDocument).call(node);
+
+    }else if(nodeType===ENodeType.DocumentFragment){
+        //未实现
+
+    }else if(nodeType===undefined||nodeType===ENodeType.Element){
+        if(nodeName[0]==='#'){
+            nodeName=nodeName.substr(1).toLowerCase();
+            switch(nodeName){
+                case "text":
+                    node.__proto__=VText.prototype;
+                    (<any>VText).call(node,nodeName);
+                    break;
+                case "comment":
+                    node.__proto__=VComment.prototype;
+                    (<any>VComment).call(node,nodeName);
+                    break;
+                case "document":
+                    node.__proto__=VDocument.prototype;
+                    (<any>VDocument).call(node);
+                    break;
+                case "document-fragment":
+                    //未实现
+                    break;
+            }
         }else{
-            throw new Error(`unknown nodeName:${nodeName}`);
+            nodeName=nodeName.toLowerCase();
+            let name="V"+nodeName[0].toUpperCase()+nodeName.substr(1).toLowerCase()+"Element";
+            if(VMElement.hasOwnProperty(name)){
+                node.__proto__=VMElement[name].prototype;
+                VMElement[name].call(node);
+            }else{
+                throw new Error(`unknown nodeName:${nodeName}`);
+            }
         }
+        
     }else{
         throw new Error(`unknown nodeType:${nodeType}`);
     }
 }
 function getVNodeMethod():VNode&IVNodeMethod{
-    let that=<any>function(nodeName: string, nodeType?: VNodeType|undefined):IVNodeMethod & VNode{
+    let that=<any>function(nodeName: string, nodeType?: ENodeType|undefined):IVNodeMethod & VNode{
         let fn=getVNodeMethod()
         bindClassToFunction(fn,nodeName,nodeType);
         that.appendChild(fn);
@@ -369,7 +412,7 @@ function getVNodeMethod():VNode&IVNodeMethod{
     }
     return that;
 }
-let VNodeHelp:IVNodeMethod=<any>function(nodeName: string, nodeType?: VNodeType|undefined):VNode&IVNodeMethod{
+let VNodeHelp:IVNodeMethod=<any>function(nodeName: string, nodeType?: ENodeType|undefined):VNode&IVNodeMethod{
     let that=getVNodeMethod()
     bindClassToFunction(that,nodeName,nodeType);
     return that;

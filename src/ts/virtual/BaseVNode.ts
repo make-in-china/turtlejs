@@ -3,6 +3,7 @@
 /// <reference path='VText.ts'/>
 /// <reference path='VComment.ts'/>
 /// <reference path='VDocumentType.ts'/>
+/// <reference path='VDocument.ts'/>
 
 /// <reference path='./element/VAElement.ts'/>
 /// <reference path='./element/VAreaElement.ts'/>

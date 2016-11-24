@@ -20,7 +20,7 @@ let getFunctionBlock=(function(){
 }());
 class VText extends VCharacterData{
     nodeName="#text"
-    nodeType:VNodeType=3
+    nodeType:ENodeType=ENodeType.Text
     private __value__=""
     cloneNode(deep:boolean):VText&IVNodeMethod{
         return $$$(this.__value__,3);

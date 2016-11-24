@@ -17,9 +17,12 @@ class JavaScriptStatement{
     childrenToString():string{
         let ret="";
         for(const statement of this.children){
-           ret+=statement.type+statement.childrenToString();
+           ret+=statement.toString();
         }
         return ret;
+    }
+    toString():string{
+        return this.type+this.childrenToString();
     }
     // setParentClose(){
     //     if(this.parent)this.parent.isClose=true;

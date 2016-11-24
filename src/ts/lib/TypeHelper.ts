@@ -12,25 +12,25 @@ let
     
     slice:{
         <T>(start?: number, end?: number): T[]
-        call<T>(arr:IArray,start?: number, end?: number):T[]
+        call<T>(arr:IArray|T[],start?: number, end?: number):T[]
     }
                                                 =   arrayConstructor.slice,
     
     push:{
         <T>(...items: T[]):number
-        apply<T>(arr:IArray,items:T[]):T[]
-        call<T>(arr:IArray,...items:T[]):T[]
+        apply<T>(arr:IArray|T[],items:T[]):T[]
+        call<T>(arr:IArray|T[],...items:T[]):T[]
     }                                           =   arrayConstructor.push,
     
     splice:{
         <T>(start: number): T[]
-        call<T>(arr:IArray,start: number):T[]
-        call<T>(arr:IArray,start: number, deleteCount: number, ...items: T[]): T[];
+        call<T>(arr:IArray|T[],start: number):T[]
+        call<T>(arr:IArray|T[],start: number, deleteCount: number, ...items: T[]): T[];
     }                                           =   arrayConstructor.splice,
 
     indexOf:{
         <T>(searchElement: T, fromIndex?: number): number
-        call<T>(arr:IArray,searchElement: T, fromIndex?: number): number
+        call<T>(arr:IArray|T[],searchElement: T, fromIndex?: number): number
     }                                           =   arrayConstructor.indexOf;
 
 

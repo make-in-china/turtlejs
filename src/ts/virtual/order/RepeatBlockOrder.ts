@@ -11,7 +11,6 @@ namespace Order {
         private parseRepeatBlock(){
             let blocks=this.blocks[0].blocks;
             let cloneBlocks=[];
-            debugger;
             for(var i=0;i<blocks.length;i++){
                 cloneBlocks.push(blocks[i].cloneNode(true));
             }

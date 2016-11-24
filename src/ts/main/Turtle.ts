@@ -39,7 +39,7 @@ interface IRenderDocument{
 
 class Turtle extends EventEmitterEx implements ITurtle{
     // domScope                                =new DOMScope;
-    // rootScope                               =new RootScope;
+    // rootScope                               =new Scope;
     config                                  =new Config;
     T:TemplateList                          =new TemplateList;
     xhr                                     =new XHR;

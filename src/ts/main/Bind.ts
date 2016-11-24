@@ -7,7 +7,7 @@
 /// <reference path="../part/PartCore.ts"/>
 
 
-function _getBindObject(scope:Scope|RootScope, arrNames: Array<string>) {
+function _getBindObject(scope:Scope, arrNames: Array<string>) {
     let i, obj, length = arrNames.length;;
     while (scope) {
         obj = scope;
@@ -222,7 +222,7 @@ function bindNodeProperty(node: INode, proName: string, condition: string) {
     let
         cdtn = splitByOnce(condition, "|"),
         name,
-        scope:Scope|RootScope,
+        scope:Scope,
         obj,
         obj2 = node,
         bindVar = cdtn[0],
@@ -338,7 +338,7 @@ function bindExpressionsByOrder(node:INode, condition:string) {
         cdtn.push('v');
     let
         name,
-        scope:Scope|RootScope,
+        scope:Scope,
         obj,
         bindVar = cdtn[0],
         arrBindVar: Array<string>,

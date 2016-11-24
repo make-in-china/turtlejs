@@ -9,6 +9,7 @@ interface IJavaScriptParseState{
     keyWordStart:number
     commentStart:number
     stringStart:number
+    stringStartBy:string
 }
 class JavaScript{
     private static getInitData(condition:string):IJavaScriptParseState{
@@ -23,7 +24,8 @@ class JavaScript{
             rootStatement:rootStatement,
             keyWordStart:-1,
             commentStart:-1,
-            stringStart:-1
+            stringStart:-1,
+            stringStartBy:""
         }
     }
     private static ''(m:IJavaScriptParseState){
@@ -36,7 +38,7 @@ class JavaScript{
             default:
                 m.action="keyWord";
                 m.keyWordStart=m.index;
-                m.index++;
+                // m.index++;
         }
     }
     private static parseKeyWord(m:IJavaScriptParseState):JavaScriptStatement|null{
@@ -82,13 +84,17 @@ class JavaScript{
             default:
                 statement=new JavaScriptStatement(keyWord);   
         }
-        if(m.statement.isBlock){
+        this.pushStatement(m,statement);
+        m.statement = statement;
+        return statement;
+    }
+    private static pushStatement(m:IJavaScriptParseState,statement:JavaScriptStatement){
+        if (m.statement.isBlock) {
             m.statement.push(statement);
-        }else{
+        }
+        else {
             m.statement.parentPush(statement);
         }
-        m.statement=statement;
-        return statement;
     }
     private static '+'(m:IJavaScriptParseState){
         this['+-'](m,"+");
@@ -109,8 +115,8 @@ class JavaScript{
         if(!this['?='](m,keyWord)){
             this.parseKeyWord(m);
             let statement=new JavaScriptStatement(keyWord);
-            m.statement.parentPush(statement);
-            m.statement=statement;
+            this.pushStatement(m,statement);
+            m.statement = statement;
             m.action='';
             m.index++;
         }
@@ -118,7 +124,7 @@ class JavaScript{
     private static comment(m:IJavaScriptParseState){
         if(m.condition[m.index]==='\n'){
             let statement=new JavaScriptStatement(m.condition.substring(m.commentStart,m.index));
-            m.statement.parentPush(statement);
+            this.pushStatement(m,statement);
             //不更新m.statement
         }
         m.index++;
@@ -127,7 +133,7 @@ class JavaScript{
     private static comment2(m:IJavaScriptParseState){
         if(m.condition[m.index]==='*'&&m.condition[m.index+1]==='/'){
             let statement=new JavaScriptStatement(m.condition.substring(m.commentStart,m.index+2));
-            m.statement.parentPush(statement);
+            this.pushStatement(m,statement);
             //不更新m.statement
         }
         m.index+=2;
@@ -153,7 +159,7 @@ class JavaScript{
                 if(!this['*/<>'](m,'/')){
                     this.parseKeyWord(m);
                     let statement=new JavaScriptStatement('/');
-                    m.statement.parentPush(statement);
+                    this.pushStatement(m,statement);
                     m.statement=statement;
                     m.index+=2;
                     m.action="";
@@ -169,7 +175,7 @@ class JavaScript{
             if(!this['?='](m,keyWord)){
                 this.parseKeyWord(m);
                 let statement=new JavaScriptStatement(keyWord);
-                m.statement.parentPush(statement);
+                this.pushStatement(m,statement);
                 m.statement=statement;
                 m.index++;
                 m.action="";
@@ -185,7 +191,7 @@ class JavaScript{
                 throw new Error("此处不该有'"+keyWord+"='");
             }
             let statement=new JavaScriptStatement(keyWord+'=');
-            m.statement.parentPush(statement);
+            this.pushStatement(m,statement);
             m.statement=statement;
             m.action='';
             m.index+=2;
@@ -199,7 +205,7 @@ class JavaScript{
                 throw new Error("此处不该有'"+keyWord+"='");
             }
             let statement=new JavaScriptStatement(keyWord+'==');
-            m.statement.parentPush(statement);
+            this.pushStatement(m,statement);
             m.statement=statement;
             m.index+=3;
             m.action='';
@@ -208,11 +214,9 @@ class JavaScript{
         return false
     }
     private static ','(m:IJavaScriptParseState){
-        if(!this.parseKeyWord(m)){
-            throw new Error("此处不该有','");
-        }
+        this.parseKeyWord(m);
         let statement=new JavaScriptStatement(',');
-        m.statement.parentPush(statement);
+        this.pushStatement(m,statement);
         m.statement=statement;
         m.action="";
         m.index++;
@@ -229,7 +233,7 @@ class JavaScript{
             throw new Error("此处不该有'.'");
         }
         let statement=new JavaScriptStatement('.');
-        m.statement.parentPush(statement);
+        this.pushStatement(m,statement);
         m.statement=statement;
         m.action="";
         m.index++;
@@ -246,7 +250,8 @@ class JavaScript{
             throw new Error("此处不该有'"+keyWord+"'");
         }
         let statement=new JavaScriptStatement(keyWord);
-        m.statement.parentPush(statement);
+        this.pushStatement(m,statement);
+        m.statement=statement;
         m.action="";
         m.index++;
     }
@@ -258,7 +263,7 @@ class JavaScript{
         }
 
         let statement=new JavaScriptStatement(' ');
-        m.statement.parentPush(statement);
+        this.pushStatement(m,statement);
         m.statement=statement;
         m.action='';
     }
@@ -298,7 +303,7 @@ class JavaScript{
         this.parseKeyWord(m);
         let statement=new JavaScriptStatement(keyWord);
         statement.isBlock=true;
-        m.statement.parentPush(statement);
+        this.pushStatement(m,statement);
         m.statement=statement;
         m.index++;
         m.action="";
@@ -322,7 +327,7 @@ class JavaScript{
                 throw new Error("此处不该有'='");
             }
             let statement=new JavaScriptStatement('=');
-            m.statement.parentPush(statement);
+            this.pushStatement(m,statement);
             m.statement=statement;
             m.action="";
             m.index++;
@@ -331,7 +336,7 @@ class JavaScript{
     private static ':'(m:IJavaScriptParseState){
         this.parseKeyWord(m);
         let statement=new JavaScriptStatement(':');
-        m.statement.parentPush(statement);
+        this.pushStatement(m,statement);
         m.statement=statement;
         m.action="";
         m.index++;
@@ -346,15 +351,22 @@ class JavaScript{
         this['"`\''](m,"'");
     }
     private static '"`\''(m:IJavaScriptParseState,keyWord:"'"|'"'|'`'){
+        m.stringStart=m.index;
+        m.index++;
+        m.action='string';
+        m.stringStartBy=keyWord;
+    }
+    private static string(m:IJavaScriptParseState){
         switch(m.condition[m.index]){
             case '\\':
                 m.index+=2;
                 return;
-            case keyWord:
-                let statement=new JavaScriptStatement(m.condition.substring(m.stringStart,m.index));
-                m.statement.parentPush(statement);
+            case m.stringStartBy:
+                let statement=new JavaScriptStatement(m.condition.substring(m.stringStart,m.index+1));
+                this.pushStatement(m,statement);
                 m.statement=statement;
                 m.action='';
+                m.index++;
                 return;
             default:
                 m.index++;
@@ -367,7 +379,7 @@ class JavaScript{
                 break;
             case "space":
                 let statement=new JavaScriptStatement(' ');
-                m.statement.parentPush(statement);
+                this.pushStatement(m,statement);
                 // m.statement=statement;
                 break;
             case "string":

@@ -612,7 +612,7 @@ function bindNodeByCondition(node: INode, condition: string) {
         cdtn = splitByOnce(condition, "|"),
         name = cdtn[0],
         arrName: string[],
-        scope: Scope | RootScope,
+        scope: Scope,
         obj,
         exp: IExp;
 

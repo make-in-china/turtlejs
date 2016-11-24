@@ -88,58 +88,64 @@ namespace Order {
         }
         return order;
     }
-    let _exec:{call(that:any,$$turtle$$: string,node:IComment):any} = Function('$$turtle$$,node', 'with(this){return eval($$turtle$$)};');;
-    let env:RootScope=$rootScope;
-    let envNames=[];
+    let _exec:{call(that:any,$$turtle$$: string,node:INode):any} = Function('$$turtle$$,node', 'with(this){return eval($$turtle$$)};');
     export function registerEnvVar(name:string,value:any){
-        if(name in env){
+        if(name in $rootScope){
             throw new Error(name+"无法重复注册到环境！");
         }
-        env[name]=value;
-        envNames.push(name);
-        // createExec();
+        $rootScope[name]=value;
     }
-    // function createExec(){
-    //     let args=envNames.join(',');
-    //     if(args.length>0){
-    //         args='$$turtle$$,$node,'+args;
-    //     }else{
-    //         args='$$turtle$$,$node';
-    //     }
-    //     _exec = <(this: VComment, $$turtle$$: string) => any>Function(args, 'with(this){return eval($$turtle$$)};');
-    // }
-    // createExec();
-    export function exec(this:void,node: IComment, script: string): any {
-        let that:Scope|RootScope;
-        if(node.__scope__){
-            that=node.__scope__;
-        }else{
-            that=env;
-        }
-        // for(const name of envNames){
-        //     args.push(env[name]);
-        // }
+    
+    export function exec(this:void,node: INode, script: string): any {
+        let that:Scope=DOMScope.get(node);
+
         let ret=_exec.call(that, script,node);
         return ret;
     }
-    export function test(this:void,node: IComment, script: string): any {
-        let that:Scope|RootScope;
-        if(node.__scope__){
-            that=node.__scope__;
+//test    
+    let replaceScopes={
+        scopes:[] as Scope[],
+        oldScopes:[] as Scope[]
+    }
+    /**取消scope保护 */
+    export function testEnd(){
+        for(let i=0;i<replaceScopes.oldScopes.length;i++){
+            let oldScope=replaceScopes.oldScopes.pop();
+            let scope=<Scope>replaceScopes.scopes.pop();
+            scope.__actionNode__.__scope__=oldScope;
+        }
+    }
+    /**测试时保护原来的scope */
+    function replaceScope(scope:Scope):Scope{
+        let idx=replaceScopes.oldScopes.indexOf(scope);
+        if(idx!==-1){
+            return replaceScopes.scopes[idx];
         }else{
-            that=env;
+            let newScope=<Scope>createFakeObject(<any>scope);
+            scope.__actionNode__.__scope__=newScope;
+            replaceScopes.oldScopes.push(scope);
+            replaceScopes.scopes.push(newScope);
+            return newScope;
         }
-        let _that={}
-        for(const name of envNames){
-            defineLockProperty(_that,name,that);
-        }
+    }
+    export function test(this:void,node: INode, script: string): any {
+        let that:Scope=DOMScope.get(node);
+        that=replaceScope(that);
+        let _that=createFakeObject(<any>that);
         return _exec.call(_that,script, node);
     }
+    export function testSet(this:void,node: INode,name:string, v: any): void {
+        let that:Scope=DOMScope.get(node);
+        that=replaceScope(that);
+        that[name]=v;
+    }
+
+    
     function createFakeObject(that:Object):Object{
         let obj={};
         for(let name in that){
             if(that.hasOwnProperty(name)){
-                defineLockProperty(obj,name,that[name]);
+                defineCloneProperty(obj,name,that[name]);
             }
         }
         if(that.__proto__!==Object){
@@ -148,7 +154,7 @@ namespace Order {
         return obj;
     }
     function emptyFunction(){}
-    function defineLockProperty(that:Object,name:string,source:Object){
+    function defineCloneProperty(that:Object,name:string,source:any){
         Object.defineProperty(that,name,{
             get(){
                 let ret = source[name];

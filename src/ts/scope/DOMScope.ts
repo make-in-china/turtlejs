@@ -1,13 +1,18 @@
-/// <reference path="RootScope.ts"/>
 /// <reference path="Scope.ts"/>
+/// <reference path="../virtual/BaseVNode.ts"/>
+
+
+typeof document==="undefined"&&(document=<any>$$$('#document'));
+let $rootScope:RootScope=new RootScope(document);
+
 class DOMScope{
-    static stack:Array<Scope|RootScope>=[$rootScope]
+    static stack:Array<Scope>=[$rootScope]
     /**
      * 在dom节点上创建变量作用域对象
      * @param {INode} node - dom节点
      * @param {string} name - 名称
      */
-    static create(node:INode,name:string):Scope{
+    static create(node:IComment,name:string):Scope{
         let scope=this.get(node);
         if(node.parentNode!==scope.__actionNode__){
             scope=new Scope(node,scope,name);
@@ -23,7 +28,7 @@ class DOMScope{
      * 获取变量作用域对象
      * @param {INode} node - dom节点
      */
-    static get(node:INode):Scope|RootScope{
+    static get(node:INode):Scope{
         var nd:INode|null;
         if(!node){
             return $rootScope;
@@ -59,7 +64,7 @@ class DOMScope{
      * @param {INode} node - dom节点
      */
     static link(scope:Scope,node:INode){
-        var p:Scope|RootScope=this.get(node);
+        var p:Scope=this.get(node);
         if(!p){
             return;
         }

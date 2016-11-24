@@ -7,7 +7,7 @@ function isVDocType(node: VNode): node is VDocumentType {
     return node.nodeType === 10
 }
 class VDocumentType extends VNode{
-    nodeType:VNodeType=10
+    nodeType:ENodeType=ENodeType.DocumentType
     nodeName="html"
     cloneNode(deep:boolean):VDocumentType&IVNodeMethod{
         return $$$("",10);
