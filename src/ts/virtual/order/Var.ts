@@ -6,7 +6,7 @@ namespace Order {
         static orderName = "var";
         node:IComment;
         statement:JavaScriptStatement
-        private varInfos:[string,any,boolean][]
+        private varInfos:[string,any,boolean][]=[]
         constructor(node:VComment , condition:string){
             super(node,condition);
             this.init();

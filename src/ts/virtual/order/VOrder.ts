@@ -1,5 +1,5 @@
 
-/// <reference path='lib.ts'/>
+/// <reference path='Lib.ts'/>
 
 namespace Order {
     

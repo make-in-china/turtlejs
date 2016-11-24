@@ -5,13 +5,9 @@ namespace Order {
         static orderName = "scope";
         node:IComment;
         scopeName:string
-        statement:JavaScriptStatement
-        
-        constructor(node:VComment , condition:string){
-            super(node,condition);
-        }
-        
+
         init(){
+            debugger;
             let conditionArr=splitByOnce(this.condition,":");
             this.scopeName=conditionArr[0];
             if(conditionArr.length===2){

@@ -10,7 +10,7 @@ namespace Order {
         private tempBlocks:INode[]=[];
         private parseRepeatBlock(){
             let blocks=this.blocks[0].blocks;
-            let cloneBlocks=[];
+            let cloneBlocks:INode[]=[];
             for(var i=0;i<blocks.length;i++){
                 cloneBlocks.push(blocks[i].cloneNode(true));
             }

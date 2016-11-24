@@ -414,6 +414,9 @@ class JavaScript{
             case ":":
                 this[m.condition[m.index]](m);
                 break;
+            case "&":
+            case "|":
+                throw new Error("未实现");
             default:
                 m.index++;
         }
