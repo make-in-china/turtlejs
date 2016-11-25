@@ -8,14 +8,23 @@ namespace Order {
         condition: string;
         run?(): void
         undo?():void
-        parseBlockResult: ITreeEachReturn | undefined
-        abstract canRunAtService:boolean;
+        abstract tryRun():void
+        get canRunAtService():boolean{
+            try{
+                this.tryRun();
+                resetTest();
+                return true;
+            }catch(e){
+                resetTest();
+                return false;
+            }
+        }
         constructor(node: IComment, condition: string) {
             this.node = node;
             this.condition = condition;
         }
-        protected eachOrder(array:INode[]|INodeList,fn:(node:IComment,info:ICommentOrderInfo,step:ITreeEachStep)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
-            return treeEach(array, 'childNodes', (node: INode, step)=> {
+        protected eachOrder(array:INode[]|INodeList,fn:(node:IComment,info:ICommentOrderInfo,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
+            return treeEach(array, 'childNodes', (node: INode, state)=> {
                 if (!(node instanceof VComment)) {
                     return;
                 }
@@ -23,7 +32,7 @@ namespace Order {
                 if (!info) {
                     return;
                 }
-                fn(node,info,step);
+                return fn(node,info,state);
             },beginIndex);
         }
     }

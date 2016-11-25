@@ -7,7 +7,11 @@
 /// <reference path='order/VOrder.ts'/>
 /// <reference path='order/If.ts'/>
 /// <reference path='order/For.ts'/>
+/// <reference path='order/Switch.ts'/>
+/// <reference path='order/while.ts'/>
+/// <reference path='order/Do.ts'/>
 /// <reference path='order/Scope.ts'/>
+/// <reference path='order/=.ts'/>
 
 class UIHelper{
     static fs=typeof require!== "undefined"&&require('fs');
@@ -79,6 +83,7 @@ namespace Component{
             return 'VMElement.V'+nodeName+'Element&IVNodeMethod';
         }
     }
+    
     static makeClass(path:string,className?:string){
         if(!className){
             className=path.match(/[\s\S]*[\/\\](.*?)[\/\\].*?$/)[1];
@@ -90,7 +95,7 @@ namespace Component{
         }
         let dom=VDOM(html);
         let tops:VNode[];
-        let chds:VNode | IArray;
+        let chds:VNode[]| IArray;
         if(isArray(dom)){
             chds=dom;
             tops=dom
@@ -99,23 +104,27 @@ namespace Component{
             tops=[dom];
         }
         let refs:[string,VMElement.VHtmlElement][]=[];
-        treeEach(<VNode[]>chds,"childNodes",(node,step)=>{
+        treeEach(<VNode[]>chds,"childNodes",(node,state)=>{
             if(node instanceof VComment){
                 //解析注释里的命令
-                let order=Order.parseComment(node);
-                if(order&&order.run){
-                    if(order.canRunAtService){
-                        order.run();
-                    }else if(order.undo){
-                        //哎呀debugger
-                        order.undo();
-                    }
-                };
+                try{
+                    let order=Order.parseComment(node);
+                    if(order&&order.run){
+                        if(order.canRunAtService){
+                            order.run();
+                        }else if(order.undo){
+                            //哎呀debugger
+                            order.undo();
+                        }
+                    };
+                }catch(e){
+                    throw getMakeClassError(path,node,(<Error>e).message,state);
+                }
                 return eTreeEach.c_noIn;
                 //解析命令
             }
         });
-        treeEach(<VNode[]>chds,"childNodes",(node,step)=>{
+        treeEach(<VNode[]>chds,"childNodes",(node,state)=>{
             if(node instanceof VMElement.VHtmlElement){
                 //解析ref
                 let v=node.getAttribute("ref");
@@ -160,3 +169,16 @@ namespace Component{
 typeof exports!=="undefined"&&(exports.UIHelper=UIHelper);
 
 
+function getMakeClassError(path:string,node:IComment,message:string,state:ITreeEachState<INode>):string{
+    let stack=state.stack;
+    let strStack='    at '+path+'\n';
+    for(let i=0;i<stack.length;i+=2){
+        let arr:INode[]=<INode[]>stack[i];
+        let index:number=<number>stack[i+1];
+        let info:string[]=[];
+        strStack='    at childNodes.'+index+':'+arr[index].nodeName+'\n'+strStack;
+    }
+    strStack='    at childNodes.'+state.currentIndex+':'+node.data+'\n'+strStack;
+    
+    return 'Error:'+message+'\n'+strStack;
+}

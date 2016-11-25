@@ -66,7 +66,7 @@ class xxxxOrder{
             return eTreeEach.c_stopEach;
         }
 
-        return treeEach(<INode[]><any>(<INode>node.parentNode).childNodes,'childNodes',function(node,step){
+        return treeEach(<INode[]><any>(<INode>node.parentNode).childNodes,'childNodes',function(node,state){
             if(!isCommentNode(node)){
                 return;
             }
@@ -77,7 +77,7 @@ class xxxxOrder{
             if(info.order){
                 let ret=this.parseCommentOrderNoScript(info,node,outerChildNodes,outerChildren,props,part);
                 if(ret){
-                    step.next=ret.index-getNodeIndex2(node)+1;
+                    state.nextStepLength=ret.index-getNodeIndex2(node)+1;
                 }
                 return eTreeEach.c_noRepeat&eTreeEach.c_noIn;
             }

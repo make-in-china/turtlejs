@@ -66,7 +66,7 @@ function nodesToString(nodes: INode[]) {
 //     return n;
 // }
 function cloneBetween(node1: INode, node2: INode):INode[]|null {
-    let nodes = [];
+    let nodes:INode[] = [];
     let l1 = getNodeIndex2(node1);
     let l2 = getNodeIndex2(node2);
     let p1 = node1.parentNode;
@@ -89,16 +89,16 @@ function removeBlockBetween(node1: INode, node2: INode) {
         p1.removeChild(<INode>p1.childNodes[l1]);
     }
 }
-function replaceNodeByNode(node: INode, node2: INode) {
-    let parent = node.parentNode;
-    if (parent == null) {
-        return;
+function replaceNodeByNode(refChilde: INode, newChild: INode) {
+    let parent = refChilde.parentNode;
+    if (parent) {
+        insertNode(refChilde, newChild);
+        parent.removeChild(refChilde);
     }
-    insertNode(node, node2);
-    parent.removeChild(node);
 }
 function appendNodes(nodes: INode[]|INodeList|IHTMLCollection, parent: INode) {
-    let cds = push.apply([],<INode[]>nodes);
+    let cds =[];
+    push.apply(cds,<INode[]>nodes);
     for(const c of cds){
         parent.appendChild(c);
     }
@@ -106,7 +106,7 @@ function appendNodes(nodes: INode[]|INodeList|IHTMLCollection, parent: INode) {
 function takeChildNodes(node: INode): INode[] {
     let cds = node.childNodes;
     let length = cds.length;
-    let ret = [];
+    let ret:INode[] = [];
     for (let i = length; i > 0; i--) {
         ret.push(node.removeChild(<INode>cds[0]));
     }
@@ -131,7 +131,7 @@ function takeBlockBetween(node1: INode, node2: INode): INode[]|null {
     let ns1 = p1.childNodes;
     let l1 = getNodeIndex2(node1) + 1;
     let l2 = getNodeIndex2(node2);
-    let ns = [];
+    let ns:INode[] = [];
     for (let i = l1; i < l2; i++) {
         ns.push(p1.removeChild(<INode>ns1[l1]));
     }

@@ -18,8 +18,8 @@ let
     
     push:{
         <T>(...items: T[]):number
-        apply<T>(arr:IArray|T[],items:T[]):T[]
-        call<T>(arr:IArray|T[],...items:T[]):T[]
+        apply<T>(arr:IArray|T[],items:T[]):number
+        call<T>(arr:IArray|T[],...items:T[]):number
     }                                           =   arrayConstructor.push,
     
     splice:{
@@ -134,7 +134,7 @@ function decamelize(str:string){
 function splitByOnce(s:string,split:string):Array<string>{
     let 
         index=s.indexOf(split),
-        arr=[];
+        arr:string[]=[];
     if(index!=-1){
         arr.push(s.substring(0,index));
         arr.push(s.substring(index+split.length,s.length));

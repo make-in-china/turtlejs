@@ -39,12 +39,11 @@ namespace Order {
                 throw new Error("错误的for表达式！");
             }
         }
-
-        get canRunAtService(): boolean {
+        tryRun(){
             if (this.forMode === eForMode.forIn) {
-                return this.canPrebuildForIn();
+                this.canPrebuildForIn();
             } else {
-                return this.canPrebuildForSplit();
+                this.canPrebuildForSplit();
             }
         }
         private forSplit: {
@@ -54,15 +53,10 @@ namespace Order {
             isFirst: boolean
         }
 
-        private canPrebuildForSplit(): boolean {
-            try {
-                test(this.placeholder, this.forSplit.pre);
-                test(this.placeholder, this.forSplit.step);
-                test(this.placeholder, this.forSplit.exec);
-            } catch (error) {
-                return false;
-            }
-            return true;
+        private canPrebuildForSplit() {
+            test(this.placeholder, this.forSplit.pre);
+            test(this.placeholder, this.forSplit.step);
+            test(this.placeholder, this.forSplit.exec);
         }
         private checkForSplit(): boolean {
             if (this.forSplit.isFirst) {
@@ -81,13 +75,8 @@ namespace Order {
             names: string[]
             index: number
         }
-        private canPrebuildForIn(): boolean {
-            try {
-                test(this.placeholder, this.forIn.object)
-            } catch (error) {
-                return false;
-            }
-            return true;
+        private canPrebuildForIn() {
+            test(this.placeholder, this.forIn.object)
         }
         private initForInSourceData(): boolean {
             if (!this.forIn.source) {

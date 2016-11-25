@@ -11,10 +11,11 @@ const enum eTreeEach{
     c_noIn=4,
     c_noRepeat=8
 }
-interface ITreeEachStep{
-    next:number
+interface ITreeEachState<T>{
+    stack:[T[]|IArray,number]
+    nextStepLength:number
+    currentIndex:number
 }
-
 
 
 interface IArray{
@@ -23,7 +24,7 @@ interface IArray{
 
 interface ITreeEachReturn {
     stack: [IArray | INode[], number];
-    state: eTreeEach | undefined;
+    return: eTreeEach | undefined;
     array: IArray | INode[];
     index: number;
 }
@@ -35,46 +36,50 @@ interface ITreeEachReturn {
  * @param {(node:T,step?:ITreeEachStep)=>eTreeEach|undefined} fn 回调函数
  * @param {number} beginIndex 遍历起始位置
  */
-function treeEach<T>(array:T[]|IArray,propertyName:string,fn:(node:T,step:ITreeEachStep)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
+function treeEach<T>(array:T[]|IArray,propertyName:string,fn:(node:T,state:ITreeEachState<T>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
     if(!isArrayLike(array)){
         return;
     }
     let 
         arr                             =array,
         i                               =beginIndex,
-        stack:[T[]|IArray,number]       =<any>[],
-        step:ITreeEachStep              ={next:1},
+        state:ITreeEachState<T>         =<any>{
+            stack:[array,beginIndex],
+            nextStepLength:1,
+            currentIndex:0},
+        stack                           =state.stack,
         obj:T,
         obj2:T,
-        state:eTreeEach|undefined;
+        ret:eTreeEach|undefined;
     while(true){
         if(i<arr.length){
             obj=arr[i];
-            step.next=1;
-            state=<eTreeEach|undefined>fn(obj,step);
-            if(state==undefined){
-                state=0
-            }else if(state==eTreeEach.c_stopEach){
+            state.nextStepLength=1;
+            state.currentIndex=i;
+            ret=<eTreeEach|undefined>fn(obj,state);
+            if(ret==undefined){
+                ret=0
+            }else if(ret==eTreeEach.c_stopEach){
                 break;
             }
             obj2=arr[i];
-            if(obj2 && obj2!=obj && !(eTreeEach.c_noRepeat&state)){
-                    state=state|eTreeEach.c_repeat;
+            if(obj2 && obj2!=obj && !(eTreeEach.c_noRepeat&ret)){
+                    ret=ret|eTreeEach.c_repeat;
             }
-            if(obj2 && obj2[propertyName] && obj2[propertyName].length>0 && !(state&eTreeEach.c_noIn)&&propertyName){
+            if(obj2 && obj2[propertyName] && obj2[propertyName].length>0 && !(ret&eTreeEach.c_noIn)&&propertyName){
                 stack.push(arr);
-                stack.push(i+(state&eTreeEach.c_repeat?0:step.next));
+                stack.push(i+(ret&eTreeEach.c_repeat?0:state.nextStepLength));
                 i=0;
                 arr=obj2[propertyName];
             }else{
-                i+=(state&eTreeEach.c_repeat?0:step.next);
+                i+=(ret&eTreeEach.c_repeat?0:state.nextStepLength);
             }
-        }else if(stack.length>0){
+        }else if(stack.length>2){
             i=<number>stack.pop();
             arr=<T[]|IArray>stack.pop();
         }else{
             break;
         }
     }
-    return {stack:stack,state:state,array:arr,index:i}
+    return {stack:stack,return:ret,array:arr,index:i}
 }

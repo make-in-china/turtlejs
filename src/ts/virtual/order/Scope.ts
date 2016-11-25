@@ -7,7 +7,6 @@ namespace Order {
         scopeName:string
 
         init(){
-            debugger;
             let conditionArr=splitByOnce(this.condition,":");
             this.scopeName=conditionArr[0];
             if(conditionArr.length===2){

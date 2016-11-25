@@ -12,24 +12,16 @@ namespace Order {
             this.init();
         }
         init(){
-            
             this.statement=this.getStatement('var '+this.condition);
             this.initvarInfos();
         }
-        get canRunAtService():boolean{
-            try{
-                for(const varInfo of this.varInfos){
-                    if(varInfo[2]){
-                        let v=test(this.node,varInfo[1]);
-                        debugger;
-                        testSet(this.node,varInfo[0],v);
-                    }
+        
+        tryRun(){
+
+            for(const varInfo of this.varInfos){
+                if(varInfo[2]){
+                    testSet(this.node,varInfo[0],test(this.node,varInfo[1]));
                 }
-                testEnd();
-                return true;
-            }catch(e){
-                testEnd();
-                return false;
             }
         }
         getStatement(condition:string):JavaScriptStatement{
@@ -75,10 +67,8 @@ namespace Order {
                         if(statement.isBlock){
                             i++;
                             this.varInfos.push([varName,statement.toString()+chds[i].toString(),true]);
-                            // scope[varName]=exec(this.node,statement.toString()+chds[i].toString());
                         }else{
                             this.varInfos.push([varName,'('+statement.toString()+')',true]);
-                            // scope[varName]=exec(this.node,'('+statement.toString()+')');
                         }
                         step++
                         break;

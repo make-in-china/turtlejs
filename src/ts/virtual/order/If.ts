@@ -15,25 +15,20 @@ namespace Order {
             }
             return false
         }
-        get canRunAtService(): boolean {
-            try {
-                for(const block of this.blocks){
-                    test(block.node, block.condition);
-                }
-                return true;
-            } catch (error) {
-                return false
+        tryRun(){
+            for(const block of this.blocks){
+                test(this.placeholder, block.condition);
             }
         }
         run() {
             let hit=-1;
-            if( parseBool(exec(this.node, this.condition))){
+            if( parseBool(exec(this.placeholder, this.condition))){
                 hit=0;
             }
             let blocks=this.blocks;
             for(let i=1;i<blocks.length;i++){
                 let block=blocks[i];
-                if (block.order === 'else'||parseBool(exec(block.node, this.condition))) {
+                if (block.order === 'else'||parseBool(exec(this.placeholder, block.condition))) {
                     hit = i;
                     break;
                 }

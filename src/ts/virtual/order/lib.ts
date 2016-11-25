@@ -49,21 +49,23 @@ namespace Order {
         subOrder?:string[];
     }
     export let orders: { [index: string]: IOrderConstructor } = {};
-    
+    function makeOrderRegExp(names:string[]):RegExp{
+        return new RegExp("^\\s*("+names.join("|")+")(?:\\s*|$)");
+    }
     export function register(this:void,order: IOrderConstructor) {
         let name:string=order.orderName.toLowerCase();
         orders[name] = order;
         orderNames.push(name);
-        orderRE=new RegExp("^\\s*"+orderNames.join("|")+"(?:\\s*|$)");
+        orderRE=makeOrderRegExp(orderNames);
         if(isArray(order.subOrder)&&order.subOrder.length>0){
             for(const subOrder of order.subOrder){
                 addSubOrderName(subOrder);
             }
             // subOrderNames.push(order.subOrder.join("|"));
-            subOrderRE=new RegExp("^\\s*"+subOrderNames.join("|")+"(?:\\s*|$)");
+            subOrderRE=makeOrderRegExp(subOrderNames);
         }
     }
-    export function parseComment(this:void,node: VComment, run: boolean = false): VOrder | undefined {
+    export function parseComment(this:void,node: VComment): VOrder | undefined {
 
         if (node.__order__) {
             return node.__order__;
@@ -80,12 +82,7 @@ namespace Order {
             return;
         }
         let order: VOrder = new orders[orderName](node, info.condition);
-        // order.parse(node, []);
-        if (run&&order.run) {
-            // if (order.endNode) {
-                order.run();
-            // }
-        }
+        
         return order;
     }
     let _exec:{call(that:any,$$turtle$$: string,node:INode):any} = Function('$$turtle$$,node', 'with(this){return eval($$turtle$$)};');
@@ -108,7 +105,7 @@ namespace Order {
         oldScopes:[] as Scope[]
     }
     /**取消scope保护 */
-    export function testEnd(){
+    export function resetTest(){
         for(let i=0;i<replaceScopes.oldScopes.length;i++){
             let oldScope=replaceScopes.oldScopes.pop();
             let scope=<Scope>replaceScopes.scopes.pop();
@@ -119,8 +116,13 @@ namespace Order {
     function replaceScope(scope:Scope):Scope{
         let idx=replaceScopes.oldScopes.indexOf(scope);
         if(idx!==-1){
-            return replaceScopes.scopes[idx];
+            return <Scope>replaceScopes.scopes[idx];
         }else{
+            
+            idx=replaceScopes.scopes.indexOf(scope);
+            if(idx!==-1){
+                return scope;
+            }
             let newScope=<Scope>createFakeObject(<any>scope);
             scope.__actionNode__.__scope__=newScope;
             replaceScopes.oldScopes.push(scope);
@@ -131,35 +133,37 @@ namespace Order {
     export function test(this:void,node: INode, script: string): any {
         let that:Scope=DOMScope.get(node);
         that=replaceScope(that);
-        let _that=createFakeObject(<any>that);
-        return _exec.call(_that,script, node);
+        return _exec.call(that,script, node);
     }
-    export function testSet(this:void,node: INode,name:string, v: any): void {
+    export function testSet(this:void,node: INode,name:string, script: string): void {
         let that:Scope=DOMScope.get(node);
         that=replaceScope(that);
-        that[name]=v;
+        that[name]=_exec.call(that,script, node);
     }
-
     
     function createFakeObject(that:Object):Object{
         let obj={};
         for(let name in that){
             if(that.hasOwnProperty(name)){
-                defineCloneProperty(obj,name,that[name]);
+                defineCloneProperty(obj,name,that);
             }
         }
-        if(that.__proto__!==Object){
+        if(that.__proto__!==Object.prototype){
             obj.__proto__=createFakeObject(that.__proto__);
         }
         return obj;
     }
     function emptyFunction(){}
     function defineCloneProperty(that:Object,name:string,source:any){
+        let created:any=null;
         Object.defineProperty(that,name,{
             get(){
                 let ret = source[name];
                 if(isObject(ret)){
-                    return createFakeObject(ret);
+                    if(!created){
+                        created=createFakeObject(ret)
+                    }
+                    return created;
                 }else{
                     return ret;
                 }

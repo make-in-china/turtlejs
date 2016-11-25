@@ -183,13 +183,9 @@ let VDOM:IVDOMBuilder,
                             m.node('', 10);
                             m.index += 13;
                             m.action = '';
-                        } else {
-                            m.index++;
+                            break;
                         }
-                    } else {
-                        m.index++;
                     }
-                    break;
                 default:
                     m.commentStart = m.index;
                     m.action = 'comment2';

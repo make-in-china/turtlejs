@@ -1,35 +1,17 @@
 
-/// <reference path='VOrder.ts'/>
+/// <reference path='RepeatBlockOrder.ts'/>
 namespace Order {
-    class While extends VOrder {
+    class While extends RepeatBlockOrder {
         static orderName = "while"
-        static isLogic = true
-        isBreak: boolean = false
-        checkConditions:string[]=[this.condition]
-        onBreak() {
-            this.isBreak = true;
+        constructor(node: VComment, condition: string) {
+            super(node, condition,'while');
         }
-        run() {
-
-            let p: INode = <INode>this.node.parentNode;
-            if (this.isBreak || !parseBool(exec(this.node, this.condition))) {
-                //全部删除
-                removeBlockBetween(this.node, <INode>this.endNode);
-                p.removeChild(this.node);
-                p.removeChild(<INode>this.endNode);
-            } else {
-                let nodes = cloneBetween(this.node, <INode>this.endNode);
-                p.insertBefore2(createBreakElement(nodes, this), this.node);
-            }
+        tryRun(){
+            test(this.placeholder, this.condition);
+        }
+        canRepeat():boolean{
+            return parseBool(exec(this.placeholder, this.condition));
         }
     }
     register(While);
-    function createBreakElement(nodes, order: VOrder) {
-        let breakElement: IHTMLBreakElement = $node('__break__');
-        for (let i = 0; i < nodes.length; i++) {
-            breakElement.appendChild(nodes[i]);
-        }
-        breakElement.source = order;
-        return breakElement;
-    }
 }

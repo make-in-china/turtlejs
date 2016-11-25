@@ -2,10 +2,9 @@
 /// <reference path='BlockOrder.ts'/>
 namespace Order {
     export abstract class RepeatBlockOrder extends BlockOrder {
-        isBreak: boolean
         abstract canRepeat():boolean;
         protected isBlockStart(subOrder:string):boolean{
-            return subOrder==='break'
+            return subOrder==='end'
         }
         private tempBlocks:INode[]=[];
         private parseRepeatBlock(){
@@ -16,41 +15,17 @@ namespace Order {
             }
             insertNodesBefore(this.placeholder , cloneBlocks);
             let p=this.placeholder.parentNode;
-            this.parseOrders(cloneBlocks,(node:INode,subOrder,condition,step)=>{
-                if(subOrder==='break'){
-                    this.isBreak=true;
-                }
-                
-                //级联删除break后面的数据直至当前层；
-                let pNode=<INode>node.parentNode;
-                while(node!==p){
-                    let cs=pNode.childNodes;
-                    let length=cs.length;
-                    let index=getNodeIndex2(node)+1;
-                    for(let i=index;i<length;i++){
-                        //删除后面的数据；
-                        pNode.removeChild(<INode>cs[index]);
-                    }
-                    node=pNode;
-                    pNode=<INode>pNode.parentNode;
-                }
-                return eTreeEach.c_stopEach;
-            });
-            this.run(true);
-        }
-        run(isAgain=false){
-            let canRepeat: boolean=this.isBreak?false:true;
-            if(canRepeat){
-                canRepeat=this.canRepeat();
-            }
-            if(canRepeat){
+            //执行order
+            this.parseBreakOrder(cloneBlocks,<INode>p);
+            if(!this.isBreak&&this.canRepeat()){
                 this.parseRepeatBlock();
             }
-            if(!isAgain){
-                this.placeholder.remove();
+        }
+        run(){
+            if(this.canRepeat()){
+                this.parseRepeatBlock();
             }
+            this.placeholder.remove();
         }
     }
-    //必须注册break；
-    addSubOrderName('break');
 }
