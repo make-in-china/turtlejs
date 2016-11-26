@@ -3,18 +3,17 @@
 namespace Order {
     class Script extends VOrder {
         static orderName = ":"
-        statement:JavaScriptBlock
+        block:JS.JavaScriptBlock
         constructor(node:VComment , condition:string){
             super(node,condition);
             this.init();
         }
         init(){
-            this.statement=JavaScript.parse(this.condition);
-            debugger;
+            this.block=JS.Parser.parseStructor(this.condition);
         }
         
         tryRun(){
-            console.log(this.statement);
+            console.log(this.block);
             // test(this.node, this.condition);
         }
         run(){

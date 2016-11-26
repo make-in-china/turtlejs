@@ -1,85 +1,46 @@
 /// <reference path='../../scope/Scope.ts'/>
 /// <reference path='VOrder.ts'/>
-/// <reference path='../javascript/JavaScript.ts'/>
+/// <reference path='../javascript/Parser.ts'/>
+/// <reference path='../javascript/logic/Var.ts'/>
 namespace Order {
     export class Var extends VOrder {
         static orderName = "var";
         node:IComment;
-        statement:JavaScriptBlock
-        private varInfos:[string,any,boolean][]=[]
+        block:JS.JavaScriptBlock
+        private varInfos:[string,any,boolean][]
         constructor(node:VComment , condition:string){
             super(node,condition);
-            this.init();
-        }
-        init(){
-            this.statement=this.getStatement('var '+this.condition);
+            this.initStatement();
             this.initvarInfos();
         }
-        
+        initStatement(){
+            this.block=this.getBlock('var '+this.condition);
+        }
         tryRun(){
-
             for(const varInfo of this.varInfos){
                 if(varInfo[2]){
                     testSet(this.node,varInfo[0],test(this.node,varInfo[1]));
                 }
             }
         }
-        getStatement(condition:string):JavaScriptBlock{
-            let statement=JavaScript.parse(condition);
-            let chds=statement.children;
-            // if(chds.length!==1){
-            //     throw new Error("只识别一句var语句");
-            // }
-            // if(chds[0].type!=='var'){
-            //     throw new Error("不支持"+chds[0].type);
-            // }
-            return statement;
+        getBlock(condition:string):JS.JavaScriptBlock{
+            return JS.Parser.parseStructor(condition);
         }
         initvarInfos(){
-            // let statement=this.statement;
-            // let chds=statement.children;
-            // chds=chds[0].children;
-            // let step=0;
-            // let varName:string="";
-            // for(let i=0;i< chds.length;i++){
-            //      statement=chds[i];
-            //     if(statement.type===" "){
-            //         continue;
-            //     }
-            //     switch(step){
-            //         case 0:
-            //             //声明变量
-            //             varName=statement.type;
-            //             step++;
-            //             break;
-            //         case 1:
-            //             if(statement.type===','){
-            //                 this.varInfos.push([varName,undefined,false]);
-            //                 // scope[varName]=undefined;
-            //                 step=0;
-            //             }else if(statement.type==='='){
-            //                 step++;
-            //             }else{
-            //                 throw new Error('keyword后只能出现"="或","');
-            //             }
-            //             break;
-            //         case 2:
-            //             if(statement.isBlock){
-            //                 i++;
-            //                 this.varInfos.push([varName,statement.toString()+chds[i].toString(),true]);
-            //             }else{
-            //                 this.varInfos.push([varName,'('+statement.toString()+')',true]);
-            //             }
-            //             step++
-            //             break;
-            //         case 3:
-            //             if(statement.type!==','){
-            //                 throw new Error('value后只能出现","');
-            //             }
-            //             step=0;
-            //             break;
-            //     }
-            // }
+            let block=this.block;
+            if(!block){
+                return ;
+            }
+            
+            let statements=block.children;
+            if(statements.length>1){
+                throw new Error("不支持多句！");
+            }
+            let logic:JS.Var=<JS.Var>JS.getLogic(statements[0],["var"]);
+            if(logic){
+                this.varInfos=logic.varInfos;
+            }
+            
         }
         registerVar(scope:Scope){
             for(const varInfo of this.varInfos){

@@ -6,17 +6,16 @@ namespace Order {
         node:IComment;
         scopeName:string
 
-        init(){
+        initBlock(){
             let conditionArr=splitByOnce(this.condition,":");
             this.scopeName=conditionArr[0];
             if(conditionArr.length===2){
-                this.statement=this.getStatement(conditionArr[1]);
-                this.initvarInfos();
+                this.block=this.getBlock(conditionArr[1]);
             }
         }
         run(){
             let scope=DOMScope.create(this.node,this.scopeName);
-            if(this.statement){
+            if(this.block){
                 this.registerVar(scope);
             }
             removeNode(this.node);
