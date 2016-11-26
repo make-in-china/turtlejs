@@ -12,6 +12,7 @@
 /// <reference path='order/Do.ts'/>
 /// <reference path='order/Scope.ts'/>
 /// <reference path='order/=.ts'/>
+/// <reference path='order/Script.ts'/>
 
 class UIHelper{
     static fs=typeof require!== "undefined"&&require('fs');

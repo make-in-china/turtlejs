@@ -33,7 +33,14 @@ let
         call<T>(arr:IArray|T[],searchElement: T, fromIndex?: number): number
     }                                           =   arrayConstructor.indexOf;
 
-
+let last:{
+        <T>(): T|undefined
+        call<T>(arr:IArray|T[]): T|undefined
+    }=function<T>(this:T[]):T|undefined{
+    if(this.length>0){
+        return this[this.length-1];
+    }
+}
 interface Constructor{
     prototype:Object
 }
