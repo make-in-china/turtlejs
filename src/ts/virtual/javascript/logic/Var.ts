@@ -4,7 +4,7 @@
 namespace JS{
     export class Var extends JavaScriptLogic{
         static logicName='var'
-        varInfos:[string,any,boolean][]
+        varInfos:[string,string|undefined,boolean][]
         static new(statement:JavaScriptStatement):Var|null{
             
             let keyWords=statement.children;
@@ -13,7 +13,7 @@ namespace JS{
             }
             let varInfos:[string,any,boolean][]=[];
             if(keyWords[0]!=='var'){
-                throw new Error("仅支持var语句！");
+                return null;
             }
             let step=0;
             let varName:string="";
@@ -29,7 +29,8 @@ namespace JS{
                             varName=keyWord;
                             step++;
                         }else{
-                            throw new Error("此处不该出现："+keyWord);
+                            // throw new Error("此处不该出现："+keyWord);
+                            return null;
                         }
                         break;
                     case 1:
@@ -39,7 +40,8 @@ namespace JS{
                         }else if(keyWord==='='){
                             step++;
                         }else{
-                            throw new Error('keyword后只能出现"="或","');
+                            // throw new Error('keyword后只能出现"="或","');
+                            return null;
                         }
                         break;
                     case 2:
@@ -52,7 +54,8 @@ namespace JS{
                         break;
                     case 3:
                         if(keyWord!==','){
-                            throw new Error('value后只能出现","');
+                            // throw new Error('value后只能出现","');
+                            return null;
                         }
                         step=0;
                         break;
@@ -60,9 +63,16 @@ namespace JS{
             }
             return new Var(varInfos);
         }
-        protected constructor(varInfos:[string,any,boolean][]){
+        protected constructor(varInfos:[string,string|undefined,boolean][]){
             super();
             this.varInfos=varInfos;
+        }
+        getVars():string[]{
+            let vars:string[]=[];
+            for(const info of this.varInfos){
+                vars.push(info[0])
+            }
+            return vars;
         }
     }
     registerLogic(Var);

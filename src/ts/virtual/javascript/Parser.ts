@@ -41,6 +41,40 @@ namespace JS{
                     // m.index++;
             }
         }
+        /**是否跟随回车换行 */
+        private static isFollowCarriageReturnOrLineFeed(m:IJavaScriptParseState):boolean{
+            let statement=last.call(m.block.children);
+            if(!statement){
+                return false;
+            }
+            let keyWords=statement.children;
+            
+            let length=keyWords.length;
+            if(length===0){
+                return false;
+            }
+            let lastKeyWord=keyWords[length-1];
+            switch(lastKeyWord){
+                case '\r':
+                case '\n':
+                    return true;
+                case ' ':
+                    break;
+                default:
+                    return false;
+            }
+            if(length===1){
+                return false;
+            }
+            let beforeLastKeyWord=keyWords[length-2];
+            switch(beforeLastKeyWord){
+                case '\r':
+                case '\n':
+                    return true;
+                default:
+                    return false;
+            }
+        }
         private static parseKeyWord(m:IJavaScriptParseState):boolean{
             
             let keyWordEnd=m.index;
@@ -48,6 +82,11 @@ namespace JS{
             m.keyWordStart=-1;
             if(keyWord===""){
                 return false;
+            }
+            
+            if(this.isFollowCarriageReturnOrLineFeed(m)){
+                this.pushKeyWord(m,';');
+                this.getLastStatement(m).isEnd=true;
             }
             // switch(keyWord){
             //     case "break":
@@ -229,13 +268,27 @@ namespace JS{
             m.action="";
             m.index++;
         }
-        
+        private static isStatementBegin(m:IJavaScriptParseState):boolean{
+            if(m.block.isEnd){
+                return true;
+            }
+
+            let statement=last.call(m.block.children);
+            if(statement){
+                return statement.children.length===0;
+            }else{
+                return true;
+            }
+        }
         private static space(m:IJavaScriptParseState){
             if(m.condition[m.index]===' '){
                 m.index++;
                 return ;
             }
-            this.pushKeyWord(m,' ');
+            //不添加为语句的开始。
+            if(!this.isStatementBegin(m)){
+                this.pushKeyWord(m,' ');
+            }
             m.action='';
         }
         private static '({['(m:IJavaScriptParseState,keyWord:string,keyWordEnd:string){
@@ -286,6 +339,11 @@ namespace JS{
                     break;
                 case "string":
                     throw new Error("字符串没有闭合！");
+            }
+            if(m.block!==m.root){
+                if(!m.block.isEnd){
+                    throw new Error(m.block.begin+"没有闭合！");
+                }
             }
         }
         private static keyWord(m:IJavaScriptParseState){

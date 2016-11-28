@@ -16,7 +16,7 @@ namespace Order {
         run(){
             let scope=DOMScope.create(this.node,this.scopeName);
             if(this.block){
-                this.registerVar(scope);
+                runVarInfos(scope,this.node,this.varInfos);
             }
             removeNode(this.node);
         }

@@ -13,6 +13,10 @@ namespace JS{
         logics[name]=logic;
         logicNames.push(name);
     }
+    let isVarNameRegExp=/^[$_a-zA-Z][$_a-zA-Z\d]*$/;
+    export function isVarName(keyWord:string):boolean{
+        return isVarNameRegExp.test(keyWord);
+    }
     export function getLogic(statement:JavaScriptStatement,firstTryNames:string[]):JavaScriptLogic|null{
 
         if(firstTryNames){

@@ -15,7 +15,7 @@ namespace Order {
 
     let
         subOrderNames:string[]=[],
-        subOrderRE:RegExp=/^\s*()(?:\s|$)/,// = /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
+        subOrderRE:RegExp,//=/^\s*()(?:\s|$)/,// = /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
         orderNames:string[]=[],
         orderRE:RegExp;
         //if|while|for|switch|async|break|-|scope|content|elements|bind|!|let|=
@@ -139,6 +139,11 @@ namespace Order {
         let that:Scope=DOMScope.get(node);
         that=replaceScope(that);
         that[name]=_exec.call(that,script, node);
+    }
+    export function testSetValue(this:void,node: INode,name:string, value: any): void {
+        let that:Scope=DOMScope.get(node);
+        that=replaceScope(that);
+        that[name]=value;
     }
     
     function createFakeObject(that:Object):Object{

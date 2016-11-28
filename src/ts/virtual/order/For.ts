@@ -1,67 +1,76 @@
 
 /// <reference path='RepeatBlockOrder.ts'/>
+/// <reference path='../javascript/logic/For.ts'/>
 namespace Order {
-    let parseForOrderRE = /[a-zA-Z\d] in .*/,
-        parseForOrderRE2 = /^.*;.*;.*$/;
-    const enum eForMode {
-        forIn = 0,
-        forSplit = 1
-    }
     export class For extends RepeatBlockOrder {
         static orderName = "for"
-        private forMode: eForMode;
+        private forMode: JS.EForMode;
         constructor(node: VComment, condition: string) {
             super(node, condition,'for');
-            if (parseForOrderRE.test(condition)/**for in */) {
-                this.forMode = eForMode.forIn;
-                let s = condition.split(' in ');
-                this.forIn = {
-                    var: s[0],
-                    object: s[1],
-                    names: [],
-                    source: null,
-                    index: 0
+            let jsblock=JS.Parser.parseStructor(condition);
+            let info=JS.For.parseConditions(jsblock);
+            if(info){
+                this.forMode = info.mode;
+                if(info.mode===JS.EForMode.In){
+                    let infoForIn:JS.IInfoForIn=<JS.IInfoForIn>info;
+                    this.forIn = {
+                        var: infoForIn.hasVar?infoForIn.varName:'',
+                        object:infoForIn.bindingExp.toString(),
+                        names: [],
+                        source: null,
+                        index: 0
+                    }
+                }else{
+                    let infoForStep:JS.IInfoForStep=<JS.IInfoForStep>info;
+                    let first:string|[string,string|undefined,boolean][];
+                    if(infoForStep.variable){
+                        first=infoForStep.variable.varInfos
+                    }else{
+                        first=infoForStep.first.toString();
+                    }
+                    this.forSplit = {
+                        first: first,
+                        exec: infoForStep.exec.toString(),
+                        step: infoForStep.step.toString(),
+                        isFirst: true
+                    }
                 }
-            } else if (parseForOrderRE2.test(condition)/**for i;i;i++ */) {
-                this.forMode = eForMode.forSplit;
-
-                let s = condition.split(';');
-                if (s.length !== 3) {
-                    throw new Error("错误的for表达式！");
-                }
-                this.forSplit = {
-                    pre: s[0],
-                    exec: s[1],
-                    step: s[2],
-                    isFirst: true
-                }
-            } else {
+            }else{
                 throw new Error("错误的for表达式！");
             }
+            
         }
         tryRun(){
-            if (this.forMode === eForMode.forIn) {
+            if (this.forMode === JS.EForMode.In) {
                 this.canPrebuildForIn();
             } else {
                 this.canPrebuildForSplit();
             }
         }
         private forSplit: {
-            pre: string
+            first: string|[string,string|undefined,boolean][]
             exec: string
             step: string
             isFirst: boolean
         }
 
         private canPrebuildForSplit() {
-            test(this.placeholder, this.forSplit.pre);
+            if(isString( this.forSplit.first)){
+                test(this.placeholder, this.forSplit.first);
+            }else{
+                tryRunVarInfos(this.placeholder,this.forSplit.first);
+            }
             test(this.placeholder, this.forSplit.step);
             test(this.placeholder, this.forSplit.exec);
         }
         private checkForSplit(): boolean {
             if (this.forSplit.isFirst) {
                 this.forSplit.isFirst = false;
-                exec(this.placeholder, this.forSplit.pre);
+                if(isString( this.forSplit.first)){
+                    exec(this.placeholder, this.forSplit.first);
+                }else{
+                    runVarInfos(DOMScope.get(this.node),this.node,this.forSplit.first);
+                }
             } else {
                 exec(this.placeholder, this.forSplit.step);
             }
@@ -103,7 +112,7 @@ namespace Order {
             }
         }
         canRepeat():boolean{
-            if (this.forMode === eForMode.forIn) {
+            if (this.forMode === JS.EForMode.In) {
                 return this.checkForIn();
             } else {
                 return this.checkForSplit();

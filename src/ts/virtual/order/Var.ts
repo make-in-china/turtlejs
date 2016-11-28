@@ -3,11 +3,29 @@
 /// <reference path='../javascript/Parser.ts'/>
 /// <reference path='../javascript/logic/Var.ts'/>
 namespace Order {
+    export function tryRunVarInfos(this:void,node:IComment,varInfos:[string,string|undefined,boolean][]){
+        for(const varInfo of varInfos){
+            if(varInfo[2]){
+                testSet(node,varInfo[0],test(node,<string>varInfo[1]));
+            }else{
+                testSetValue(node,varInfo[0],undefined);
+            }
+        }
+    }
+    export function runVarInfos(this:void,scope:Scope,node:IComment,varInfos:[string,string|undefined,boolean][]){
+        for(const varInfo of varInfos){
+            if(varInfo[2]){
+                scope[varInfo[0]]=exec(node,<any>varInfo[1]);
+            }else{
+                scope[varInfo[0]]=varInfo[1];
+            }
+        }
+    }
     export class Var extends VOrder {
         static orderName = "var";
         node:IComment;
         block:JS.JavaScriptBlock
-        private varInfos:[string,any,boolean][]
+        protected varInfos:[string,string|undefined,boolean][]
         constructor(node:VComment , condition:string){
             super(node,condition);
             this.initStatement();
@@ -17,11 +35,7 @@ namespace Order {
             this.block=this.getBlock('var '+this.condition);
         }
         tryRun(){
-            for(const varInfo of this.varInfos){
-                if(varInfo[2]){
-                    testSet(this.node,varInfo[0],test(this.node,varInfo[1]));
-                }
-            }
+            tryRunVarInfos(this.node,this.varInfos);
         }
         getBlock(condition:string):JS.JavaScriptBlock{
             return JS.Parser.parseStructor(condition);
@@ -42,17 +56,8 @@ namespace Order {
             }
             
         }
-        registerVar(scope:Scope){
-            for(const varInfo of this.varInfos){
-                if(varInfo[2]){
-                    scope[varInfo[0]]=exec(this.node,varInfo[1]);
-                }else{
-                    scope[varInfo[0]]=varInfo[1];
-                }
-            }
-        }
         run(){
-            this.registerVar(DOMScope.get(this.node));
+            runVarInfos(DOMScope.get(this.node),this.node,this.varInfos);
             removeNode(this.node);
         }
     }
