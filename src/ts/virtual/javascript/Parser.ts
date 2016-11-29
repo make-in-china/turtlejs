@@ -162,6 +162,40 @@ namespace JS{
                 m.index++;
             }
         }
+        private static '<>'(m:IJavaScriptParseState,keyWord:string){
+            if(!this['<<>>'](m,keyWord)&&!this['?='](m,keyWord)){
+                this.parseKeyWord(m);
+                this.pushKeyWord(m,keyWord);
+                m.action='';
+                m.index++;
+            }
+        }
+        private static '<<>>'(m:IJavaScriptParseState,keyWord:string):boolean{
+            if(m.condition[m.index+1]===keyWord){
+                if(this['<<<>>>'](m,keyWord)){
+                    return true;
+                }
+                if(!this.parseKeyWord(m)){
+                    throw new Error("此处不该有'"+keyWord+keyWord);
+                }
+                this.pushKeyWord(m,keyWord+keyWord);
+                m.action='';
+                m.index+=2;
+            }
+            return false;
+        }
+        private static '<<<>>>'(m:IJavaScriptParseState,keyWord:string):boolean{
+            if(m.condition[m.index+2]===keyWord){
+                if(!this.parseKeyWord(m)){
+                    throw new Error("此处不该有'"+keyWord+keyWord+keyWord);
+                }
+                this.pushKeyWord(m,keyWord+keyWord+keyWord);
+                m.action='';
+                m.index+=3;
+                return true;
+            }
+            return false;
+        }
         private static comment(m:IJavaScriptParseState){
             if(m.condition[m.index]==='\n'){
                 this.pushComment(m,new JavaScriptComment(m.condition.substring(m.commentStart,m.index)));
@@ -204,6 +238,7 @@ namespace JS{
         private static '+-%'(m:IJavaScriptParseState,keyWord:string){
             if(m.condition[m.index+1]===keyWord){
                 this.parseKeyWord(m);
+                this.pushKeyWord(m,keyWord+keyWord);
                 m.index+=2;
                 m.action="";
             }else{
@@ -226,6 +261,17 @@ namespace JS{
                 this.pushKeyWord(m,keyWord+'=');
                 m.action='';
                 m.index+=2;
+                return true;
+            }
+            return false;
+        }
+        private static '=>'(m:IJavaScriptParseState):boolean{
+            if(m.condition[m.index+1]==='>'){
+                this.parseKeyWord(m);
+                this.pushKeyWord(m,'=>');
+                m.action='';
+                m.index+=2;
+                return true;
             }
             return false;
         }
@@ -361,7 +407,7 @@ namespace JS{
                     m.index++;
                     break;
                 case "=":
-                    if(!this['?='](m,'=')){
+                    if(!this['?='](m,'=')&&!this['=>'](m)){
                         //赋值
                         if(!this.parseKeyWord(m)){
                             throw new Error("此处不该有'='");
@@ -404,12 +450,15 @@ namespace JS{
                     this['+-%'](m,keyWord);
                     break;
                 case "*":
+                    this['*/<>'](m,keyWord);
+                    break
                 case "<":
                 case ">":
-                    this['*/<>'](m,keyWord);
+                    this['<>'](m,keyWord);
                     break;
                 case "\n":
                 case "\r":
+                case "\t":
                 case ",":
                 case ":":
                     this.parseKeyWord(m);

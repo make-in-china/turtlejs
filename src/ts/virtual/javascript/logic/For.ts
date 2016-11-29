@@ -7,15 +7,14 @@ namespace JS{
         In=0,
         Step=1
     }
-    interface IInfoMode{
+    export interface IInfoForIn{
         mode:EForMode
-    }
-    export interface IInfoForIn extends IInfoMode{
         hasVar:boolean
         varName:string
         bindingExp:JavaScriptStatement
     }
-    export interface IInfoForStep extends IInfoMode{
+    export interface IInfoForStep{
+        mode:EForMode
         variable:Var|null
         first:JavaScriptStatement
         exec:JavaScriptStatement
@@ -26,6 +25,7 @@ namespace JS{
         static logicName='for'
         static new(statement:JavaScriptStatement):For|null{
             
+            mergeStatementSpace(statement,true);
             let keyWords=statement.children;
             let count=3;
             if(keyWords.length<count){
@@ -36,13 +36,10 @@ namespace JS{
                 return null;
             }
             let index=1;
-            //允许一段空格或cr或lf存在
-            let info=this.parseSpaceOrCarriageReturnOrLineFeed(index,count,keyWords);
-            if(!info){
-                return null;
+            if(keyWords[index]===' '){
+                index++;
+                count++;
             }
-            index=info.index;
-            count=info.count;
             let keyWord=keyWords[index];
             if(!(keyWord instanceof JS.JavaScriptBlock)){
                 //应该是一个block;
@@ -54,12 +51,11 @@ namespace JS{
             }
             let controlParamsBlock=keyWord;
             index++;
-            info=this.parseSpaceOrCarriageReturnOrLineFeed(index,count,keyWords);
-            if(!info){
-                return null;
+            
+            if(keyWords[index]===' '){
+                index++;
+                count++;
             }
-            index=info.index;
-            count=info.count;
 
             keyWord=keyWords[index];
             
@@ -75,7 +71,7 @@ namespace JS{
             //判断controlParamsBlock内容是否有效;
             let conditionsInfo=this.parseConditions(controlParamsBlock);
             if(conditionsInfo){
-                return new For(conditionsInfo.mode,conditionsInfo);
+                return new this(conditionsInfo.mode,conditionsInfo);
             }
             return null;
             
@@ -115,13 +111,11 @@ namespace JS{
                 //var开头;
                 hasVar=true;
                 index++;
-                count+=2;
-                info=this.parseSpaceOrCarriageReturnOrLineFeed(index,count,keyWords);
-                if(!info){
+                if(keyWords[index]!==' '){
                     return null;
                 }
-                index=info.index;
-                count=info.count;
+                index++;
+                count+=2;
             }else{
                 hasVar=false;
             }
@@ -131,12 +125,10 @@ namespace JS{
                 return null;
             }
             index++;
-            info=this.parseSpaceOrCarriageReturnOrLineFeed(index,count,keyWords);
-            if(!info){
+            if(keyWords[index]!==' '){
                 return null;
             }
-            index=info.index;
-            count=info.count;
+            index++;
             let keyWord=keyWords[index];
             if(keyWord!=='in'){
                 //需求一个in
@@ -144,10 +136,10 @@ namespace JS{
             }
             
             index++;
-            info=this.parseSpaceOrCarriageReturnOrLineFeed(index,count,keyWords);
-            if(!info){
+            if(keyWords[index]!==' '){
                 return null;
             }
+            index++;
 
             //后面可能是一串语句
             let bindingExp:JavaScriptStatement=new JavaScriptStatement();
@@ -170,31 +162,6 @@ namespace JS{
                 varName:varName,
                 bindingExp:bindingExp
             };
-        }
-        private static parseSpaceOrCarriageReturnOrLineFeed(
-            index:number,
-            count:number,
-            keyWords:(string | JavaScriptBlock | JavaScriptComment | JavaScriptString)[]
-        ):{count:number,index:number}|null
-        {
-            let breakWhile=false;
-                do{
-                    switch(keyWords[index]){
-                        case ' ':
-                        case '\r':
-                        case '\n':
-                            count++;
-                            index++;
-                            if(keyWords.length<count){
-                                //至少count个keyWord
-                                return null;
-                            }
-                            break;
-                        default:
-                            breakWhile=true;
-                    }
-                }while(!breakWhile);
-            return {index:index,count:count};
         }
 
         mode:EForMode

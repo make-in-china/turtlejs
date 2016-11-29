@@ -17,6 +17,22 @@ namespace JS{
     export function isVarName(keyWord:string):boolean{
         return isVarNameRegExp.test(keyWord);
     }
+    let isNumberRegExp=/^(\d+)|(\de3)|([1-9]\d+e\d+)$/;
+    export function toConst(value:string):null|number|string{
+        switch(value){
+            case "NaN":
+                return NaN;
+            case "null":
+                return null;
+            // case "undefined":
+            // maybe be hook，so don't return
+            //     return undefined;
+        }
+        if(isNumberRegExp.test(value)){
+            return <number>eval.call(null,value);
+        }
+        return value;
+    }
     export function getLogic(statement:JavaScriptStatement,firstTryNames:string[]):JavaScriptLogic|null{
 
         if(firstTryNames){
@@ -50,5 +66,84 @@ namespace JS{
             }
         }
         return null;
+    }
+    /**合并连续空格
+     * @param {JavaScriptBlock} block 语句块
+     * @param {boolean=false} deep 递归
+     */
+    export function mergeSpace(block:JavaScriptBlock,deep:boolean=false):void{
+        for(const statement of block.children){
+            mergeStatementSpace(statement,deep);
+        }
+    }
+    /**合并连续空格
+     * @param {JavaScriptStatement} statement 语句
+     * @param {boolean=false} deep 递归
+     */
+    export function mergeStatementSpace(statement:JavaScriptStatement,deep:boolean=false):void{
+        let hasSpace:boolean=false;
+        let chds=statement.children;
+        for(let i=0;i<chds.length;i++){
+            let keyWord=chds[i];
+            if(keyWord instanceof JavaScriptBlock){
+                if(deep){
+                    mergeSpace(keyWord,true);
+                }
+                hasSpace=true;
+            }else{
+                switch(keyWord){
+                    case " ":
+                    case "\r":
+                    case "\n":
+                    case "\t":
+                        if(hasSpace){
+                            //删掉一个；
+                            chds.pop();
+                            i--;
+                        }else{
+                            //换成空格
+                            chds[i]=' ';
+                            hasSpace=true;
+                        }
+                        break;
+                    default:
+                        hasSpace=false;
+                }
+            }
+        }
+    }
+    /**删除所有空格
+     * @param {JavaScriptBlock} block 语句块
+     * @param {boolean=false} deep 递归
+     */
+    export function deleteSpace(block:JavaScriptBlock,deep:boolean=false):void{
+        for(const statement of block.children){
+            deleteStatementSpace(statement,deep);
+        }
+    }
+    /**删除所有空格
+     * @param {JavaScriptStatement} statement 语句
+     * @param {boolean=false} deep 递归
+     */
+    export function deleteStatementSpace(statement:JavaScriptStatement,deep:boolean=false):void{
+        let chds=statement.children;
+        for(let i=0;i<chds.length;i++){
+            let keyWord=chds[i];
+            if(keyWord instanceof JavaScriptBlock){
+                if(deep){
+                    deleteSpace(keyWord,true);
+                }
+            }else{
+                switch(keyWord){
+                    case " ":
+                    case "\r":
+                    case "\n":
+                    case "\t":
+                        chds.pop();
+                        i--;
+                        break;
+                }
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@ namespace Order {
             if(varInfo[2]){
                 testSet(node,varInfo[0],test(node,<string>varInfo[1]));
             }else{
-                testSetValue(node,varInfo[0],undefined);
+                testSetValue(node,varInfo[0],varInfo[1]);
             }
         }
     }

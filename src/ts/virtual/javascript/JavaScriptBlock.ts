@@ -9,11 +9,14 @@ namespace JS{
             child.parent=this;
         }
         toString():string{
+            return this.begin+this.innerText+this.end;
+        }
+        get innerText():string{
             let ret="";
             for(const statement of this.children){
                 ret+=statement;
             }
-            return this.begin+ret+this.end;
+            return ret;
         }
     }
 }

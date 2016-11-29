@@ -26,9 +26,11 @@ namespace Order {
                     if(infoForStep.variable){
                         first=infoForStep.variable.varInfos
                     }else{
+                        infoForStep.first.children.pop();
                         first=infoForStep.first.toString();
                     }
-                    this.forSplit = {
+                    infoForStep.exec.children.pop();
+                    this.forStep = {
                         first: first,
                         exec: infoForStep.exec.toString(),
                         step: infoForStep.step.toString(),
@@ -44,37 +46,37 @@ namespace Order {
             if (this.forMode === JS.EForMode.In) {
                 this.canPrebuildForIn();
             } else {
-                this.canPrebuildForSplit();
+                this.canPrebuildForStep();
             }
         }
-        private forSplit: {
+        private forStep: {
             first: string|[string,string|undefined,boolean][]
             exec: string
             step: string
             isFirst: boolean
         }
 
-        private canPrebuildForSplit() {
-            if(isString( this.forSplit.first)){
-                test(this.placeholder, this.forSplit.first);
+        private canPrebuildForStep() {
+            if(isString( this.forStep.first)){
+                test(this.placeholder, this.forStep.first);
             }else{
-                tryRunVarInfos(this.placeholder,this.forSplit.first);
+                tryRunVarInfos(this.placeholder,this.forStep.first);
             }
-            test(this.placeholder, this.forSplit.step);
-            test(this.placeholder, this.forSplit.exec);
+            test(this.placeholder, this.forStep.step);
+            test(this.placeholder, this.forStep.exec);
         }
-        private checkForSplit(): boolean {
-            if (this.forSplit.isFirst) {
-                this.forSplit.isFirst = false;
-                if(isString( this.forSplit.first)){
-                    exec(this.placeholder, this.forSplit.first);
+        private checkForStep(): boolean {
+            if (this.forStep.isFirst) {
+                this.forStep.isFirst = false;
+                if(isString( this.forStep.first)){
+                    exec(this.placeholder, this.forStep.first);
                 }else{
-                    runVarInfos(DOMScope.get(this.node),this.node,this.forSplit.first);
+                    runVarInfos(DOMScope.get(this.node),this.node,this.forStep.first);
                 }
             } else {
-                exec(this.placeholder, this.forSplit.step);
+                exec(this.placeholder, this.forStep.step);
             }
-            return exec(this.placeholder, this.forSplit.exec);
+            return exec(this.placeholder, this.forStep.exec);
         }
 
         private forIn: {
@@ -115,7 +117,7 @@ namespace Order {
             if (this.forMode === JS.EForMode.In) {
                 return this.checkForIn();
             } else {
-                return this.checkForSplit();
+                return this.checkForStep();
             }
         }
     }

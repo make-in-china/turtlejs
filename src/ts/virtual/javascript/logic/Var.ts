@@ -7,6 +7,7 @@ namespace JS{
         varInfos:[string,string|undefined,boolean][]
         static new(statement:JavaScriptStatement):Var|null{
             
+            mergeStatementSpace(statement,true);
             let keyWords=statement.children;
             if(keyWords.length===0){
                 return null;
@@ -46,22 +47,24 @@ namespace JS{
                         break;
                     case 2:
                         if(isString(keyWord)){
-                            varInfos.push([varName,'('+keyWord+')',true]);
+                            let v=toConst(keyWord);
+                            debugger;
+                            varInfos.push([varName,v,isString(v)]);
                         }else{
                             varInfos.push([varName,keyWord.toString(),true]);
                         }
                         step++
                         break;
                     case 3:
-                        if(keyWord!==','){
-                            // throw new Error('value后只能出现","');
+                        if(keyWord!==','&&keyWord!==';'){
+                            //value后只能出现","、";"'
                             return null;
                         }
                         step=0;
                         break;
                 }
             }
-            return new Var(varInfos);
+            return new this(varInfos);
         }
         protected constructor(varInfos:[string,string|undefined,boolean][]){
             super();

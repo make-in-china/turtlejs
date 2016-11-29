@@ -423,50 +423,50 @@ class xxxxOrder{
     }
     parseCommentOrder(info:ICommentOrderInfo,node:IComment,outerChildNodes,outerChildren,props,part){
         switch(info.order){
-            case 'scope':
-                this.parseScopeOrder(info,node,outerChildNodes,outerChildren,props,part);
-                break;
-            case 'let':
-                execScope(info.condition,node,outerChildNodes,outerChildren,props,part);
-                removeNode(node);
-                break;
-            case 'bind':
-                bindPropertyByOrder(node,info.condition);
-                break;
-            case '-':
-                bindExpressionsByOrder(node,info.condition);
-                break;
-            case '!':
-                execByScope(node,info.condition,null,outerChildNodes,outerChildren,props,part);
-                removeNode(node);
-                break;
-            case '=':
-                let v=execByScope(node,info.condition,null,outerChildNodes,outerChildren,props,part);
-                if(isObject(v)&&v.nodeType){
-                    replaceNodeByNode(node,v);
-                }else{
-                    replaceNodeByNode(node,$node(v,3));
-                }
+            // case 'scope':
+            //     this.parseScopeOrder(info,node,outerChildNodes,outerChildren,props,part);
+            //     break;
+            // case 'let':
+            //     execScope(info.condition,node,outerChildNodes,outerChildren,props,part);
+            //     removeNode(node);
+            //     break;
+            // case 'bind':
+            //     bindPropertyByOrder(node,info.condition);
+            //     break;
+            // case '-':
+            //     bindExpressionsByOrder(node,info.condition);
+            //     break;
+            // case '!':
+            //     execByScope(node,info.condition,null,outerChildNodes,outerChildren,props,part);
+            //     removeNode(node);
+            //     break;
+            // case '=':
+            //     let v=execByScope(node,info.condition,null,outerChildNodes,outerChildren,props,part);
+            //     if(isObject(v)&&v.nodeType){
+            //         replaceNodeByNode(node,v);
+            //     }else{
+            //         replaceNodeByNode(node,$node(v,3));
+            //     }
                 
-                break;
-            case 'content':
-                replaceNodeByNodes(node,outerChildNodes);
-                break;
-            case 'elements':
-                replaceNodeByNodes(node,outerChildren);
-                break;
-            case 'while':
-                return this.parseWhileOrder(info,node,outerChildNodes,outerChildren,props,part);
-            case 'if':
-                return this.parseIfOrder(info,node,outerChildNodes,outerChildren,props,part);
-            case 'break':
-                return this.parseBreakOrder(info,node,outerChildNodes,outerChildren,props,part);
-            case 'for':
-                return this.parseForOrder(info,node,outerChildNodes,outerChildren,props,part);
-            case 'switch':
-                return this.parseSwitchOrder(info,node,outerChildNodes,outerChildren,props,part);
-            case 'async':
-                return this.parseAsyncOrder(info,node,outerChildNodes,outerChildren,props,part);
+            //     break;
+            // case 'content':
+            //     replaceNodeByNodes(node,outerChildNodes);
+            //     break;
+            // case 'elements':
+            //     replaceNodeByNodes(node,outerChildren);
+            //     break;
+            // case 'while':
+            //     return this.parseWhileOrder(info,node,outerChildNodes,outerChildren,props,part);
+            // case 'if':
+            //     return this.parseIfOrder(info,node,outerChildNodes,outerChildren,props,part);
+            // case 'break':
+            //     return this.parseBreakOrder(info,node,outerChildNodes,outerChildren,props,part);
+            // case 'for':
+            //     return this.parseForOrder(info,node,outerChildNodes,outerChildren,props,part);
+            // case 'switch':
+            //     return this.parseSwitchOrder(info,node,outerChildNodes,outerChildren,props,part);
+            // case 'async':
+            //     return this.parseAsyncOrder(info,node,outerChildNodes,outerChildren,props,part);
         }
     }
     parseComment(node:IComment,outerChildNodes:INode[],outerChildren:IHTMLCollection,props:{},part){
