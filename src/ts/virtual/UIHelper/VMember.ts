@@ -1,18 +1,18 @@
 
-/// <reference path='VNode.ts'/>
+/// <reference path='../node/VNode.ts'/>
 interface IVNodeMethod{
-    (nodeName: string, nodeType: 20): VMember&IVNodeMethod;
+    (nodeName: string, nodeType: ENodeType.Member): VMember&IVNodeMethod;
 }
 class VMember extends VNode{
     nodeName="#member"
-    nodeType:ENodeType=ENodeType.Member
+    nodeType:ENodeType.Member=ENodeType.Member
     data:string
     constructor(data:string){
         super();
         this.data=data;
     }
     toJS():string{
-        return `.appendChild(this.${this.data}).$`;
+        return `.$.appendChild(this.${this.data}).$`;
     }
     toHTMLString(): string[] {
         throw new Error("Can't toHTMLString");

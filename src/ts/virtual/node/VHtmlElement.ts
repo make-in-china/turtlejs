@@ -7,6 +7,7 @@
 
 interface IVNodeMethod{
     (nodeName: string, nodeType?: 1): VMElement.VHtmlElement&IVNodeMethod;
+    (nodeName: 'html', nodeType?: 1): VMElement.VHtmlElement&IVNodeMethod;
 }
 function isVHTMLElement(node: VNode): node is VMElement.VHtmlElement {
     return node.nodeType === 1
@@ -22,7 +23,7 @@ namespace VMElement{
         webkitdropzone:string
         id:string
         cloneNode(deep:boolean=false): VHtmlElement&IVNodeMethod {
-            let newNode=$$$(this.nodeName);
+            let newNode=$$$('html');
             
             // newNode.version=this.version;
             for(const name of ["title", "lang", "accessKey", "webkitdropzone", "id"]){
@@ -91,7 +92,7 @@ namespace VMElement{
                 let chds = this.children;
                 // for (let i = idx; i < chds.length; i++) {
                     // if ((<VElem<IVNodeMethod>>chds[i]).nodeType === 1) {
-                        splice.call(chds,idx, 0, newNode);
+                        splice.call(<VNode[]><any>chds,idx, 0,newNode);
                         return newNode;
                     // }
                 // }
@@ -141,7 +142,7 @@ namespace VMElement{
         }
         toJS(space:number=0):string{
             let sSpace=(new Array(space+1)).join(" ");
-            let sFn='\n'+sSpace+`("${this.nodeName}")`;
+            let sFn='\n'+sSpace+`("${this.nodeName.toLowerCase()}")`;
             let sAttr="";
             let sInner="";
             let attrs = this.attributes;

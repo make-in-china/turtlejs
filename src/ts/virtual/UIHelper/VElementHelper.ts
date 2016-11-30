@@ -1,6 +1,6 @@
 class VElementHelper{
     private static build(name:string,datas:string[]){
-        let decorates=[];
+        let decorates:string[]=[];
         for(let i in datas){
             decorates.push(datas[i]);
         }
@@ -21,7 +21,7 @@ namespace VMElement{
     }
     private static checkAttr_Prop(name:string){
         let elem=document.createElement(name);
-        let names=[];
+        let names:string[]=[];
         for(let i in elem){
             elem.setAttribute(i,"1");
             if((<any>elem)[i]==="1"){

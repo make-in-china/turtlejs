@@ -4,7 +4,7 @@
 namespace Order {
     export class For extends RepeatBlockOrder {
         static orderName = "for"
-        private forMode: JS.EForMode;
+        forMode: JS.EForMode;
         constructor(node: VComment, condition: string) {
             super(node, condition,'for');
             let jsblock=JS.Parser.parseStructor(condition);
@@ -13,7 +13,7 @@ namespace Order {
                 this.forMode = info.mode;
                 if(info.mode===JS.EForMode.In){
                     let infoForIn:JS.IInfoForIn=<JS.IInfoForIn>info;
-                    this.forIn = {
+                    this.forInInfo = {
                         var: infoForIn.hasVar?infoForIn.varName:'',
                         object:infoForIn.bindingExp.toString(),
                         names: [],
@@ -30,7 +30,7 @@ namespace Order {
                         first=infoForStep.first.toString();
                     }
                     infoForStep.exec.children.pop();
-                    this.forStep = {
+                    this.forStepInfo = {
                         first: first,
                         exec: infoForStep.exec.toString(),
                         step: infoForStep.step.toString(),
@@ -42,61 +42,41 @@ namespace Order {
             }
             
         }
-        tryRun(){
-            if (this.forMode === JS.EForMode.In) {
-                this.canPrebuildForIn();
-            } else {
-                this.canPrebuildForStep();
-            }
-        }
-        private forStep: {
+        forStepInfo: {
             first: string|[string,string|undefined,boolean][]
             exec: string
             step: string
             isFirst: boolean
         }
-
-        private canPrebuildForStep() {
-            if(isString( this.forStep.first)){
-                test(this.placeholder, this.forStep.first);
-            }else{
-                tryRunVarInfos(this.placeholder,this.forStep.first);
-            }
-            test(this.placeholder, this.forStep.step);
-            test(this.placeholder, this.forStep.exec);
-        }
         private checkForStep(): boolean {
-            if (this.forStep.isFirst) {
-                this.forStep.isFirst = false;
-                if(isString( this.forStep.first)){
-                    exec(this.placeholder, this.forStep.first);
+            if (this.forStepInfo.isFirst) {
+                this.forStepInfo.isFirst = false;
+                if(isString( this.forStepInfo.first)){
+                    exec(this.placeholder, this.forStepInfo.first);
                 }else{
-                    runVarInfos(DOMScope.get(this.node),this.node,this.forStep.first);
+                    runVarInfos(DOMScope.get(this.node),this.node,this.forStepInfo.first);
                 }
             } else {
-                exec(this.placeholder, this.forStep.step);
+                exec(this.placeholder, this.forStepInfo.step);
             }
-            return exec(this.placeholder, this.forStep.exec);
+            return exec(this.placeholder, this.forStepInfo.exec);
         }
 
-        private forIn: {
+        forInInfo: {
             source: any
             var: string
             object: string
             names: string[]
             index: number
         }
-        private canPrebuildForIn() {
-            test(this.placeholder, this.forIn.object)
-        }
         private initForInSourceData(): boolean {
-            if (!this.forIn.source) {
-                this.forIn.source = exec(this.placeholder, this.forIn.object);
-                if (!this.forIn.source) {
+            if (!this.forInInfo.source) {
+                this.forInInfo.source = exec(this.placeholder, this.forInInfo.object);
+                if (!this.forInInfo.source) {
                     return false;
                 }
-                for (let i in this.forIn.source) {
-                    this.forIn.names.push(i);
+                for (let i in this.forInInfo.source) {
+                    this.forInInfo.names.push(i);
                 }
             }
             return true
@@ -105,9 +85,9 @@ namespace Order {
             if (!this.initForInSourceData()) {
                 throw new Error("计算出错！");
             }
-            if (this.forIn.index < this.forIn.names.length) {
-                exec(this.placeholder, this.forIn.var + '=\'' + this.forIn.names[this.forIn.index] + '\';');
-                this.forIn.index++;
+            if (this.forInInfo.index < this.forInInfo.names.length) {
+                exec(this.placeholder, this.forInInfo.var + '=\'' + this.forInInfo.names[this.forInInfo.index] + '\';');
+                this.forInInfo.index++;
                 return true
             } else {
                 return false

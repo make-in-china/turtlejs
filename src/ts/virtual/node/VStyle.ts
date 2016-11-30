@@ -46,7 +46,7 @@ class VStyle {
                 }
                 isLock = 1;
                 var lst;
-                var lst2 = [];
+                var lst2:any[] = [];
                 while ((lst = styleListRE.exec(s)) !== null) {
                     lst2.push(lst);
                 }

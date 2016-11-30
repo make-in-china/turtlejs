@@ -1,18 +1,20 @@
 
 /// <reference path='VDOM.ts'/>
-/// <reference path='../lib/TreeEach.ts'/>
-/// <reference path='../lib/is.ts'/>
+/// <reference path='../../lib/TreeEach.ts'/>
+/// <reference path='../../lib/is.ts'/>
 /// <reference path='./VElementHelper.ts'/>
 /// <reference path='VMember.ts'/>
-/// <reference path='order/VOrder.ts'/>
-/// <reference path='order/If.ts'/>
-/// <reference path='order/For.ts'/>
-/// <reference path='order/Switch.ts'/>
-/// <reference path='order/while.ts'/>
-/// <reference path='order/Do.ts'/>
-/// <reference path='order/Scope.ts'/>
-/// <reference path='order/=.ts'/>
-/// <reference path='order/Script.ts'/>
+/// <reference path='../order/VOrder.ts'/>
+/// <reference path='../order/If.ts'/>
+/// <reference path='../order/For.ts'/>
+/// <reference path='../order/Switch.ts'/>
+/// <reference path='../order/while.ts'/>
+/// <reference path='../order/Do.ts'/>
+/// <reference path='../order/Scope.ts'/>
+/// <reference path='../order/=.ts'/>
+/// <reference path='../order/-.ts'/>
+/// <reference path='../order/Script.ts'/>
+/// <reference path='../order/orderEx/Index.ts'/>
 
 class UIHelper{
     static fs=typeof require!== "undefined"&&require('fs');
@@ -20,16 +22,18 @@ class UIHelper{
         return `namespace ComponentScript{
     export class ${className}{
         constructor(part:Component.${className}){
-            
+            part.dom.initDOM();
         }
     }
 }`
     }
-    static getViewString(className:string,propertyInfo:string){
+    static getViewString(className:string,propertyInfo:string,domInitScript:string){
         return `/// <reference path="../../../dest/virtual/UIHelper.0.1.d.ts"/>
 namespace ComponentView{
     export class ${className}{
         ${propertyInfo}
+        initDOM(){${domInitScript}
+        }
     }
 }`
     }
@@ -111,7 +115,7 @@ namespace Component{
                 try{
                     let order=Order.parseComment(node);
                     if(order&&order.run){
-                        if(order.canRunAtService){
+                        if(Order.canRunAtService(order)){
                             order.run();
                         }else if(order.undo){
                             //哎呀debugger
@@ -137,6 +141,7 @@ namespace Component{
             }
         });
         let propertys:string[]=[];
+        let propertyNames:string[]=[];
         for(let i=refs.length-1;i>=0;i--){
             let refInfo=refs[i];
             let name=refInfo[0];
@@ -147,11 +152,14 @@ namespace Component{
                 p.removeChild(refNode);
             }
         }
+        let propertyInitScript:{[index:string]:string}={};
         for(let i=refs.length-1;i>=0;i--){
             let refInfo=refs[i];
             let name=refInfo[0];
             let refNode=refInfo[1];
-            propertys.push(name+':'+this.toClassName(refNode)+'=<any>'+refNode.toJSString());
+            propertyNames.push(name);
+            propertys.push(name+':'+this.toClassName(refNode));
+            propertyInitScript[name]=`this.${name}=<any>${refNode.toJSString()};`;
         }
         let topsJS:string[]=[];
         let topsType:string[]=[];
@@ -159,11 +167,22 @@ namespace Component{
             topsJS.push(top.toJSString());
             topsType.push(this.toClassName(top));
         }
+        let domInitScript:string;
         if(topsJS.length>0){
-            propertys.push('tops:['+topsType.join('\n,')+']=[<any>'+topsJS.join(',<any>')+']');
+            propertys.push('tops:['+topsType.join('\n,')+'];');
+            domInitScript=`
+            push.call(this.tops,<any>[
+                    ${topsJS.join(',\n                    ')}
+            ]);`;
+        }else{
+            domInitScript='';
         }
         let propertyInfo:string=propertys.join(';\n        ');
-        this.fs.writeFileSync(path.replace(/View\.html$/,'View.ts'),this.getViewString(className,propertyInfo));
+        for(const name of propertyNames){
+            domInitScript+='\n            '+propertyInitScript[name];
+        }
+        this.fs.writeFileSync(path.replace(/View\.html$/,'View.ts'),this.getViewString(className,propertyInfo,domInitScript));
+        
         //mixin .css  to  变量
     }
 }

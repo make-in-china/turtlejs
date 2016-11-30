@@ -8,17 +8,6 @@ namespace Order {
         condition: string;
         run?(): void
         undo?():void
-        abstract tryRun():void
-        get canRunAtService():boolean{
-            try{
-                this.tryRun();
-                resetTest();
-                return true;
-            }catch(e){
-                resetTest();
-                return false;
-            }
-        }
         constructor(node: IComment, condition: string) {
             this.node = node;
             this.condition = condition;

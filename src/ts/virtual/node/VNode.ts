@@ -1,12 +1,12 @@
 
 /// <reference path='.d.ts'/>
-/// <reference path='../lib/INamedNodeMap.ts'/>
+/// <reference path='../../lib/INamedNodeMap.ts'/>
 /// <reference path='VStyle.ts'/>
-/// <reference path='../lib/HashObject.ts'/>
-/// <reference path='../lib/ClassList.ts'/>
-/// <reference path='../lib/Lib.ts'/>
-/// <reference path='../lib/TypeHelper.ts'/>
-/// <reference path='../lib/INamedNodeMap.ts'/>
+/// <reference path='../../lib/HashObject.ts'/>
+/// <reference path='../../lib/ClassList.ts'/>
+/// <reference path='../../lib/Lib.ts'/>
+/// <reference path='../../lib/TypeHelper.ts'/>
+/// <reference path='../../lib/INamedNodeMap.ts'/>
 /// <reference path='VNodeList.ts'/>
 /// <reference path='VHTMLCollection.ts'/>
 /// <reference path='VNodeVMData.ts'/>
@@ -21,7 +21,8 @@ const enum ENodeType{
     Document=9,
     DocumentType=10,
     DocumentFragment=11,
-    Member=20
+    Member=20,
+    Script=21
 }
 
 interface IVNodeMethod{
@@ -417,4 +418,3 @@ let VNodeHelp:IVNodeMethod=<any>function(nodeName: string, nodeType?: ENodeType|
     bindClassToFunction(that,nodeName,nodeType);
     return that;
 };
-let $$$:IVNodeMethod=VNodeHelp;

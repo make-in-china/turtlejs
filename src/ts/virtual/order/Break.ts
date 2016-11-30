@@ -5,7 +5,6 @@ namespace Order {
     class Break extends VOrder {
         static orderName = "break"
         static subOrder=[];
-        tryRun(){}
         run() {}
     }
     register(Break);

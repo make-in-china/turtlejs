@@ -25,7 +25,7 @@ namespace Order {
         static orderName = "var";
         node:IComment;
         block:JS.JavaScriptBlock
-        protected varInfos:[string,string|undefined,boolean][]
+        varInfos:[string,string|undefined,boolean][]
         constructor(node:VComment , condition:string){
             super(node,condition);
             this.initStatement();
@@ -33,9 +33,6 @@ namespace Order {
         }
         initStatement(){
             this.block=this.getBlock('var '+this.condition);
-        }
-        tryRun(){
-            tryRunVarInfos(this.node,this.varInfos);
         }
         getBlock(condition:string):JS.JavaScriptBlock{
             return JS.Parser.parseStructor(condition);

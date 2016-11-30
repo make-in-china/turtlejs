@@ -77,7 +77,7 @@ abstract class VElement extends VNode{
         let
             ret: string[] = [],
             sAttr = '',
-            arrAttr = [],
+            arrAttr:string[] = [],
             attr = this.attributes
         for (let i = 0; i < attr.length; i++) {
             if (attr[i].value) {

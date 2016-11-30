@@ -3,43 +3,43 @@
 /// <reference path='VOrder.ts'/>
 namespace Order {
     
-    function bindExpressionsByOrder(node:INode, condition:string) {
-        let cdtn = splitByOnce(condition, '|');
-        if (cdtn.length < 2)
-            cdtn.push('v');
-        let
-            name,
-            scope:Scope,
-            obj,
-            bindVar = cdtn[0],
-            arrBindVar: Array<string>,
-            exp: IExp,
-            textNode: IText = $node(' ', 3);
+    // function bindExpressionsByOrder(node:INode, condition:string) {
+    //     let cdtn = splitByOnce(condition, '|');
+    //     if (cdtn.length < 2)
+    //         cdtn.push('v');
+    //     let
+    //         name,
+    //         scope:Scope,
+    //         obj,
+    //         bindVar = cdtn[0],
+    //         arrBindVar: Array<string>,
+    //         exp: IExp,
+    //         textNode: IText = $node(' ', 3);
 
-        if (bindVar.indexOf(".") != -1) {
-            arrBindVar = bindVar.split(".");
-        } else {
-            arrBindVar = [bindVar];
-        }
-        name = bindVar[bindVar.length - 1];
-        scope = DOMScope.get(node);
-        obj = _getBindObject(scope, arrBindVar);
-        if (obj === null) {
-            throw new Error('不能获取绑定属性:' + cdtn[0]);
-        }
-        exp = <any>function (v:string) {
-            // try {
-            return _execExpressionsByScope.call(scope, cdtn[1], v, node);
-            // } catch (e) { _catch(e) }
-        }
-        exp.__me__ = exp;
-        bindProperty(obj, name, exp, '__me__');
-        replaceNodeByNode(node, textNode);
-        bindElementProperty(exp, '__me__', textNode, 'data');
-        textNode['data'] = <any>exp.__me__;
-    }
+    //     if (bindVar.indexOf(".") != -1) {
+    //         arrBindVar = bindVar.split(".");
+    //     } else {
+    //         arrBindVar = [bindVar];
+    //     }
+    //     name = bindVar[bindVar.length - 1];
+    //     scope = DOMScope.get(node);
+    //     obj = _getBindObject(scope, arrBindVar);
+    //     if (obj === null) {
+    //         throw new Error('不能获取绑定属性:' + cdtn[0]);
+    //     }
+    //     exp = <any>function (v:string) {
+    //         // try {
+    //         return _execExpressionsByScope.call(scope, cdtn[1], v, node);
+    //         // } catch (e) { _catch(e) }
+    //     }
+    //     exp.__me__ = exp;
+    //     bindProperty(obj, name, exp, '__me__');
+    //     replaceNodeByNode(node, textNode);
+    //     bindElementProperty(exp, '__me__', textNode, 'data');
+    //     textNode['data'] = <any>exp.__me__;
+    // }
 
-    class BindExpressions extends VOrder {
+    export class BindExpressions extends VOrder {
         static orderName = "-"
         var:string
         propertyName:string
@@ -95,11 +95,8 @@ namespace Order {
             this.expForGetObject=statement;
 
         }
-        tryRun(){
-            test(this.node, this.condition);
-        }
         run(){
-            replaceNodeByNode(this.node,$$$(exec(this.node,this.condition),3));
+            
         }
     }
     register(BindExpressions);

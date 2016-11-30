@@ -1,7 +1,7 @@
 
 /// <reference path='VCharacterData.ts'/>
 interface IVNodeMethod{
-    (nodeName: any, nodeType: 3): VText&IVNodeMethod;
+    (nodeName: any, nodeType: ENodeType.Text): VText&IVNodeMethod;
 }
 
 function isVText(node: VNode): node is VText {
@@ -23,7 +23,7 @@ class VText extends VCharacterData{
     nodeType:ENodeType=ENodeType.Text
     private __value__=""
     cloneNode(deep:boolean):VText&IVNodeMethod{
-        return $$$(this.__value__,3);
+        return $$$(this.__value__,ENodeType.Text);
     }
     constructor(data:any){
         super();

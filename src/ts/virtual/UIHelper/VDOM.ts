@@ -528,6 +528,7 @@ let VDOM:IVDOMBuilder,
     };
 } ());
 
+let $$$:IVNodeMethod=VNodeHelp;
     // $VDOM=VDOM;
     // $VNode=newVNode;
     // if(mode===1){

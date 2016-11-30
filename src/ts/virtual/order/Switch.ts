@@ -1,7 +1,7 @@
 
 /// <reference path='BlockOrder.ts'/>
 namespace Order {
-    class Switch extends BlockOrder {
+    export class Switch extends BlockOrder {
         static orderName = "switch"
         static subOrder=["case","default"];
         isBreak:boolean=false
@@ -15,11 +15,6 @@ namespace Order {
                     return true
             }
             return false
-        }
-        tryRun(){
-            for(const block of this.blocks){
-                test(block.node, block.condition);
-            }
         }
         run(){
             let hit=-1

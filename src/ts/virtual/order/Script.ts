@@ -11,11 +11,6 @@ namespace Order {
         init(){
             this.block=JS.Parser.parseStructor(this.condition);
         }
-        
-        tryRun(){
-            console.log(this.block);
-            // test(this.node, this.condition);
-        }
         run(){
 
             // replaceNodeByNode(this.node,$$$(exec(this.node,this.condition),3));

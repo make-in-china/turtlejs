@@ -81,7 +81,7 @@ namespace Order {
 
             if (orderName in orders) {
                 let order=new orders[orderName](node,info.condition);
-                if(order.run&&order.canRunAtService){
+                if(order.run&&canRunAtService(order)){
                     order.run();
                 }
                 return order;

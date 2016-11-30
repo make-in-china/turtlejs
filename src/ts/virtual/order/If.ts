@@ -1,7 +1,7 @@
 
 /// <reference path='BlockOrder.ts'/>
 namespace Order {
-    class If extends BlockOrder {
+    export class If extends BlockOrder {
         static orderName = "if"
         static subOrder=["else if","else"];
         constructor(node: VComment, condition: string) {
@@ -14,11 +14,6 @@ namespace Order {
                     return true
             }
             return false
-        }
-        tryRun(){
-            for(const block of this.blocks){
-                test(this.placeholder, block.condition);
-            }
         }
         run() {
             let hit=-1;

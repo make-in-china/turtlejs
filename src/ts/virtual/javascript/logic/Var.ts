@@ -48,7 +48,6 @@ namespace JS{
                     case 2:
                         if(isString(keyWord)){
                             let v=toConst(keyWord);
-                            debugger;
                             varInfos.push([varName,v,isString(v)]);
                         }else{
                             varInfos.push([varName,keyWord.toString(),true]);

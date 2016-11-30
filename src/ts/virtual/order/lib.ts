@@ -107,7 +107,7 @@ namespace Order {
     /**取消scope保护 */
     export function resetTest(){
         //倒序还原
-        for(let i=replaceScopes.oldScopes.length-1;i>=0;i++){
+        for(let i=replaceScopes.oldScopes.length-1;i>=0;i--){
             let oldScope=replaceScopes.oldScopes.pop();
             let scope=<Scope>replaceScopes.scopes.pop();
             scope.__actionNode__.__scope__=oldScope;
