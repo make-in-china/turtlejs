@@ -1,10 +1,10 @@
 
 /// <reference path='VCharacterData.ts'/>
 interface IVNodeMethod{
-    (nodeName: string, nodeType: 8): VComment&IVNodeMethod;
+    (nodeName: string, nodeType: ENodeType.Comment): VComment&IVNodeMethod;
 }
 function isVComment(node: VNode): node is VComment {
-    return node.nodeType === 8
+    return node.nodeType === ENodeType.Comment
 }
 interface VNodeVMData{
     /**是否有两个- */
@@ -12,10 +12,10 @@ interface VNodeVMData{
 }
 class VComment extends VCharacterData{
     nodeName="#Comment"
-    nodeType:ENodeType=ENodeType.Comment
+    nodeType:ENodeType.Comment=ENodeType.Comment
     private __value__=""
     cloneNode(deep:boolean):VComment&IVNodeMethod{
-        return $$$(this.__value__,8);
+        return $$$(this.__value__,ENodeType.Comment);
     }
     constructor(data:string){
         super();
@@ -50,7 +50,7 @@ class VComment extends VCharacterData{
         //     }
         //     return "";
         // });
-        return `(${s},8).$`;
+        return `(${s},${ENodeType.Comment}).$`;
     }
     toHTMLString(): string[] {
         let

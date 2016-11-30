@@ -2,10 +2,10 @@
 /// <reference path='VNode.ts'/>
 
 interface IVNodeMethod{
-    (nodeName: "#document", nodeType?: 1): VDocument&IVNodeMethod;
+    (nodeName: "#document", nodeType?: ENodeType.Element): VDocument&IVNodeMethod;
 }
 class VDocument extends VNode{
-    nodeType:ENodeType=ENodeType.Element;
+    nodeType:ENodeType.Element=ENodeType.Element;
     nodeName="#document"
     
     cloneNode(deep:boolean):VDocument&IVNodeMethod{

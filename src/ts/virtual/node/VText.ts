@@ -5,7 +5,7 @@ interface IVNodeMethod{
 }
 
 function isVText(node: VNode): node is VText {
-    return node.nodeType === 3
+    return node.nodeType === ENodeType.Text
 }
 let getFunctionBlock=(function(){
     let re=/(^.*?(function.*?\(.*?\).*?\{)|(\(.*?\)\=>\{))([\s\S\w\W]*)\}$/;
@@ -20,7 +20,7 @@ let getFunctionBlock=(function(){
 }());
 class VText extends VCharacterData{
     nodeName="#text"
-    nodeType:ENodeType=ENodeType.Text
+    nodeType:ENodeType.Text=ENodeType.Text
     private __value__=""
     cloneNode(deep:boolean):VText&IVNodeMethod{
         return $$$(this.__value__,ENodeType.Text);
@@ -68,7 +68,7 @@ class VText extends VCharacterData{
         //     }
         //     return "";
         // });
-        return `(${s},3).$`;
+        return `(${s},${ENodeType.Text}).$`;
     }
     toHTMLString(): string[] {
         return [this.__value__];

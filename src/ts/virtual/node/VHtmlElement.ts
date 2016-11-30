@@ -1,20 +1,20 @@
 
 /// <reference path='VNode.ts'/>
 /// <reference path='VElement.ts'/>
-/// <reference path='../lib/Encode.ts'/>
-/// <reference path='../core/Node.ts'/>
+/// <reference path='../../lib/Encode.ts'/>
+/// <reference path='../../core/Node.ts'/>
 /// <reference path='Attribute_Property.ts'/>
 
 interface IVNodeMethod{
-    (nodeName: string, nodeType?: 1): VMElement.VHtmlElement&IVNodeMethod;
-    (nodeName: 'html', nodeType?: 1): VMElement.VHtmlElement&IVNodeMethod;
+    (nodeName: string, nodeType?: ENodeType.Element): VMElement.VHtmlElement&IVNodeMethod;
+    (nodeName: 'html', nodeType?: ENodeType.Element): VMElement.VHtmlElement&IVNodeMethod;
 }
 function isVHTMLElement(node: VNode): node is VMElement.VHtmlElement {
-    return node.nodeType === 1
+    return node.nodeType === ENodeType.Element
 }
 namespace VMElement{
     export class VHtmlElement extends VElement{
-        nodeType:ENodeType=ENodeType.Element;
+        nodeType:ENodeType.Element=ENodeType.Element;
         nodeName="HTML"
         // version:string
         title:string
@@ -142,7 +142,7 @@ namespace VMElement{
         }
         toJS(space:number=0):string{
             let sSpace=(new Array(space+1)).join(" ");
-            let sFn='\n'+sSpace+`("${this.nodeName.toLowerCase()}")`;
+            let sFn=sSpace+`("${this.nodeName.toLowerCase()}")`;
             let sAttr="";
             let sInner="";
             let attrs = this.attributes;
@@ -160,10 +160,11 @@ namespace VMElement{
             if(this.vmData.closeSelf){
                 sInner='.$';
             }else{
+                //遍历子节点
                 let chds = this.childNodes;
                 if (chds.length > 0) {
                     for (let i = 0; i < chds.length; i++) {
-                        sInner +=(<VNode>chds[i]).toJS(space+4);
+                        sInner +='\n'+(<VNode>chds[i]).toJS(space+4);
                     }
                 }
                 if(this.parentNode){
@@ -284,7 +285,7 @@ namespace VMElement{
             if(!p){
                 throw new Error("This element has no parent node.");
             }
-            let vText=$$$(v,3);
+            let vText=$$$(v,ENodeType.Text);
             p.insertBefore(vText,this);
             p.removeChild(this);
         }

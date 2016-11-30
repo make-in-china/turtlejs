@@ -41,7 +41,7 @@ namespace Order {
             for(const block of this.blocks){
                 block.node.remove();
             }
-            this.placeholder=$$$("placeholder",8);
+            this.placeholder=$$$("placeholder",ENodeType.Comment);
             replaceNodeByNode(this.endNode,this.placeholder);
         }
         protected parseOrders(array:INode[]|INodeList,run:boolean,fn?:(node:IComment,subOrder:string,condition:string,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{

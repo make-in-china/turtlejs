@@ -10,7 +10,7 @@ namespace Order {
                 replaceNodeByNode(this.node,v);
                 return;
             }
-            replaceNodeByNode(this.node,$$$(''+v,3));
+            replaceNodeByNode(this.node,$$$(''+v,ENodeType.Text));
         }
     }
     register(Equal);

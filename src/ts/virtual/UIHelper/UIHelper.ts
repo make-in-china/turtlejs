@@ -18,44 +18,7 @@
 
 class UIHelper{
     static fs=typeof require!== "undefined"&&require('fs');
-    static getScriptString(className:string){
-        return `namespace ComponentScript{
-    export class ${className}{
-        constructor(part:Component.${className}){
-            part.dom.initDOM();
-        }
-    }
-}`
-    }
-    static getViewString(className:string,propertyInfo:string,domInitScript:string){
-        return `/// <reference path="../../../dest/virtual/UIHelper.0.1.d.ts"/>
-namespace ComponentView{
-    export class ${className}{
-        ${propertyInfo}
-        initDOM(){${domInitScript}
-        }
-    }
-}`
-    }
-    static getClassString(className:string){
-        return `/// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
-/// <reference path="./Script.ts"/>
-namespace Component{
-    export class ${className} extends Part{
-        constructor(
-            template:PartTemplate,
-            props:Object,
-            html:string,
-            public outerChildNodes:INode[],
-            public outerElement:IHTMLCollection
-        ) {
-            super(template,props,html,outerChildNodes,outerElement);
-            new ComponentScript.${className}(this);
-        }
-        dom=new ComponentView.${className}
-    }
-}`
-    }
+    
     static buildProject(className:string,path:string){
         if(!this.fs.existsSync(path)){
             this.fs.mkdirSync(path);
@@ -184,6 +147,47 @@ namespace Component{
         this.fs.writeFileSync(path.replace(/View\.html$/,'View.ts'),this.getViewString(className,propertyInfo,domInitScript));
         
         //mixin .css  to  变量
+    }
+
+
+    
+    static getScriptString(className:string){
+        return `namespace ComponentScript{
+    export class ${className}{
+        constructor(part:Component.${className}){
+            part.dom.initDOM();
+        }
+    }
+}`
+    }
+    static getViewString(className:string,propertyInfo:string,domInitScript:string){
+        return `/// <reference path="../../../dest/virtual/UIHelper.0.1.d.ts"/>
+namespace ComponentView{
+    export class ${className}{
+        ${propertyInfo}
+        initDOM(){${domInitScript}
+        }
+    }
+}`
+    }
+    static getClassString(className:string){
+        return `/// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
+/// <reference path="./Script.ts"/>
+namespace Component{
+    export class ${className} extends Part{
+        constructor(
+            template:PartTemplate,
+            props:Object,
+            html:string,
+            public outerChildNodes:INode[],
+            public outerElement:IHTMLCollection
+        ) {
+            super(template,props,html,outerChildNodes,outerElement);
+            new ComponentScript.${className}(this);
+        }
+        dom=new ComponentView.${className}
+    }
+}`
     }
 }
 typeof exports!=="undefined"&&(exports.UIHelper=UIHelper);
