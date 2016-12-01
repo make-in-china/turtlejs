@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "progress", nodeType?: 1): VMElement.VProgressElement&IVNodeMethod
 }
@@ -18,5 +18,5 @@ namespace VMElement{
                 return <VProgressElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VProgressElement,["value","max"]);
+    VAP.decorate(VProgressElement,["value","max"]);
 }

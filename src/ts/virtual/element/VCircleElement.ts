@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "circle", nodeType?: 1): VMElement.VCircleElement&IVNodeMethod
 }
@@ -20,5 +20,5 @@ namespace VMElement{
                 return <VCircleElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VCircleElement,["title","lang","accessKey","webkitdropzone","id"]);
+    VAP.decorate(VCircleElement,["title","lang","accessKey","webkitdropzone","id"]);
 }

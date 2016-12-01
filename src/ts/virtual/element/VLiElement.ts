@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "li", nodeType?: 1): VMElement.VLiElement&IVNodeMethod
 }
@@ -18,5 +18,5 @@ namespace VMElement{
                 return <VLiElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VLiElement,["value","type"]);
+    VAP.decorate(VLiElement,["value","type"]);
 }

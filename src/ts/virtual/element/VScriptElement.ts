@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 /// <reference path="../../core/node.ts"/>
 interface IVNodeMethod{
     (nodeName: "script", nodeType?: 1): VMElement.VScriptElement&IVNodeMethod
@@ -56,5 +56,5 @@ namespace VMElement{
             return `(${s},3).$`;
         }
     }
-    VAP.decorate(<any>VScriptElement,["src","type","charset","async","defer","crossOrigin","event","integrity"]);
+    VAP.decorate(VScriptElement,["src","type","charset","async","defer","crossOrigin","event","integrity"]);
 }

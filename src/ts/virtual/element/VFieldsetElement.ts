@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "fieldset", nodeType?: 1): VMElement.VFieldsetElement&IVNodeMethod
 }
@@ -17,5 +17,5 @@ namespace VMElement{
                 return <VFieldsetElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VFieldsetElement,["disabled","name"]);
+    VAP.decorate(VFieldsetElement,["disabled","name"]);
 }

@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "form", nodeType?: 1): VMElement.VFormElement&IVNodeMethod
 }
@@ -22,5 +22,5 @@ namespace VMElement{
                 return <VFormElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VFormElement,["name","target","title","lang","accessKey","webkitdropzone","id"]);
+    VAP.decorate(VFormElement,["name","target","title","lang","accessKey","webkitdropzone","id"]);
 }

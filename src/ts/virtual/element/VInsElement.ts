@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "ins", nodeType?: 1): VMElement.VInsElement&IVNodeMethod
 }
@@ -18,5 +18,5 @@ namespace VMElement{
                 return <VInsElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VInsElement,["cite","dateTime"]);
+    VAP.decorate(VInsElement,["cite","dateTime"]);
 }

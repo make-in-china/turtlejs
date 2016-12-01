@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "basefont", nodeType?: 1): VMElement.VBasefontElement&IVNodeMethod
 }
@@ -21,5 +21,5 @@ namespace VMElement{
                 return <VBasefontElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VBasefontElement,["title","lang","accessKey","webkitdropzone","id"]);
+    VAP.decorate(VBasefontElement,["title","lang","accessKey","webkitdropzone","id"]);
 }

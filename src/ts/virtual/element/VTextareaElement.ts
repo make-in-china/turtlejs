@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "textarea", nodeType?: 1): VMElement.VTextareaElement&IVNodeMethod
 }
@@ -37,5 +37,5 @@ namespace VMElement{
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation():void{}
     }
-    VAP.decorate(<any>VTextareaElement,["autofocus","cols","dirName","disabled","maxLength","minLength","name","placeholder","readOnly","required","rows","wrap","autocapitalize"]);
+    VAP.decorate(VTextareaElement,["autofocus","cols","dirName","disabled","maxLength","minLength","name","placeholder","readOnly","required","rows","wrap","autocapitalize"]);
 }

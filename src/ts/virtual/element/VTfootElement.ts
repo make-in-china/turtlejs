@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "tfoot", nodeType?: 1): VMElement.VTfootElement&IVNodeMethod
 }
@@ -18,5 +18,5 @@ namespace VMElement{
                 return <VTfootElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VTfootElement,["align","vAlign"]);
+    VAP.decorate(VTfootElement,["align","vAlign"]);
 }

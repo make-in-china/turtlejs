@@ -2,7 +2,7 @@
 /// <reference path='VOrder.ts'/>
 /// <reference path='../-.ts'/>
 namespace Order {
-    extendsOrderFunction(BindExpressions,'tryRun',function(this:BindExpressions){
+    extendsOrderFunction(BindExpressions,EXFunction.tryRun,function(this:BindExpressions){
         
         //绑定有可能的变故有：
         //获取变量出错

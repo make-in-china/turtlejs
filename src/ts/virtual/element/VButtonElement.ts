@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "button", nodeType?: 1): VMElement.VButtonElement&IVNodeMethod
 }
@@ -23,5 +23,5 @@ namespace VMElement{
                 return <VButtonElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VButtonElement,["formTarget","name","value","title","lang","accessKey","webkitdropzone","id"]);
+    VAP.decorate(VButtonElement,["formTarget","name","value","title","lang","accessKey","webkitdropzone","id"]);
 }

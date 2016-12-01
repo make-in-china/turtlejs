@@ -7,7 +7,7 @@ class VElementHelper{
         let className=`V${name[0]+name.substr(1).toLowerCase()}Element`;
         let propertys=decorates.join(`:string
         `)+':string';
-        return `/// <reference path="../Attribute_Property.ts"/>
+        return `/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "${name.toLowerCase()}", nodeType?: 1): VMElement.${className}&IVNodeMethod;
 }
@@ -16,7 +16,7 @@ namespace VMElement{
         nodeName="${name.toUpperCase()}"
         ${propertys}
     }
-    VAP.decorate(<any>${className},[${'"'+decorates.join('","')+'"'}]);
+    VAP.decorate(${className},[${'"'+decorates.join('","')+'"'}]);
 }`
     }
     private static checkAttr_Prop(name:string){

@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "thead", nodeType?: 1): VMElement.VTheadElement&IVNodeMethod
 }
@@ -18,5 +18,5 @@ namespace VMElement{
                 return <VTheadElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VTheadElement,["align","vAlign"]);
+    VAP.decorate(VTheadElement,["align","vAlign"]);
 }

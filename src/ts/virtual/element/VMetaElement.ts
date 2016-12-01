@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "meta", nodeType?: 1): VMElement.VMetaElement&IVNodeMethod
 }
@@ -20,5 +20,5 @@ namespace VMElement{
                 return <VMetaElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VMetaElement,["name","content","scheme"]);
+    VAP.decorate(VMetaElement,["name","content","scheme"]);
 }

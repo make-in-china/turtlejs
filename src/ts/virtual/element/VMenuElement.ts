@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "menu", nodeType?: 1): VMElement.VMenuElement&IVNodeMethod
 }
@@ -17,5 +17,5 @@ namespace VMElement{
                 return <VMenuElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VMenuElement,["compact"]);
+    VAP.decorate(VMenuElement,["compact"]);
 }

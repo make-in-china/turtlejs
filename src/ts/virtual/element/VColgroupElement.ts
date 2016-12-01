@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "colgroup", nodeType?: 1): VMElement.VColgroupElement&IVNodeMethod
 }
@@ -19,5 +19,5 @@ namespace VMElement{
                 return <VColgroupElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VColgroupElement,["span","align","vAlign","width"]);
+    VAP.decorate(VColgroupElement,["span","align","vAlign","width"]);
 }

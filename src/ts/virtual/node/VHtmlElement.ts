@@ -290,5 +290,5 @@ namespace VMElement{
             p.removeChild(this);
         }
     }
-    VAP.decorate(<any>VHtmlElement,["title", "lang", "accessKey", "webkitdropzone", "id"]);
+    VAP.decorate(VHtmlElement,["title", "lang", "accessKey", "webkitdropzone", "id"]);
 }

@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "xmp", nodeType?: 1): VMElement.VXmpElement&IVNodeMethod
 }
@@ -17,5 +17,5 @@ namespace VMElement{
                 return <VXmpElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VXmpElement,["width"]);
+    VAP.decorate(VXmpElement,["width"]);
 }

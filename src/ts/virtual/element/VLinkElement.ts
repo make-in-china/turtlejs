@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "link", nodeType?: 1): VMElement.VLinkElement &IVNodeMethod
 }
@@ -28,5 +28,5 @@ namespace VMElement{
                 return <VLinkElement &IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VLinkElement,["disabled","href","crossOrigin","rel","media","hreflang","type","charset","rev","target","integrity"]);
+    VAP.decorate(VLinkElement,["disabled","href","crossOrigin","rel","media","hreflang","type","charset","rev","target","integrity"]);
 }

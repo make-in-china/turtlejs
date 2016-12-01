@@ -2,6 +2,12 @@
 /// <reference path='VOrder.ts'/>
 /// <reference path='Break.ts'/>
 namespace Order {
+    export interface IOrderDataBlock extends IOrderData{
+        isBreak: boolean
+        endNode: IComment
+        placeholder:IComment
+        blocks:IOrderBlock[];
+    }
     export interface IOrderBlock{
         order:string
         condition:string
@@ -9,28 +15,27 @@ namespace Order {
         blocks:INode[]
     }
     export abstract class BlockOrder extends VOrder {
-        isBreak: boolean
-        endNode: IComment
-        placeholder:IComment
+        data:IOrderDataBlock
         protected abstract isBlockStart(subOrder:string):boolean;
-        blocks:IOrderBlock[]=[];
         constructor(node:IComment,condition:string,orderName:string){
             super(node,condition);
+            let data=this.data;
+            data.blocks=[];
             let i = getNodeIndex2(node);
             // let orderStack:VOrder[]=[this];
-            let preOrderNode=this.node;
+            let preOrderNode=data.node;
             let preNode=node;
             let preCondition=condition;
-            this.parseOrders((<INode>this.node.parentNode).childNodes,false, (node,subOrder,condition, state)=> {
+            this.parseOrders((<INode>data.node.parentNode).childNodes,false, (node,subOrder,condition, state)=> {
                 switch(subOrder){
                     case 'end':
-                        this.blocks.push({order:orderName,condition:preCondition,node:preNode,blocks:<VNode[]>takeBlockBetween(preOrderNode,node)});
-                        this.endNode=node;
+                        data.blocks.push({order:orderName,condition:preCondition,node:preNode,blocks:<VNode[]>takeBlockBetween(preOrderNode,node)});
+                        data.endNode=node;
                         return eTreeEach.c_stopEach;
                     case 'break':
                         return;
                     default:
-                        this.blocks.push({order:orderName,condition:preCondition,node:preNode,blocks:<VNode[]>takeBlockBetween(preOrderNode,node)});
+                        data.blocks.push({order:orderName,condition:preCondition,node:preNode,blocks:<VNode[]>takeBlockBetween(preOrderNode,node)});
                         preOrderNode=node;
                         preCondition=condition;
                         preNode=node;
@@ -38,13 +43,13 @@ namespace Order {
                         return eTreeEach.c_noIn;
                 }
             }, i + 1);
-            for(const block of this.blocks){
+            for(const block of data.blocks){
                 block.node.remove();
             }
-            this.placeholder=$$$("placeholder",ENodeType.Comment);
-            replaceNodeByNode(this.endNode,this.placeholder);
+            data.placeholder=$$$("placeholder",ENodeType.Comment);
+            replaceNodeByNode(data.endNode,data.placeholder);
         }
-        protected parseOrders(array:INode[]|INodeList,run:boolean,fn?:(node:IComment,subOrder:string,condition:string,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
+        protected static parseOrders(array:INode[]|INodeList,run:boolean,fn?:(node:IComment,subOrder:string,condition:string,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
             return this.eachOrder(array, (node,info, state)=> {
                 
                 if (info.order) {
@@ -56,7 +61,7 @@ namespace Order {
                         }else{
                             let innerBlock=this.parseBlock(info, node);
                             if (innerBlock) {
-                                state.nextStepLength = getNodeIndex2(innerBlock.placeholder) - getNodeIndex2(node) + 1;
+                                state.nextStepLength = getNodeIndex2(innerBlock.data.placeholder) - getNodeIndex2(node) + 1;
                             }
                             return eTreeEach.c_noRepeat & eTreeEach.c_noIn;
                         }
@@ -72,9 +77,9 @@ namespace Order {
             }, beginIndex);
         }
         
-        protected replaceCommentToBlock(block:INode[]){
-            insertNodesBefore(this.placeholder, block);
-            this.placeholder.remove();
+        protected static replaceCommentToBlock(data:IOrderDataBlock,block:INode[]){
+            insertNodesBefore(data.placeholder, block);
+            data.placeholder.remove();
         }
         protected runOrder(info: ICommentOrderInfo, node: IComment): VOrder|null {
             let orderName: string = <string>info.order;
@@ -99,10 +104,10 @@ namespace Order {
             }
             return null;
         }
-        protected parseBreakOrder(blocks:INode[],p:INode){
+        protected static parseBreakOrder(data: IOrderDataBlock,blocks:INode[],p:INode){
             this.parseOrders(blocks,true,(node:IComment,subOrder,condition,step)=>{
                 if(subOrder==='break'){
-                    this.isBreak=true;
+                    data.isBreak=true;
                     //级联删除break后面的数据直至当前层；
                     let node1:INode=node;
                     let pNode=<INode>node.parentNode;

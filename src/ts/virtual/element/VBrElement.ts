@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "br", nodeType?: 1): VMElement.VBrElement&IVNodeMethod
 }
@@ -17,5 +17,5 @@ namespace VMElement{
                 return <VBrElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VBrElement,["clear"]);
+    VAP.decorate(VBrElement,["clear"]);
 }

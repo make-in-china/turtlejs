@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "param", nodeType?: 1): VMElement.VParamElement&IVNodeMethod
 }
@@ -21,5 +21,5 @@ namespace VMElement{
                 return <VParamElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VParamElement,["name","value","type","valueType"]);
+    VAP.decorate(VParamElement,["name","value","type","valueType"]);
 }

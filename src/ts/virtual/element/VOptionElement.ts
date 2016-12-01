@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "option", nodeType?: 1): VMElement.VOptionElement&IVNodeMethod
 }
@@ -20,5 +20,5 @@ namespace VMElement{
                 return <VOptionElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VOptionElement,["disabled","label","selected","value"]);
+    VAP.decorate(VOptionElement,["disabled","label","selected","value"]);
 }

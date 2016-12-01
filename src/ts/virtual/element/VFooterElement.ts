@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "footer", nodeType?: 1): VMElement.VFooterElement&IVNodeMethod
 }
@@ -20,5 +20,5 @@ namespace VMElement{
                 return <VFooterElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VFooterElement,["title","lang","accessKey","webkitdropzone","id"]);
+    VAP.decorate(VFooterElement,["title","lang","accessKey","webkitdropzone","id"]);
 }

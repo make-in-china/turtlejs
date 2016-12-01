@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "meter", nodeType?: 1): VMElement.VMeterElement&IVNodeMethod
 }
@@ -22,5 +22,5 @@ namespace VMElement{
                 return <VMeterElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VMeterElement,["value","min","max","low","high","optimum"]);
+    VAP.decorate(VMeterElement,["value","min","max","low","high","optimum"]);
 }

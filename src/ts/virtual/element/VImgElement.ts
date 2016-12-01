@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "img", nodeType?: 1): VMElement.VImgElement&IVNodeMethod
 }
@@ -33,5 +33,5 @@ namespace VMElement{
                 return <VImgElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VImgElement,["alt","src","srcset","sizes","crossOrigin","useMap","isMap","width","height","name","lowsrc","align","hspace","vspace","longDesc","border"]);
+    VAP.decorate(VImgElement,["alt","src","srcset","sizes","crossOrigin","useMap","isMap","width","height","name","lowsrc","align","hspace","vspace","longDesc","border"]);
 }

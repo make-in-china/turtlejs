@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "dt", nodeType?: 1): VMElement.VDtElement&IVNodeMethod
 }
@@ -20,5 +20,5 @@ namespace VMElement{
                 return <VDtElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VDtElement,["title","lang","accessKey","webkitdropzone","id"]);
+    VAP.decorate(VDtElement,["title","lang","accessKey","webkitdropzone","id"]);
 }

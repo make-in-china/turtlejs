@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "table", nodeType?: 1): VMElement.VTableElement&IVNodeMethod
 }
@@ -25,5 +25,5 @@ namespace VMElement{
                 return <VTableElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VTableElement,["align","border","frame","rules","summary","width","bgColor","cellPadding","cellSpacing"]);
+    VAP.decorate(VTableElement,["align","border","frame","rules","summary","width","bgColor","cellPadding","cellSpacing"]);
 }

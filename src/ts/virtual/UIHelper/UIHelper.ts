@@ -79,10 +79,11 @@ class UIHelper{
                     let order=Order.parseComment(node);
                     if(order&&order.run){
                         if(Order.canRunAtService(order)){
+                            //参数完整，运行
                             order.run();
-                        }else if(order.undo){
-                            //哎呀debugger
-                            order.undo();
+                        }else{
+                            //参数不完整，输出js
+                            Order.toJS(order);
                         }
                     };
                 }catch(e){
@@ -150,7 +151,7 @@ class UIHelper{
     }
 
 
-    
+
     static getScriptString(className:string){
         return `namespace ComponentScript{
     export class ${className}{

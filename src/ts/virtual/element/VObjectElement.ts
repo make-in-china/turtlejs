@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "object", nodeType?: 1): VMElement.VObjectElement&IVNodeMethod
 }
@@ -31,5 +31,5 @@ namespace VMElement{
                 return <VObjectElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VObjectElement,["type","name","useMap","width","height","align","archive","code","standby","codeType","border","title","lang","accessKey","webkitdropzone","id"]);
+    VAP.decorate(VObjectElement,["type","name","useMap","width","height","align","archive","code","standby","codeType","border","title","lang","accessKey","webkitdropzone","id"]);
 }

@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "h5", nodeType?: 1): VMElement.VH5Element&IVNodeMethod
 }
@@ -16,5 +16,5 @@ namespace VMElement{
                 return <VH5Element&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VH5Element,["align"]);
+    VAP.decorate(VH5Element,["align"]);
 }

@@ -2,7 +2,7 @@
 /// <reference path='VOrder.ts'/>
 /// <reference path='../For.ts'/>
 namespace Order {
-    extendsOrderFunction(For,'tryRun',function(this:For){
+    extendsOrderFunction(For,EXFunction.tryRun,function(this:For){
         if (this.forMode === JS.EForMode.In) {
             test(this.placeholder, this.forInInfo.object)
         } else {

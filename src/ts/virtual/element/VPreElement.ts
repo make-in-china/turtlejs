@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "pre", nodeType?: 1): VMElement.VPreElement&IVNodeMethod;
 }
@@ -17,5 +17,5 @@ namespace VMElement{
             return <VPreElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VPreElement,["width"]);
+    VAP.decorate(VPreElement,["width"]);
 }

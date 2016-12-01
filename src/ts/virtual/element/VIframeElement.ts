@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "iframe", nodeType?: 1): VMElement.VIframeElement&IVNodeMethod
 }
@@ -29,5 +29,5 @@ namespace VMElement{
                 return <VIframeElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VIframeElement,["src","srcdoc","name","sandbox","allowFullscreen","width","height","align","scrolling","frameBorder","longDesc","marginHeight","marginWidth"]);
+    VAP.decorate(VIframeElement,["src","srcdoc","name","sandbox","allowFullscreen","width","height","align","scrolling","frameBorder","longDesc","marginHeight","marginWidth"]);
 }

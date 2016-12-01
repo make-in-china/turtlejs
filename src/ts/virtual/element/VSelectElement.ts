@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "select", nodeType?: 1): VMElement.VSelectElement&IVNodeMethod
 }
@@ -26,5 +26,5 @@ namespace VMElement{
             this.setBridgeGetSet("value");
         }
     }
-    VAP.decorate(<any>VSelectElement,["autofocus","disabled","multiple","name","required","size"]);
+    VAP.decorate(VSelectElement,["autofocus","disabled","multiple","name","required","size"]);
 }

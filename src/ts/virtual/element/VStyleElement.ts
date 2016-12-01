@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "style", nodeType?: 1): VMElement.VStyleElement&IVNodeMethod
 }
@@ -18,5 +18,5 @@ namespace VMElement{
                 return <VStyleElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VStyleElement,["media","type"]);
+    VAP.decorate(VStyleElement,["media","type"]);
 }

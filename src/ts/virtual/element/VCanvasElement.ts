@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "canvas", nodeType?: 1): VMElement.VCanvasElement&IVNodeMethod
 }
@@ -17,5 +17,5 @@ namespace VMElement{
                 return <VCanvasElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VCanvasElement,["width","height"]);
+    VAP.decorate(VCanvasElement,["width","height"]);
 }

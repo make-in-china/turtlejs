@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "span", nodeType?: 1): VMElement.VSpanElement&IVNodeMethod
 }
@@ -20,5 +20,5 @@ namespace VMElement{
                 return <VSpanElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VSpanElement,["title","lang","accessKey","webkitdropzone","id"]);
+    VAP.decorate(VSpanElement,["title","lang","accessKey","webkitdropzone","id"]);
 }

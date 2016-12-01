@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "strong", nodeType?: 1): VMElement.VStrongElement&IVNodeMethod
 }
@@ -20,5 +20,5 @@ namespace VMElement{
                 return <VStrongElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VStrongElement,["title","lang","accessKey","webkitdropzone","id"]);
+    VAP.decorate(VStrongElement,["title","lang","accessKey","webkitdropzone","id"]);
 }

@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "video", nodeType?: 1): VMElement.VVideoElement&IVNodeMethod
 }
@@ -19,5 +19,5 @@ namespace VMElement{
                 return <VVideoElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VVideoElement,["width","height","poster"]);
+    VAP.decorate(VVideoElement,["width","height","poster"]);
 }

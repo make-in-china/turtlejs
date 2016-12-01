@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "hr", nodeType?: 1): VMElement.VHrElement&IVNodeMethod
 }
@@ -21,5 +21,5 @@ namespace VMElement{
                 return <VHrElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VHrElement,["align","color","noShade","size","width"]);
+    VAP.decorate(VHrElement,["align","color","noShade","size","width"]);
 }

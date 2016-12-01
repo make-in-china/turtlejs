@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "col", nodeType?: 1): VMElement.VColElement&IVNodeMethod
 }
@@ -20,5 +20,5 @@ namespace VMElement{
                 return <VColElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VColElement,["span","align","vAlign","width"]);
+    VAP.decorate(VColElement,["span","align","vAlign","width"]);
 }

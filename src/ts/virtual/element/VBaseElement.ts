@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "base", nodeType?: 1): VMElement.VBaseElement&IVNodeMethod
 }
@@ -18,5 +18,5 @@ namespace VMElement{
                 return <VBaseElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VBaseElement,["href","target"]);
+    VAP.decorate(VBaseElement,["href","target"]);
 }

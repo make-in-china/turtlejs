@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "body", nodeType?: 1): VMElement.VBodyElement&IVNodeMethod
 }
@@ -21,5 +21,5 @@ namespace VMElement{
                 return <VBodyElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VBodyElement,["text","link","vLink","aLink","bgColor","background"]);
+    VAP.decorate(VBodyElement,["text","link","vLink","aLink","bgColor","background"]);
 }

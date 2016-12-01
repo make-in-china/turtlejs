@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "track", nodeType?: 1): VMElement.VTrackElement&IVNodeMethod
 }
@@ -21,5 +21,5 @@ namespace VMElement{
                 return <VTrackElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VTrackElement,["kind","src","srclang","label","default"]);
+    VAP.decorate(VTrackElement,["kind","src","srclang","label","default"]);
 }

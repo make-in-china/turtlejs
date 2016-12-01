@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "blockquote", nodeType?: 1): VMElement.VBlockquoteElement&IVNodeMethod
 }
@@ -16,5 +16,5 @@ namespace VMElement{
                 return <VBlockquoteElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VBlockquoteElement,["cite"]);
+    VAP.decorate(VBlockquoteElement,["cite"]);
 }

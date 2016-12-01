@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "frame", nodeType?: 1): VMElement.VFrameElement&IVNodeMethod
 }
@@ -26,5 +26,5 @@ namespace VMElement{
                 return <VFrameElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VFrameElement,["name","scrolling","frameBorder","marginHeight","marginWidth","title","lang","accessKey","webkitdropzone","id"]);
+    VAP.decorate(VFrameElement,["name","scrolling","frameBorder","marginHeight","marginWidth","title","lang","accessKey","webkitdropzone","id"]);
 }

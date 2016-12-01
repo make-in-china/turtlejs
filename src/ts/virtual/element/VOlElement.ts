@@ -1,4 +1,4 @@
-/// <reference path="../Attribute_Property.ts"/>
+/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
     (nodeName: "ol", nodeType?: 1): VMElement.VOlElement&IVNodeMethod
 }
@@ -20,5 +20,5 @@ namespace VMElement{
                 return <VOlElement&IVNodeMethod>newNode;
         }
     }
-    VAP.decorate(<any>VOlElement,["reversed","start","type","compact"]);
+    VAP.decorate(VOlElement,["reversed","start","type","compact"]);
 }
