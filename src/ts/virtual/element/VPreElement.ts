@@ -4,18 +4,11 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["width"])
     export class  VPreElement extends VHtmlElement{
         nodeName="PRE";
         width:string
-        cloneNode(deep:boolean=false):VPreElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["width"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-            return <VPreElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VPreElement,["width"]);
+    
 }

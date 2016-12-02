@@ -3,6 +3,7 @@ interface IVNodeMethod{
     (nodeName: "hr", nodeType?: 1): VMElement.VHrElement&IVNodeMethod
 }
 namespace VMElement{
+    @VAP.setA_P(["align","color","noShade","size","width"])
     export class VHrElement extends VHtmlElement{
         nodeName="HR";
         __closeSelf__=true;
@@ -11,15 +12,7 @@ namespace VMElement{
         noShade:string
         size:string
         width:string
-        cloneNode(deep:boolean=false):VHrElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["align","color","noShade","size","width"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VHrElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VHrElement,["align","color","noShade","size","width"]);
+    
 }

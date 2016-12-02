@@ -4,6 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["alt","src","srcset","sizes","crossOrigin","useMap","isMap","width","height","name","lowsrc","align","hspace","vspace","longDesc","border"])
     export class  VImgElement extends VHtmlElement{
         nodeName="IMG";
         __closeSelf__=true;
@@ -23,15 +24,7 @@ namespace VMElement{
         vspace:string
         longDesc:string
         border:string
-        cloneNode(deep:boolean=false):VImgElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["alt","src","srcset","sizes","crossOrigin","useMap","isMap","width","height","name","lowsrc","align","hspace","vspace","longDesc","border"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VImgElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VImgElement,["alt","src","srcset","sizes","crossOrigin","useMap","isMap","width","height","name","lowsrc","align","hspace","vspace","longDesc","border"]);
+    
 }

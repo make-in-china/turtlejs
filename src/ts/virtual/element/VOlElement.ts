@@ -4,21 +4,14 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["reversed","start","type","compact"])
     export class  VOlElement extends VHtmlElement{
         nodeName="OL";
         reversed:string
         start:string
         type:string
         compact:string
-        cloneNode(deep:boolean=false):VOlElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["reversed","start","type","compact"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VOlElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VOlElement,["reversed","start","type","compact"]);
+    
 }

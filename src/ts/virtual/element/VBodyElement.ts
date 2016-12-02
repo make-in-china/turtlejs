@@ -3,6 +3,7 @@ interface IVNodeMethod{
     (nodeName: "body", nodeType?: 1): VMElement.VBodyElement&IVNodeMethod
 }
 namespace VMElement{
+    @VAP.setA_P(["text","link","vLink","aLink","bgColor","background"])
     export class  VBodyElement extends VHtmlElement{
         nodeName="BODY";
         text:string
@@ -11,15 +12,7 @@ namespace VMElement{
         aLink:string
         bgColor:string
         background:string
-        cloneNode(deep:boolean=false):VBodyElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["text","link","vLink","aLink","bgColor","background"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VBodyElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VBodyElement,["text","link","vLink","aLink","bgColor","background"]);
+    
 }

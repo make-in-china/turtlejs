@@ -3,6 +3,7 @@ interface IVNodeMethod{
     (nodeName: "basefont", nodeType?: 1): VMElement.VBasefontElement&IVNodeMethod
 }
 namespace VMElement{
+    @VAP.setA_P(["title","lang","accessKey","webkitdropzone","id"])
     export class VBasefontElement extends VHtmlElement{
         nodeName="BASEFONT"
         __closeSelf__=true;
@@ -11,15 +12,7 @@ namespace VMElement{
         accessKey:string
         webkitdropzone:string
         id:string
-        cloneNode(deep:boolean=false):VBasefontElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["title","lang","accessKey","webkitdropzone","id"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VBasefontElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VBasefontElement,["title","lang","accessKey","webkitdropzone","id"]);
+    
 }

@@ -4,6 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["kind","src","srclang","label","default"])
     export class  VTrackElement extends VHtmlElement{
         nodeName="TRACK";
         kind:string
@@ -11,15 +12,6 @@ namespace VMElement{
         srclang:string
         label:string
         default:string
-        cloneNode(deep:boolean=false):VTrackElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["kind","src","srclang","label","default"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VTrackElement&IVNodeMethod>newNode;
-        }
     }
-    VAP.decorate(VTrackElement,["kind","src","srclang","label","default"]);
+    
 }

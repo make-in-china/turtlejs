@@ -4,19 +4,12 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["value","type"])
     export class  VLiElement extends VHtmlElement{
         nodeName="LI";
         value:string
         type:string
-        cloneNode(deep:boolean=false):VLiElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["value","type"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VLiElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VLiElement,["value","type"]);
+    
 }

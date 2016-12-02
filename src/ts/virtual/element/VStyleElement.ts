@@ -4,19 +4,12 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["media","type"])
     export class  VStyleElement extends VHtmlElement{
         nodeName="STYLE";
         media:string
         type:string
-        cloneNode(deep:boolean=false):VStyleElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["media","type"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VStyleElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VStyleElement,["media","type"]);
+    
 }

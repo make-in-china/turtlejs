@@ -3,19 +3,12 @@ interface IVNodeMethod{
     (nodeName: "br", nodeType?: 1): VMElement.VBrElement&IVNodeMethod
 }
 namespace VMElement{
+    @VAP.setA_P(["clear"])
     export class  VBrElement extends VHtmlElement{
         nodeName="BR";
         __closeSelf__=true;
         clear:string;
-        cloneNode(deep:boolean=false):VBrElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["clear"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VBrElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VBrElement,["clear"]);
+    
 }

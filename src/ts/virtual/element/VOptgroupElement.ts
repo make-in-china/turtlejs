@@ -4,19 +4,12 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["disabled","label"])
     export class  VOptgroupElement extends VHtmlElement{
         nodeName="OPTGROUP";
         disabled:string
         label:string
-        cloneNode(deep:boolean=false):VOptgroupElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["disabled","label"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VOptgroupElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VOptgroupElement,["disabled","label"]);
+    
 }

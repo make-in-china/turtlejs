@@ -3,6 +3,7 @@ interface IVNodeMethod{
     (nodeName: "b", nodeType?: 1): VMElement.VBElement&IVNodeMethod
 }
 namespace VMElement{
+    @VAP.setA_P(["title","lang","accessKey","webkitdropzone","id"])
     export class VBElement extends VHtmlElement{
         nodeName="B"
         title:string
@@ -10,15 +11,7 @@ namespace VMElement{
         accessKey:string
         webkitdropzone:string
         id:string
-        cloneNode(deep:boolean=false):VBElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["title","lang","accessKey","webkitdropzone","id"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VBElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VBElement,["title","lang","accessKey","webkitdropzone","id"]);
+    
 }

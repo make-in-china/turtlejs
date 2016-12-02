@@ -4,6 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["src","type","srcset","sizes","media"])
     export class  VSourceElement extends VHtmlElement{
         nodeName="SOURCE";
         src:string
@@ -11,15 +12,7 @@ namespace VMElement{
         srcset:string
         sizes:string
         media:string
-        cloneNode(deep:boolean=false):VSourceElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["src","type","srcset","sizes","media"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VSourceElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VSourceElement,["src","type","srcset","sizes","media"]);
+    
 }

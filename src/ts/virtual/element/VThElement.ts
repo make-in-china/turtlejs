@@ -4,6 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["colSpan","rowSpan","headers","align","axis","height","width","noWrap","vAlign","bgColor","abbr","scope"])
     export class  VThElement extends VHtmlElement{
         nodeName="TH";
         colSpan:string
@@ -18,15 +19,7 @@ namespace VMElement{
         bgColor:string
         abbr:string
         scope:string
-        cloneNode(deep:boolean=false):VThElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["colSpan","rowSpan","headers","align","axis","height","width","noWrap","vAlign","bgColor","abbr","scope"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VThElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VThElement,["colSpan","rowSpan","headers","align","axis","height","width","noWrap","vAlign","bgColor","abbr","scope"]);
+    
 }

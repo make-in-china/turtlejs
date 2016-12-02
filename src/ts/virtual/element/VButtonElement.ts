@@ -3,6 +3,7 @@ interface IVNodeMethod{
     (nodeName: "button", nodeType?: 1): VMElement.VButtonElement&IVNodeMethod
 }
 namespace VMElement{
+    @VAP.setA_P(["formTarget","name","value","title","lang","accessKey","webkitdropzone","id"])
     export class VButtonElement extends VHtmlElement{
         nodeName="BUTTON"
         formTarget:string
@@ -13,15 +14,7 @@ namespace VMElement{
         accessKey:string
         webkitdropzone:string
         id:string
-        cloneNode(deep:boolean=false):VButtonElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["formTarget","name","value","title","lang","accessKey","webkitdropzone","id"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VButtonElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VButtonElement,["formTarget","name","value","title","lang","accessKey","webkitdropzone","id"]);
+    
 }

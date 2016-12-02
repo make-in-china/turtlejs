@@ -4,6 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["src","srcdoc","name","sandbox","allowFullscreen","width","height","align","scrolling","frameBorder","longDesc","marginHeight","marginWidth"])
     export class  VIframeElement extends VHtmlElement{
         nodeName="IFRAME";
         src:string
@@ -19,15 +20,7 @@ namespace VMElement{
         longDesc:string
         marginHeight:string
         marginWidth:string
-        cloneNode(deep:boolean=false):VIframeElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["src","srcdoc","name","sandbox","allowFullscreen","width","height","align","scrolling","frameBorder","longDesc","marginHeight","marginWidth"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VIframeElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VIframeElement,["src","srcdoc","name","sandbox","allowFullscreen","width","height","align","scrolling","frameBorder","longDesc","marginHeight","marginWidth"]);
+    
 }

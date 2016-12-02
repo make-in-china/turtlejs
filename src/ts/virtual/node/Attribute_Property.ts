@@ -11,9 +11,16 @@ namespace VAP{
     function setAttr(node:VMElement.VHtmlElement,name:string,value:string){
         node.setAttribute(name,value);
     }
-    export function decorate(vclass:typeof VMElement.VHtmlElement,names:string[]){
-        var prototype:any=(<any>vclass).prototype;
-        for(const name of names){
+    let apNames:string[];
+    export function setA_P(names:string[]){
+        //不重复创建类装饰器，而是使用外部变量转存参数，因此不支持异步
+        apNames=names;
+        return setA_PToClassPrototype;
+    }
+    function setA_PToClassPrototype(constructor:typeof VMElement.VHtmlElement){
+        let prototype=constructor.prototype;
+        let clazzSuperPrototype=VMElement.VHtmlElement.prototype;
+        for(const name of apNames){
             Object.defineProperty(prototype,name,{
                 get:function(this:VMElement.VHtmlElement):string{
                     return getAttr(this,name);
@@ -22,6 +29,15 @@ namespace VAP{
                     setAttr(this,name,v);
                 }
             })
+        }
+        prototype.cloneNode=function(this:VMElement.VHtmlElement&IVNodeMethod,deep?:boolean):VMElement.VHtmlElement&IVNodeMethod{
+            let newNode=clazzSuperPrototype.cloneNode(deep);
+            for(const name of apNames){
+                if(this[name]!==""){
+                    newNode[name]=this[name];
+                }
+            }
+            return <VMElement.VHtmlElement&IVNodeMethod>newNode;
         }
     }
 }

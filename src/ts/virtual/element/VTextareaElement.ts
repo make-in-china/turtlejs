@@ -4,6 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["autofocus","cols","dirName","disabled","maxLength","minLength","name","placeholder","readOnly","required","rows","wrap","autocapitalize"])
     export class  VTextareaElement extends VHtmlElement{
         nodeName="TEXTAREA";
         autofocus:string
@@ -19,15 +20,7 @@ namespace VMElement{
         rows:string
         wrap:string
         autocapitalize:string
-        cloneNode(deep:boolean=false):VTextareaElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["autofocus","cols","dirName","disabled","maxLength","minLength","name","placeholder","readOnly","required","rows","wrap","autocapitalize"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VTextareaElement&IVNodeMethod>newNode;
-        }
+        
         get value():string{
             return this.innerText;
         }
@@ -37,5 +30,5 @@ namespace VMElement{
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation():void{}
     }
-    VAP.decorate(VTextareaElement,["autofocus","cols","dirName","disabled","maxLength","minLength","name","placeholder","readOnly","required","rows","wrap","autocapitalize"]);
+    
 }

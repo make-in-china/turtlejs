@@ -4,19 +4,12 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["align","vAlign"])
     export class  VTbodyElement extends VHtmlElement{
         nodeName="TBODY";
         align:string
         vAlign:string
-        cloneNode(deep:boolean=false):VTbodyElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["align","vAlign"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VTbodyElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VTbodyElement,["align","vAlign"]);
+    
 }

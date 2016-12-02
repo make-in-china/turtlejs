@@ -4,6 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["accept","alt","autocomplete","autofocus","checked","dirName","disabled","formAction","formEnctype","formMethod","formNoValidate","formTarget","height","max","maxLength","min","minLength","multiple","name","pattern","placeholder","readOnly","required","size","src","step","type","value","width","align","useMap","autocapitalize","webkitdirectory","incremental"])
     export class  VInputElement extends VHtmlElement{
         nodeName="INPUT";
         __closeSelf__=true;
@@ -41,21 +42,13 @@ namespace VMElement{
         autocapitalize:string
         webkitdirectory:string
         incremental:string
-        cloneNode(deep:boolean=false):VInputElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["accept","alt","autocomplete","autofocus","checked","dirName","disabled","formAction","formEnctype","formMethod","formNoValidate","formTarget","height","max","maxLength","min","minLength","multiple","name","pattern","placeholder","readOnly","required","size","src","step","type","value","width","align","useMap","autocapitalize","webkitdirectory","incremental"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VInputElement&IVNodeMethod>newNode;
-        }
+        
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation():void{
             this.setBridgeGetSet("value");
             this.setBridgeGetSet("checked");
         }
     }
-    VAP.decorate(VInputElement,["accept","alt","autocomplete","autofocus","checked","dirName","disabled","formAction","formEnctype","formMethod","formNoValidate","formTarget","height","max","maxLength","min","minLength","multiple","name","pattern","placeholder","readOnly","required","size","src","step","type","value","width","align","useMap","autocapitalize","webkitdirectory","incremental"]);
+    
 
 }

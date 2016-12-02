@@ -3,6 +3,7 @@ interface IVNodeMethod{
     (nodeName: "col", nodeType?: 1): VMElement.VColElement&IVNodeMethod
 }
 namespace VMElement{
+    @VAP.setA_P(["span","align","vAlign","width"])
     export class  VColElement extends VHtmlElement{
         nodeName="COL";
         __closeSelf__=true;
@@ -10,15 +11,7 @@ namespace VMElement{
         align:string
         vAlign:string
         width:string
-        cloneNode(deep:boolean=false):VColElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["span","align","vAlign","width"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VColElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VColElement,["span","align","vAlign","width"]);
+    
 }

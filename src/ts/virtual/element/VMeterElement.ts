@@ -4,6 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["value","min","max","low","high","optimum"])
     export class  VMeterElement extends VHtmlElement{
         nodeName="METER";
         value:string
@@ -12,15 +13,7 @@ namespace VMElement{
         low:string
         high:string
         optimum:string
-        cloneNode(deep:boolean=false):VMeterElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["value","min","max","low","high","optimum"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VMeterElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VMeterElement,["value","min","max","low","high","optimum"]);
+    
 }

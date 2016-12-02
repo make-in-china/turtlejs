@@ -4,20 +4,12 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["align","vAlign","bgColor"])
     export class  VTrElement extends VHtmlElement{
         nodeName="TR";
         align:string
         vAlign:string
         bgColor:string
-        cloneNode(deep:boolean=false):VTrElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["align","vAlign","bgColor"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VTrElement&IVNodeMethod>newNode;
-        }
     }
-    VAP.decorate(VTrElement,["align","vAlign","bgColor"]);
+    
 }

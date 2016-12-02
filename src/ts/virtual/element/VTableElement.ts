@@ -4,6 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["align","border","frame","rules","summary","width","bgColor","cellPadding","cellSpacing"])
     export class  VTableElement extends VHtmlElement{
         nodeName="TABLE";
         align:string
@@ -15,15 +16,7 @@ namespace VMElement{
         bgColor:string
         cellPadding:string
         cellSpacing:string
-        cloneNode(deep:boolean=false):VTableElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["align","border","frame","rules","summary","width","bgColor","cellPadding","cellSpacing"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VTableElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VTableElement,["align","border","frame","rules","summary","width","bgColor","cellPadding","cellSpacing"]);
+    
 }

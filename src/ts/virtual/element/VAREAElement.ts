@@ -3,6 +3,7 @@ interface IVNodeMethod{
     (nodeName: "area", nodeType?: 1): VMElement.VAreaElement&IVNodeMethod
 }
 namespace VMElement{
+    @VAP.setA_P(["alt","coords","shape","target","ping","noHref","href"])
     export class  VAreaElement extends VHtmlElement{
         nodeName="AREA";
         __closeSelf__=true;
@@ -13,15 +14,6 @@ namespace VMElement{
         ping:string
         noHref:string
         href:string
-        cloneNode(deep:boolean=false):VAreaElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["alt","coords","shape","target","ping","noHref","href"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VAreaElement&IVNodeMethod>newNode;
-        }
     }
-    VAP.decorate(VAreaElement,["alt","coords","shape","target","ping","noHref","href"]);
+    
 }

@@ -4,18 +4,11 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["cite"])
     export class  VQElement extends VHtmlElement{
         nodeName="Q";
         cite:string
-        cloneNode(deep:boolean=false):VQElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["cite"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VQElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VQElement,["cite"]);
+    
 }

@@ -4,19 +4,11 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["compact","type"])
     export class  VUlElement extends VHtmlElement{
         nodeName="UL";
         compact:string
         type:string
-        cloneNode(deep:boolean=false):VUlElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["compact","type"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VUlElement&IVNodeMethod>newNode;
-        }
     }
-    VAP.decorate(VUlElement,["compact","type"]);
+    
 }

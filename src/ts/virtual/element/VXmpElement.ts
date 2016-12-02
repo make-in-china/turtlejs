@@ -4,18 +4,10 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["width"])
     export class  VXmpElement extends VHtmlElement{
         nodeName="XMP";
         width:string
-        cloneNode(deep:boolean=false):VXmpElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["width"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VXmpElement&IVNodeMethod>newNode;
-        }
     }
-    VAP.decorate(VXmpElement,["width"]);
+    
 }

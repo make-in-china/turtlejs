@@ -4,21 +4,14 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["disabled","label","selected","value"])
     export class  VOptionElement extends VHtmlElement{
         nodeName="OPTION";
         disabled:string
         label:string
         selected:string
         value:string
-        cloneNode(deep:boolean=false):VOptionElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["disabled","label","selected","value"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VOptionElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VOptionElement,["disabled","label","selected","value"]);
+    
 }

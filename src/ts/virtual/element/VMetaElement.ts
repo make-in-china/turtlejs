@@ -4,21 +4,14 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["name","content","scheme"])
     export class  VMetaElement extends VHtmlElement{
         nodeName="META";
         __closeSelf__=true;
         name:string
         content:string
         scheme:string
-        cloneNode(deep:boolean=false):VMetaElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["name","content","scheme"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VMetaElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VMetaElement,["name","content","scheme"]);
+    
 }

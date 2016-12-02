@@ -3,6 +3,7 @@ interface IVNodeMethod{
     (nodeName: "strong", nodeType?: 1): VMElement.VStrongElement&IVNodeMethod
 }
 namespace VMElement{
+    @VAP.setA_P(["title","lang","accessKey","webkitdropzone","id"])
     export class VStrongElement extends VHtmlElement{
         nodeName="STRONG"
         title:string
@@ -10,15 +11,7 @@ namespace VMElement{
         accessKey:string
         webkitdropzone:string
         id:string
-        cloneNode(deep:boolean=false):VStrongElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["title","lang","accessKey","webkitdropzone","id"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VStrongElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VStrongElement,["title","lang","accessKey","webkitdropzone","id"]);
+    
 }

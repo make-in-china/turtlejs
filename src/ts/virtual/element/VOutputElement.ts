@@ -4,18 +4,11 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["name"])
     export class  VOutputElement extends VHtmlElement{
         nodeName="OUTPUT";
         name:string
-        cloneNode(deep:boolean=false):VOutputElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["name"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VOutputElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VOutputElement,["name"]);
+    
 }

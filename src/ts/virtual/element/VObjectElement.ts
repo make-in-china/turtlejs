@@ -3,6 +3,7 @@ interface IVNodeMethod{
     (nodeName: "object", nodeType?: 1): VMElement.VObjectElement&IVNodeMethod
 }
 namespace VMElement{
+    @VAP.setA_P(["type","name","useMap","width","height","align","archive","code","standby","codeType","border","title","lang","accessKey","webkitdropzone","id"])
     export class VObjectElement extends VHtmlElement{
         nodeName="OBJECT"
         type:string
@@ -21,15 +22,7 @@ namespace VMElement{
         accessKey:string
         webkitdropzone:string
         id:string
-        cloneNode(deep:boolean=false):VObjectElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["type","name","useMap","width","height","align","archive","code","standby","codeType","border","title","lang","accessKey","webkitdropzone","id"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VObjectElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VObjectElement,["type","name","useMap","width","height","align","archive","code","standby","codeType","border","title","lang","accessKey","webkitdropzone","id"]);
+    
 }

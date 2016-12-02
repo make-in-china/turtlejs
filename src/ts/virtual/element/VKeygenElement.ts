@@ -4,6 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["autofocus","challenge","disabled","keytype","name"])
     export class  VKeygenElement extends VHtmlElement{
         nodeName="KEYGEN";
         autofocus:string
@@ -11,15 +12,7 @@ namespace VMElement{
         disabled:string
         keytype:string
         name:string
-        cloneNode(deep:boolean=false):VKeygenElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["autofocus","challenge","disabled","keytype","name"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VKeygenElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VKeygenElement,["autofocus","challenge","disabled","keytype","name"]);
+    
 }

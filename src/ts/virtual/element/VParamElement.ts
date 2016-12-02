@@ -4,6 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["name","value","type","valueType"])
     export class  VParamElement extends VHtmlElement{
         nodeName="PARAM";
         __closeSelf__=true;
@@ -11,15 +12,7 @@ namespace VMElement{
         value:string
         type:string
         valueType:string
-        cloneNode(deep:boolean=false):VParamElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["name","value","type","valueType"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VParamElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VParamElement,["name","value","type","valueType"]);
+    
 }

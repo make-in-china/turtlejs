@@ -5,6 +5,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["src","type","charset","async","defer","crossOrigin","event","integrity"])
     export class  VScriptElement extends VHtmlElement{
         nodeName="SCRIPT";
         src:string
@@ -15,15 +16,7 @@ namespace VMElement{
         crossOrigin:string
         event:string
         integrity:string
-        cloneNode(deep:boolean=false):VScriptElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["src","type","charset","async","defer","crossOrigin","event","integrity"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VScriptElement&IVNodeMethod>newNode;
-        }
+        
         toJS(space:number=0):string{
             let sSpace=(new Array(space+1)).join(" ");
             let sFn='\n'+sSpace+`("${this.nodeName}")`;
@@ -53,8 +46,8 @@ namespace VMElement{
         }
         private toScriptText():string{
             let s ='()=>{'+ nodesToString(<any>this.childNodes) +'}';
-            return `(${s},3).$`;
+            return `(${s},${ENodeType.Text}).$`;
         }
     }
-    VAP.decorate(VScriptElement,["src","type","charset","async","defer","crossOrigin","event","integrity"]);
+    
 }

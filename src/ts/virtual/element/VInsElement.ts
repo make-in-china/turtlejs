@@ -4,19 +4,12 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
+    @VAP.setA_P(["cite","dateTime"])
     export class  VInsElement extends VHtmlElement{
         nodeName="INS";
         cite:string
         dateTime:string
-        cloneNode(deep:boolean=false):VInsElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["cite","dateTime"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VInsElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VInsElement,["cite","dateTime"]);
+    
 }

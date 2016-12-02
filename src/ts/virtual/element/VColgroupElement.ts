@@ -3,21 +3,14 @@ interface IVNodeMethod{
     (nodeName: "colgroup", nodeType?: 1): VMElement.VColgroupElement&IVNodeMethod
 }
 namespace VMElement{
+    @VAP.setA_P(["span","align","vAlign","width"])
     export class  VColgroupElement extends VHtmlElement{
         nodeName="COLGROUP";
         span:string
         align:string
         vAlign:string
         width:string
-        cloneNode(deep:boolean=false):VColgroupElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["span","align","vAlign","width"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VColgroupElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VColgroupElement,["span","align","vAlign","width"]);
+    
 }

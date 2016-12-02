@@ -3,18 +3,11 @@ interface IVNodeMethod{
     (nodeName: "dialog", nodeType?: 1): VMElement.VDialogElement&IVNodeMethod
 }
 namespace VMElement{
+    @VAP.setA_P(["open"])
     export class  VDialogElement extends VHtmlElement{
         nodeName="DIALOG";
         open:string
-        cloneNode(deep:boolean=false):VDialogElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["open"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VDialogElement&IVNodeMethod>newNode;
-        }
+        
     }
-    VAP.decorate(VDialogElement,["open"]);
+    
 }
