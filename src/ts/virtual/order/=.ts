@@ -2,16 +2,19 @@
 /// <reference path='VOrder.ts'/>
 namespace Order {
     /**运行并插入返回的节点 */
+    @register
     export class Equal extends VOrder {
         static orderName = "="
         run(){
-            let v=exec(this.node,this.condition);
+            Equal.run(this.data);
+        }
+        static run(this:void,data:IOrderData){
+            let v=exec(data.node,data.condition);
             if(v instanceof VNode){
-                replaceNodeByNode(this.node,v);
+                replaceNodeByNode(data.node,v);
                 return;
             }
-            replaceNodeByNode(this.node,$$$(''+v,ENodeType.Text));
+            replaceNodeByNode(data.node,$$$(''+v,ENodeType.Text));
         }
     }
-    register(Equal);
 }

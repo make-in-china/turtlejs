@@ -3,7 +3,11 @@
 namespace Order {
     
     export abstract class RepeatBlockOrder extends BlockOrder {
-        protected isBlockStart(subOrder:string):boolean{
+        
+        constructor(node: IComment, condition: string, orderName: string) {
+            super(node,condition,orderName,RepeatBlockOrder.isBlockStart);
+        }
+        protected static isBlockStart(subOrder:string):boolean{
             return subOrder==='end'
         }
         private static parseRepeatBlock(data:IOrderDataBlock,canRepeat:(data:IOrderDataBlock)=>boolean){
@@ -15,7 +19,7 @@ namespace Order {
             insertNodesBefore(data.placeholder , cloneBlocks);
             let p=data.placeholder.parentNode;
             //执行order
-            BlockOrder.parseBreakOrder(data,cloneBlocks,<INode>p);
+            parseBreakOrder(data,cloneBlocks,<INode>p);
             if(!data.isBreak&&canRepeat(data)){
                 this.parseRepeatBlock(data,canRepeat);
             }

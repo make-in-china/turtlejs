@@ -38,7 +38,7 @@ namespace Order {
     //     bindElementProperty(exp, '__me__', textNode, 'data');
     //     textNode['data'] = <any>exp.__me__;
     // }
-
+    @register
     export class BindExpressions extends VOrder {
         static orderName = "-"
         var:string
@@ -96,9 +96,11 @@ namespace Order {
 
         }
         run(){
+            BindExpressions.run(this.data);
+        }
+        static run(this:void,data:IOrderData){
             
         }
     }
-    register(BindExpressions);
 }
 

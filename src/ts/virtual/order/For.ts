@@ -60,9 +60,8 @@ namespace Order {
             }else{
                 throw new Error("错误的for表达式！");
             }
-            
         }
-        static run(data:IOrderDataBlock,canRepeat:(data:IOrderDataBlock)=>boolean){
+        static run(data:IOrderDataBlock){
             super.run(data,canRepeat);
         }
     }
