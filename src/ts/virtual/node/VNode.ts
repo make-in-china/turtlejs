@@ -21,8 +21,9 @@ const enum ENodeType{
     Document=9,
     DocumentType=10,
     DocumentFragment=11,
-    Member=20,
-    Script=21
+    PlaceHolder=20,
+    Member=21,
+    Script=22
 }
 
 interface IVNodeMethod{

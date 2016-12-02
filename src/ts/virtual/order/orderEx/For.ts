@@ -17,4 +17,20 @@ namespace Order {
             test(data.placeholder, data.forStepInfo.exec);
         }
     });
+    extendsOrderFunction(For,EXFunction.toJS,function(this:For){
+        //生成中间数据  的  生成代码
+        
+        let data=this.data;
+        let blocks=getBlocksDataString(data);
+        return `(function(this:VScript){
+            let data={
+                condition:'${data.condition}',
+                isBlockStart:Order.RepeatBlockOrder.isBlockStart,
+                placeholder:this,
+                isBreak:false,
+                blocks:[${blocks.join(',')}]
+            }; 
+            Order.For.run(data);
+        },ENodeType.Script).run()`;
+    });
 }

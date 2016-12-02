@@ -2,7 +2,7 @@
 /// <reference path='RepeatBlockOrder.ts'/>
 /// <reference path='../javascript/logic/For.ts'/>
 namespace Order {
-    interface IOrderDataFor extends IOrderDataBlock{
+    export interface IOrderDataFor extends IOrderDataBlock{
         forMode: JS.EForMode;
         
         forStepInfo: {
@@ -72,7 +72,7 @@ namespace Order {
             if(isString( forStepInfo.first)){
                 exec(data.placeholder, forStepInfo.first);
             }else{
-                runVarInfos(DOMScope.get(data.node),data.node,forStepInfo.first);
+                runVarInfos(DOMScope.get(data.placeholder),data.placeholder,forStepInfo.first);
             }
         } else {
             exec(data.placeholder, forStepInfo.step);

@@ -2,7 +2,6 @@
 /// <reference path='Var.ts'/>
 namespace Order {
     interface IOrderDataScope extends IOrderDataVar{
-        node:IComment;
         scopeName:string
     }
     @register
@@ -14,18 +13,18 @@ namespace Order {
             let conditionArr=splitByOnce(data.condition,":");
             data.scopeName=conditionArr[0];
             if(conditionArr.length===2){
-                data.block=this.getBlock(conditionArr[1]);
+                this.block=this.getBlock(conditionArr[1]);
             }
         }
         run(){
             ScopeOrder.run(this.data);
         }
         static run(data:IOrderDataScope){
-            let scope=DOMScope.create(data.node,data.scopeName);
-            if(data.block){
-                runVarInfos(scope,data.node,data.varInfos);
+            let scope=DOMScope.create(data.placeholder,data.scopeName);
+            if(data.varInfos&&data.varInfos.length>0){
+                runVarInfos(scope,data.placeholder,data.varInfos);
             }
-            removeNode(data.node);
+            removeNode(data.placeholder);
         }
     }
 }

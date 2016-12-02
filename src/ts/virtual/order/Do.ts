@@ -1,7 +1,7 @@
 
 /// <reference path='RepeatBlockOrder.ts'/>
 namespace Order {
-    interface IOrderDataDo extends IOrderDataBlock{
+    export interface IOrderDataDo extends IOrderDataBlock{
         isFirst:boolean
     }
     @register

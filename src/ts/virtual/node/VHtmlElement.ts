@@ -13,13 +13,14 @@ function isVHTMLElement(node: VNode): node is VMElement.VHtmlElement {
     return node.nodeType === ENodeType.Element
 }
 namespace VMElement{
+    @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VHtmlElement extends VElement{
         nodeType:ENodeType.Element=ENodeType.Element;
         nodeName="HTML"
         // version:string
         title:string
         lang:string
-        titaccessKeyle:string
+        accessKey:string
         webkitdropzone:string
         id:string
         cloneNode(deep:boolean=false): VHtmlElement&IVNodeMethod {
@@ -290,5 +291,4 @@ namespace VMElement{
             p.removeChild(this);
         }
     }
-    VAP.decorate(VHtmlElement,["title", "lang", "accessKey", "webkitdropzone", "id"]);
 }

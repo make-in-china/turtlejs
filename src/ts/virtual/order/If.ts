@@ -35,7 +35,7 @@ namespace Order {
                 }
             }
             if (hit!==-1) {
-                replaceCommentToBlock(data,data.blocks[hit].blocks);
+                replaceNodeByNodes(data.placeholder,data.blocks[hit].nodes);
             }
         }
     }

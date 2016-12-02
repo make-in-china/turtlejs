@@ -77,6 +77,7 @@ class UIHelper{
                 //解析注释里的命令
                 try{
                     let order=Order.parseComment(node);
+                    debugger;
                     if(order&&order.run){
                         if(Order.canRunAtService(order)){
                             //参数完整，运行

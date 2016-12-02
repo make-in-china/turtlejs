@@ -7,3 +7,4 @@
 /// <reference path='Do.ts'/>
 /// <reference path='=.ts'/>
 /// <reference path='-.ts'/>
+/// <reference path='Var.ts'/>

@@ -3,14 +3,14 @@
 
 namespace Order {
     export interface IOrderData{
-        node: IComment
         condition: string
     }
     export abstract class VOrder {
         data:IOrderData=<any>{};
+        node: IComment
         run?(): void
         constructor(node: IComment, condition: string) {
-            this.data.node = node;
+            this.node = node;
             this.data.condition = condition;
         }
         static eachOrder(this:void,array:INode[]|INodeList,fn:(node:IComment,info:ICommentOrderInfo,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{

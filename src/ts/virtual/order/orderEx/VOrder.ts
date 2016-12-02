@@ -5,22 +5,22 @@ namespace Order {
         tryRun:'tryRun',
         toJS:'toJS'
     }
-    export function extendsOrderGet<U extends VOrder,T extends typeof VOrder,R>(
-        clazz:T,
+    export function extendsOrderGet<U extends VOrder>(
+        clazz:{prototype:U},
         name:string,
-        fn:(this:U)=>R
+        fn:(this:U)=>void
     ){
-        Object.defineProperty((<any>clazz).prototype,name,{get:fn});
+        Object.defineProperty(clazz.prototype,name,{get:fn});
     }
-    export function extendsOrderFunction<U extends VOrder,T extends typeof VOrder,R>(
-        clazz:T,
+    export function extendsOrderFunction<U extends VOrder>(
+        clazz:{prototype:U},
         name:string,
-        fn:(this:U)=>R
+        fn:(this:U)=>void
     ){
-        Object.defineProperty((<any>clazz).prototype,name,{value:fn});
+        Object.defineProperty(clazz.prototype,name,{value:fn});
     }
 
-    extendsOrderGet(VOrder,'canRunAtService',function(this:VOrder):boolean{
+    extendsOrderGet(VOrder,'canRunAtService',function():boolean{
         try{
             if(EXFunction.tryRun in this){
                 this[EXFunction.tryRun]();

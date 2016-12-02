@@ -168,7 +168,7 @@ class Part extends EventEmitterEx {
         return this.refs.begin.parentNode;
     }
     get scopeNodes() {
-        let scopeNodes = [];
+        let scopeNodes:INode[] = [];
         treeEach(this.elements, "children", function (node) {
             if (node.hasOwnProperty("scope")) {
                 scopeNodes.push(node);

@@ -4,19 +4,18 @@
 namespace Order {
     export interface IOrderDataBlock extends IOrderData {
         isBreak: boolean
-        endNode: IComment
-        placeholder: IComment
+        placeholder: VPlaceHolder
         blocks: IOrderBlock[];
         isBlockStart: (subOrder: string) => boolean
     }
     export interface IOrderBlock {
         order: string
         condition: string
-        node: IComment
-        blocks: INode[]
+        nodes: VNode[]
     }
     export abstract class BlockOrder extends VOrder {
         data: IOrderDataBlock
+        endNode: IComment
         constructor(node: IComment, condition: string, orderName: string,isBlockStart:(subOrder: string) => boolean) {
             super(node, condition);
             let data = this.data;
@@ -24,19 +23,22 @@ namespace Order {
             data.blocks = [];
             let i = getNodeIndex2(node);
             // let orderStack:VOrder[]=[this];
-            let preOrderNode = data.node;
+            let preOrderNode = node;
             let preNode = node;
             let preCondition = condition;
-            parseOrders(data, (<INode>data.node.parentNode).childNodes, false, (node, subOrder, condition, state) => {
+            let blockNodes:INode[]=[];
+            parseOrders(data, (<INode>node.parentNode).childNodes, false, (node, subOrder, condition, state) => {
                 switch (subOrder) {
                     case 'end':
-                        data.blocks.push({ order: orderName, condition: preCondition, node: preNode, blocks: <VNode[]>takeBlockBetween(preOrderNode, node) });
-                        data.endNode = node;
+                        blockNodes.push(preNode);
+                        data.blocks.push({ order: orderName, condition: preCondition, nodes: <VNode[]>takeBlockBetween(preOrderNode, node) });
+                        this.endNode = node;
                         return eTreeEach.c_stopEach;
                     case 'break':
                         return;
                     default:
-                        data.blocks.push({ order: orderName, condition: preCondition, node: preNode, blocks: <VNode[]>takeBlockBetween(preOrderNode, node) });
+                        blockNodes.push(preNode);
+                        data.blocks.push({ order: orderName, condition: preCondition, nodes: <VNode[]>takeBlockBetween(preOrderNode, node) });
                         preOrderNode = node;
                         preCondition = condition;
                         preNode = node;
@@ -44,11 +46,11 @@ namespace Order {
                         return eTreeEach.c_noIn;
                 }
             }, i + 1);
-            for (const block of data.blocks) {
-                block.node.remove();
+            for (const blockNode of blockNodes) {
+                (<IHTMLElement>blockNode.parentNode).removeChild(blockNode);
             }
-            data.placeholder = $$$("placeholder", ENodeType.Comment);
-            replaceNodeByNode(data.endNode, data.placeholder);
+            data.placeholder = $$$("", ENodeType.PlaceHolder);
+            replaceNodeByNode(this.endNode, data.placeholder);
         }
 
     }
@@ -86,10 +88,6 @@ namespace Order {
         }, beginIndex);
     }
     
-    export function replaceCommentToBlock(this:void,data:IOrderDataBlock,block:INode[]){
-        insertNodesBefore(data.placeholder, block);
-        data.placeholder.remove();
-    }
     function runOrder(this:void,info: ICommentOrderInfo, node: IComment): VOrder|null {
         let orderName: string = <string>info.order;
 

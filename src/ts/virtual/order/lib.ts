@@ -3,10 +3,6 @@
 interface VComment {
     __order__?: Order.VOrder
 }
-interface VComment {
-    __order__?:Order.VOrder
-}
-
 namespace Order {
     interface VNodeVMData {
         /**命令 */

@@ -25,7 +25,7 @@ namespace Order {
             let blocks=data.blocks;
             for(let i=1;i<blocks.length;i++){
                 let block=blocks[i];
-                if (block.order==='default'|| exec(data.node, data.condition)===exec(block.node, data.condition)) {
+                if (block.order==='default'|| exec(data.placeholder, data.condition)===exec(data.placeholder, data.condition)) {
                     if(hit===-1){
                         hit=i;
                     }else if(hit===i-1){
@@ -33,9 +33,9 @@ namespace Order {
                     }else{
                         break;
                     }
-                    insertNodesBefore(data.placeholder , block.blocks);
+                    insertNodesBefore(data.placeholder , block.nodes);
                     let p=data.placeholder.parentNode;
-                    parseBreakOrder(data,block.blocks,<INode>p);
+                    parseBreakOrder(data,block.nodes,<INode>p);
                     if(data.isBreak){
                         break;
                     }

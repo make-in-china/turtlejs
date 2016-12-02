@@ -7,14 +7,14 @@ namespace Order {
         constructor(node: IComment, condition: string, orderName: string) {
             super(node,condition,orderName,RepeatBlockOrder.isBlockStart);
         }
-        protected static isBlockStart(subOrder:string):boolean{
+        static isBlockStart(subOrder:string):boolean{
             return subOrder==='end'
         }
         private static parseRepeatBlock(data:IOrderDataBlock,canRepeat:(data:IOrderDataBlock)=>boolean){
-            let blocks=data.blocks[0].blocks;
+            let nodes=data.blocks[0].nodes;
             let cloneBlocks:INode[]=[];
-            for(var i=0;i<blocks.length;i++){
-                cloneBlocks.push(blocks[i].cloneNode(true));
+            for(var i=0;i<nodes.length;i++){
+                cloneBlocks.push(nodes[i].cloneNode(true));
             }
             insertNodesBefore(data.placeholder , cloneBlocks);
             let p=data.placeholder.parentNode;
