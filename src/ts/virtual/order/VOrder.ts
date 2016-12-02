@@ -13,7 +13,7 @@ namespace Order {
             this.data.node = node;
             this.data.condition = condition;
         }
-        protected eachOrder(array:INode[]|INodeList,fn:(node:IComment,info:ICommentOrderInfo,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
+        static eachOrder(this:void,array:INode[]|INodeList,fn:(node:IComment,info:ICommentOrderInfo,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
             return treeEach(array, 'childNodes', (node: INode, state)=> {
                 if (!(node instanceof VComment)) {
                     return;

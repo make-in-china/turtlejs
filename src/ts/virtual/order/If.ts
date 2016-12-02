@@ -1,13 +1,15 @@
 
 /// <reference path='BlockOrder.ts'/>
 namespace Order {
+    @register
     export class If extends BlockOrder {
         static orderName = "if"
         static subOrder=["else if","else"];
         constructor(node: VComment, condition: string) {
-            super(node, condition,'if');
+            super(node, condition,'if',If.isBlockStart);
         }
-        protected isBlockStart(subOrder:string):boolean{
+
+        static isBlockStart(subOrder:string):boolean{
             switch (subOrder) {
                 case 'else':
                 case 'else if':
@@ -33,9 +35,8 @@ namespace Order {
                 }
             }
             if (hit!==-1) {
-                BlockOrder.replaceCommentToBlock(data,data.blocks[hit].blocks);
+                replaceCommentToBlock(data,data.blocks[hit].blocks);
             }
         }
     }
-    register(If);
 }

@@ -3,17 +3,18 @@
 /// <reference path='../For.ts'/>
 namespace Order {
     extendsOrderFunction(For,EXFunction.tryRun,function(this:For){
+        let data=this.data;
         if (this.forMode === JS.EForMode.In) {
-            test(this.placeholder, this.forInInfo.object)
+            test(data.placeholder, this.forInInfo.object)
         } else {
             
             if(isString( this.forStepInfo.first)){
-                test(this.placeholder, this.forStepInfo.first);
+                test(data.placeholder, this.forStepInfo.first);
             }else{
-                tryRunVarInfos(this.placeholder,this.forStepInfo.first);
+                tryRunVarInfos(data.placeholder,this.forStepInfo.first);
             }
-            test(this.placeholder, this.forStepInfo.step);
-            test(this.placeholder, this.forStepInfo.exec);
+            test(data.placeholder, this.forStepInfo.step);
+            test(data.placeholder, this.forStepInfo.exec);
         }
     });
 }

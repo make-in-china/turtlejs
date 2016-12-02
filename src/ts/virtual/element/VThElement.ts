@@ -19,7 +19,6 @@ namespace VMElement{
         bgColor:string
         abbr:string
         scope:string
-        
     }
     
 }

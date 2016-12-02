@@ -1,6 +1,7 @@
 
 /// <reference path='VOrder.ts'/>
 namespace Order {
+    @register
     class Script extends VOrder {
         static orderName = ":"
         block:JS.JavaScriptBlock
@@ -9,12 +10,15 @@ namespace Order {
             this.init();
         }
         init(){
-            this.block=JS.Parser.parseStructor(this.condition);
+
+            this.block=JS.Parser.parseStructor(this.data.condition);
         }
         run(){
-
+            Script.run(this.data);
             // replaceNodeByNode(this.node,$$$(exec(this.node,this.condition),3));
         }
+        static run(data:IOrderData){
+
+        }
     }
-    register(Script);
 }

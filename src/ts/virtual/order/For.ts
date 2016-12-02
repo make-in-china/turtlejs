@@ -2,18 +2,38 @@
 /// <reference path='RepeatBlockOrder.ts'/>
 /// <reference path='../javascript/logic/For.ts'/>
 namespace Order {
+    interface IOrderDataFor extends IOrderDataBlock{
+        forMode: JS.EForMode;
+        
+        forStepInfo: {
+            first: string|[string,string|undefined,boolean][]
+            exec: string
+            step: string
+            isFirst: boolean
+        }
+        
+        forInInfo: {
+            source: any
+            var: string
+            object: string
+            names: string[]
+            index: number
+        }
+    }
+
+    @register
     export class For extends RepeatBlockOrder {
         static orderName = "for"
-        forMode: JS.EForMode;
+        data:IOrderDataFor
         constructor(node: VComment, condition: string) {
             super(node, condition,'for');
             let jsblock=JS.Parser.parseStructor(condition);
             let info=JS.For.parseConditions(jsblock);
             if(info){
-                this.forMode = info.mode;
+                this.data.forMode = info.mode;
                 if(info.mode===JS.EForMode.In){
                     let infoForIn:JS.IInfoForIn=<JS.IInfoForIn>info;
-                    this.forInInfo = {
+                    this.data.forInInfo = {
                         var: infoForIn.hasVar?infoForIn.varName:'',
                         object:infoForIn.bindingExp.toString(),
                         names: [],
@@ -30,7 +50,7 @@ namespace Order {
                         first=infoForStep.first.toString();
                     }
                     infoForStep.exec.children.pop();
-                    this.forStepInfo = {
+                    this.data.forStepInfo = {
                         first: first,
                         exec: infoForStep.exec.toString(),
                         step: infoForStep.step.toString(),
@@ -42,64 +62,56 @@ namespace Order {
             }
             
         }
-        forStepInfo: {
-            first: string|[string,string|undefined,boolean][]
-            exec: string
-            step: string
-            isFirst: boolean
-        }
-        private checkForStep(): boolean {
-            if (this.forStepInfo.isFirst) {
-                this.forStepInfo.isFirst = false;
-                if(isString( this.forStepInfo.first)){
-                    exec(this.placeholder, this.forStepInfo.first);
-                }else{
-                    runVarInfos(DOMScope.get(this.node),this.node,this.forStepInfo.first);
-                }
-            } else {
-                exec(this.placeholder, this.forStepInfo.step);
-            }
-            return exec(this.placeholder, this.forStepInfo.exec);
-        }
-
-        forInInfo: {
-            source: any
-            var: string
-            object: string
-            names: string[]
-            index: number
-        }
-        private initForInSourceData(): boolean {
-            if (!this.forInInfo.source) {
-                this.forInInfo.source = exec(this.placeholder, this.forInInfo.object);
-                if (!this.forInInfo.source) {
-                    return false;
-                }
-                for (let i in this.forInInfo.source) {
-                    this.forInInfo.names.push(i);
-                }
-            }
-            return true
-        }
-        private checkForIn(): boolean {
-            if (!this.initForInSourceData()) {
-                throw new Error("计算出错！");
-            }
-            if (this.forInInfo.index < this.forInInfo.names.length) {
-                exec(this.placeholder, this.forInInfo.var + '=\'' + this.forInInfo.names[this.forInInfo.index] + '\';');
-                this.forInInfo.index++;
-                return true
-            } else {
-                return false
-            }
-        }
-        canRepeat():boolean{
-            if (this.forMode === JS.EForMode.In) {
-                return this.checkForIn();
-            } else {
-                return this.checkForStep();
-            }
+        static run(data:IOrderDataBlock,canRepeat:(data:IOrderDataBlock)=>boolean){
+            super.run(data,canRepeat);
         }
     }
-    register(For);
+    function checkForStep(this:void,data:IOrderDataFor): boolean {
+        let forStepInfo=data.forStepInfo
+        if (forStepInfo.isFirst) {
+            forStepInfo.isFirst = false;
+            if(isString( forStepInfo.first)){
+                exec(data.placeholder, forStepInfo.first);
+            }else{
+                runVarInfos(DOMScope.get(data.node),data.node,forStepInfo.first);
+            }
+        } else {
+            exec(data.placeholder, forStepInfo.step);
+        }
+        return exec(data.placeholder, forStepInfo.exec);
+    }
+    function initForInSourceData(this:void,data:IOrderDataFor): boolean {
+        let forInInfo=data.forInInfo
+        if (!forInInfo.source) {
+            forInInfo.source = exec(data.placeholder, forInInfo.object);
+            if (!forInInfo.source) {
+                return false;
+            }
+            for (let i in forInInfo.source) {
+                forInInfo.names.push(i);
+            }
+        }
+        return true
+    }
+    function checkForIn(this:void,data:IOrderDataFor): boolean {
+        if (!initForInSourceData(data)) {
+            throw new Error("计算出错！");
+        }
+        let forInInfo=data.forInInfo
+        
+        if (forInInfo.index < forInInfo.names.length) {
+            exec(data.placeholder, forInInfo.var + '=\'' + forInInfo.names[forInInfo.index] + '\';');
+            forInInfo.index++;
+            return true
+        } else {
+            return false
+        }
+    }
+    function canRepeat(this:void,data:IOrderDataFor):boolean{
+        if (data.forMode === JS.EForMode.In) {
+            return checkForIn(data);
+        } else {
+            return checkForStep(data);
+        }
+    }
 }

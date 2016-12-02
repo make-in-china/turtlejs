@@ -15,12 +15,12 @@ namespace Order {
             insertNodesBefore(data.placeholder , cloneBlocks);
             let p=data.placeholder.parentNode;
             //执行order
-            BlockOrder.parseBreakOrder(cloneBlocks,<INode>p);
+            BlockOrder.parseBreakOrder(data,cloneBlocks,<INode>p);
             if(!data.isBreak&&canRepeat(data)){
                 this.parseRepeatBlock(data,canRepeat);
             }
         }
-        static run(data:IOrderDataBlock,canRepeat:(data:IOrderDataBlock)=>boolean){
+        static run(data:IOrderDataBlock,canRepeat:(this:void,data:IOrderDataBlock)=>boolean){
             if(canRepeat(data)){
                 this.parseRepeatBlock(data,canRepeat);
             }

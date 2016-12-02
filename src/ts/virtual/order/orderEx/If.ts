@@ -3,8 +3,9 @@
 /// <reference path='../If.ts'/>
 namespace Order {
     extendsOrderFunction(If,EXFunction.tryRun,function(this:If){
-        for(const block of this.blocks){
-            test(this.placeholder, block.condition);
+        let data=this.data;
+        for(const block of data.blocks){
+            test(data.placeholder, block.condition);
         }
     });
 

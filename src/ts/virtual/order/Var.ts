@@ -21,24 +21,30 @@ namespace Order {
             }
         }
     }
-    export class Var extends VOrder {
-        static orderName = "var";
+    export interface IOrderDataVar extends IOrderData{
         node:IComment;
         block:JS.JavaScriptBlock
         varInfos:[string,string|undefined,boolean][]
+    }
+    @register
+    export class Var extends VOrder {
+        static orderName = "var";
+        data:IOrderDataVar
         constructor(node:VComment , condition:string){
             super(node,condition);
             this.initStatement();
             this.initvarInfos();
         }
         initStatement(){
-            this.block=this.getBlock('var '+this.condition);
+            let data=this.data;
+            data.block=this.getBlock('var '+data.condition);
         }
         getBlock(condition:string):JS.JavaScriptBlock{
             return JS.Parser.parseStructor(condition);
         }
         initvarInfos(){
-            let block=this.block;
+            let data=this.data;
+            let block=data.block;
             if(!block){
                 return ;
             }
@@ -49,14 +55,16 @@ namespace Order {
             }
             let logic:JS.Var=<JS.Var>JS.getLogic(statements[0],["var"]);
             if(logic){
-                this.varInfos=logic.varInfos;
+                data.varInfos=logic.varInfos;
             }
             
         }
         run(){
-            runVarInfos(DOMScope.get(this.node),this.node,this.varInfos);
-            removeNode(this.node);
+            Var.run(this.data);
+        }
+        static run(data:IOrderDataVar){
+            runVarInfos(DOMScope.get(data.node),data.node,data.varInfos);
+            removeNode(data.node);
         }
     }
-    register(Var);
 }

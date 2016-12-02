@@ -11,15 +11,6 @@ namespace VMElement{
         accessKey:string
         webkitdropzone:string
         id:string
-        loneNode(deep:boolean=false):VTitleElement&IVNodeMethod{
-            let newNode=super.cloneNode(deep);
-            for(const name of ["title","lang","accessKey","webkitdropzone","id"]){
-                if(this[name]!==""){
-                    newNode[name]=this[name];
-                }
-            }
-                return <VTitleElement&IVNodeMethod>newNode;
-        }
     }
     
 }

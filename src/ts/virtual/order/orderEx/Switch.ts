@@ -3,7 +3,8 @@
 /// <reference path='../Switch.ts'/>
 namespace Order {
     extendsOrderFunction(Switch,EXFunction.tryRun,function(this:Switch){
-        for(const block of this.blocks){
+        let data=this.data;
+        for(const block of data.blocks){
             test(block.node, block.condition);
         }
     });

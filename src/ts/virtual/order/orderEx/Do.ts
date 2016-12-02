@@ -3,6 +3,7 @@
 /// <reference path='../Do.ts'/>
 namespace Order {
     extendsOrderFunction(Do,EXFunction.tryRun,function(this:Do){
-        test(this.placeholder, this.condition);
+        let data=this.data;
+        test(data.placeholder, data.condition);
     });
 }

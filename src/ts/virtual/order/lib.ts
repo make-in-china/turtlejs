@@ -47,13 +47,13 @@ namespace Order {
         new (node: IComment, condition: string,...args:any[]): VOrder;
         orderName: string;
         subOrder?:string[];
-        run(this:void,data:IOrderData):void;
+        run(this:typeof VOrder,data:IOrderData):void;
     }
     export let orders: { [index: string]: IOrderConstructor } = {};
     function makeOrderRegExp(names:string[]):RegExp{
         return new RegExp("^\\s*("+names.join("|")+")(?:\\s*|$)");
     }
-    export function register(this:void,order: IOrderConstructor) {
+    export function register(order: IOrderConstructor) {
         let name:string=order.orderName.toLowerCase();
         orders[name] = order;
         orderNames.push(name);
