@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["name","content","scheme"])
+    @mergeClass({name:'',content:'',scheme:''})
     export class  VMetaElement extends VHtmlElement{
         nodeName="META";
         __closeSelf__=true;

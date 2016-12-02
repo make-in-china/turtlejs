@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "fieldset", nodeType?: 1): VMElement.VFieldsetElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["disabled","name"])
+    @mergeClass({disabled:'',name:''})
     export class  VFieldsetElement extends VHtmlElement{
         nodeName="FIELDSET"
         disabled:string

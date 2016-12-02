@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "i", nodeType?: 1): VMElement.VIElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["title","lang","accessKey","webkitdropzone","id"])
+    @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VIElement extends VHtmlElement{
         nodeName="I"
         title:string

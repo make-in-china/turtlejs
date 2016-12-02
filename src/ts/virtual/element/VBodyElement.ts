@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "body", nodeType?: 1): VMElement.VBodyElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["text","link","vLink","aLink","bgColor","background"])
+    @mergeClass({text:'',link:'',vLink:'',aLink:'',bgColor:'',background:''})
     export class  VBodyElement extends VHtmlElement{
         nodeName="BODY";
         text:string

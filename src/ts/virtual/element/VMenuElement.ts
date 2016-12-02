@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["compact"])
+    @mergeClass({compact:''})
     export class  VMenuElement extends VHtmlElement{
         nodeName="MENU";
         compact:string

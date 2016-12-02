@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "basefont", nodeType?: 1): VMElement.VBasefontElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["title","lang","accessKey","webkitdropzone","id"])
+    @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VBasefontElement extends VHtmlElement{
         nodeName="BASEFONT"
         __closeSelf__=true;

@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "div", nodeType?: 1): VMElement.VDivElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["align"])
+    @mergeClass({align:''})
     export class  VDivElement extends VHtmlElement{
         nodeName="DIV"
         align:string

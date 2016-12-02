@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["accept","alt","autocomplete","autofocus","checked","dirName","disabled","formAction","formEnctype","formMethod","formNoValidate","formTarget","height","max","maxLength","min","minLength","multiple","name","pattern","placeholder","readOnly","required","size","src","step","type","value","width","align","useMap","autocapitalize","webkitdirectory","incremental"])
+    @mergeClass({accept:'',alt:'',autocomplete:'',autofocus:'',checked:'',dirName:'',disabled:'',formAction:'',formEnctype:'',formMethod:'',formNoValidate:'',formTarget:'',height:'',max:'',maxLength:'',min:'',minLength:'',multiple:'',name:'',pattern:'',placeholder:'',readOnly:'',required:'',size:'',src:'',step:'',type:'',value:'',width:'',align:'',useMap:'',autocapitalize:'',webkitdirectory:'',incremental:''})
     export class  VInputElement extends VHtmlElement{
         nodeName="INPUT";
         __closeSelf__=true;

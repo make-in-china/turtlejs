@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "blockquote", nodeType?: 1): VMElement.VBlockquoteElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["cite"])
+    @mergeClass({cite:''})
     export class  VBlockquoteElement extends VHtmlElement{
         nodeName="BLOCKQUOTE";
         cite:string

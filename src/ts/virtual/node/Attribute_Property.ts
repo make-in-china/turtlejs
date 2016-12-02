@@ -1,5 +1,5 @@
 
-namespace VAP{
+namespace VMElement{
     function getAttr(node:VMElement.VHtmlElement,name:string):string{
         var ret:string|null=node.getAttribute(name);
         if(ret){
@@ -11,11 +11,13 @@ namespace VAP{
     function setAttr(node:VMElement.VHtmlElement,name:string,value:string){
         node.setAttribute(name,value);
     }
+
     let apNames:string[];
-    export function setA_P(names:string[]){
+
+    export function mergeClass<U>(v:U):(constructor:{prototype:VMElement.VHtmlElement&U})=>void{
         //不重复创建类装饰器，而是使用外部变量转存参数，因此不支持异步
-        apNames=names;
-        return setA_PToClassPrototype;
+        apNames=Object.keys(v);;
+        return <any>setA_PToClassPrototype;
     }
     function setA_PToClassPrototype(constructor:typeof VMElement.VHtmlElement){
         let prototype=constructor.prototype;

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["cite","dateTime"])
+    @mergeClass({cite:'',dateTime:''})
     export class  VInsElement extends VHtmlElement{
         nodeName="INS";
         cite:string

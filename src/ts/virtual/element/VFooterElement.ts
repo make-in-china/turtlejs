@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "footer", nodeType?: 1): VMElement.VFooterElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["title","lang","accessKey","webkitdropzone","id"])
+    @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VFooterElement extends VHtmlElement{
         nodeName="FOOTER"
         title:string

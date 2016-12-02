@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["disabled","href","crossOrigin","rel","media","hreflang","type","charset","rev","target","integrity"])
+    @mergeClass({disabled:'',href:'',crossOrigin:'',rel:'',media:'',hreflang:'',type:'',charset:'',rev:'',target:'',integrity:''})
     export class  VLinkElement extends VHtmlElement{
         nodeName="LINK";
         __closeSelf__=true;

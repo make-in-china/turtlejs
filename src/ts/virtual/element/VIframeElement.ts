@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["src","srcdoc","name","sandbox","allowFullscreen","width","height","align","scrolling","frameBorder","longDesc","marginHeight","marginWidth"])
+    @mergeClass({src:'',srcdoc:'',name:'',sandbox:'',allowFullscreen:'',width:'',height:'',align:'',scrolling:'',frameBorder:'',longDesc:'',marginHeight:'',marginWidth:''})
     export class  VIframeElement extends VHtmlElement{
         nodeName="IFRAME";
         src:string

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["kind","src","srclang","label","default"])
+    @mergeClass({kind:'',src:'',srclang:'',label:'',default:''})
     export class  VTrackElement extends VHtmlElement{
         nodeName="TRACK";
         kind:string

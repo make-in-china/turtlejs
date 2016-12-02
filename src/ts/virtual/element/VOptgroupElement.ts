@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["disabled","label"])
+    @mergeClass({disabled:'',label:''})
     export class  VOptgroupElement extends VHtmlElement{
         nodeName="OPTGROUP";
         disabled:string

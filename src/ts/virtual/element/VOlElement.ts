@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["reversed","start","type","compact"])
+    @mergeClass({reversed:'',start:'',type:'',compact:''})
     export class  VOlElement extends VHtmlElement{
         nodeName="OL";
         reversed:string

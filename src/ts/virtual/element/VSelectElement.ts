@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["autofocus","disabled","multiple","name","required","size"])
+    @mergeClass({autofocus:'',disabled:'',multiple:'',name:'',required:'',size:''})
     export class  VSelectElement extends VHtmlElement{
         nodeName="SELECT";
         autofocus:string

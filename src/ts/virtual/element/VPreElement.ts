@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["width"])
+    @mergeClass({width:''})
     export class  VPreElement extends VHtmlElement{
         nodeName="PRE";
         width:string

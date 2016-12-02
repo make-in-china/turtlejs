@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["value","max"])
+    @mergeClass({value:'',max:''})
     export class  VProgressElement extends VHtmlElement{
         nodeName="PROGRESS";
         value:string

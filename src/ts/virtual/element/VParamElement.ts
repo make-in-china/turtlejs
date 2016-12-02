@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["name","value","type","valueType"])
+    @mergeClass({name:'',value:'',type:'',valueType:''})
     export class  VParamElement extends VHtmlElement{
         nodeName="PARAM";
         __closeSelf__=true;

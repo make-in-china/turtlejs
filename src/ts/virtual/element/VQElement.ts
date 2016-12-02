@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["cite"])
+    @mergeClass({cite:''})
     export class  VQElement extends VHtmlElement{
         nodeName="Q";
         cite:string

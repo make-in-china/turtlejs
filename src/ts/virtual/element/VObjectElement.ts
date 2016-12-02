@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "object", nodeType?: 1): VMElement.VObjectElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["type","name","useMap","width","height","align","archive","code","standby","codeType","border","title","lang","accessKey","webkitdropzone","id"])
+    @mergeClass({type:'',name:'',useMap:'',width:'',height:'',align:'',archive:'',code:'',standby:'',codeType:'',border:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VObjectElement extends VHtmlElement{
         nodeName="OBJECT"
         type:string

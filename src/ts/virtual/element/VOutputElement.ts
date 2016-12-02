@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["name"])
+    @mergeClass({name:''})
     export class  VOutputElement extends VHtmlElement{
         nodeName="OUTPUT";
         name:string

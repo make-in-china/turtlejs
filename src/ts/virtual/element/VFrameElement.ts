@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "frame", nodeType?: 1): VMElement.VFrameElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["name","scrolling","frameBorder","marginHeight","marginWidth","title","lang","accessKey","webkitdropzone","id"])
+    @mergeClass({name:'',scrolling:'',frameBorder:'',marginHeight:'',marginWidth:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VFrameElement extends VHtmlElement{
         nodeName="FRAME"
         __closeSelf__=true;

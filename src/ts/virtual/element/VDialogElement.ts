@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "dialog", nodeType?: 1): VMElement.VDialogElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["open"])
+    @mergeClass({open:''})
     export class  VDialogElement extends VHtmlElement{
         nodeName="DIALOG";
         open:string

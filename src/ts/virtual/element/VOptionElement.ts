@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["disabled","label","selected","value"])
+    @mergeClass({disabled:'',label:'',selected:'',value:''})
     export class  VOptionElement extends VHtmlElement{
         nodeName="OPTION";
         disabled:string

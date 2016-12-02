@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "circle", nodeType?: 1): VMElement.VCircleElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["title","lang","accessKey","webkitdropzone","id"])
+    @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VCircleElement extends VHtmlElement{
         nodeName="CIRCLE"
         title:string

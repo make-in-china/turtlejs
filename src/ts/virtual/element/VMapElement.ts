@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["name"])
+    @mergeClass({name:''})
     export class  VMapElement extends VHtmlElement{
         nodeName="MAP";
         __closeSelf__=true;

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["align"])
+    @mergeClass({align:''})
     export class  VLegendElement extends VHtmlElement{
         nodeName="LEGEND";
         align:string

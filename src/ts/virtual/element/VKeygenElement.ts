@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["autofocus","challenge","disabled","keytype","name"])
+    @mergeClass({autofocus:'',challenge:'',disabled:'',keytype:'',name:''})
     export class  VKeygenElement extends VHtmlElement{
         nodeName="KEYGEN";
         autofocus:string

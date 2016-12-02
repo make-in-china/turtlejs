@@ -4,7 +4,7 @@ interface IVNodeMethod{
     (nodeName: "a", nodeType?: 1): VMElement.VAElement&IVNodeMethod;
 }
 namespace VMElement{
-    @VAP.setA_P(["target", "download", "ping", "rel", "hreflang", "type", "coords", "charset", "name", "rev", "shape", "href"])
+    @mergeClass({target:'',download:'',ping:'',rel:'',hreflang:'',type:'',coords:'',charset:'',name:'',rev:'',shape:'',href:''})
     export class VAElement extends VHtmlElement{
         nodeName="A"
         target:string

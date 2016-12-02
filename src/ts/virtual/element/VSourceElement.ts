@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["src","type","srcset","sizes","media"])
+    @mergeClass({src:'',type:'',srcset:'',sizes:'',media:''})
     export class  VSourceElement extends VHtmlElement{
         nodeName="SOURCE";
         src:string

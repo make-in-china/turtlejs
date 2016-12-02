@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["align","vAlign"])
+    @mergeClass({align:'',vAlign:''})
     export class  VTfootElement extends VHtmlElement{
         nodeName="TFOOT";
         align:string

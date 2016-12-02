@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "col", nodeType?: 1): VMElement.VColElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["span","align","vAlign","width"])
+    @mergeClass({span:'',align:'',vAlign:'',width:''})
     export class  VColElement extends VHtmlElement{
         nodeName="COL";
         __closeSelf__=true;

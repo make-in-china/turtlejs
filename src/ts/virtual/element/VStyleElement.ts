@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["media","type"])
+    @mergeClass({media:'',type:''})
     export class  VStyleElement extends VHtmlElement{
         nodeName="STYLE";
         media:string

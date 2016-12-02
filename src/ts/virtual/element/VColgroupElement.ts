@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "colgroup", nodeType?: 1): VMElement.VColgroupElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["span","align","vAlign","width"])
+    @mergeClass({span:'',align:'',vAlign:'',width:''})
     export class  VColgroupElement extends VHtmlElement{
         nodeName="COLGROUP";
         span:string

@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["width","height","poster"])
+    @mergeClass({width:'',height:'',poster:''})
     export class  VVideoElement extends VHtmlElement{
         nodeName="VIDEO";
         width:string

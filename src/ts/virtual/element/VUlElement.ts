@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["compact","type"])
+    @mergeClass({compact:'',type:''})
     export class  VUlElement extends VHtmlElement{
         nodeName="UL";
         compact:string

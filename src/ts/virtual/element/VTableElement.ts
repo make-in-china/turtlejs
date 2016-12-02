@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["align","border","frame","rules","summary","width","bgColor","cellPadding","cellSpacing"])
+    @mergeClass({align:'',border:'',frame:'',rules:'',summary:'',width:'',bgColor:'',cellPadding:'',cellSpacing:''})
     export class  VTableElement extends VHtmlElement{
         nodeName="TABLE";
         align:string

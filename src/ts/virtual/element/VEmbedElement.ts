@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "embed", nodeType?: 1): VMElement.VEmbedElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["type","width","height","align","name","title","lang","accessKey","webkitdropzone","id"])
+    @mergeClass({type:'',width:'',height:'',align:'',name:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VEmbedElement extends VHtmlElement{
         nodeName="EMBED"
         type:string

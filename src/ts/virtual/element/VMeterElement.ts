@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["value","min","max","low","high","optimum"])
+    @mergeClass({value:'',min:'',max:'',low:'',high:'',optimum:''})
     export class  VMeterElement extends VHtmlElement{
         nodeName="METER";
         value:string

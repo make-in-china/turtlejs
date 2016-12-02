@@ -3,7 +3,7 @@ interface IVNodeMethod{
     (nodeName: "hr", nodeType?: 1): VMElement.VHrElement&IVNodeMethod
 }
 namespace VMElement{
-    @VAP.setA_P(["align","color","noShade","size","width"])
+    @mergeClass({align:'',color:'',noShade:'',size:'',width:''})
     export class VHrElement extends VHtmlElement{
         nodeName="HR";
         __closeSelf__=true;

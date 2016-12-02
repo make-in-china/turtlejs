@@ -4,7 +4,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["value","type"])
+    @mergeClass({value:'',type:''})
     export class  VLiElement extends VHtmlElement{
         nodeName="LI";
         value:string

@@ -5,7 +5,7 @@ interface IVNodeMethod{
 }
 
 namespace VMElement{
-    @VAP.setA_P(["src","type","charset","async","defer","crossOrigin","event","integrity"])
+    @mergeClass({src:'',type:'',charset:'',async:'',defer:'',crossOrigin:'',event:'',integrity:''})
     export class  VScriptElement extends VHtmlElement{
         nodeName="SCRIPT";
         src:string
