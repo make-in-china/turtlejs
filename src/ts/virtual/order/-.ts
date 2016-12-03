@@ -44,7 +44,7 @@ namespace Order {
         var:string
         propertyName:string
         expForGetObject:JS.JavaScriptStatement
-        constructor(node:IComment,condition:string){
+        constructor(node:VComment,condition:string){
             super(node,condition);
             let cdtn = splitByOnce(condition, ':');
             if (cdtn.length < 2){

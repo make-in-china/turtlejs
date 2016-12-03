@@ -20,7 +20,7 @@ namespace Order {
         }
         initStatement(){
             let data=this.data;
-            this.block=this.getBlock('var '+data.condition);
+            this.block=this.getBlock('var '+this.condition);
         }
         getBlock(condition:string):JS.JavaScriptBlock{
             return JS.Parser.parseStructor(condition);

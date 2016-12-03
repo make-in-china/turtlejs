@@ -4,14 +4,12 @@
 namespace Order {
     export interface IOrderDataFor extends IOrderDataBlock{
         forMode: JS.EForMode;
-        
         forStepInfo: {
             first: string|[string,string|undefined,boolean][]
             exec: string
             step: string
             isFirst: boolean
         }
-        
         forInInfo: {
             source: any
             var: string
@@ -61,7 +59,10 @@ namespace Order {
                 throw new Error("错误的for表达式！");
             }
         }
-        static run(data:IOrderDataBlock){
+        run(){
+            For.run(this.data);
+        }
+        static run(data:IOrderDataFor){
             super.run(data,canRepeat);
         }
     }

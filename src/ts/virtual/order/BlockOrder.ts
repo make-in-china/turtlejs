@@ -15,8 +15,8 @@ namespace Order {
     }
     export abstract class BlockOrder extends VOrder {
         data: IOrderDataBlock
-        endNode: IComment
-        constructor(node: IComment, condition: string, orderName: string,isBlockStart:(subOrder: string) => boolean) {
+        endNode: VComment
+        constructor(node: VComment, condition: string, orderName: string,isBlockStart:(subOrder: string) => boolean) {
             super(node, condition);
             let data = this.data;
             this.data.isBlockStart=isBlockStart;
@@ -60,7 +60,7 @@ namespace Order {
 
 
 
-    function parseOrders(this:void,data:IOrderDataBlock,array:INode[]|INodeList,run:boolean,fn?:(node:IComment,subOrder:string,condition:string,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
+    function parseOrders(this:void,data:IOrderDataBlock,array:INode[]|INodeList,run:boolean,fn?:(node:VComment,subOrder:string,condition:string,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
         return VOrder.eachOrder(array, (node,info, state)=> {
             
             if (info.order) {
@@ -88,19 +88,19 @@ namespace Order {
         }, beginIndex);
     }
     
-    function runOrder(this:void,info: ICommentOrderInfo, node: IComment): VOrder|null {
+    function runOrder(this:void,info: ICommentOrderInfo, node: VComment): VOrder|null {
         let orderName: string = <string>info.order;
 
         if (orderName in orders) {
             let order=new orders[orderName](node,info.condition);
-            if(order.run&&canRunAtService(order)){
+            if(order.run&&OrderEx.canRunAtService(order)){
                 order.run();
             }
             return order;
         }
         return null;
     }
-    function parseBlock(this:void,info: ICommentOrderInfo, node: IComment): BlockOrder|null {
+    function parseBlock(this:void,info: ICommentOrderInfo, node: VComment): BlockOrder|null {
         let orderName: string = <string>info.order;
 
         if (orderName in orders) {
@@ -112,7 +112,7 @@ namespace Order {
         return null;
     }
     export function parseBreakOrder(this:void,data: IOrderDataBlock,blocks:INode[],p:INode){
-        parseOrders(data,blocks,true,(node:IComment,subOrder,condition,step)=>{
+        parseOrders(data,blocks,true,(node:VComment,subOrder,condition,step)=>{
             if(subOrder==='break'){
                 data.isBreak=true;
                 //级联删除break后面的数据直至当前层；

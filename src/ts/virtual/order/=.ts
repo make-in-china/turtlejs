@@ -3,12 +3,16 @@
 namespace Order {
     /**运行并插入返回的节点 */
     export interface IOrderDataEqual extends IOrderData{
-        placeholder:VNode
+        condition:string
     }
     @register
     export class Equal extends VOrder {
         static orderName = "="
         data:IOrderDataEqual
+        constructor(node:VComment,condition:string){
+            super(node,condition);
+            this.data.condition=condition;
+        }
         run(){
             Equal.run(this.data);
         }

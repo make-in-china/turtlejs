@@ -1,7 +1,7 @@
 
 /// <reference path='RepeatBlockOrder.ts'/>
 namespace Order {
-    export interface IOrderDataDo extends IOrderDataBlock{
+    export interface IOrderDataDo extends IOrderDataWhile{
         isFirst:boolean
     }
     @register
@@ -11,6 +11,7 @@ namespace Order {
         constructor(node: VComment, condition: string) {
             super(node, condition,'do');
             this.data.isFirst=true;
+            this.data.condition=condition;
         }
         static run(data:IOrderDataDo){
             super.run(data,canRepeat);

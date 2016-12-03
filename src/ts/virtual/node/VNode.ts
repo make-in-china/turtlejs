@@ -123,10 +123,10 @@ abstract class VNode implements INode{
     insertBefore2(this:  VNode&IVNodeMethod, newNode:  VNode&IVNodeMethod, node:  VNode&IVNodeMethod):  VNode&IVNodeMethod{
         return this.insertBefore(newNode,node);
     }
-    remove(this:VNode&IVNodeMethod){
+    remove(){
         let p=this.parentNode;
         if(p){
-            p.removeChild(this);
+            p.removeChild(<any>this);
         }
     }
     removeChild(this:  VNode&IVNodeMethod, vNode: VNode&IVNodeMethod): VNode&IVNodeMethod {
@@ -351,6 +351,14 @@ function bindClassToFunction(node:IVNodeMethod & VNode,nodeName: string, nodeTyp
         node.__proto__=VMember.prototype;
         (<any>VMember).call(node,nodeName);
 
+    }else if(nodeType===ENodeType.Script){
+        node.__proto__=VScript.prototype;
+        (<any>VScript).call(node,nodeName);
+
+    }else if(nodeType===ENodeType.PlaceHolder){
+        node.__proto__=VPlaceHolder.prototype;
+        (<any>VPlaceHolder).call(node,nodeName);
+
     }else if(nodeType===ENodeType.DocumentType){
         node.__proto__=VDocumentType.prototype;
         (<any>VDocumentType).call(node);
@@ -406,13 +414,15 @@ function bindClassToFunction(node:IVNodeMethod & VNode,nodeName: string, nodeTyp
     }
 }
 function getVNodeMethod():VNode&IVNodeMethod{
-    let that=<any>function(nodeName: string, nodeType?: ENodeType|undefined):IVNodeMethod & VNode{
+    let VNode=<any>function(nodeName: string, nodeType?: ENodeType|undefined):IVNodeMethod & VNode{
         let fn=getVNodeMethod()
         bindClassToFunction(fn,nodeName,nodeType);
-        that.appendChild(fn);
+        VNode.appendChild(fn);
         return fn;
     }
-    return that;
+    delete VNode.name;
+    delete VNode.arguments;
+    return VNode;
 }
 let VNodeHelp:IVNodeMethod=<any>function(nodeName: string, nodeType?: ENodeType|undefined):VNode&IVNodeMethod{
     let that=getVNodeMethod()

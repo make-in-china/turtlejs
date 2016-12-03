@@ -10,7 +10,7 @@ namespace Order {
         data:IOrderDataScope
         initBlock(){
             let data=this.data;
-            let conditionArr=splitByOnce(data.condition,":");
+            let conditionArr=splitByOnce(this.condition,":");
             data.scopeName=conditionArr[0];
             if(conditionArr.length===2){
                 this.block=this.getBlock(conditionArr[1]);

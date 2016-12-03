@@ -10,8 +10,7 @@ namespace Order {
             this.init();
         }
         init(){
-
-            this.block=JS.Parser.parseStructor(this.data.condition);
+            this.block=JS.Parser.parseStructor(this.condition);
         }
         run(){
             Script.run(this.data);

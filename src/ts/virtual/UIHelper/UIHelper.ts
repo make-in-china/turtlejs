@@ -77,14 +77,13 @@ class UIHelper{
                 //解析注释里的命令
                 try{
                     let order=Order.parseComment(node);
-                    debugger;
                     if(order&&order.run){
-                        if(Order.canRunAtService(order)){
-                            //参数完整，运行
+                        if(OrderEx.canRunAtService(order)){
+                            //order运行所需达成，运行
                             order.run();
                         }else{
-                            //参数不完整，输出js
-                            Order.toJS(order);
+                            //order运行所需未达成，转换为VScript
+                            OrderEx.toScriptNode(order);
                         }
                     };
                 }catch(e){
@@ -113,7 +112,7 @@ class UIHelper{
             let refNode:VElement&IVNodeMethod=<any>refInfo[1];
             let p=refNode.parentNode;
             if(p){
-                p.insertBefore($$$(name,20),refNode);
+                p.insertBefore($$$(name,ENodeType.Member),refNode);
                 p.removeChild(refNode);
             }
         }

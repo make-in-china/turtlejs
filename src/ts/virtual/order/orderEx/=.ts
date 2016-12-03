@@ -1,22 +1,19 @@
 
 /// <reference path='VOrder.ts'/>
 /// <reference path='../=.ts'/>
-namespace Order {
-    extendsOrderFunction(Equal,EXFunction.tryRun,function(this:Equal){
+namespace OrderEx {
+    extendsOrderFunction(Order.Equal,tryRun,function(this:Order.Equal){
         let data=this.data;
-        test(data.placeholder, data.condition);
+        Order.test(data.placeholder, data.condition);
     });
 
-    extendsOrderFunction(Equal,EXFunction.toJS,function(this:Equal){
+    extendsOrderFunction(Order.Equal,replaceToScriptNode,function(this:Order.Equal){
         //生成中间数据  的  生成代码
         
         let data=this.data;
-        return `(function(this:VScript){
-            let data={
+        return `(Order.Equal.run({
                 condition:'${data.condition}',
                 placeholder:this
-            }; 
-            Order.Equal.run(data);
-        },ENodeType.Script).run()`;
+            });`;
     });
 }

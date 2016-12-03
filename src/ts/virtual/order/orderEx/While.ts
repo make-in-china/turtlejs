@@ -1,26 +1,23 @@
 
 /// <reference path='VOrder.ts'/>
 /// <reference path='../While.ts'/>
-namespace Order {
-    extendsOrderFunction(While,EXFunction.tryRun,function(this:While){
+namespace OrderEx {
+    extendsOrderFunction(Order.While,tryRun,function(this:Order.While){
         let data=this.data;
-        test(data.placeholder, data.condition);
+        Order.test(data.placeholder, data.condition);
     });
 
-    extendsOrderFunction(While,EXFunction.toJS,function(this:While){
+    extendsOrderFunction(Order.While,replaceToScriptNode,function(this:Order.While){
         //生成中间数据  的  生成代码
         
         let data=this.data;
         let blocks=getBlocksDataString(data);
-        return `(function(this:VScript){
-            let data={
+        return `Order.While.run({
                 condition:'${data.condition}',
                 isBlockStart:Order.RepeatBlockOrder.isBlockStart,
                 placeholder:this,
                 isBreak:false,
                 blocks:[${blocks.join(',')}]
-            }; 
-            Order.While.run(data);
-        },ENodeType.Script).run()`;
+            });`;
     });
 }

@@ -21,7 +21,7 @@ namespace VMElement{
     }
     function setA_PToClassPrototype(constructor:typeof VMElement.VHtmlElement){
         let prototype=constructor.prototype;
-        let clazzSuperPrototype=VMElement.VHtmlElement.prototype;
+        let clazzSuperPrototype=(<typeof VMElement.VHtmlElement><any>prototype).prototype;//这里只是让后面的比较正常,类型并不准
         for(const name of apNames){
             Object.defineProperty(prototype,name,{
                 get:function(this:VMElement.VHtmlElement):string{

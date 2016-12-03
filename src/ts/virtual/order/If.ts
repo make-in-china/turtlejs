@@ -1,12 +1,20 @@
 
 /// <reference path='BlockOrder.ts'/>
 namespace Order {
+
+    
+    export interface IOrderDataIf extends IOrderDataBlock {
+        condition:string
+    }
+
     @register
     export class If extends BlockOrder {
         static orderName = "if"
         static subOrder=["else if","else"];
+        data:IOrderDataIf
         constructor(node: VComment, condition: string) {
             super(node, condition,'if',If.isBlockStart);
+            this.data.condition=condition;
         }
 
         static isBlockStart(subOrder:string):boolean{
@@ -20,7 +28,7 @@ namespace Order {
         run() {
             If.run(this.data);
         }
-        static run(data:IOrderDataBlock){
+        static run(this:void,data:IOrderDataIf){
 
             let hit=-1;
             if( parseBool(exec(data.placeholder, data.condition))){

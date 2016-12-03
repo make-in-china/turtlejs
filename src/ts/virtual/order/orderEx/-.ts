@@ -1,8 +1,8 @@
 
 /// <reference path='VOrder.ts'/>
 /// <reference path='../-.ts'/>
-namespace Order {
-    extendsOrderFunction(BindExpressions,EXFunction.tryRun,function(this:BindExpressions){
+namespace OrderEx {
+    extendsOrderFunction(Order.BindExpressions,tryRun,function(this:Order.BindExpressions){
         
         //绑定有可能的变故有：
         //获取变量出错
