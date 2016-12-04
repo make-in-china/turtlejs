@@ -13,11 +13,15 @@ namespace OrderEx {
         
         let data=this.data;
         let blocks=getBlocksDataString(data);
-        return `Order.Switch.run({
-                isBlockStart:Order.If.isBlockStart,
-                placeholder:this,
-                isBreak:false,
-                blocks:[${blocks.join(',')}]
-            });`;
+        return `
+    Order.Switch.run({
+        condition:'${data.condition}',
+        placeholder:this,
+        isBreak:false,
+        blocks:[
+            ${blocks.join(`,
+            `)}]
+    });
+`;
     });
 }

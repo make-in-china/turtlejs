@@ -1,6 +1,5 @@
 
-/// <reference path='../node/VNode.ts'/>
-
+/// <reference path='VNode.ts'/>
 interface IVNodeMethod{
     (nodeName: string, nodeType: ENodeType.PlaceHolder): VPlaceHolder&IVNodeMethod;
 }

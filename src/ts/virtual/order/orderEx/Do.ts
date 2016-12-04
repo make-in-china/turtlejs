@@ -17,12 +17,12 @@ namespace OrderEx {
         return `
     Order.Do.run({
         condition:'${data.condition}',
-        isBlockStart:Order.RepeatBlockOrder.isBlockStart,
         placeholder:this,
         isBreak:false,
         blocks:[
             ${blocks.join(`,
             `)}]
-    });`;
+    });
+`;
     });
 }

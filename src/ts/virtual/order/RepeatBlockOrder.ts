@@ -4,7 +4,7 @@ namespace Order {
     
     export abstract class RepeatBlockOrder extends BlockOrder {
         constructor(node: VComment, condition: string, orderName: string) {
-            super(node,condition,orderName,isBlockStart);
+            super(node,condition,orderName,RepeatBlockOrder.isBlockStart);
         }
         static run(data:IOrderDataBlock,canRepeat:(data:IOrderDataBlock)=>boolean){
             if(canRepeat(data)){
@@ -12,10 +12,9 @@ namespace Order {
             }
             data.placeholder.remove();
         }
-    }
-
-    function isBlockStart(subOrder:string):boolean{
-        return subOrder==='end'
+        static isBlockStart(subOrder:string):boolean{
+            return subOrder==='end'
+        }
     }
     function parseRepeatBlock(this:void,data:IOrderDataBlock,canRepeat:(data:IOrderDataBlock)=>boolean){
         let nodes=data.blocks[0].nodes;

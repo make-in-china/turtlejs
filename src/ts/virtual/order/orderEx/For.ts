@@ -39,12 +39,12 @@ namespace OrderEx {
         forStepInfo:${forStepInfo},
         forInInfo:${forInInfo},
         forMode:${data.forMode},
-        isBlockStart:Order.RepeatBlockOrder.isBlockStart,
         placeholder:this,
         isBreak:false,
         blocks:[
             ${blocks.join(`,
             `)}]
-    });`;
+    });
+`;
     });
 }

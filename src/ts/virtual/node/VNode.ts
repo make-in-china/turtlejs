@@ -50,7 +50,23 @@ abstract class VNode implements INode{
     abstract nodeName: string;
     readonly childNodes: VNodeList=new VNodeList;
     parentNode: VNode&IVNodeMethod | null;
-
+    /**
+     * 用自身做环境调用函数,并返回自身
+     */
+    useThisCall(this: VNode&IVNodeMethod,fn:(node:VNode)=>void): VNode&IVNodeMethod{
+        fn.call(this);
+        return this;
+    }
+    /**
+     * 添加子节点，并返回子节点
+     */
+    $$(this: VNode&IVNodeMethod, vNode: VNode&IVNodeMethod): VNode&IVNodeMethod{
+        this.appendChild(vNode);
+        return vNode;
+    }
+    /**
+     * 返回父节点，如果无，返回自己
+     */
     get $(): VElement&IVNodeMethod{
         let p=this.parentNode;
         this.vmData.isClose=true;
@@ -87,6 +103,10 @@ abstract class VNode implements INode{
     append(this: VNode, name: string, nodeType: ENodeType): VNode&IVNodeMethod {
         return this.doAppendChild($$$(name, nodeType));
     }
+
+    /**
+     * 添加子节点，并返回子节点
+     */
     appendChild(this: VNode, vNode: VNode&IVNodeMethod): VNode&IVNodeMethod {
         let idx =Array.prototype.indexOf.call(this.childNodes,vNode);
         if (idx === -1) {

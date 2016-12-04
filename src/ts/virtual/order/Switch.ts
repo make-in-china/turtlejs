@@ -1,14 +1,23 @@
 
 /// <reference path='BlockOrder.ts'/>
 namespace Order {
+
+    
+    export interface IOrderDataSwitch extends IOrderDataBlock {
+        condition:string
+    }
+
+
     @register
     export class Switch extends BlockOrder {
         static orderName = "switch"
         static subOrder=["case","default"];
+        data:IOrderDataSwitch
         constructor(node: VComment, condition: string) {
             super(node, condition,'switch',Switch.isBlockStart);
+            this.data.condition=condition;
         }
-        protected static isBlockStart(subOrder:string):boolean{
+        static isBlockStart(subOrder:string):boolean{
             switch (subOrder) {
                 case 'case':
                 case 'default':
@@ -19,7 +28,7 @@ namespace Order {
         run(){
             Switch.run(this.data);
         }
-        static run(data:IOrderDataBlock){
+        static run(data:IOrderDataSwitch){
             
             let hit=-1
             let blocks=data.blocks;

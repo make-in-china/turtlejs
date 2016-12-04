@@ -1,5 +1,7 @@
 
 /// <reference path='VDOM.ts'/>
+/// <reference path='VMember.ts'/>
+/// <reference path='VScript.ts'/>
 /// <reference path='../../lib/TreeEach.ts'/>
 /// <reference path='../../lib/is.ts'/>
 /// <reference path='./VElementHelper.ts'/>
@@ -72,6 +74,7 @@ class UIHelper{
             tops=[dom];
         }
         let refs:[string,VMElement.VHtmlElement][]=[];
+        let scripts:VScript[]=[];
         treeEach(<VNode[]>chds,"childNodes",(node,state)=>{
             if(node instanceof VComment){
                 //解析注释里的命令
@@ -102,25 +105,32 @@ class UIHelper{
                     node.removeAttribute("ref");
                 }
                 //解析class
+            }else if(node instanceof VScript){
+                scripts.push(node);
             }
         });
+
         let propertys:string[]=[];
-        let propertyNames:string[]=[];
-        for(let i=refs.length-1;i>=0;i--){
-            let refInfo=refs[i];
-            let name=refInfo[0];
-            let refNode:VElement&IVNodeMethod=<any>refInfo[1];
-            let p=refNode.parentNode;
-            if(p){
-                p.insertBefore($$$(name,ENodeType.Member),refNode);
-                p.removeChild(refNode);
-            }
+        
+        for(let i=scripts.length-1;i>=0;i--){
+            let script=scripts[i];
+            let p=<VElement&IVNodeMethod>scripts[i].parentNode;
+            let name='orderScript_'+i;
+            script.propertyName=name;
+            // p.insertBefore($$$(`('',${ENodeType.PlaceHolder}).useThisCall(`+name,ENodeType.Member),script);
+            // p.removeChild(script);
+            propertys.push(name+`=${script.toFunction()};`);
         }
+
+        let propertyNames:string[]=[];
         let propertyInitScript:{[index:string]:string}={};
         for(let i=refs.length-1;i>=0;i--){
             let refInfo=refs[i];
             let name=refInfo[0];
-            let refNode=refInfo[1];
+            let refNode:VElement&IVNodeMethod=<any>refInfo[1];
+            let p=<VElement&IVNodeMethod>refNode.parentNode;
+            p.insertBefore($$$(name,ENodeType.Member),refNode);
+            p.removeChild(refNode);
             propertyNames.push(name);
             propertys.push(name+':'+this.toClassName(refNode));
             propertyInitScript[name]=`this.${name}=<any>${refNode.toJSString()};`;
@@ -131,15 +141,13 @@ class UIHelper{
             topsJS.push(top.toJSString());
             topsType.push(this.toClassName(top));
         }
-        let domInitScript:string;
+        let domInitScript:string='';
         if(topsJS.length>0){
             propertys.push('tops:['+topsType.join('\n,')+'];');
-            domInitScript=`
+            domInitScript+=`
             push.call(this.tops,<any>[
                     ${topsJS.join(',\n                    ')}
             ]);`;
-        }else{
-            domInitScript='';
         }
         let propertyInfo:string=propertys.join(';\n        ');
         for(const name of propertyNames){

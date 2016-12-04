@@ -5,8 +5,7 @@ namespace Order {
     export interface IOrderDataBlock extends IOrderData {
         isBreak: boolean
         placeholder: VPlaceHolder
-        blocks: IOrderBlock[];
-        isBlockStart: (subOrder: string) => boolean
+        blocks: IOrderBlock[]
     }
     export interface IOrderBlock {
         order: string
@@ -19,7 +18,6 @@ namespace Order {
         constructor(node: VComment, condition: string, orderName: string,isBlockStart:(subOrder: string) => boolean) {
             super(node, condition);
             let data = this.data;
-            this.data.isBlockStart=isBlockStart;
             data.blocks = [];
             let i = getNodeIndex2(node);
             // let orderStack:VOrder[]=[this];
@@ -27,7 +25,7 @@ namespace Order {
             let preNode = node;
             let preCondition = condition;
             let blockNodes:INode[]=[];
-            parseOrders(data, (<INode>node.parentNode).childNodes, false, (node, subOrder, condition, state) => {
+            parseOrders(data,isBlockStart, (<INode>node.parentNode).childNodes, false, (node, subOrder, condition, state) => {
                 switch (subOrder) {
                     case 'end':
                         blockNodes.push(preNode);
@@ -60,7 +58,7 @@ namespace Order {
 
 
 
-    function parseOrders(this:void,data:IOrderDataBlock,array:INode[]|INodeList,run:boolean,fn?:(node:VComment,subOrder:string,condition:string,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
+    function parseOrders(this:void,data:IOrderDataBlock,isBlockStart: (subOrder: string) => boolean,array:INode[]|INodeList,run:boolean,fn?:(node:VComment,subOrder:string,condition:string,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
         return VOrder.eachOrder(array, (node,info, state)=> {
             
             if (info.order) {
@@ -80,7 +78,7 @@ namespace Order {
             }
             if(fn){
                 let subOrder=<string>info.subOrder;
-                if(subOrder==='end'||data.isBlockStart(subOrder)){
+                if(subOrder==='end'||isBlockStart(subOrder)){
                     return fn(node,subOrder,info.condition,state);
                 }
             }
@@ -111,8 +109,8 @@ namespace Order {
         }
         return null;
     }
-    export function parseBreakOrder(this:void,data: IOrderDataBlock,blocks:INode[],p:INode){
-        parseOrders(data,blocks,true,(node:VComment,subOrder,condition,step)=>{
+    export function parseBreakOrder(this:void,data: IOrderDataBlock,isBlockStart: (subOrder: string) => boolean,blocks:INode[],p:INode){
+        parseOrders(data,isBlockStart,blocks,true,(node:VComment,subOrder,condition,step)=>{
             if(subOrder==='break'){
                 data.isBreak=true;
                 //级联删除break后面的数据直至当前层；

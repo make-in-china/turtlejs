@@ -4,8 +4,6 @@
 /// <reference path='../node/VComment.ts'/>
 /// <reference path='../node/VDocumentType.ts'/>
 /// <reference path='../node/VDocument.ts'/>
-/// <reference path='VMember.ts'/>
-/// <reference path='VScript.ts'/>
 
 /// <reference path='../element/VAElement.ts'/>
 /// <reference path='../element/VAreaElement.ts'/>
@@ -86,3 +84,4 @@
 /// <reference path='../element/VCircleElement.ts'/>
 /// <reference path='../element/VHeaderElement.ts'/>
 /// <reference path='../element/VFooterElement.ts'/>
+
