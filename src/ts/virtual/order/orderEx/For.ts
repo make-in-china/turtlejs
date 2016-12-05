@@ -3,8 +3,13 @@
 /// <reference path='../For.ts'/>
 namespace OrderEx {
     extendsOrderFunction(Order.For,tryRun,function(this:Order.For){
+        //只测试输入条件，不测试后期循环过程的变化
         let data=this.data;
         if (data.forMode === JS.EForMode.In) {
+            
+            if(data.forInInfo.var){
+                Order.testSetValue(data.placeholder,data.forInInfo.var,undefined);
+            }
             Order.test(data.placeholder, data.forInInfo.object)
         } else {
             
@@ -24,27 +29,26 @@ namespace OrderEx {
         let blocks=getBlocksDataString(data);
         let forStepInfo='';
         if(data.forStepInfo){
-            forStepInfo=JSON.stringify(data.forStepInfo);
+            forStepInfo=`{first:'${data.forStepInfo.first}',exec:'${data.forStepInfo.exec}',step:'${data.forStepInfo.step}'}`
         }else{
             forStepInfo='undefined';
         }
         let forInInfo='';
         if(data.forInInfo){
-            forInInfo=JSON.stringify(data.forInInfo);
+            forInInfo=`{object:'${data.forInInfo.object},names:'${data.forInInfo.names.join("','")}',var:'${data.forInInfo.var}'}`
         }else{
             forInInfo='undefined';
         }
         return `
-    Order.For.run({
-        forStepInfo:${forStepInfo},
-        forInInfo:${forInInfo},
-        forMode:${data.forMode},
-        placeholder:this,
-        isBreak:false,
-        blocks:[
-            ${blocks.join(`,
-            `)}]
-    });
+        Order.For.run({
+            forStepInfo:${forStepInfo},
+            forInInfo:${forInInfo},
+            forMode:${data.forMode},
+            placeholder:this,
+            blocks:[
+                ${blocks.join(`,
+                `)}]
+        });
 `;
     });
 }

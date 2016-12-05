@@ -6,12 +6,15 @@ namespace VMElement{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VBasefontElement extends VHtmlElement{
         nodeName="BASEFONT"
-        __closeSelf__=true;
         title:string
         lang:string
         accessKey:string
         webkitdropzone:string
         id:string
+        constructor(){
+            super();
+            this.vmData.closeSelf=true;
+        }
         
     }
     

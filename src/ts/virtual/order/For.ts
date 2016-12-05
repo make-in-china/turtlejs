@@ -2,21 +2,30 @@
 /// <reference path='RepeatBlockOrder.ts'/>
 /// <reference path='../javascript/logic/For.ts'/>
 namespace Order {
-    export interface IOrderDataFor extends IOrderDataBlock{
-        forMode: JS.EForMode;
+    export interface IOrderDataForIn extends IOrderDataBlock{
+        forInInfo: {
+            var: string
+            object: string
+            names: string[]
+        }
+    }
+    export interface IOrderDataForStep extends IOrderDataBlock{
         forStepInfo: {
             first: string|[string,string|undefined,boolean][]
             exec: string
             step: string
-            isFirst: boolean
         }
-        forInInfo: {
-            source: any
-            var: string
-            object: string
-            names: string[]
-            index: number
-        }
+    }
+    export interface IOrderDataFor extends IOrderDataForIn,IOrderDataForStep{
+        forMode: JS.EForMode;
+    }
+    
+    interface IOrderDataForInRun extends IOrderDataForIn{
+        index:number
+        source:any
+    }
+    interface IOrderDataForStepRun extends IOrderDataForStep{
+        isFirst:boolean
     }
 
     @register
@@ -34,9 +43,7 @@ namespace Order {
                     this.data.forInInfo = {
                         var: infoForIn.hasVar?infoForIn.varName:'',
                         object:infoForIn.bindingExp.toString(),
-                        names: [],
-                        source: null,
-                        index: 0
+                        names: []
                     }
                 }else{
                     let infoForStep:JS.IInfoForStep=<JS.IInfoForStep>info;
@@ -51,8 +58,7 @@ namespace Order {
                     this.data.forStepInfo = {
                         first: first,
                         exec: infoForStep.exec.toString(),
-                        step: infoForStep.step.toString(),
-                        isFirst: true
+                        step: infoForStep.step.toString()
                     }
                 }
             }else{
@@ -63,13 +69,26 @@ namespace Order {
             For.run(this.data);
         }
         static run(data:IOrderDataFor){
-            super.run(data,canRepeat);
+            
+            if (data.forMode === JS.EForMode.In) {
+                let runData:IOrderDataForInRun=<any>data;
+                runData.index=0
+                runData.source=null;
+                super.run(runData,canRepeat);
+            } else {
+                let runData:IOrderDataForStepRun=<any>data;
+                runData.isFirst=true
+                super.run(runData,canRepeat);
+            }
         }
     }
-    function checkForStep(this:void,data:IOrderDataFor): boolean {
+
+
+
+    function checkForStep(this:void,data:IOrderDataForStepRun): boolean {
         let forStepInfo=data.forStepInfo
-        if (forStepInfo.isFirst) {
-            forStepInfo.isFirst = false;
+        if (data.isFirst) {
+            data.isFirst = false;
             if(isString( forStepInfo.first)){
                 exec(data.placeholder, forStepInfo.first);
             }else{
@@ -80,28 +99,28 @@ namespace Order {
         }
         return exec(data.placeholder, forStepInfo.exec);
     }
-    function initForInSourceData(this:void,data:IOrderDataFor): boolean {
+    function initForInSourceData(this:void,data:IOrderDataForInRun): boolean {
         let forInInfo=data.forInInfo
-        if (!forInInfo.source) {
-            forInInfo.source = exec(data.placeholder, forInInfo.object);
-            if (!forInInfo.source) {
+        if (!data.source) {
+            data.source = exec(data.placeholder, forInInfo.object);
+            if (!data.source) {
                 return false;
             }
-            for (let i in forInInfo.source) {
+            for (let i in data.source) {
                 forInInfo.names.push(i);
             }
         }
         return true
     }
-    function checkForIn(this:void,data:IOrderDataFor): boolean {
+    function checkForIn(this:void,data:IOrderDataForInRun): boolean {
         if (!initForInSourceData(data)) {
             throw new Error("计算出错！");
         }
         let forInInfo=data.forInInfo
         
-        if (forInInfo.index < forInInfo.names.length) {
-            exec(data.placeholder, forInInfo.var + '=\'' + forInInfo.names[forInInfo.index] + '\';');
-            forInInfo.index++;
+        if (data.index < forInInfo.names.length) {
+            exec(data.placeholder, forInInfo.var + '=\'' + forInInfo.names[data.index] + '\';');
+            data.index++;
             return true
         } else {
             return false
@@ -109,9 +128,9 @@ namespace Order {
     }
     function canRepeat(this:void,data:IOrderDataFor):boolean{
         if (data.forMode === JS.EForMode.In) {
-            return checkForIn(data);
+            return checkForIn(<any>data);
         } else {
-            return checkForStep(data);
+            return checkForStep(<any>data);
         }
     }
 }

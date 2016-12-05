@@ -6,9 +6,11 @@ namespace VMElement{
     @mergeClass({clear:''})
     export class  VBrElement extends VHtmlElement{
         nodeName="BR";
-        __closeSelf__=true;
         clear:string;
-        
+        constructor(){
+            super();
+            this.vmData.closeSelf=true;
+        }
     }
     
 }

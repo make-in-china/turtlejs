@@ -29,7 +29,7 @@ abstract class VElement extends VNode{
             return <any>this;
         }
     }
-    _(this:VElement&IVNodeMethod,name: string, value?: string): VElement&IVNodeMethod{
+    _(this:VElement&IVNodeMethod,name:string,value?:string): VElement&IVNodeMethod{
         this.setAttribute(name, value?value:"");
         return this;
     }

@@ -6,11 +6,14 @@ namespace VMElement{
     @mergeClass({span:'',align:'',vAlign:'',width:''})
     export class  VColElement extends VHtmlElement{
         nodeName="COL";
-        __closeSelf__=true;
         span:string
         align:string
         vAlign:string
         width:string
+        constructor(){
+            super();
+            this.vmData.closeSelf=true;
+        }
         
     }
     

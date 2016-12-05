@@ -7,9 +7,12 @@ namespace VMElement{
     @mergeClass({name:''})
     export class  VMapElement extends VHtmlElement{
         nodeName="MAP";
-        __closeSelf__=true;
         name:string
         
+        constructor(){
+            super();
+            this.vmData.closeSelf=true;
+        }
     }
     
 }

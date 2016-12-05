@@ -3,9 +3,11 @@
 /// <reference path='Break.ts'/>
 namespace Order {
     export interface IOrderDataBlock extends IOrderData {
-        isBreak: boolean
         placeholder: VPlaceHolder
         blocks: IOrderBlock[]
+    }
+    export interface IOrderDataBlockRun extends IOrderDataBlock {
+        isBreak:boolean
     }
     export interface IOrderBlock {
         order: string
@@ -47,7 +49,7 @@ namespace Order {
             for (const blockNode of blockNodes) {
                 (<IHTMLElement>blockNode.parentNode).removeChild(blockNode);
             }
-            data.placeholder = $$$("", ENodeType.PlaceHolder);
+            data.placeholder = $$$("PlaceHolder", ENodeType.PlaceHolder);
             replaceNodeByNode(this.endNode, data.placeholder);
         }
 
@@ -109,14 +111,15 @@ namespace Order {
         }
         return null;
     }
-    export function parseBreakOrder(this:void,data: IOrderDataBlock,isBlockStart: (subOrder: string) => boolean,blocks:INode[],p:INode){
+    export function parseBreakOrder(this:void,data: IOrderDataBlockRun,isBlockStart: (subOrder: string) => boolean,blocks:INode[],p:INode){
         parseOrders(data,isBlockStart,blocks,true,(node:VComment,subOrder,condition,step)=>{
             if(subOrder==='break'){
                 data.isBreak=true;
                 //级联删除break后面的数据直至当前层；
                 let node1:INode=node;
                 let pNode=<INode>node.parentNode;
-                while(node1!==p){
+                let level=step.stack.length/2;
+                while(level>1){
                     let cs=pNode.childNodes;
                     let length=cs.length;
                     let index=getNodeIndex2(node1)+1;
@@ -126,6 +129,11 @@ namespace Order {
                     }
                     node1=pNode;
                     pNode=<INode>pNode.parentNode;
+                    level--;
+                }
+                for(var i=step.currentIndex+1;i<blocks.length;i++){
+                    // pNode=<INode>blocks[i].parentNode;
+                    pNode.removeChild(blocks[i]);
                 }
                 node.remove();
                 return eTreeEach.c_stopEach;

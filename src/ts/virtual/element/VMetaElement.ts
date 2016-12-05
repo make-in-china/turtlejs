@@ -7,11 +7,14 @@ namespace VMElement{
     @mergeClass({name:'',content:'',scheme:''})
     export class  VMetaElement extends VHtmlElement{
         nodeName="META";
-        __closeSelf__=true;
         name:string
         content:string
         scheme:string
         
+        constructor(){
+            super();
+            this.vmData.closeSelf=true;
+        }
     }
     
 }

@@ -7,7 +7,6 @@ namespace VMElement{
     @mergeClass({disabled:'',href:'',crossOrigin:'',rel:'',media:'',hreflang:'',type:'',charset:'',rev:'',target:'',integrity:''})
     export class  VLinkElement extends VHtmlElement{
         nodeName="LINK";
-        __closeSelf__=true;
         disabled:string
         href:string
         crossOrigin:string
@@ -20,6 +19,10 @@ namespace VMElement{
         target:string
         integrity:string
         
+        constructor(){
+            super();
+            this.vmData.closeSelf=true;
+        }
     }
     
 }

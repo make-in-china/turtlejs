@@ -6,7 +6,6 @@ namespace VMElement{
     @mergeClass({name:'',scrolling:'',frameBorder:'',marginHeight:'',marginWidth:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VFrameElement extends VHtmlElement{
         nodeName="FRAME"
-        __closeSelf__=true;
         name:string
         scrolling:string
         frameBorder:string
@@ -17,6 +16,10 @@ namespace VMElement{
         accessKey:string
         webkitdropzone:string
         id:string
+        constructor(){
+            super();
+            this.vmData.closeSelf=true;
+        }
         
     }
     

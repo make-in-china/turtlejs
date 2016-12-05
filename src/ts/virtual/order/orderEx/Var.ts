@@ -18,10 +18,11 @@ namespace OrderEx {
                 varInfos.push(`['${varInfo[0]}',${varInfo[1]},${varInfo[2]}]`);
             }
         }
-        return `Order.Var.run({
-                placeholder:this,
-                varInfos:[${varInfos.join(',')}]
-            });`;
+        return `
+        Order.Var.run({
+            placeholder:this,
+            varInfos:[${varInfos.join(',')}]
+        });`;
     });
 }
             

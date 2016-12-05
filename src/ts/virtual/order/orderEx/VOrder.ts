@@ -34,8 +34,8 @@ namespace OrderEx {
 
     export function canRunAtService(order:Order.VOrder):boolean{
         try{
-            if(tryRun in this){
-                this[tryRun]();
+            if(tryRun in order){
+                order[tryRun]();
             }
             Order.resetTest();
             return true;

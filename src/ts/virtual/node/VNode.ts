@@ -50,13 +50,7 @@ abstract class VNode implements INode{
     abstract nodeName: string;
     readonly childNodes: VNodeList=new VNodeList;
     parentNode: VNode&IVNodeMethod | null;
-    /**
-     * 用自身做环境调用函数,并返回自身
-     */
-    useThisCall(this: VNode&IVNodeMethod,fn:(node:VNode)=>void): VNode&IVNodeMethod{
-        fn.call(this);
-        return this;
-    }
+    
     /**
      * 添加子节点，并返回子节点
      */
@@ -198,7 +192,7 @@ abstract class VNode implements INode{
                 case '__events__':
                 case '__isClose__':
                 case 'vmData.domNode':
-                case "__closeSelf__":
+                // case "__closeSelf__":
                 case '__proto__':
                 case 'children':
                 case 'childNodes':

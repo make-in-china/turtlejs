@@ -17,30 +17,30 @@
 /// <reference path='../order/-.ts'/>
 /// <reference path='../order/Script.ts'/>
 /// <reference path='../order/orderEx/Index.ts'/>
+/// <reference path='UIHelper.template.ts'/>
+/// <reference path='RefInfo.ts'/>
 
-class UIHelper{
-    static fs=typeof require!== "undefined"&&require('fs');
+namespace UIHelper{
+    let fs=typeof require!== "undefined"&&require('fs');
     
-    static buildProject(className:string,path:string){
-        if(!this.fs.existsSync(path)){
-            this.fs.mkdirSync(path);
+    export function buildProject(this:void,className:string,path:string){
+        if(!fs.existsSync(path)){
+            fs.mkdirSync(path);
         }
         
         let htmlPath=path+'/View.html';
         let classPath=path+'/Class.ts';
         let scriptPath=path+'/Script.ts';
-        // let viewPath=path+'/View.ts';
         className=className[0].toUpperCase()+className.substr(1).toLowerCase();
-        this.fs.writeFileSync(htmlPath,
+        fs.writeFileSync(htmlPath,
 `<div>
     <div ref="${className}"></div>
 </div>`);
-        this.fs.writeFileSync(classPath,this.getClassString(className));
-        this.fs.writeFileSync(scriptPath,this.getScriptString(className));
-        this.makeClass(htmlPath,className);
-        // this.fs.writeFileSync(viewPath,this.template.view.replace(/\{\{className\}\}/g,className).replace('{{propertyInfo}}','tops:[]'));
+        fs.writeFileSync(classPath,getClassString(className));
+        fs.writeFileSync(scriptPath,getScriptString(className));
+        makeClass(htmlPath,className);
     }
-    static toClassName(node:VNode):string{
+    function toClassName(this:void,node:VNode):string{
         if(isVComment(node)){
             return "VComment&IVNodeMethod"
         }else if(isVText(node)){
@@ -54,12 +54,12 @@ class UIHelper{
         }
     }
     
-    static makeClass(path:string,className?:string){
+    export function makeClass(this:void,path:string,className?:string){
         if(!className){
             className=path.match(/[\s\S]*[\/\\](.*?)[\/\\].*?$/)[1];
         }
         className=className[0].toUpperCase()+className.substr(1).toLowerCase();
-        let html=this.fs.readFileSync(path);
+        let html=fs.readFileSync(path);
         if(!isString(html)){
             html=html.toString();
         }
@@ -73,7 +73,8 @@ class UIHelper{
             chds=dom.childNodes;
             tops=[dom];
         }
-        let refs:[string,VMElement.VHtmlElement][]=[];
+
+        let refInfo=new RefInfo;
         let scripts:VScript[]=[];
         treeEach(<VNode[]>chds,"childNodes",(node,state)=>{
             if(node instanceof VComment){
@@ -82,10 +83,10 @@ class UIHelper{
                     let order=Order.parseComment(node);
                     if(order&&order.run){
                         if(OrderEx.canRunAtService(order)){
-                            //order运行所需达成，运行
+                            //order达成运行所需条件，运行
                             order.run();
                         }else{
-                            //order运行所需未达成，转换为VScript
+                            //order达成运行所需未条件，转换为VScript节点
                             OrderEx.toScriptNode(order);
                         }
                     };
@@ -96,12 +97,17 @@ class UIHelper{
                 //解析命令
             }
         });
+
+
+
         treeEach(<VNode[]>chds,"childNodes",(node,state)=>{
             if(node instanceof VMElement.VHtmlElement){
                 //解析ref
                 let v=node.getAttribute("ref");
                 if(v){
-                    refs.push([v,node]);
+                    debugger;
+                    refInfo.push(v,<any>node);
+                    // refs.push([v,node]);
                     node.removeAttribute("ref");
                 }
                 //解析class
@@ -110,38 +116,67 @@ class UIHelper{
             }
         });
 
-        let propertys:string[]=[];
-        
+        let scriptFunctions:string='';
         for(let i=scripts.length-1;i>=0;i--){
             let script=scripts[i];
             let p=<VElement&IVNodeMethod>scripts[i].parentNode;
-            let name='orderScript_'+i;
+            let name='order'+i;
             script.propertyName=name;
-            // p.insertBefore($$$(`('',${ENodeType.PlaceHolder}).useThisCall(`+name,ENodeType.Member),script);
-            // p.removeChild(script);
-            propertys.push(name+`=${script.toFunction()};`);
+            scriptFunctions+='\n    '+script.toFunction();
         }
 
-        let propertyNames:string[]=[];
+        let propertys:string[]=[];
+        let names:string[]=[];
+        let vars:string[]=[];
         let propertyInitScript:{[index:string]:string}={};
-        for(let i=refs.length-1;i>=0;i--){
-            let refInfo=refs[i];
-            let name=refInfo[0];
-            let refNode:VElement&IVNodeMethod=<any>refInfo[1];
-            let p=<VElement&IVNodeMethod>refNode.parentNode;
-            p.insertBefore($$$(name,ENodeType.Member),refNode);
-            p.removeChild(refNode);
-            propertyNames.push(name);
-            propertys.push(name+':'+this.toClassName(refNode));
-            propertyInitScript[name]=`this.${name}=<any>${refNode.toJSString()};`;
+
+                    debugger;
+        for(const info of refInfo.data){
+            if(info.refs.length>1){
+                //缓存parent;
+                let refParent=info.refParent;
+                let parentName=RefInfo.getRefParentName(info.refs);
+                for(const ref of info.refs){
+                    let name=ref.name;
+                    let refNode:VElement&IVNodeMethod=ref.node;
+                    let mem=$$$(name,ENodeType.Member);
+                    mem.isVar=true;
+                    refParent.insertBefore(mem,refNode);
+                    refNode.remove();
+                    names.push(name);
+                    propertys.push(name+':'+toClassName(refNode));
+                    propertyInitScript[name]=`this.${name}=<any>${refNode.toJSString()};`;
+                }
+                let p=<VElement&IVNodeMethod>refParent.parentNode;
+                p.insertBefore($$$(parentName,ENodeType.Member),<any>refParent);
+                p.removeChild(<any>refParent);
+                names.push(parentName);
+                vars.push(parentName+':'+toClassName(refParent));
+                propertyInitScript[parentName]=`${parentName}=<any>${refParent.toJSString()};`;
+            }else{
+                //只拆一次
+                let refInfo=info.refs[0];
+                let name=refInfo.name;
+                let refNode:VElement&IVNodeMethod=<any>refInfo.node;
+                let p=<VElement&IVNodeMethod>refNode.parentNode;
+                p.insertBefore($$$(name,ENodeType.Member),refNode);
+                p.removeChild(refNode);
+                names.push(name);
+                propertys.push(name+':'+toClassName(refNode));
+                propertyInitScript[name]=`this.${name}=<any>${refNode.toJSString()};`;
+            }
         }
         let topsJS:string[]=[];
         let topsType:string[]=[];
         for(const top of tops){
             topsJS.push(top.toJSString());
-            topsType.push(this.toClassName(top));
+            topsType.push(toClassName(top));
         }
         let domInitScript:string='';
+        for(const name of names){
+            domInitScript+='\n            '+propertyInitScript[name];
+        }
+        
         if(topsJS.length>0){
             propertys.push('tops:['+topsType.join('\n,')+'];');
             domInitScript+=`
@@ -150,68 +185,26 @@ class UIHelper{
             ]);`;
         }
         let propertyInfo:string=propertys.join(';\n        ');
-        for(const name of propertyNames){
-            domInitScript+='\n            '+propertyInitScript[name];
-        }
-        this.fs.writeFileSync(path.replace(/View\.html$/,'View.ts'),this.getViewString(className,propertyInfo,domInitScript));
+        let varInfo:string=vars.join(';\n            ');
+        fs.writeFileSync(path.replace(/View\.html$/,'View.ts'),getViewString(className,propertyInfo,varInfo,domInitScript,scriptFunctions));
         
         //mixin .css  to  变量
     }
 
+    function getMakeClassError(path:string,node:IComment,message:string,state:ITreeEachState<INode>):string{
+        let stack=state.stack;
+        let strStack='    at '+path+'\n';
+        for(let i=0;i<stack.length;i+=2){
+            let arr:INode[]=<INode[]>stack[i];
+            let index:number=<number>stack[i+1];
+            let info:string[]=[];
+            strStack='    at childNodes.'+index+':'+arr[index].nodeName+'\n'+strStack;
+        }
+        strStack='    at childNodes.'+state.currentIndex+':'+node.data+'\n'+strStack;
+        
+        return 'Error:'+message+'\n'+strStack;
+    }
 
-
-    static getScriptString(className:string){
-        return `namespace ComponentScript{
-    export class ${className}{
-        constructor(part:Component.${className}){
-            part.dom.initDOM();
-        }
-    }
-}`
-    }
-    static getViewString(className:string,propertyInfo:string,domInitScript:string){
-        return `/// <reference path="../../../dest/virtual/UIHelper.0.1.d.ts"/>
-namespace ComponentView{
-    export class ${className}{
-        ${propertyInfo}
-        initDOM(){${domInitScript}
-        }
-    }
-}`
-    }
-    static getClassString(className:string){
-        return `/// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
-/// <reference path="./Script.ts"/>
-namespace Component{
-    export class ${className} extends Part{
-        constructor(
-            template:PartTemplate,
-            props:Object,
-            html:string,
-            public outerChildNodes:INode[],
-            public outerElement:IHTMLCollection
-        ) {
-            super(template,props,html,outerChildNodes,outerElement);
-            new ComponentScript.${className}(this);
-        }
-        dom=new ComponentView.${className}
-    }
-}`
-    }
 }
 typeof exports!=="undefined"&&(exports.UIHelper=UIHelper);
 
-
-function getMakeClassError(path:string,node:IComment,message:string,state:ITreeEachState<INode>):string{
-    let stack=state.stack;
-    let strStack='    at '+path+'\n';
-    for(let i=0;i<stack.length;i+=2){
-        let arr:INode[]=<INode[]>stack[i];
-        let index:number=<number>stack[i+1];
-        let info:string[]=[];
-        strStack='    at childNodes.'+index+':'+arr[index].nodeName+'\n'+strStack;
-    }
-    strStack='    at childNodes.'+state.currentIndex+':'+node.data+'\n'+strStack;
-    
-    return 'Error:'+message+'\n'+strStack;
-}

@@ -5,11 +5,11 @@ interface IVNodeMethod{
 class VScript extends VPlaceHolder{
     nodeName="#script"
     toJS():string{
-        return `('',${ENodeType.PlaceHolder}).useThisCall(this.${this.propertyName}).$`;
+        return `('',ENodeType.PlaceHolder).__(${this.propertyName})`;
     }
     propertyName:string
     toFunction():string{
-        return `function(this:VPlaceHolder){${this.data}
-}`;
+        return `function ${this.propertyName}(this:VPlaceHolder){${this.data}
+    }`;
     }
 }

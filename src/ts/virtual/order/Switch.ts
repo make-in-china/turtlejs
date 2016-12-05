@@ -32,6 +32,8 @@ namespace Order {
             
             let hit=-1
             let blocks=data.blocks;
+            let runData:IOrderDataBlockRun=<any>data;
+            runData.isBreak=false;
             for(let i=1;i<blocks.length;i++){
                 let block=blocks[i];
                 if (block.order==='default'|| exec(data.placeholder, data.condition)===exec(data.placeholder, data.condition)) {
@@ -44,12 +46,13 @@ namespace Order {
                     }
                     insertNodesBefore(data.placeholder , block.nodes);
                     let p=data.placeholder.parentNode;
-                    parseBreakOrder(data,block.nodes,<INode>p);
-                    if(data.isBreak){
+                    parseBreakOrder(runData,this.isBlockStart,block.nodes,<INode>p);
+                    if(runData.isBreak){
                         break;
                     }
                 }
             }
+            data.placeholder.remove();
         }
     }
 }

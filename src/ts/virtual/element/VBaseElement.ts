@@ -6,10 +6,12 @@ namespace VMElement{
     @mergeClass({href:'',target:''})
     export class  VBaseElement extends VHtmlElement{
         nodeName="BASE";
-        __closeSelf__=true;
         href:string
         target:string
-        
+        constructor(){
+            super();
+            this.vmData.closeSelf=true;
+        }
     }
     
 }

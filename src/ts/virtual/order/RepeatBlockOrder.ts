@@ -8,7 +8,9 @@ namespace Order {
         }
         static run(data:IOrderDataBlock,canRepeat:(data:IOrderDataBlock)=>boolean){
             if(canRepeat(data)){
-                parseRepeatBlock(data,canRepeat);
+                let runData:IOrderDataBlockRun=<any>data;
+                runData.isBreak=false;
+                parseRepeatBlock(runData,canRepeat);
             }
             data.placeholder.remove();
         }
@@ -16,7 +18,7 @@ namespace Order {
             return subOrder==='end'
         }
     }
-    function parseRepeatBlock(this:void,data:IOrderDataBlock,canRepeat:(data:IOrderDataBlock)=>boolean){
+    function parseRepeatBlock(this:void,data:IOrderDataBlockRun,canRepeat:(data:IOrderDataBlock)=>boolean){
         let nodes=data.blocks[0].nodes;
         let cloneBlocks:INode[]=[];
         for(var i=0;i<nodes.length;i++){
@@ -25,7 +27,7 @@ namespace Order {
         insertNodesBefore(data.placeholder , cloneBlocks);
         let p=data.placeholder.parentNode;
         //执行order
-        parseBreakOrder(data,cloneBlocks,<INode>p);
+        parseBreakOrder(data,RepeatBlockOrder.isBlockStart,cloneBlocks,<INode>p);
         if(!data.isBreak&&canRepeat(data)){
             parseRepeatBlock(data,canRepeat);
         }

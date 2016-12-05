@@ -68,7 +68,7 @@ class VText extends VCharacterData{
         //     }
         //     return "";
         // });
-        return `(${s},${ENodeType.Text}).$`;
+        return `(${s},ENodeType.Text).$`;
     }
     toHTMLString(): string[] {
         return [this.__value__];

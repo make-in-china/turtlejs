@@ -7,7 +7,6 @@ namespace VMElement{
     @mergeClass({alt:'',src:'',srcset:'',sizes:'',crossOrigin:'',useMap:'',isMap:'',width:'',height:'',name:'',lowsrc:'',align:'',hspace:'',vspace:'',longDesc:'',border:''})
     export class  VImgElement extends VHtmlElement{
         nodeName="IMG";
-        __closeSelf__=true;
         alt:string
         src:string
         srcset:string
@@ -25,6 +24,10 @@ namespace VMElement{
         longDesc:string
         border:string
         
+        constructor(){
+            super();
+            this.vmData.closeSelf=true;
+        }
     }
     
 }

@@ -7,7 +7,6 @@ namespace VMElement{
     @mergeClass({accept:'',alt:'',autocomplete:'',autofocus:'',checked:'',dirName:'',disabled:'',formAction:'',formEnctype:'',formMethod:'',formNoValidate:'',formTarget:'',height:'',max:'',maxLength:'',min:'',minLength:'',multiple:'',name:'',pattern:'',placeholder:'',readOnly:'',required:'',size:'',src:'',step:'',type:'',value:'',width:'',align:'',useMap:'',autocapitalize:'',webkitdirectory:'',incremental:''})
     export class  VInputElement extends VHtmlElement{
         nodeName="INPUT";
-        __closeSelf__=true;
         accept:string
         alt:string
         autocomplete:string
@@ -42,7 +41,10 @@ namespace VMElement{
         autocapitalize:string
         webkitdirectory:string
         incremental:string
-        
+        constructor(){
+            super();
+            this.vmData.closeSelf=true;
+        }
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation():void{
             this.setBridgeGetSet("value");

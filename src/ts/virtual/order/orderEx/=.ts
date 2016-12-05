@@ -11,9 +11,10 @@ namespace OrderEx {
         //生成中间数据  的  生成代码
         
         let data=this.data;
-        return `(Order.Equal.run({
-                condition:'${data.condition}',
-                placeholder:this
-            });`;
+        return `
+        Order.Equal.run({
+            condition:'${data.condition}',
+            placeholder:this
+        });`;
     });
 }

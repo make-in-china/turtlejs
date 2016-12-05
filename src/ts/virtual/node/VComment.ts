@@ -36,6 +36,13 @@ class VComment extends VCharacterData{
     set textContent(s:string) {
         this.data=s
     }
+    /**
+     * 用自身做环境调用函数,并返回父
+     */
+    __(fn:(node:VNode)=>void): VElement&IVNodeMethod{
+        fn.call(this)
+        return <VElement&IVNodeMethod>this.parentNode;
+    }
     toJS():string{
         let s ='`'+ this.data+'`';
         // s = s.replace(/[\'\"\r\n]/g, function (s: string) {
@@ -50,7 +57,7 @@ class VComment extends VCharacterData{
         //     }
         //     return "";
         // });
-        return `(${s},${ENodeType.Comment}).$`;
+        return `(${s},ENodeType.Comment).$`;
     }
     toHTMLString(): string[] {
         let
