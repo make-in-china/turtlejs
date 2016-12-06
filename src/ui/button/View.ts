@@ -10,36 +10,39 @@ namespace ComponentView{
         tops:[VMElement.VDivElement&IVNodeMethod];
         initDOM(){
             
-            this.panel=<any>$$$("div")
-    ("input")._("type")._("name")._("value")
-        ("input")._("type")._("name")._("value").$.$;
-            this.ok=<any>$$$("input")._("type")._("name")._("value")
-    ("input")._("type")._("name")._("value").$;
-            this.cancel=<any>$$$("input")._("type")._("name")._("value");
+            this.cancel=<any>$$$("input");
+            this.cancel._("type")._("name")._("value");
+            this.ok=<any>$$$("input");
+            this.ok._("type")._("name")._("value");
+            this.panel=<any>$$$("div");
+            
+            this.panel
+                    .$$$(this.ok)
+                    .$$$(this.cancel);
             push.call(this.tops,<any>[
                     $$$("div")
-.$.$$(this.panel).$
-(`
+                    .$$$(this.panel)
+                    (`
     
     可完整预编译的例子
     `,ENodeType.Text).$
-(`0`,ENodeType.Text).$
-(`1`,ENodeType.Text).$
-(`2`,ENodeType.Text).$
-(`3`,ENodeType.Text).$
-(`4`,ENodeType.Text).$
-(`
+                    (`0`,ENodeType.Text).$
+                    (`1`,ENodeType.Text).$
+                    (`2`,ENodeType.Text).$
+                    (`3`,ENodeType.Text).$
+                    (`4`,ENodeType.Text).$
+                    (`
 
     不可完整预编译的例子，只能生成中间数据（xx未定义）
     `,ENodeType.Text).$
 ('',ENodeType.PlaceHolder).__(order0)
-(`
+                    (`
 
 
     可完整预编译的例子
     `,ENodeType.Text).$
-(`case x===555`,ENodeType.Text).$
-(`
+                    (`case x===555`,ENodeType.Text).$
+                    (`
 
 
     不可完整预编译的例子，只能生成中间数据（xx未定义）

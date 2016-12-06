@@ -315,12 +315,12 @@ class Part extends EventEmitterEx {
             /*cut scope*/
             let scopeNodes = this.scopeNodes;
             for (let i = 0; i < scopeNodes.length; i++) {
-                DOMScope.unlink(scopeNodes[i].scope);
+                DOMScope.unlink(<Scope>scopeNodes[i].__scope__);
             }
             appendNodes(elems, elem);
             /*link scope*/
             for (let i = 0; i < scopeNodes.length; i++) {
-                DOMScope.link(scopeNodes[i].scope, elem);
+                DOMScope.link(<Scope>scopeNodes[i].__scope__, elem);
             }
             this.$online.emit(this, elem);
         } else {
@@ -328,7 +328,7 @@ class Part extends EventEmitterEx {
             /*link scope*/
             let scopeNodes = this.scopeNodes;
             for (let i = 0; i < scopeNodes.length; i++) {
-                DOMScope.link(scopeNodes[i].scope, elem);
+                DOMScope.link(<Scope>scopeNodes[i].__scope__, elem);
             }
             this.$online.emit(this, elem);
             this.isInDOM = true;
@@ -346,12 +346,12 @@ class Part extends EventEmitterEx {
             /*cut scope*/
             let scopeNodes = this.scopeNodes;
             for (let i = 0; i < scopeNodes.length; i++) {
-                DOMScope.unlink(scopeNodes[i].scope);
+                DOMScope.unlink(<Scope>scopeNodes[i].__scope__);
             }
             insertNodesBefore(elem, elems);
             /*link scope*/
             for (let i = 0; i < scopeNodes.length; i++) {
-                DOMScope.link(scopeNodes[i].scope, elem);
+                DOMScope.link(<Scope>scopeNodes[i].__scope__, elem);
             }
             this.$online.emit(this, elem);
         } else {
@@ -359,7 +359,7 @@ class Part extends EventEmitterEx {
             /*link scope*/
             let scopeNodes = this.scopeNodes;
             for (let i = 0; i < scopeNodes.length; i++) {
-                DOMScope.link(scopeNodes[i].scope, elem);
+                DOMScope.link(<Scope>scopeNodes[i].__scope__, elem);
             }
             this.$online.emit(this, elem);
             // this.basePart.isInsert=true;
@@ -377,7 +377,7 @@ class Part extends EventEmitterEx {
             let scopeNodes = this.scopeNodes;
             /*cut scope*/
             for (let i = 0; i < scopeNodes.length; i++) {
-                DOMScope.unlink(scopeNodes[i].scope);
+                DOMScope.unlink(<Scope>scopeNodes[i].__scope__);
             }
             let p = this.refs.begin.parentNode;
             if (p !== null) {

@@ -43,21 +43,11 @@ class VComment extends VCharacterData{
         fn.call(this)
         return <VElement&IVNodeMethod>this.parentNode;
     }
-    toJS():string{
-        let s ='`'+ this.data+'`';
-        // s = s.replace(/[\'\"\r\n]/g, function (s: string) {
-        //     switch (s) {
-        //         case '\'':
-        //         case '\"':
-        //             return '\\' + s;
-        //         case '\r':
-        //             return '\\r';
-        //         case '\n':
-        //             return '\\n';
-        //     }
-        //     return "";
-        // });
-        return `(${s},ENodeType.Comment).$`;
+    toCreateJS(space:number=0):string{
+        return (new Array(space+1)).join(" ")+'(`'+ this.__value__+'`,ENodeType.Comment)';
+    }
+    toJS(space:number=0):string{
+        return this.toCreateJS(space)+'.$';
     }
     toHTMLString(): string[] {
         let

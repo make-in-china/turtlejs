@@ -54,21 +54,12 @@ class VText extends VCharacterData{
     set value(s:string) {
         this.data=s
     }
-    toJS():string{
-        let s ='`'+ this.__value__+'`';
-        // s = s.replace(/[\'\"\r\n]/g, function (s: string) {
-        //     switch (s) {
-        //         case '\'':
-        //         case '\"':
-        //             return '\\' + s;
-        //         case '\r':
-        //             return '\\r';
-        //         case '\n':
-        //             return '\\n';
-        //     }
-        //     return "";
-        // });
-        return `(${s},ENodeType.Text).$`;
+    
+    toCreateJS(space:number=0):string{
+        return (new Array(space+1)).join(" ")+'(`'+ this.__value__+'`,ENodeType.Text)';
+    }
+    toJS(space:number=0):string{
+        return this.toCreateJS(space)+'.$';
     }
     toHTMLString(): string[] {
         return [this.__value__];

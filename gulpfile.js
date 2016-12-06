@@ -1,22 +1,11 @@
 ﻿
 var gulp = require('gulp');
 var fs=require('fs');
-var ts = require('gulp-typescript');
 var moment=require('moment');
 var sourcemaps = require('gulp-sourcemaps');
+var ts = require('gulp-typescript');
 var merge = require('merge2');  // Requires separate installation
 function tsc(event){
-    // var tsResult=gulp.src('src/ts/index.ts')
-    //     .pipe(ts({
-    //         target: 'es5',//把typescript转换成es5标准的js文件,也可以是es6,但这个node版本不支持
-    //         outFile:'js/turtle.0.1.js',
-    //         "declaration": true
-    //         })
-    //     );
-    //     // tsResult.pipe(sourcemaps.init()).pipe(sourcemaps.write('../maps', {addComment: false}))
-    //  merge([
-    //      tsResult.js.pipe(gulp.dest('dest')),
-    //      tsResult.dts.pipe(gulp.dest('dest'))])   
          
     var tsResult=gulp.src('src/ts/virtual/UIHelper/UIHelper.ts')
         .pipe(sourcemaps.init())
@@ -31,6 +20,20 @@ function tsc(event){
          tsResult.js.pipe(gulp.dest('dest')),
          tsResult.dts.pipe(gulp.dest('dest'))])
          
+}
+function tsc2(event){
+    
+    var tsResult=gulp.src('src/ts/index.ts')
+        .pipe(ts({
+            target: 'es5',//把typescript转换成es5标准的js文件,也可以是es6,但这个node版本不支持
+            outFile:'js/turtle.0.1.js',
+            "declaration": true
+            })
+        );
+        // tsResult.pipe(sourcemaps.init()).pipe(sourcemaps.write('../maps', {addComment: false}))
+     merge([
+         tsResult.js.pipe(gulp.dest('dest')),
+         tsResult.dts.pipe(gulp.dest('dest'))])   
 }
 function ui(path,name){
     var tsResult=gulp.src(path+'/Class.ts')
@@ -61,14 +64,35 @@ function tscui(event){
         })(0);  
     });   
 }
-function uibuild(path){
+function uibuildTs(path){
     console.log('\n['+moment().format("HH:mm:ss")+']\n'+path.replace(/html$/,'ts'));
     var UIHelper=require('./dest/virtual/UIHelper.0.1.js').UIHelper;
     UIHelper.makeClass(path);
 }
+function uibuildJs(path){
+    var jsPath=path.replace(/ts$/,'js');
+    var name=path.match(/[\s\S]*[\/\\](.*?)[\/\\].*?$/)[1];
+    console.log('\n['+moment().format("HH:mm:ss")+']\n'+jsPath);
+    var tsResult=gulp.src(path.replace(/Script\.ts$/,'Class.ts'))
+        .pipe(sourcemaps.init())
+        .pipe(ts({
+            target: 'es5',//把typescript转换成es5标准的js文件,也可以是es6,但这个node版本不支持
+            outFile:'./dest/ui/'+name+'/index.js',
+            experimentalDecorators:true,
+            "declaration": true
+            })
+        );
+     merge([
+         tsResult.js.pipe(gulp.dest('dest')),
+         tsResult.dts.pipe(gulp.dest('dest'))])
+}
 function uiwatch(event){
-    gulp.watch('src/ui/**/*.html', function(event){
-        uibuild(event.path);
+    gulp.watch(['src/ui/**/*.html','src/ui/**/Script.ts'], function(event){
+        console.log(event);
+        debugger;
+        // uibuildTs(event.path);
+        
+        // uibuildJs(event.path);
     });
 }
 function buildProjects(event){
@@ -82,6 +106,7 @@ function buildProjects(event){
 }
 
 gulp.task('tsc', tsc);
+gulp.task('tsc2', tsc2);
 gulp.task('tscui',tscui);
 gulp.task('ui:w',uiwatch);
 gulp.task('project',buildProjects);

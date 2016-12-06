@@ -1,6 +1,19 @@
 
 /// <reference path="../lib/ArrayEx.ts"/>
-/// <reference path="INamedNodeMap.ts"/>
+
+interface INamedNodeMap{
+    [index:number]:IAttr
+    indexOfName(name:string)
+    indexOf(o:any) 
+    getNamedItem(name:string):IAttr|null
+    //getNamedItemNS: getNamedItemNS()
+    item(index:number):IAttr|undefined 
+    readonly length:number
+    removeNamedItem(v:string|Object)
+    //removeNamedItemNS: removeNamedItemNS()
+    setNamedItem(arg:IAttr)
+    //setNamedItemNS: setNamedItemNS()
+}
 
 interface IExp{
     (...arg):any

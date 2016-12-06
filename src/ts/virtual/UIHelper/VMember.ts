@@ -5,7 +5,7 @@ interface IVNodeMethod{
 class VMember extends VPlaceHolder{
     nodeName="#member"
     isVar:boolean=false
-    toJS():string{
-        return `.$.$$(${this.isVar?"":"this."}${this.data}).$`;
+    toJS(space:number=0):string{
+        return (new Array(space+1)).join(" ")+`.$$$(${this.isVar?"":"this."}${this.data})`;
     }
 }

@@ -37,7 +37,7 @@ class BasePath{
         return this.paths.hasOwnProperty(sortPath);
     }
     toString(){
-        var arr=[];
+        var arr:string[]=[];
         for(var i in this.paths){
             arr.push("{name:'"+this.paths[i].name+"',path:'"+this.paths[i].path+"'}")
         }
@@ -45,14 +45,15 @@ class BasePath{
     }
 }
 class TemplateConfig{
-    ["XMP"]         ={};
-    ["TEMPLATE"]    ={};
-    ["TITLE"]       ={getData:function(node:IHTMLTitleElement):string{return node.innerText;}};
-    ["STYLE"]       ={xmp:undefined};
-    ["SCRIPT"]      ={xmp:undefined};
-    ["TEXTAREA"]    ={xmp:undefined,getData:function(node:IHTMLTextAreaElement):string{return node.defaultValue;}};
+    [index:string]:Object
+    XMP         ={};
+    TEMPLATE    ={};
+    TITLE       ={getData:function(node:IHTMLTitleElement):string{return node.innerText;}};
+    STYLE       ={xmp:undefined};
+    SCRIPT      ={xmp:undefined};
+    TEXTAREA    ={xmp:undefined,getData:function(node:IHTMLTextAreaElement):string{return node.defaultValue;}};
     toString(){
-        let arr=[];
+        let arr:string[]=[];
         let desc:string;
         for(let i in this){
             if(!this.hasOwnProperty(i)){
@@ -67,8 +68,8 @@ class TemplateConfig{
         }
         return arr.join("\n");
     }
-    get items():Array<NameItem>{
-        let items=[];
+    get items():NameItem[]{
+        let items:NameItem[]=[];
         for(let i in this){
             if(!this.hasOwnProperty(i)){
                 continue;
@@ -84,7 +85,7 @@ class TemplateConfig{
             return ;
         }
         let ts=this.items;
-        let regExes=[];
+        let regExes:string[]=[];
         for(let i=0;i<ts.length;i++){
             let s='(<'+ts[i].name;
             if(ts[i].hasOwnProperty('xmp')){

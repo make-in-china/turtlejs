@@ -1,8 +1,7 @@
 /// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
 /// <reference path="./View.ts"/>
-/// <reference path="./Script.ts"/>
 namespace Component{
-    export class Button extends Part{
+    export class Button{
         constructor(
             template:PartTemplate,
             props:Object,
@@ -10,7 +9,7 @@ namespace Component{
             public outerChildNodes:INode[],
             public outerElement:IHTMLCollection
         ) {
-            super(template,props,html,outerChildNodes,outerElement);
+            // super(template,props,html,outerChildNodes,outerElement);
             new ComponentScript.Button(this);
         }
         dom=new ComponentView.Button

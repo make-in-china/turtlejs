@@ -8,9 +8,10 @@
 
 
 function _getBindObject(scope:Scope, arrNames: Array<string>) {
-    let i, obj, length = arrNames.length;;
-    while (scope) {
-        obj = scope;
+    let i:number, obj:Scope, length:number = arrNames.length;
+    let temp:Scope|null=scope;
+    while (temp) {
+        obj = temp;
         for (i = 0; i < length; i++) {
             if (obj.hasOwnProperty(arrNames[i])) {
                 if (i < length - 1) {
@@ -21,7 +22,7 @@ function _getBindObject(scope:Scope, arrNames: Array<string>) {
                 }
             }
         }
-        scope = scope.__parent__;
+        temp = temp.__parent__;
     }
 
     obj = window[arrNames[0]];
@@ -58,7 +59,7 @@ function removeBind(obj:Object, name:string, targetName:string): boolean {
         return false;
     }
     let bindInfoHash = obj.__bind__;
-    for (let i in bindInfoHash) {
+    for (let i=0;i<bindInfoHash.length;i++) {
         if (bindInfoHash[i].name === name && bindInfoHash[i].targetName === targetName) {
             if (bindInfoHash.length == 1) {
                 bindInfoHash.length = 0;

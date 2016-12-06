@@ -1,6 +1,6 @@
-/// <reference path="../lib/is.ts"/>
-/// <reference path="IAttr.ts"/>
-class INamedNodeMap{
+/// <reference path="../../lib/is.ts"/>
+/// <reference path="../../lib/IAttr.ts"/>
+class VNamedNodeMap{
     [index:number]:IAttr
     private _length:number=0;
     indexOfName(name:string) {
@@ -81,4 +81,18 @@ class INamedNodeMap{
         }
     }
     //setNamedItemNS: setNamedItemNS()
+    toJS():string{
+        let sAttr:string= '';
+        if (this.length > 0) {
+            for (let i = 0; i < this.length; i++) {
+                sAttr += '._("' + this[i].name;
+                if (this[i].value) {
+                    sAttr += '","' + this[i].value + '")';
+                } else {
+                    sAttr += '")';
+                }
+            }
+        }
+        return sAttr;
+    }
 }

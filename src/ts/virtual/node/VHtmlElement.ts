@@ -141,23 +141,11 @@ namespace VMElement{
             }
             return elem;
         }
-        toJS(space:number=0):string{
-            let sSpace=(new Array(space+1)).join(" ");
-            let sFn=sSpace+`("${this.nodeName.toLowerCase()}")`;
-            let sAttr="";
+        toCreateJS(space:number=0):string{
+            return (new Array(space+1)).join(" ")+`("${this.nodeName.toLowerCase()}")`;
+        }
+        childNodesToJS(space:number=0):string{
             let sInner="";
-            let attrs = this.attributes;
-            if (attrs.length > 0) {
-                sAttr = '';
-                for (let i = 0; i < attrs.length; i++) {
-                    sAttr += '._("' + attrs[i].name;
-                    if (attrs[i].value) {
-                        sAttr += '","' + attrs[i].value + '")';
-                    } else {
-                        sAttr += '")';
-                    }
-                }
-            }
             if(this.vmData.closeSelf){
                 sInner='.$';
             }else{
@@ -170,9 +158,12 @@ namespace VMElement{
                 }
                 if(this.parentNode){
                     sInner+='.$';
-                }
+                } 
             }
-            return sFn+sAttr+sInner;
+            return sInner;
+        }
+        toJS(space:number=0):string{
+            return this.toCreateJS(space)+this.attributes.toJS()+this.childNodesToJS(space);
         }
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation():void{

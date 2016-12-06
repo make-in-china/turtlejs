@@ -5,7 +5,7 @@ interface VElementVMData extends VNodeVMData{
 }
 abstract class VElement extends VNode{
     vmData:VElementVMData
-    attributes:INamedNodeMap=new INamedNodeMap;
+    attributes:VNamedNodeMap=new VNamedNodeMap;
     style: VStyle=new VStyle(this);
     children=new VHTMLCollection();
     constructor(){

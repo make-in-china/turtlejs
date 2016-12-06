@@ -1,6 +1,6 @@
 
 /// <reference path='TemplateConfig.ts'/>
-/// <reference path='../order/Order.ts'/>
+/// <reference path='../virtual/order/VOrder.ts'/>
 /// <reference path='../core/XHR.ts'/>
 /// <reference path='../lib/instantiation.ts'/>
 /// <reference path='../lib/treeEach.ts'/>

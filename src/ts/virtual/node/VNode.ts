@@ -1,12 +1,11 @@
 
 /// <reference path='.d.ts'/>
-/// <reference path='../../lib/INamedNodeMap.ts'/>
+/// <reference path='VNamedNodeMap.ts'/>
 /// <reference path='VStyle.ts'/>
 /// <reference path='../../lib/HashObject.ts'/>
 /// <reference path='../../lib/ClassList.ts'/>
 /// <reference path='../../lib/Lib.ts'/>
 /// <reference path='../../lib/TypeHelper.ts'/>
-/// <reference path='../../lib/INamedNodeMap.ts'/>
 /// <reference path='VNodeList.ts'/>
 /// <reference path='VHTMLCollection.ts'/>
 /// <reference path='VNodeVMData.ts'/>
@@ -48,6 +47,8 @@ abstract class VNode implements INode{
     vmData:VNodeVMData=new VNodeVMData();
     abstract nodeType: ENodeType;
     abstract nodeName: string;
+    abstract toJS(space?:number):string;
+    abstract toCreateJS(space?:number):string;
     readonly childNodes: VNodeList=new VNodeList;
     parentNode: VNode&IVNodeMethod | null;
     
@@ -57,6 +58,13 @@ abstract class VNode implements INode{
     $$(this: VNode&IVNodeMethod, vNode: VNode&IVNodeMethod): VNode&IVNodeMethod{
         this.appendChild(vNode);
         return vNode;
+    }
+    /**
+     * 添加子节点，并返回自身
+     */
+    $$$(this: VNode&IVNodeMethod, vNode: VNode&IVNodeMethod): VNode&IVNodeMethod{
+        this.appendChild(vNode);
+        return this;
     }
     /**
      * 返回父节点，如果无，返回自己
@@ -162,10 +170,9 @@ abstract class VNode implements INode{
     // createComment(value: string): IVComment;
     // addEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
     // removeEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
-    toJSString():string{
-        return "$$$"+this.toJS();
+    toJSString(space:number=0):string{
+        return "$$$"+this.toJS(space).replace(/^\s*/,'');
     }
-    abstract toJS(space?:number):string;
     beDOM():Node{
         if (this.vmData.domNode) {
             return this.vmData.domNode;

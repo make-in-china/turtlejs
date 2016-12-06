@@ -12,8 +12,11 @@ class VDocumentType extends VNode{
     cloneNode(deep:boolean):VDocumentType&IVNodeMethod{
         return $$$("",ENodeType.DocumentType);
     }
-    toJS():string{
+    toCreateJS(space:number=0):string{
         return `("",${ENodeType.DocumentType})`;
+    }
+    toJS():string{
+        return this.toCreateJS()+'.$';
     }
     /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
     protected emulation():void{}

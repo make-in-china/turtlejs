@@ -9,6 +9,16 @@ class RefInfo{
         refParent:VMElement.VHtmlElement&IVNodeMethod
         refs:IRefs[]
     }[]=[]
+    getRefNodeName(node:VMElement.VHtmlElement&IVNodeMethod){
+        for(const data of this.data){
+            for(const ref of data.refs){
+                if(ref.node===node){
+                    return ref.name;
+                }
+            }
+        }
+        return null;
+    }
     push(name:string,refNode:VMElement.VHtmlElement&IVNodeMethod){
         let p:VMElement.VHtmlElement&IVNodeMethod=<any>refNode.parentNode;
         for(const data of this.data){

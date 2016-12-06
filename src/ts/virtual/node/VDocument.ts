@@ -11,6 +11,9 @@ class VDocument extends VNode{
     cloneNode(deep:boolean):VDocument&IVNodeMethod{
         throw new Error("本标签不支持cloneNode");
     }
+    toCreateJS(space:number=0):string{
+        throw new Error("本标签不支持输出JS");
+    }
     toJS():string{
         throw new Error("本标签不支持输出JS");
     }
