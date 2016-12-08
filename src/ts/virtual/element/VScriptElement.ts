@@ -48,6 +48,7 @@ namespace VMElement{
             let s ='()=>{'+ nodesToString(<any>this.childNodes) +'}';
             return `(${s},${ENodeType.Text}).$`;
         }
+        onload: (this: HTMLElement, ev: Event) => any;
     }
     
 }

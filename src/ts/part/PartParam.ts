@@ -4,13 +4,13 @@
 /// <reference path='../lib/debughelper.ts'/>
 /// <reference path='../main/lib.ts'/>
 /// <reference path='../lib/HashObject.ts'/>
-/// <reference path='TemplateList.ts'/>
+/// <reference path='Template.ts'/>
 /// <reference path='PartParamFilter.ts'/>
 const colorRE=/^\s*((#[\dabcdefABCDEF]{3,6})|(rgba\(.*\)))\s*$/
 interface ITurtle{
     parts:IKeyArrayHashObject<Part>;
     service:Service;
-    T:TemplateList;
+    T:Template;
 }
 
 class PartParam{

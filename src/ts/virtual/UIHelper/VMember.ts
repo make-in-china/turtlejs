@@ -9,3 +9,7 @@ class VMember extends VPlaceHolder{
         return (new Array(space+1)).join(" ")+`.$$$(${this.isVar?"":"this."}${this.data})`;
     }
 }
+bindClassToFunctionHelper[ENodeType.Member]=function(node:IVNodeMethod & VNode,nodeName: string){
+    node.__proto__=VMember.prototype;
+    VMember.call(node);
+}

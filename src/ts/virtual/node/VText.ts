@@ -64,7 +64,7 @@ class VText extends VCharacterData{
     toHTMLString(): string[] {
         return [this.__value__];
     }
-    protected doToDOM():Text{
+    protected doBeDOM():Text{
         let elem:Text;
         if (this.data !== "") {
             let toHelp = document.createElement('__Turtle__');//用于创建

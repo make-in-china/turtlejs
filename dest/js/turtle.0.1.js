@@ -1808,54 +1808,48 @@ var VNode = (function () {
     });
     return VNode;
 }());
-function bindClassToFunction(node, nodeName, nodeType) {
-    if (nodeType === 21 /* Member */) {
-        node.__proto__ = VMember.prototype;
-        VMember.call(node, nodeName);
-    }
-    else if (nodeType === 22 /* Script */) {
-        node.__proto__ = VScript.prototype;
-        VScript.call(node, nodeName);
-    }
-    else if (nodeType === 20 /* PlaceHolder */) {
-        node.__proto__ = VPlaceHolder.prototype;
-        VPlaceHolder.call(node, nodeName);
-    }
-    else if (nodeType === 10 /* DocumentType */) {
+var bindClassToFunctionHelper = (_a = {},
+    _a[10 /* DocumentType */] = function (node, nodeName) {
         node.__proto__ = VDocumentType.prototype;
         VDocumentType.call(node);
-    }
-    else if (nodeType === 8 /* Comment */) {
+    },
+    _a[8 /* Comment */] = function (node, nodeName) {
         node.__proto__ = VComment.prototype;
         VComment.call(node, nodeName);
-    }
-    else if (nodeType === 3 /* Text */) {
+    },
+    _a[3 /* Text */] = function (node, nodeName) {
         node.__proto__ = VText.prototype;
         VText.call(node, nodeName);
-    }
-    else if (nodeType === 9 /* Document */) {
+    },
+    _a[9 /* Document */] = function (node, nodeName) {
         node.__proto__ = VDocument.prototype;
         VDocument.call(node);
+    },
+    _a);
+function bindClassToFunction(node, nodeName, nodeType) {
+    if (nodeType !== undefined) {
+        var fn = bindClassToFunctionHelper[nodeType];
+        if (fn) {
+            fn(node, nodeName);
+            return '';
+        }
     }
-    else if (nodeType === 11 /* DocumentFragment */) {
-    }
-    else if (nodeType === undefined || nodeType === 1 /* Element */) {
+    if (nodeType === undefined || nodeType === 1 /* Element */) {
         if (nodeName[0] === '#') {
-            nodeName = nodeName.substr(1).toLowerCase();
             switch (nodeName) {
-                case "text":
+                case "#text":
                     node.__proto__ = VText.prototype;
                     VText.call(node, nodeName);
                     break;
-                case "comment":
+                case "#comment":
                     node.__proto__ = VComment.prototype;
                     VComment.call(node, nodeName);
                     break;
-                case "document":
+                case "#document":
                     node.__proto__ = VDocument.prototype;
                     VDocument.call(node);
                     break;
-                case "document-fragment":
+                case "#document-fragment":
                     //未实现
                     break;
             }
@@ -1892,6 +1886,7 @@ var VNodeHelp = function (nodeName, nodeType) {
     bindClassToFunction(that, nodeName, nodeType);
     return that;
 };
+var _a;
 /// <reference path='VNode.ts'/>
 var VElement = (function (_super) {
     __extends(VElement, _super);
@@ -4136,8 +4131,553 @@ var VMElement;
 /// <reference path='../element/VCircleElement.ts'/>
 /// <reference path='../element/VHeaderElement.ts'/>
 /// <reference path='../element/VFooterElement.ts'/>
+var VMElement;
+(function (VMElement) {
+    var VDomhelperElement = (function (_super) {
+        __extends(VDomhelperElement, _super);
+        function VDomhelperElement() {
+            var _this = _super.apply(this, arguments) || this;
+            _this.nodeName = "DOMHELPER";
+            return _this;
+        }
+        return VDomhelperElement;
+    }(VMElement.VHtmlElement));
+    VMElement.VDomhelperElement = VDomhelperElement;
+})(VMElement || (VMElement = {}));
+/// <reference path='BaseVNode.ts'/>
+/// <reference path='VDomhelperElement.ts'/>
+var VDOM, VTemplate;
+(function () {
+    var htmlwordRE = /[a-zA-Z\/\!]/;
+    var htmlParse = {
+        '': function (html, m) {
+            var nodeName = m.node.nodeName;
+            if (m.node.vmData.closeSelf) {
+                m.node = m.node.parentNode;
+                m.action = 'textNode';
+                m.textNodeStart = m.index;
+            }
+            else if (stringNode.hasOwnProperty(nodeName)) {
+                m.action = 'stringNode';
+                m.stringNodeRegExp = stringNode[nodeName];
+                m.stringNodeKeyLength = nodeName.length + 2;
+                m.stringNodeStart = m.index;
+                return;
+            }
+            else {
+                m.action = 'textNode';
+                m.textNodeStart = m.index;
+            }
+        },
+        textNode: function (html, m) {
+            var data;
+            switch (html[m.index]) {
+                case '<':
+                    if (m.index < m.length + 1 && htmlwordRE.test(html[m.index + 1])) {
+                        if (m.textNodeStart !== m.index) {
+                            data = html.substring(m.textNodeStart, m.index);
+                            if (!emptyTextNodeRE.test(data)) {
+                                m.node(data, 3);
+                            }
+                            m.textNodeStart = 0;
+                        }
+                        m.htmlNodeStart = m.index;
+                        m.index++;
+                        m.action = 'htmlNode';
+                    }
+                    else {
+                        m.index++;
+                    }
+                    break;
+                default:
+                    m.index++;
+            }
+        },
+        createHTMLNode: function (html, m) {
+            m.htmlNodeStart = 0;
+            if (m.htmlNodeNameStart > 0) {
+                //无属性标签
+                var nodeName = html.substring(m.htmlNodeNameStart, m.index);
+                m.node = m.node(nodeName);
+                m.htmlNodeNameStart = 0;
+                m.index++;
+            }
+            m.action = '';
+        },
+        setHTMLNodeClose: function (html, m) {
+            var n = m.node;
+            var name = trim(html.substring(m.htmlNodeNameStart, m.index)).toUpperCase();
+            while (n) {
+                if (n.nodeName === name) {
+                    n.vmData.isClose = true;
+                    m.node = n.parentNode;
+                    m.action = '';
+                    m.htmlNodeNameStart = 0;
+                    return;
+                }
+                n = n.parentNode;
+            }
+            throw new Error("Tag is not closed!");
+            //console.log('Tag is not closed!', name,m.htmlNodeNameStart,html.substring(m.htmlNodeNameStart-20, m.index+20));
+            //m.node(name, 8);
+        },
+        setAttrStart: function (m) {
+            m.action = 'attributes';
+            m.attrStart = 0;
+            m.attrNameEnd = 0;
+            m.equlIndex = 0;
+            m.stringStart = 0;
+            m.stringStartChar = '';
+        },
+        htmlNode: function (html, m) {
+            switch (html[m.index]) {
+                case '>':
+                    this.createHTMLNode(html, m);
+                    break;
+                case ' ':
+                    this.createHTMLNode(html, m);
+                    m.action = 'attributes';
+                    break;
+                case '!':
+                    if (m.htmlNodeStart === m.index - 1) {
+                        m.action = 'comment';
+                    }
+                    m.index++;
+                    break;
+                case '/':
+                    if (m.htmlNodeStart === m.index - 1) {
+                        m.action = 'endXmlNode';
+                        m.index++;
+                        m.htmlNodeNameStart = m.index;
+                        return;
+                    }
+                    else if (m.length >= m.index + 1) {
+                        if (html.substr(m.index + 1, 1) === '>') {
+                            this.createHTMLNode(html, m);
+                            m.index++;
+                            return;
+                        }
+                    }
+                    break;
+                default:
+                    if (m.htmlNodeNameStart === 0) {
+                        m.htmlNodeNameStart = m.index;
+                    }
+                    m.index++;
+            }
+        },
+        endXmlNode: function (html, m) {
+            switch (html[m.index]) {
+                case '>':
+                    this.setHTMLNodeClose(html, m);
+                    m.index++;
+                    break;
+                default:
+                    m.index++;
+            }
+        },
+        comment: function (html, m) {
+            switch (html[m.index]) {
+                case '>':
+                    m.node('', 8);
+                    m.index++;
+                    break;
+                case '-':
+                    if (m.length >= m.index + 2) {
+                        if (html.substr(m.index + 1, 1) === '-') {
+                            m.commentStart = m.index + 2;
+                            m.action = 'comment3';
+                            m.index += 2;
+                        }
+                        else {
+                            m.commentStart = m.index;
+                            m.action = 'comment2';
+                            m.index++;
+                        }
+                    }
+                    else {
+                        m.index++;
+                    }
+                    break;
+                case 'd':
+                case 'D':
+                    if (m.length >= m.index + 7) {
+                        if (html.substr(m.index + 1, 6).toUpperCase() === 'OCTYPE') {
+                            m.node('', 10);
+                            m.index += 13;
+                            m.action = '';
+                            break;
+                        }
+                    }
+                default:
+                    m.commentStart = m.index;
+                    m.action = 'comment2';
+                    m.index++;
+            }
+        },
+        comment2: function (html, m) {
+            if (html[m.index] === '>') {
+                var vNode = m.node(html.substring(m.commentStart, m.index), 8);
+                vNode.vmData.doubleMinus = false;
+                m.commentStart = 0;
+                m.action = '';
+            }
+            m.index++;
+        },
+        comment3: function (html, m) {
+            if (html[m.index] === '-') {
+                if (m.length >= m.index + 3) {
+                    if (html.substr(m.index + 1, 2) === '->') {
+                        var vNode = m.node(html.substring(m.commentStart, m.index), 8);
+                        vNode.vmData.doubleMinus = true;
+                        m.commentStart = 0;
+                        m.action = '';
+                        m.index += 3;
+                        return;
+                    }
+                }
+            }
+            m.index++;
+        },
+        attributes: function (html, m) {
+            switch (html[m.index]) {
+                case '/':
+                    if (m.length >= m.index + 2) {
+                        if (html.substr(m.index + 1, 1) === '>') {
+                            if (m.attrStart !== m.attrNameEnd) {
+                                if (m.attrNameEnd === 0) {
+                                    m.attrNameEnd = m.index;
+                                }
+                                m.node._(html.substring(m.attrStart, m.attrNameEnd));
+                            }
+                            m.action = '';
+                            m.index += 2;
+                            break;
+                        }
+                    }
+                    m.attrStart = m.attrNameEnd = 0;
+                    m.action = '';
+                    m.index++;
+                    break;
+                case '>':
+                    if (m.attrStart !== m.attrNameEnd) {
+                        if (m.attrNameEnd === 0) {
+                            m.attrNameEnd = m.index;
+                        }
+                        m.node._(html.substring(m.attrStart, m.attrNameEnd));
+                    }
+                    m.attrStart = m.attrNameEnd = 0;
+                    m.action = '';
+                    m.index++;
+                    break;
+                case '=':
+                    if (m.attrStart > 0 && m.attrNameEnd === 0) {
+                        m.attrNameEnd = m.index;
+                    }
+                    m.equlIndex = m.index;
+                    m.action = 'attrValue';
+                    m.index++;
+                    break;
+                case '\r':
+                case '\n':
+                case ' ':
+                    if (m.attrStart > 0 && m.attrNameEnd === 0) {
+                        m.attrNameEnd = m.index;
+                    }
+                    m.index++;
+                    break;
+                default:
+                    if (m.attrStart === 0) {
+                        m.attrStart = m.index;
+                    }
+                    else if (m.equlIndex > 0) {
+                        m.node._(html.substring(m.attrStart, m.attrNameEnd));
+                        this.setAttrStart(m);
+                    }
+                    else if (m.attrNameEnd !== 0) {
+                        m.node._(html.substring(m.attrStart, m.attrNameEnd));
+                        this.setAttrStart(m);
+                        m.attrStart = m.index;
+                    }
+                    m.index++;
+            }
+        },
+        attrValue: function (html, m) {
+            switch (html[m.index]) {
+                case '\r':
+                case '\n':
+                case ' ':
+                    m.index++;
+                    break;
+                case '"':
+                    m.stringStartChar = '"';
+                    m.action = 'atvstring';
+                    m.index++;
+                    m.stringStart = m.index;
+                    break;
+                case "'":
+                    m.stringStartChar = '\'';
+                    m.action = 'atvstring';
+                    m.index++;
+                    m.stringStart = m.index;
+                    break;
+                case '>':
+                    /*忽略等号*/
+                    m.node._(html.substring(m.attrStart, m.attrNameEnd));
+                    m.action = '';
+                    m.index++;
+                    break;
+                case "/":
+                    if (m.length >= m.index + 2) {
+                        if (html.substring(m.index + 1, 1) === '>') {
+                            m.node._(html.substring(m.attrStart, m.attrNameEnd));
+                            m.action = '';
+                            m.index += 2;
+                            return;
+                        }
+                    }
+                    m.index++;
+                    break;
+                default:
+                    m.action = 'atvbetweenSpace';
+                    m.betweenSpaceStart = m.index;
+                    m.index++;
+            }
+        },
+        atvbetweenSpace: function (html, m) {
+            switch (html[m.index]) {
+                case ' ':
+                    m.node._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
+                    this.setAttrStart(m);
+                    m.index++;
+                    break;
+                case '>':
+                    m.node._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
+                    this.setAttrStart(m);
+                    break;
+                case "/":
+                    if (m.length >= m.index + 2) {
+                        m.node._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
+                        if (html.substring(m.index + 1, 1) === '>') {
+                            this.setAttrStart(m);
+                            m.index++;
+                            return;
+                        }
+                    }
+                    m.index++;
+                default:
+                    m.index++;
+            }
+        },
+        atvstring: function (html, m) {
+            switch (html[m.index]) {
+                case '\\':
+                    m.index += 2;
+                    break;
+                case m.stringStartChar:
+                    m.node._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.stringStart, m.index));
+                    this.setAttrStart(m);
+                    m.index++;
+                    break;
+                default:
+                    m.index++;
+            }
+        },
+        stringNode: function (html, m) {
+            if (html[m.index] === '<') {
+                if (m.length >= m.index + m.stringNodeKeyLength + 1) {
+                    if (m.stringNodeRegExp && m.stringNodeRegExp.test(html.substr(m.index + 1, m.stringNodeKeyLength))) {
+                        var s = html.substring(m.stringNodeStart, m.index);
+                        if (!emptyTextNodeRE.test(s)) {
+                            m.node.addText(s);
+                        }
+                        m.stringNodeStart = 0;
+                        m.stringNodeRegExp = null;
+                        m.action = 'stringNode2';
+                        m.node.vmData.isClose = true;
+                        if (!m.node.parentNode) {
+                            throw new Error("渲染出错！");
+                        }
+                        m.node = m.node.parentNode;
+                        m.index += m.stringNodeKeyLength;
+                        m.stringNodeKeyLength = 0;
+                        return;
+                    }
+                }
+            }
+            m.index++;
+        },
+        stringNode2: function (html, m) {
+            if (html[m.index] === '>') {
+                m.action = '';
+            }
+            m.index++;
+        },
+        checkEnd: function (html, m) {
+            if (m.action === 'textNode') {
+                if (m.textNodeStart !== m.index) {
+                    var data = html.substring(m.textNodeStart, m.index);
+                    if (!emptyTextNodeRE.test(data)) {
+                        m.node(data, 3);
+                    }
+                    m.textNodeStart = 0;
+                }
+            }
+            else if (m.action !== "") {
+                console.log(m.action);
+                debugger;
+            }
+        }
+    };
+    var htmlParseT = {
+        __proto__: htmlParse,
+        checkTemplate: function (html, m) {
+            switch (html[m.index]) {
+                case '{':
+                    debugger;
+                    break;
+                case '<':
+                    if (html[m.index + 1] === '%') {
+                        debugger;
+                        m.index += 2;
+                        return true;
+                    }
+                    break;
+                case '%':
+                    if (html[m.index + 1] === '>') {
+                        debugger;
+                        m.index += 2;
+                        return true;
+                    }
+                    break;
+            }
+        },
+        attributes: function (html, m) {
+            if (!this.checkTemplate(html, m)) {
+                this.__proto__.attributes(html, m);
+            }
+        },
+        stringNode: function (html, m) {
+            if (!this.checkTemplate(html, m)) {
+                this.__proto__.stringNode(html, m);
+            }
+        },
+        attrValue: function (html, m) {
+            if (!this.checkTemplate(html, m)) {
+                this.__proto__.attrValue(html, m);
+            }
+        },
+        checkEnd: function (html, m) {
+            debugger;
+            if (m.action === 'textNode') {
+                if (m.textNodeStart !== m.index) {
+                    var data = html.substring(m.textNodeStart, m.index);
+                    if (!emptyTextNodeRE.test(data)) {
+                        m.node(data, 3);
+                    }
+                    m.textNodeStart = 0;
+                }
+            }
+            else if (m.action !== "") {
+                console.log(m.action);
+                debugger;
+            }
+        }
+    };
+    function getInitData(vNode, length) {
+        if (!vNode) {
+            vNode = $$$('domhelper');
+            vNode.vmData.isClose = true;
+        }
+        return {
+            index: 0,
+            node: vNode,
+            action: '',
+            length: length,
+            textNodeStart: 0,
+            htmlNodeStart: 0,
+            htmlNodeNameStart: 0,
+            attrStart: 0,
+            attrNameEnd: 0,
+            equlIndex: 0,
+            stringStart: 0,
+            stringStartChar: '',
+            betweenSpaceStart: 0,
+            stringNodeStart: 0,
+            stringNodeRegExp: null,
+            stringNodeKeyLength: 0,
+            commentStart: 0
+        };
+    }
+    ;
+    VTemplate = function (html, vNode) {
+        var m = getInitData(vNode, html.length);
+        var parent = m.node;
+        while (m.index < html.length) {
+            htmlParseT[m.action](html, m);
+        }
+        htmlParseT.checkEnd(html, m);
+        if (vNode) {
+            return vNode;
+        }
+        else {
+            var ret = void 0;
+            if (parent.childNodes.length === 1) {
+                ret = parent.childNodes[0];
+                VNodeList.clear(parent.childNodes);
+                return ret;
+            }
+            else {
+                ret = slice.call(parent.childNodes);
+                VNodeList.clear(parent.childNodes);
+                return ret;
+            }
+        }
+    };
+    VDOM = function (html, vNode) {
+        var m = getInitData(vNode, html.length);
+        var parent = m.node;
+        while (m.index < html.length) {
+            htmlParse[m.action](html, m);
+        }
+        htmlParse.checkEnd(html, m);
+        if (vNode) {
+            return vNode;
+        }
+        else {
+            var ret = void 0;
+            if (parent.childNodes.length === 1) {
+                ret = parent.childNodes[0];
+                VNodeList.clear(parent.childNodes);
+                return ret;
+            }
+            else {
+                ret = slice.call(parent.childNodes);
+                VNodeList.clear(parent.childNodes);
+                return ret;
+            }
+        }
+    };
+}());
+var $$$ = VNodeHelp;
+// $VDOM=VDOM;
+// $VNode=newVNode;
+// if(mode===1){
+//     /*
+//         * 虚拟DOM
+//         */
+//     $DOM=VDOM;
+//     $node=newVNode;
+//     vNodesToDOM=function(vNodes){
+//         var arr=[];
+//         for(var i=0;i<vNodes.length;i++){
+//             arr.push(vNodes[i].beDOM());    
+//         }
+//         return arr;
+//     }
+// }else{
 /// <reference path="Scope.ts"/>
-/// <reference path="../virtual/UIHelper/BaseVNode.ts"/>
+/// <reference path='../virtual/UIHelper/VDOM.ts'/>
 typeof document === "undefined" && (document = $$$('#document'));
 var $rootScope = new RootScope(document);
 var DOMScope = (function () {
@@ -4510,7 +5050,10 @@ var Config = (function () {
 /// <reference path='Part.ts'/>
 /// <reference path='Store.ts'/>
 /// <reference path='../main/Config.ts'/>
-var $DOM, $node, operatorRE = /\!=|==|=|<|>|\|/;
+var 
+// $DOM,
+// $node: I$Node,
+operatorRE = /\!=|==|=|<|>|\|/;
 function replaceCls() {
     var arr = $t.replaceClassStore;
     for (var i_36 = 0; i_36 < arr.length; i_36++) {
@@ -4535,17 +5078,17 @@ function getScopeBy(scope, node) {
 //     execByScope(node, '$t.extend(this,{' + s + '});', null, outerChildNodes, outerElement, props, part);
 // }
 function setNodeProperty(node, proName, condition, outerChildNodes, outerElement, props, part) {
-    var v = execByScope(node, condition, null, outerChildNodes, outerElement, props, part);
+    var v = Order.exec(node, condition); //debugger , null, outerChildNodes, outerElement, props, part);
     var name = camelCase(proName.substr(0, proName.length - 1));
     if (name.indexOf(".") != -1) {
         var obj2 = node;
-        name = name.split(".");
-        for (var i_37 = 0; i_37 < name.length - 1; i_37++) {
-            obj2 = obj2[name[i_37]];
+        var nameArr = name.split(".");
+        for (var i_37 = 0; i_37 < nameArr.length - 1; i_37++) {
+            obj2 = obj2[nameArr[i_37]];
             if (!obj2)
                 return;
         }
-        name = name[name.length - 1];
+        name = nameArr[nameArr.length - 1];
         obj2[name] = v;
     }
     else {
@@ -4606,20 +5149,20 @@ function defineServiceByNode(node) {
     }
     removeNode(node);
 }
-function getExtendsByNode(node, sortPath) {
-    var ext = getAttr(node, 'extends', null);
-    if (isString(ext)) {
-        return getExtends(ext, sortPath);
-    }
-}
-function defineUIByNode(node) {
-    var name = getAttr(node, 'ui');
-    var ext = getExtendsByNode(node, 'ui');
-    if (name) {
-        $t.T.define(name, '', '', getTemplate(node), ext);
-    }
-    removeNode(node);
-}
+// function getExtendsByNode(node: IHTMLElement, sortPath: string) {
+//     let ext = getAttr(node, 'extends', null);
+//     if (isString(ext)) {
+//         return getExtends(ext, sortPath);
+//     }
+// }
+// function defineUIByNode(node: IHTMLElement) {
+//     let name = getAttr(node, 'ui');
+//     let ext = getExtendsByNode(node, 'ui');
+//     if (name) {
+//         $t.T.define(name, '', '', getTemplate(node), ext);
+//     }
+//     removeNode(node);
+// }
 function defineClasses(node) {
     var v = getAttr(node, 'class');
     if (v) {
@@ -4632,9 +5175,9 @@ function parseDefine(node) {
         case node.hasAttribute('service'):
             defineServiceByNode(node);
             break;
-        case node.hasAttribute('ui'):
-            defineUIByNode(node);
-            break;
+        // case node.hasAttribute('ui'):
+        //     defineUIByNode(node);
+        //     break;
         case node.hasAttribute('class'):
             defineClasses(node);
             break;
@@ -4670,54 +5213,58 @@ function findTemplates(nodes) {
     });
     return temps;
 }
-function parseUITemplate(uiName, uiSortPath, uiPath, sHTML) {
-    var vDOM = $DOM(sHTML), cs = vDOM.children, i = 0, node, s, name, nodeName;
-    for (; i < cs.length; i++) {
-        node = cs[i];
-        if (!isTemplate(node)) {
-            alert('最上层必须是ui/service模板标签');
-            return;
-        }
-        if (node.hasAttribute('service')) {
-            defineServiceByNode(node);
-            i--;
-        }
-        else {
-            nodeName = node.getAttribute('ui');
-            if (!nodeName)
-                nodeName = uiName;
-            if (!$t.T.hasOwnProperty(nodeName)) {
-                s = getTemplate(node);
-                $t.T.define(nodeName, uiSortPath, uiPath, s, getExtendsByNode(node, uiSortPath));
-            }
-            else {
-                alert('不能重复定义ui：' + nodeName);
-            }
-        }
-    }
-}
-function importUIHTML(uiName, uiSortPath) {
-    if (!$t.T.hasOwnProperty(uiName)) {
-        var uiPath_1 = baseUIPath.getPathBySortPath(uiSortPath);
-        $t.xhr.get(uiPath_1 + '/' + (uiName + '.html').toLowerCase(), false, function (text) {
-            parseUITemplate(uiName, uiSortPath, uiPath_1, text);
-        });
-    }
-    return $t.T[uiName];
-}
-function getExtends(extName, sortPath) {
-    var ext;
-    if (extName.indexOf(':') !== -1) {
-        extName = extName.split(':');
-        sortPath = extName[0] ? extName[0] : sortPath;
-        extName = extName[1];
-    }
-    if (!isObject(importUIHTML(extName, sortPath))) {
-        throw new Error('找不到可继承的模板：' + extName);
-    }
-    ext = $t.T[extName];
-    return ext;
-}
+// function parseUITemplate(uiName: string, uiSortPath: string, uiPath: string, sHTML: string) {
+//     let
+//         vDOM = $DOM(sHTML),
+//         cs = vDOM.children,
+//         i = 0,
+//         node,
+//         s,
+//         name,
+//         nodeName;
+//     for (; i < cs.length; i++) {
+//         node = cs[i];
+//         if (!isTemplate(node)) {
+//             alert('最上层必须是ui/service模板标签');
+//             return;
+//         }
+//         if (node.hasAttribute('service')) {
+//             defineServiceByNode(node);
+//             i--;
+//         } else {
+//             nodeName = node.getAttribute('ui');
+//             if (!nodeName) nodeName = uiName;
+//             if (!$t.T.hasOwnProperty(nodeName)) {
+//                 s = getTemplate(node);
+//                 $t.T.define(nodeName, uiSortPath, uiPath, s, getExtendsByNode(node, uiSortPath));
+//             } else {
+//                 alert('不能重复定义ui：' + nodeName);
+//             }
+//         }
+//     }
+// }
+// function importUIHTML(uiName: string, uiSortPath: string) {
+//     if (!$t.T.hasOwnProperty(uiName)) {
+//         let uiPath = baseUIPath.getPathBySortPath(uiSortPath);
+//         $t.xhr.get(uiPath + '/' + (uiName + '.html').toLowerCase(), false, function (text: string) {
+//             parseUITemplate(uiName, uiSortPath, uiPath, text);
+//         });
+//     }
+//     return $t.T[uiName];
+// }
+// function getExtends(extName, sortPath) {
+//     let ext;
+//     if (extName.indexOf(':') !== -1) {
+//         extName = extName.split(':');
+//         sortPath = extName[0] ? extName[0] : sortPath;
+//         extName = extName[1];
+//     }
+//     if (!isObject(importUIHTML(extName, sortPath))) {
+//         throw new Error('找不到可继承的模板：' + extName);
+//     }
+//     ext = $t.T[extName];
+//     return ext;
+// }
 /**从DOM树获取父组件
  * @param {}
  */
@@ -4732,21 +5279,21 @@ function getParentPart(node) {
         else {
             return null;
         }
-        if (isCommentNode(node) && node.__part__) {
-            if (node.__sign__ === 0) {
-                node = node.__part__.refs.begin;
+        if (isCommentNode(node) && node.vmData.part) {
+            if (node.vmData.sign === 0) {
+                node = node.vmData.part.refs.begin;
             }
             else {
-                return node.__part__;
+                return node.vmData.part;
             }
         }
     }
     return null;
 }
 function parseAsync(node, outerChildNodes, outerElement, props, part) {
-    var delay = parseInt(execByScope(node, node.getAttribute('async'), null, outerChildNodes, outerElement, props, part));
+    var delay = parseInt(Order.exec(node, node.getAttribute('async'))); //, null, outerChildNodes, outerElement, props, part));
     node.removeAttribute('async');
-    var mark = $node('async', 8);
+    var mark = $$$('async', 8 /* Comment */);
     replaceNodeByNode(node, mark);
     if (delay === NaN) {
         delay = 0;
@@ -4903,7 +5450,7 @@ var includeJSFiles = (function () {
                     var url = files[i_42];
                     if (isString(url) && !(url in data)) {
                         arr.push(url);
-                        data[url] = $node("script");
+                        data[url] = $$$("script");
                     }
                 }
             }
@@ -4912,7 +5459,7 @@ var includeJSFiles = (function () {
                 var url = files;
                 if (isString(url) && !(url in data)) {
                     arr.push(url);
-                    data[url] = $node("script");
+                    data[url] = $$$("script");
                 }
             }
             else {
@@ -5038,7 +5585,7 @@ function parseScript(node, outerChildNodes, outerElement, props, part) {
 function execNodeQuestion(node, outerChildNodes, outerElement, props, part) {
     var v = takeAttr(node, ':', "");
     if (v && v.length > 0) {
-        execByScope(node, v, null, outerChildNodes, outerElement, props, part);
+        Order.exec(node, v); //, null, outerChildNodes, outerElement, props, part);
     }
 }
 function bindNode(node, obj, name) {
@@ -5148,7 +5695,7 @@ var ElementParser = (function () {
     function ElementParser() {
         this.GET = parseGet;
         this.SET = parseSet;
-        this.__BREAK__ = parseBreakOrder;
+        // __BREAK__ = parseBreakOrder
         this.SCRIPT = parseScript;
     }
     return ElementParser;
@@ -5212,7 +5759,7 @@ var AttributeParser = (function () {
         });
     };
     AttributeParser.prototype.add = function (node, outerChildNodes, outerElement, props, part) {
-        var placeholder = $node('', 8);
+        var placeholder = $$$('', 8 /* Comment */);
         replaceNodeByNode(node, placeholder);
         var bindInfo = bindEval(node, takeAttr(node, 'add'), outerChildNodes, outerElement, props, part, function (v) {
             if (!v)
@@ -5245,10 +5792,12 @@ var elementParser = new ElementParser;
 var attributeParser = new AttributeParser;
 function initHTML(arr, outerChildNodes, outerElement, props, part) {
     treeEach(arr, 'childNodes', function (node, step) {
-        if (node.nodeType === 8) {
-            // try {
-            parseComment(node, outerChildNodes, outerElement, props, part);
-            // } catch (e) { _catch(e) }
+        if (node instanceof VComment) {
+            var order = Order.parseComment(node);
+            if (order && order.run) {
+                order.run();
+            }
+            ;
             return 4 /* c_noIn */;
         }
         if (node.nodeType !== 1) {
@@ -5286,10 +5835,10 @@ function getParts(childNodes) {
     var child = [];
     var cpn;
     treeEach(childNodes, "childNodes", function (node) {
-        if (node.nodeType === 8 && node.__part__) {
-            var part = node.__part__;
+        if (node.nodeType === 8 && node.vmData.part) {
+            var part = node.vmData.part;
             if (cpn) {
-                if (part === cpn && node.__sign__ === 0) {
+                if (part === cpn && node.vmData.sign === 0) {
                     child.push(part);
                     cpn = undefined;
                 }
@@ -5770,10 +6319,11 @@ var PartTemplate = (function () {
 /// <reference path='../lib/is.ts'/>
 /// <reference path="Server.ts"/>
 /// <reference path="PartTemplate.ts"/>
+/// <reference path="View.ts"/>
 var Part = (function (_super) {
     __extends(Part, _super);
     /**初始化对象 */
-    function Part(template, props, html, outerChildNodes, outerElement) {
+    function Part(template, props, outerChildNodes, outerElement) {
         var _this = 
         // constructor(public template: PartTemplate, extPart: Part | undefined, public props: Object, html: string, outerChildNodes: INodeArray, outerElement: IHTMLCollection) {
         _super.call(this) || this;
@@ -5799,18 +6349,18 @@ var Part = (function (_super) {
         // if(!isUndefined(extPart)){
         //     this.super=extPart;
         // }
-        var dom = $DOM(html);
-        var nodes = dom.childNodes;
+        var nodes = _this.dom.tops;
         initHTML(nodes, outerChildNodes, outerElement, props, _this);
         for (var i_49 = nodes.length; i_49 > 0; i_49--) {
-            _this.nodeStore.push(dom.removeChild(nodes[0]));
+            _this.nodeStore.push(nodes[0]);
         }
         var name = template.name;
-        var begin = $node(name, 8); // document.createComment('<'+name+'>');
-        var end = $node('/' + name, 8); //document.createComment('</'+name+'>')
-        end.__part__ = begin.__part__ = _this;
-        begin.__sign__ = 1;
-        end.__sign__ = 0;
+        var begin = $$$(name, 8 /* Comment */); // document.createComment('<'+name+'>');
+        var end = $$$('/' + name, 8 /* Comment */); //document.createComment('</'+name+'>')
+        end.vmData.part = begin.vmData.part = _this;
+        begin.vmData.sign = 1;
+        end.vmData.sign = 0;
+        // end.__part__ = begin.__part__ = this;
         _this.refs = {
             begin: begin,
             end: end
@@ -5823,15 +6373,15 @@ var Part = (function (_super) {
         // }
         // this.basePart=sp?sp:this;
         // this.basePart.isInDOM=false;
-        initHTML(nodes, outerChildNodes, outerElement, props, _this);
+        // initHTML(nodes, outerChildNodes, outerElement, props, this);
         // if(extPart){
         //     (<ExtendsPart>extPart).to(this);
         // }
         var store = _this.nodeStore;
-        store.push.apply(store, nodes);
-        for (var i_50 = nodes.length; i_50 > 0; i_50--) {
-            dom.removeChild(nodes[0]);
-        }
+        push.apply(store, nodes);
+        // for (let i = nodes.length; i > 0; i--) {
+        //     dom.removeChild(nodes[0]);
+        // }
         store.unshift(begin);
         store.push(end);
         _this.$init.emit(_this);
@@ -5864,7 +6414,7 @@ var Part = (function (_super) {
             // }
             if (this.isInDOM) {
                 try {
-                    var elements = new ArrayEx();
+                    var elements = [];
                     var node = this.refs.begin.nextSibling;
                     var end = this.refs.end;
                     while (node && node !== end) {
@@ -5875,14 +6425,14 @@ var Part = (function (_super) {
                 }
                 catch (e) {
                     // _catch(e);
-                    return new ArrayEx();
+                    return [];
                 }
             }
             if (isArray(this.nodeStore)) {
                 return this.nodeStore.slice().splice(1, this.nodeStore.length - 2);
             }
             else {
-                return new ArrayEx();
+                return [];
             }
         },
         enumerable: true,
@@ -5943,8 +6493,8 @@ var Part = (function (_super) {
                 var cs = this.elements;
                 var elem = void 0;
                 var dom = document.documentElement;
-                for (var i_51 = 0; i_51 < cs.length; i_51++) {
-                    elem = cs[i_51].valueOf();
+                for (var i_50 = 0; i_50 < cs.length; i_50++) {
+                    elem = cs[i_50].valueOf();
                     if (elem.nodeType === 1) {
                         var l = 0, t = 0;
                         var elem2 = elem;
@@ -5957,8 +6507,8 @@ var Part = (function (_super) {
                     }
                 }
                 var rect = { left: 0x7fffffff, top: 0x7fffffff, width: 0, height: 0, right: 0, bottom: 0 };
-                for (var i_52 = 0; i_52 < rects.length; i_52++) {
-                    rt = rects[i_52];
+                for (var i_51 = 0; i_51 < rects.length; i_51++) {
+                    rt = rects[i_51];
                     if (rt[0] < rect.left) {
                         rect.left = rt[0];
                     }
@@ -6051,8 +6601,8 @@ var Part = (function (_super) {
         }
         var s = "\r\n" + new Array(tabSpace + 1).join(" ") + this.toString();
         var child = this.child;
-        for (var i_53 = 0; i_53 < child.length; i_53++) {
-            s += child[i_53].treeDiagram(tabSpace + 8);
+        for (var i_52 = 0; i_52 < child.length; i_52++) {
+            s += child[i_52].treeDiagram(tabSpace + 8);
         }
         return s;
     };
@@ -6063,13 +6613,13 @@ var Part = (function (_super) {
             elems.push(this.refs.end);
             /*cut scope*/
             var scopeNodes = this.scopeNodes;
-            for (var i_54 = 0; i_54 < scopeNodes.length; i_54++) {
-                DOMScope.unlink(scopeNodes[i_54].__scope__);
+            for (var i_53 = 0; i_53 < scopeNodes.length; i_53++) {
+                DOMScope.unlink(scopeNodes[i_53].__scope__);
             }
             appendNodes(elems, elem);
             /*link scope*/
-            for (var i_55 = 0; i_55 < scopeNodes.length; i_55++) {
-                DOMScope.link(scopeNodes[i_55].__scope__, elem);
+            for (var i_54 = 0; i_54 < scopeNodes.length; i_54++) {
+                DOMScope.link(scopeNodes[i_54].__scope__, elem);
             }
             this.$online.emit(this, elem);
         }
@@ -6077,8 +6627,8 @@ var Part = (function (_super) {
             appendNodes(this.nodeStore, elem);
             /*link scope*/
             var scopeNodes = this.scopeNodes;
-            for (var i_56 = 0; i_56 < scopeNodes.length; i_56++) {
-                DOMScope.link(scopeNodes[i_56].__scope__, elem);
+            for (var i_55 = 0; i_55 < scopeNodes.length; i_55++) {
+                DOMScope.link(scopeNodes[i_55].__scope__, elem);
             }
             this.$online.emit(this, elem);
             this.isInDOM = true;
@@ -6091,13 +6641,13 @@ var Part = (function (_super) {
             elems.push(this.refs.end);
             /*cut scope*/
             var scopeNodes = this.scopeNodes;
-            for (var i_57 = 0; i_57 < scopeNodes.length; i_57++) {
-                DOMScope.unlink(scopeNodes[i_57].__scope__);
+            for (var i_56 = 0; i_56 < scopeNodes.length; i_56++) {
+                DOMScope.unlink(scopeNodes[i_56].__scope__);
             }
             insertNodesBefore(elem, elems);
             /*link scope*/
-            for (var i_58 = 0; i_58 < scopeNodes.length; i_58++) {
-                DOMScope.link(scopeNodes[i_58].__scope__, elem);
+            for (var i_57 = 0; i_57 < scopeNodes.length; i_57++) {
+                DOMScope.link(scopeNodes[i_57].__scope__, elem);
             }
             this.$online.emit(this, elem);
         }
@@ -6105,8 +6655,8 @@ var Part = (function (_super) {
             insertNodesBefore(elem, this.nodeStore);
             /*link scope*/
             var scopeNodes = this.scopeNodes;
-            for (var i_59 = 0; i_59 < scopeNodes.length; i_59++) {
-                DOMScope.link(scopeNodes[i_59].__scope__, elem);
+            for (var i_58 = 0; i_58 < scopeNodes.length; i_58++) {
+                DOMScope.link(scopeNodes[i_58].__scope__, elem);
             }
             this.$online.emit(this, elem);
         }
@@ -6118,13 +6668,13 @@ var Part = (function (_super) {
             elems.push(this.refs.end);
             var scopeNodes = this.scopeNodes;
             /*cut scope*/
-            for (var i_60 = 0; i_60 < scopeNodes.length; i_60++) {
-                DOMScope.unlink(scopeNodes[i_60].__scope__);
+            for (var i_59 = 0; i_59 < scopeNodes.length; i_59++) {
+                DOMScope.unlink(scopeNodes[i_59].__scope__);
             }
             var p = this.refs.begin.parentNode;
             if (p !== null) {
-                for (var i_61 = 0; i_61 < elems.length; i_61++) {
-                    p.removeChild(elems[i_61]);
+                for (var i_60 = 0; i_60 < elems.length; i_60++) {
+                    p.removeChild(elems[i_60]);
                 }
             }
             this.nodeStore = elems;
@@ -6328,11 +6878,11 @@ var Turtle = (function (_super) {
         //预加载依赖项
         if (load) {
             var loads_1 = load.split(",");
-            var i_62 = 0;
+            var i_61 = 0;
             var fnLoad_1 = function () {
-                i_62++;
-                if (i_62 < loads_1.length) {
-                    includeJSFiles(loads_1[i_62], fnLoad_1);
+                i_61++;
+                if (i_61 < loads_1.length) {
+                    includeJSFiles(loads_1[i_61], fnLoad_1);
                 }
                 else {
                     if (compileInfo && compileInfo.isOn && compileInfo.url) {
@@ -6417,9 +6967,9 @@ var Turtle = (function (_super) {
                     c.appendChild(br.cloneNode());
                     c.appendChild(br.cloneNode());
                     c.appendChild(document.createTextNode(text));
-                    for (var i_63 = 0; i_63 < compileJS.length; i_63++) {
-                        var url_1 = compileInfo.url + "?uiName=" + compileJS[i_63].name + "&uiPath=" + compileJS[i_63].path;
-                        this.xhr.post(url_1, compileJS[i_63].script, false, function (text) {
+                    for (var i_62 = 0; i_62 < compileJS.length; i_62++) {
+                        var url_1 = compileInfo.url + "?uiName=" + compileJS[i_62].name + "&uiPath=" + compileJS[i_62].path;
+                        this.xhr.post(url_1, compileJS[i_62].script, false, function (text) {
                             c.appendChild(br.cloneNode());
                             c.appendChild(document.createTextNode(text));
                         });
@@ -6470,26 +7020,24 @@ var Turtle = (function (_super) {
     return Turtle;
 }(EventEmitterEx));
 /// <reference path='./main/Turtle.ts'/>
-if (!$DOM) {
-    $DOM = function (html) {
-        var elem = document.createElement('ui:dom');
-        elem.innerHTML = html;
-        return elem;
-    };
-    $node = function (name, nodeType) {
-        switch (nodeType) {
-            case 3:
-                return document.createTextNode(name);
-            case 8:
-                return document.createComment(name);
-            case 1:
-            case undefined:
-                return document.createElement(name);
-            case 10:
-                return null;
-            default:
-                return null;
-        }
-    };
-}
+// if(!$DOM){
+//     $DOM=function(html){
+//         var elem=document.createElement('ui:dom');elem.innerHTML=html;return elem;
+//     }
+//     $node=<any>function(name:string,nodeType?:number):INode|null{
+//         switch(nodeType){
+//             case 3:
+//                 return <any>document.createTextNode(name);
+//             case 8:
+//                 return <any>document.createComment(name);
+//             case 1:
+//             case undefined:
+//                 return <any>document.createElement(name);
+//             case 10:
+//                 return null;
+//             default:
+//                 return null;
+//         }
+//     };
+// }
 var turtle = $t = new Turtle();

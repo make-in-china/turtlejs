@@ -10,16 +10,16 @@
 
 declare let $t:ITurtle;
 let
-    $DOM,
-    $node: I$Node,
+    // $DOM,
+    // $node: I$Node,
     operatorRE = /\!=|==|=|<|>|\|/;
-interface I$Node {
-    (name:'__break__', nodeType?:number):IHTMLBreakElement
-    (name: string, nodeType?: 1): INode
-    (name: string, nodeType?: 3): IText
-    (name: string, nodeType?: 8): IComment
-    (name: string, nodeType?: number): INode | null
-}
+// interface I$Node {
+//     (name:'__break__', nodeType?:number):IHTMLBreakElement
+//     (name: string, nodeType?: 1): INode
+//     (name: string, nodeType?: 3): IText
+//     (name: string, nodeType?: 8): IComment
+//     (name: string, nodeType?: number): INode | null
+// }
 interface ITurtle {
     xhr: XHR;
     refs: IKeyArrayHashObject<IHTMLElement>;
@@ -52,17 +52,17 @@ function getScopeBy(scope, node: INode) {
 // }
 
 function setNodeProperty(node, proName, condition, outerChildNodes, outerElement, props, part) {
-    let v = execByScope(node, condition, null, outerChildNodes, outerElement, props, part);
+    let v = Order.exec(node, condition)//debugger , null, outerChildNodes, outerElement, props, part);
     let name = camelCase(proName.substr(0, proName.length - 1));
 
     if (name.indexOf(".") != -1) {
         let obj2 = node;
-        name = name.split(".");
-        for (let i = 0; i < name.length - 1; i++) {
-            obj2 = obj2[name[i]];
+        let nameArr = name.split(".");
+        for (let i = 0; i < nameArr.length - 1; i++) {
+            obj2 = obj2[nameArr[i]];
             if (!obj2) return;
         }
-        name = name[name.length - 1];
+        name = nameArr[nameArr.length - 1];
         obj2[name] = v;
     } else {
         node.setAttribute(name, v);
@@ -90,7 +90,7 @@ function getTemplate(node: IHTMLElement): string {
     if (templateConfig.hasOwnProperty(nodeName)) {
         debugger;
         if (templateConfig[nodeName].hasOwnProperty('getData')) {
-            return templateConfig[nodeName].getData(node);
+            return (<{getData(node:INode):string}>templateConfig[nodeName]).getData(node);
         } else {
             return node.innerHTML;
         }
@@ -118,20 +118,20 @@ function defineServiceByNode(node: IHTMLElement) {
     }
     removeNode(node);
 }
-function getExtendsByNode(node: IHTMLElement, sortPath: string) {
-    let ext = getAttr(node, 'extends', null);
-    if (isString(ext)) {
-        return getExtends(ext, sortPath);
-    }
-}
-function defineUIByNode(node: IHTMLElement) {
-    let name = getAttr(node, 'ui');
-    let ext = getExtendsByNode(node, 'ui');
-    if (name) {
-        $t.T.define(name, '', '', getTemplate(node), ext);
-    }
-    removeNode(node);
-}
+// function getExtendsByNode(node: IHTMLElement, sortPath: string) {
+//     let ext = getAttr(node, 'extends', null);
+//     if (isString(ext)) {
+//         return getExtends(ext, sortPath);
+//     }
+// }
+// function defineUIByNode(node: IHTMLElement) {
+//     let name = getAttr(node, 'ui');
+//     let ext = getExtendsByNode(node, 'ui');
+//     if (name) {
+//         $t.T.define(name, '', '', getTemplate(node), ext);
+//     }
+//     removeNode(node);
+// }
 function defineClasses(node: IHTMLElement) {
     let v = getAttr(node, 'class');
     if (v) {
@@ -144,9 +144,9 @@ function parseDefine(node: IHTMLElement) {
         case node.hasAttribute('service'):
             defineServiceByNode(node);
             break;
-        case node.hasAttribute('ui'):
-            defineUIByNode(node);
-            break;
+        // case node.hasAttribute('ui'):
+        //     defineUIByNode(node);
+        //     break;
         case node.hasAttribute('class'):
             defineClasses(node);
             break;
@@ -173,7 +173,7 @@ function isTemplate(node: IHTMLElement): node is IHTMLElement {
     return false;
 }
 function findTemplates(nodes: IHTMLElement[] | IArray): IElement[] | IArray {
-    let temps = [];
+    let temps:IElement[] = [];
     treeEach(nodes, 'children', function (node) {
         if (isTemplate(node)) {
             temps.push(node);
@@ -211,35 +211,41 @@ function parseUITemplate(uiName: string, uiSortPath: string, uiPath: string, sHT
         }
     }
 }
-function importUIHTML(uiName: string, uiSortPath: string) {
+/**
+ * 加载UI
+ */
+function importUI(uiName: string, uiSortPath: string):Part {
+
     if (!$t.T.hasOwnProperty(uiName)) {
         let uiPath = baseUIPath.getPathBySortPath(uiSortPath);
-        $t.xhr.get(uiPath + '/' + (uiName + '.html').toLowerCase(), false, function (text: string) {
-            parseUITemplate(uiName, uiSortPath, uiPath, text);
-        });
+        let path=uiPath + '/' + (uiName + '.html').toLowerCase();
+        
+        // $t.xhr.get(path, false, function (text: string) {
+        //     parseUITemplate(uiName, uiSortPath, uiPath, text);
+        // });
     }
     return $t.T[uiName];
 }
 
-function getExtends(extName, sortPath) {
-    let ext;
-    if (extName.indexOf(':') !== -1) {
-        extName = extName.split(':');
-        sortPath = extName[0] ? extName[0] : sortPath;
-        extName = extName[1];
-    }
-    if (!isObject(importUIHTML(extName, sortPath))) {
-        throw new Error('找不到可继承的模板：' + extName);
-    }
-    ext = $t.T[extName];
-    return ext;
-}
+// function getExtends(extName, sortPath) {
+//     let ext;
+//     if (extName.indexOf(':') !== -1) {
+//         extName = extName.split(':');
+//         sortPath = extName[0] ? extName[0] : sortPath;
+//         extName = extName[1];
+//     }
+//     if (!isObject(importUI(extName, sortPath))) {
+//         throw new Error('找不到可继承的模板：' + extName);
+//     }
+//     ext = $t.T[extName];
+//     return ext;
+// }
 
 
 /**从DOM树获取父组件
  * @param {}
  */
-function getParentPart(node:INode):Part|null{
+function getParentPart(node:VNode):Part|null{
     while(1){
         if(node.previousSibling!==null){
             node=node.previousSibling;
@@ -248,20 +254,20 @@ function getParentPart(node:INode):Part|null{
         }else{
             return null;
         }
-        if(isCommentNode(node)&&node.__part__){
-            if(node.__sign__===0){
-                node=node.__part__.refs.begin;
+        if(isCommentNode(node)&&node.vmData.part){
+            if(node.vmData.sign===0){
+                node=node.vmData.part.refs.begin;
             }else{
-                return node.__part__;
+                return node.vmData.part;
             }
         }
     }
     return null;
 }
 function parseAsync(node: IHTMLElement, outerChildNodes, outerElement, props, part) {
-    let delay = parseInt(execByScope(node, node.getAttribute('async'), null, outerChildNodes, outerElement, props, part));
+    let delay = parseInt(Order.exec(node, node.getAttribute('async')));//, null, outerChildNodes, outerElement, props, part));
     node.removeAttribute('async');
-    let mark = $node('async', 8);
+    let mark = $$$('async', ENodeType.Comment);
     replaceNodeByNode(node, mark);
     if (delay === NaN) {
         delay = 0;
@@ -295,7 +301,7 @@ function parseUI(node: IHTMLElement, uiInfo, step, part) {
         outerChildNodes,
         outerElement,
         cpn,
-        ui = importUIHTML(uiInfo.name, uiInfo.sortPath);
+        ui = importUI(uiInfo.name, uiInfo.sortPath);
 
     if (!ui) {
         removeNode(node);
@@ -412,7 +418,7 @@ function parseSet(node: IHTMLElement, outerChildNodes: INode[], outerElement: IE
 
 let includeJSFiles = (function () {
     class IncludeTask {
-        static jsScript: IHashObject<IHTMLScriptElement> = {};
+        static jsScript: IHashObject<VMElement.VScriptElement> = {};
         files: string[];
         constructor(public parent: IncludeTask, files: string[] | string, public callback?: () => void) {
             if (parent) {
@@ -426,7 +432,7 @@ let includeJSFiles = (function () {
                     let url = files[i];
                     if (isString(url) && !(url in data)) {
                         arr.push(url);
-                        data[url] = <IHTMLScriptElement>$node("script");
+                        data[url] = $$$("script");
                     }
                 }
             } else if (files) {
@@ -434,7 +440,7 @@ let includeJSFiles = (function () {
                 let url: string = <string>files;
                 if (isString(url) && !(url in data)) {
                     arr.push(url);
-                    data[url] = <IHTMLScriptElement>$node("script");
+                    data[url] = $$$("script");
                 }
             } else {
                 arr = [];
@@ -560,7 +566,7 @@ function parseScript(node: IHTMLElement, outerChildNodes, outerElement, props, p
 function execNodeQuestion(node: IHTMLElement, outerChildNodes, outerElement, props, part) {
     let v = takeAttr(node, ':', "");
     if (v && v.length > 0) {
-        execByScope(node, v, null, outerChildNodes, outerElement, props, part);
+        Order.exec(node, v);//, null, outerChildNodes, outerElement, props, part);
     }
 }
 function bindNode(node: INode, obj, name) {
@@ -680,10 +686,10 @@ function bindEval(node: INode, s, outer, outerElement, props, part, fn) {
 class ElementParser {
     GET = parseGet
     SET = parseSet
-    __BREAK__ = parseBreakOrder
+    // __BREAK__ = parseBreakOrder
     SCRIPT = parseScript
 }
-function bindShowHide(node: INode, s, isBindShow, outer, outerElement, props, part) {
+function bindShowHide(node: IElement, s, isBindShow, outer, outerElement, props, part) {
     bindEval(node, s, outer, outerElement, props, part, function (v) {
         if (v) {
             if (isBindShow) {
@@ -735,7 +741,7 @@ class AttributeParser {
         });
     }
     add(node, outerChildNodes, outerElement, props, part) {
-        var placeholder = $node('', 8);
+        var placeholder = $$$('', ENodeType.Comment);
         replaceNodeByNode(node, placeholder);
         var bindInfo = bindEval(node, takeAttr(node, 'add'), outerChildNodes, outerElement, props, part, function (v) {
             if (!v) return;
@@ -764,10 +770,11 @@ let elementParser = new ElementParser;
 let attributeParser = new AttributeParser;
 function initHTML(arr: INode[]|INodeList, outerChildNodes?, outerElement?, props?, part?) {
     treeEach(arr, 'childNodes', function (node: IHTMLElement, step) {
-        if (node.nodeType === 8) {
-            // try {
-                parseComment(node, outerChildNodes, outerElement, props, part);
-            // } catch (e) { _catch(e) }
+        if (node instanceof VComment) {
+            let order = Order.parseComment(node);
+            if (order && order.run) {
+                order.run();
+            };
             return eTreeEach.c_noIn;
         }
         if (node.nodeType !== 1) {
@@ -804,14 +811,14 @@ function initHTML(arr: INode[]|INodeList, outerChildNodes?, outerElement?, props
         }
     });
 }
-function getParts(childNodes: INode[]): Part[] {
+function getParts(childNodes: VNode[]): Part[] {
     let child: Part[] = [];
     let cpn:Part|undefined;
-    treeEach(childNodes, "childNodes", function (node: INode) {
-        if (node.nodeType === 8 && (<IComment>node).__part__) {
-            let part=(<IComment>node).__part__;
+    treeEach(childNodes, "childNodes", function (node) {
+        if (node.nodeType === 8 && node.vmData.part) {
+            let part=node.vmData.part;
             if (cpn) {
-                if ( part === cpn && (<IComment>node).__sign__ === 0) {
+                if ( part === cpn && node.vmData.sign === 0) {
                     child.push(part);
                     cpn = undefined;
                 }

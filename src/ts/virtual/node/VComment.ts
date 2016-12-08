@@ -59,7 +59,7 @@ class VComment extends VCharacterData{
         }
         return ret;
     }
-    protected doToDOM():Comment{
+    protected doBeDOM():Comment{
         let elem = document.createComment(this.data);
         return elem;
     }

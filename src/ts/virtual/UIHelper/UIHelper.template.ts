@@ -37,9 +37,7 @@ ${scripts!==''?`
 namespace Component{
     export class ${className} extends Part{
         constructor(
-            template:PartTemplate,
             props:Object,
-            html:string,
             public outerChildNodes:INode[],
             public outerElement:IHTMLCollection
         ) {

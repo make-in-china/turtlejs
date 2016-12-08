@@ -16,3 +16,7 @@ class VPlaceHolder extends VComment{
         this.parentNode.removeChild(<any>this);
     }
 }
+bindClassToFunctionHelper[ENodeType.PlaceHolder]=function(node:IVNodeMethod & VNode,nodeName: string){
+    node.__proto__=VPlaceHolder.prototype;
+    VPlaceHolder.call(node);
+}

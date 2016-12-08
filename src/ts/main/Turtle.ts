@@ -11,23 +11,6 @@
 /// <reference path='../lib/Encode.ts'/>
 
 
-let 
-        readyRE                 =   /complete|loaded|interactive/;
-
-function renderTemplate(tp:IHTMLElement){
-    let sHTML=getTemplate(tp);
-    let vDOM=$DOM(sHTML);
-    initHTML(vDOM.childNodes);
-    
-    if(isFunction(vDOM)){
-        let p=tp.parentNode;
-        replaceNodeByNodes(tp,takeChildNodes(vDOM.beDOM()));
-        vDOM.__domNode__=p;
-        return;   
-    }
-    replaceNodeByNodes(tp,takeChildNodes(vDOM.beDOM()));
-    //vDOM.innerHTML='';
-}
 interface IRenderDocument{
     ():void;
     beginTime?:Date;
@@ -37,6 +20,7 @@ interface IRenderDocument{
 
 
 
+let readyRE                 =   /complete|loaded|interactive/;
 class Turtle extends EventEmitterEx implements ITurtle{
     // domScope                                =new DOMScope;
     // rootScope                               =new Scope;
@@ -156,12 +140,37 @@ class Turtle extends EventEmitterEx implements ITurtle{
             parts[i].$resize.emit(parts[i]);
         }
     }
+    renderTemplate(tp:IHTMLElement){
+        let sHTML=getTemplate(tp);
+        let vDOM=VDOM(sHTML);
+        let vDOMs:(VNode&IVNodeMethod)[];
+        if(isArray(vDOM)){
+            vDOMs=vDOM;
+        }else{
+            vDOMs=[vDOM];
+            vDOM.beDOM
+        }
+        
+        initHTML(vDOMs);    
+        // if(isFunction(vDOM)){
+        let p=tp.parentNode;
+        let doms:INode[]=[]
+        for(const node of vDOMs){
+            doms.push(node.beDOM());
+        }
+        replaceNodeByNodes(tp,doms);
+        // vDOM.__domNode__=p;debugger;
+            // return;   
+        // }
+        // replaceNodeByNodes(tp,takeChildNodes(vDOM.beDOM()));
+        //vDOM.innerHTML='';
+    }
     renderDocument:IRenderDocument=()=>{
         this.renderDocument.beginTime=new Date();
         let 
             xmps=findTemplates(document.body.children),
             i,
-            templateXMP=[];
+            templateXMP:IHTMLElement[]=[];
         /*优先处理定义相关的模板*/
         for(i=0;i<xmps.length;i++){
             if(isDefine(xmps[i])){
@@ -172,7 +181,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
         }
         /*处理逻辑模板*/
         for(i=0;i<templateXMP.length;i++){
-            renderTemplate(templateXMP[i]);
+            this.renderTemplate(templateXMP[i]);
         }
         
         replaceCls();

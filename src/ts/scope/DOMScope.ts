@@ -1,5 +1,5 @@
 /// <reference path="Scope.ts"/>
-/// <reference path="../virtual/UIHelper/BaseVNode.ts"/>
+/// <reference path='../virtual/UIHelper/VDOM.ts'/>
 
 
 typeof document==="undefined"&&(document=<any>$$$('#document'));

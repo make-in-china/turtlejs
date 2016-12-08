@@ -13,3 +13,7 @@ class VScript extends VPlaceHolder{
     }`;
     }
 }
+bindClassToFunctionHelper[ENodeType.Script]=function(node:IVNodeMethod & VNode,nodeName: string){
+    node.__proto__=VScript.prototype;
+    VScript.call(node);
+}

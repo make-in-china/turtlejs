@@ -1,6 +1,7 @@
 
 /// <reference path="../core/BrowserHelper.ts"/>
-class TemplateList extends EventEmitter{
+class Template extends EventEmitter{
+    list:IHashObject<Part>[]=[]
     onDefine(name:string,fn:ICallBack){
         if(name.length===0){
             return;
@@ -8,8 +9,8 @@ class TemplateList extends EventEmitter{
         this.on(name,fn);
         this.emit(name,fn);
     }
-    define(name:string,sortPath:string,path:string,s:string,ext){
-        this[name]=new PartTemplate(name,sortPath,path,s,ext);
+    define(name:string,sortPath:string,path:string,s:string){
+        this[name]=new PartTemplate(name,sortPath,path,s);
         // this.event.emit(name,this[name]);
         this.emit(name,this);
         return this[name];

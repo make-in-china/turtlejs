@@ -3,9 +3,7 @@
 namespace Component{
     export class Button{
         constructor(
-            template:PartTemplate,
             props:Object,
-            html:string,
             public outerChildNodes:INode[],
             public outerElement:IHTMLCollection
         ) {

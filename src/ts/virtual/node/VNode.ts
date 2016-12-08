@@ -177,7 +177,7 @@ abstract class VNode implements INode{
         if (this.vmData.domNode) {
             return this.vmData.domNode;
         }
-        let elem=this.doToDOM();
+        let elem=this.doBeDOM();
         this.copyPropertyToNode(elem);
         this.vmData.domNode = elem;
         this.connectParent(elem);
@@ -185,7 +185,7 @@ abstract class VNode implements INode{
         elem.__vdomNode__ = <any>this;
         return elem;
     }
-    protected doToDOM(): Node{
+    protected doBeDOM(): Node{
         let toHelp = document.createElement('__Turtle__');//用于创建
         toHelp.innerHTML = this.vmData.data;
         let elem = toHelp.removeChild(toHelp.childNodes[0]);
@@ -366,56 +366,51 @@ abstract class VNode implements INode{
         return node ? node : null;
     }
 }
-
-function bindClassToFunction(node:IVNodeMethod & VNode,nodeName: string, nodeType?: ENodeType|undefined){
-    if(nodeType===ENodeType.Member){
-        node.__proto__=VMember.prototype;
-        (<any>VMember).call(node,nodeName);
-
-    }else if(nodeType===ENodeType.Script){
-        node.__proto__=VScript.prototype;
-        (<any>VScript).call(node,nodeName);
-
-    }else if(nodeType===ENodeType.PlaceHolder){
-        node.__proto__=VPlaceHolder.prototype;
-        (<any>VPlaceHolder).call(node,nodeName);
-
-    }else if(nodeType===ENodeType.DocumentType){
+interface IBindClassToFunction{
+    [index:number]:(node:IVNodeMethod & VNode,nodeName: string)=>void
+}
+let bindClassToFunctionHelper:IBindClassToFunction=<any>{
+    [ENodeType.DocumentType](node:IVNodeMethod & VNode,nodeName: string){
         node.__proto__=VDocumentType.prototype;
-        (<any>VDocumentType).call(node);
-
-    }else if(nodeType===ENodeType.Comment){
+        VDocumentType.call(node);
+    },
+    [ENodeType.Comment](node:IVNodeMethod & VNode,nodeName: string){
         node.__proto__=VComment.prototype;
-        (<any>VComment).call(node,nodeName);
-
-    }else if(nodeType===ENodeType.Text){
+        VComment.call(node,nodeName);
+    },
+    [ENodeType.Text](node:IVNodeMethod & VNode,nodeName: string){
         node.__proto__=VText.prototype;
-        (<any>VText).call(node,nodeName);
-
-    }else if(nodeType===ENodeType.Document){
+        VText.call(node,nodeName);
+    },
+    [ENodeType.Document](node:IVNodeMethod & VNode,nodeName: string){
         node.__proto__=VDocument.prototype;
-        (<any>VDocument).call(node);
-
-    }else if(nodeType===ENodeType.DocumentFragment){
-        //未实现
-
-    }else if(nodeType===undefined||nodeType===ENodeType.Element){
+        VDocument.call(node);
+    }
+}
+function bindClassToFunction(node:IVNodeMethod & VNode,nodeName: string, nodeType?: ENodeType|undefined){
+    if(nodeType!==undefined){
+        let fn=bindClassToFunctionHelper[nodeType];
+        if(fn){
+            fn(node,nodeName);
+            return '';
+        }
+    }
+    if(nodeType===undefined||nodeType===ENodeType.Element){
         if(nodeName[0]==='#'){
-            nodeName=nodeName.substr(1).toLowerCase();
             switch(nodeName){
-                case "text":
+                case "#text":
                     node.__proto__=VText.prototype;
                     (<any>VText).call(node,nodeName);
                     break;
-                case "comment":
+                case "#comment":
                     node.__proto__=VComment.prototype;
                     (<any>VComment).call(node,nodeName);
                     break;
-                case "document":
+                case "#document":
                     node.__proto__=VDocument.prototype;
                     (<any>VDocument).call(node);
                     break;
-                case "document-fragment":
+                case "#document-fragment":
                     //未实现
                     break;
             }

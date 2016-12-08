@@ -1,6 +1,7 @@
 
 /// <reference path='TemplateList.ts'/>
 class Service extends TemplateList{
+    [index:string]:Object
     private __defineCallbacks__:ArrayEx<Function>=new ArrayEx<Function>();
     constructor(serv?:Service){
         super();
@@ -29,7 +30,7 @@ class Service extends TemplateList{
     }
     toDefineString(){
         let s='new $t.Service(';
-        let fns=[];
+        let fns:string[]=[];
         for(let i in this){
             if(this.hasOwnProperty(i)){
                 fns.push('"'+i+'":'+this[i].toString());    

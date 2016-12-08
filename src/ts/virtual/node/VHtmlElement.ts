@@ -133,7 +133,7 @@ namespace VMElement{
             }
             return elem;
         }
-        protected doToDOM(): Node {
+        protected doBeDOM(): Node {
             let elem=this.doBaseToDOM();
             let chds = this.childNodes;
             for (let j = 0; j < chds.length; j++) {

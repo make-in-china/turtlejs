@@ -1,64 +1,17 @@
+/// <reference path="../src/ts/virtual/node/.d.ts" />
 declare class ArrayEx<T> extends Array<T> {
     last(): T | undefined;
     clear(): void;
 }
-declare let arrayConstructor: Array<any>, objectConstructor: ObjectConstructor, stringConstructor: String, toStr: () => string, slice: (start?: number, end?: number) => any[], push: (...items: any[]) => number, splice: {
-    (start: number): any[];
-    (start: number, deleteCount: number, ...items: any[]): any[];
-}, indexOf: (searchElement: any, fromIndex?: number) => number, getPrototypeOf: (o: any) => any, replace: {
-    (searchValue: string, replaceValue: string): string;
-    (searchValue: string, replacer: (substring: string, ...args: any[]) => string): string;
-    (searchValue: RegExp, replaceValue: string): string;
-    (searchValue: RegExp, replacer: (substring: string, ...args: any[]) => string): string;
-};
-interface Constructor {
-    prototype: Object;
-}
-declare function extend<T>(elem: T, elemEx: any): T;
-declare function merge<T>(elem: T, elemEx: any): T;
-declare function removeItem<T>(arr: {
-    [index: number]: T;
-    length: number;
-}, obj: T): void;
-declare function persentToFloat(s: string): number | undefined;
-declare function parseBool(v: any): boolean;
-declare function trim(s: any): any;
-declare function HTMLTrim(s: any): any;
-declare function trimLine(s: any): any;
-declare let dateFormat: (format: any, d: any) => any;
-declare let camelCaseRE: RegExp, camelizeRE: RegExp, deCamelizeRE: RegExp;
-declare function camelCase(s: any): any;
-declare function camelize(str: string): string;
-declare function decamelize(str: string): string;
-declare function splitByOnce(s: string, split: string): Array<string>;
-declare function getBind(obj: Object, fn: Function): () => any;
-declare let persentRE: RegExp;
-declare function isNull<T>(p: T | null): p is null;
-declare function isUndefined<T>(p: T | undefined): p is undefined;
-declare function isObject<T>(p: any): p is Object;
-declare function isRegExp(a: any): a is RegExp;
-declare function isDate(a: any): a is Date;
-declare function isNumber(a: any): a is number;
-declare function isString(a: any): a is string;
-declare function isFunction(a: any): a is Function;
-declare let isArray: (arg: any) => arg is any[];
-declare function isPersent(s: any): boolean;
-declare function isArrayLike(a: any): boolean;
-declare class IAttr {
-    readonly name: string;
-    value: string;
-    constructor(name: string, value: string);
-}
-declare class INamedNodeMap {
+interface INamedNodeMap {
     [index: number]: IAttr;
-    private _length;
-    indexOfName(name: string): number;
-    indexOf(o: any): number;
+    indexOfName(name: string): any;
+    indexOf(o: any): any;
     getNamedItem(name: string): IAttr | null;
     item(index: number): IAttr | undefined;
     readonly length: number;
-    removeNamedItem(v: string | Object): void;
-    setNamedItem(arg: IAttr): void;
+    removeNamedItem(v: string | Object): any;
+    setNamedItem(arg: IAttr): any;
 }
 interface IExp {
     (...arg: any[]): any;
@@ -407,7 +360,7 @@ interface IText extends ICharacterData {
     splitText(offset: number): Text;
 }
 interface IComment extends ICharacterData {
-    text: string;
+    textContent: string;
 }
 interface IHTMLCollection {
     /**
@@ -778,11 +731,11 @@ declare let vNodesToDOM: (nodes: INode[]) => INode[];
 declare function insertNodesBefore(node: INode, nodes: INode[]): void;
 declare function removeNode(this: void, node: INode): INode | null;
 declare function replaceNodeByNodes(node: INode, nodes: INode[]): void;
-declare function insertNode(node: INode, childNode: any): number;
+declare function insertNode(refChilde: INode, newChild: INode): number;
 declare function nodesToString(nodes: INode[]): string;
 declare function cloneBetween(node1: INode, node2: INode): INode[] | null;
 declare function removeBlockBetween(node1: INode, node2: INode): any;
-declare function replaceNodeByNode(node: INode, node2: INode): void;
+declare function replaceNodeByNode(refChilde: INode, newChild: INode): void;
 declare function appendNodes(nodes: INode[] | INodeList | IHTMLCollection, parent: INode): void;
 declare function takeChildNodes(node: INode): INode[];
 declare function takeOutChildNodes(node: INode): void;
@@ -794,26 +747,85 @@ declare function getNodeIndex2(node: INode): number;
 declare function takeAttr<T extends string | null>(node: IElement, attrName: string, defaultValue?: T): T | string | undefined;
 declare function getAttr<T extends string | null>(node: IElement, attrName: string, defaultValue?: T): T | string | undefined;
 declare let addStyleRE: RegExp;
-declare function addStyle(elem: any, style: any): void;
+declare function addStyle(elem: IElement, style: string): void;
 declare let addClassNameRE: RegExp;
-declare function addClassName(elem: any, className: any): void;
-declare function addClass(elem: any, ...arg: any[]): void;
-declare function addClasses(elem: any, clses: any): void;
-declare function removeClass(elem: any, cls: any): void;
-declare function removeClasses(elem: any, clses: any): void;
-declare function replaceClass(sel: any, a: any, b: any): void;
-declare function toggleClass(sel: any, a: any, t: any, f: any): void;
+declare function addClassName(elem: IElement, className: string): void;
+declare function addClass(elem: IElement, ...arg: any[]): void;
+declare function addClasses(elem: IElement, clses: string[]): void;
+declare function removeClass(elem: IElement, cls: string): void;
+declare function removeClasses(elem: IElement, clses: string[]): void;
+declare function replaceClass(elem: IElement, a: string, b: string): void;
+declare function toggleClass(elem: IElement, a: string, t: Function, f: Function): void;
 /**判断是否注释节点 */
 declare function isCommentNode(node: INode): node is IComment;
 /**判断是否文本节点 */
 declare function isTextNode(node: INode): node is IText;
+declare let arrayConstructor: Array<any>, objectConstructor: ObjectConstructor, stringConstructor: String, toStr: () => string, getPrototypeOf: (o: any) => any, replace: {
+    (searchValue: string, replaceValue: string): string;
+    (searchValue: string, replacer: (substring: string, ...args: any[]) => string): string;
+    (searchValue: RegExp, replaceValue: string): string;
+    (searchValue: RegExp, replacer: (substring: string, ...args: any[]) => string): string;
+}, slice: {
+    <T>(start?: number, end?: number): T[];
+    call<T>(arr: IArray | T[], start?: number, end?: number): T[];
+}, push: {
+    <T>(...items: T[]): number;
+    apply<T>(arr: IArray | T[], items: T[]): number;
+    call<T>(arr: IArray | T[], ...items: T[]): number;
+}, splice: {
+    <T>(start: number): T[];
+    call<T>(arr: IArray | T[], start: number): T[];
+    call<T>(arr: IArray | T[], start: number, deleteCount: number, ...items: T[]): T[];
+}, indexOf: {
+    <T>(searchElement: T, fromIndex?: number): number;
+    call<T>(arr: IArray | T[], searchElement: T, fromIndex?: number): number;
+};
+declare let last: {
+    <T>(): T | undefined;
+    call<T>(arr: IArray | T[]): T | undefined;
+};
+interface Constructor {
+    prototype: Object;
+}
+declare function extend<T>(elem: T, elemEx: any): T;
+declare function merge<T>(elem: T, elemEx: any): T;
+declare function removeItem<T>(arr: {
+    [index: number]: T;
+    length: number;
+}, obj: T): void;
+declare function persentToFloat(s: string): number | undefined;
+declare function parseBool(v: any): boolean;
+declare function trim(s: string): string;
+declare function HTMLTrim(s: string): string;
+declare function trimLine(s: string): string;
+declare let dateFormat: (format: string, d: Date) => string;
+declare let camelCaseRE: RegExp, camelizeRE: RegExp, deCamelizeRE: RegExp;
+declare function camelCase(s: string): string;
+declare function camelize(str: string): string;
+declare function decamelize(str: string): string;
+declare function splitByOnce(s: string, split: string): Array<string>;
+declare function getBind(obj: Object, fn: Function): () => any;
+/**从注释中读取字符串 */
+declare let getCommentText: (node: IComment) => string;
+declare let persentRE: RegExp;
+declare function isNull<T>(p: T | null): p is null;
+declare function isUndefined<T>(p: T | undefined): p is undefined;
+declare function isObject<T>(p: any): p is Object;
+declare function isRegExp(a: any): a is RegExp;
+declare function isDate(a: any): a is Date;
+declare function isNumber(a: any): a is number;
+declare function isString(a: any): a is string;
+declare function isFunction(a: any): a is Function;
+declare let isArray: (arg: any) => arg is any[];
+declare function isPersent(s: any): boolean;
+declare function isArrayLike(a: any): boolean;
 interface ICallBack {
     (this: void, ...arg: any[]): void;
 }
 declare class EventEmitter {
     protected events: {
         [index: string]: ICallBack | ICallBack[] | undefined;
-        error?;
+        error?: ICallBack | ICallBack[];
     };
     constructor();
     emit(type: string, ...args: any[]): boolean;
@@ -861,11 +873,19 @@ declare const enum eTreeEach {
     c_noIn = 4,
     c_noRepeat = 8,
 }
-interface ITreeEachStep {
-    next: number;
+interface ITreeEachState<T> {
+    stack: [T[] | IArray, number];
+    nextStepLength: number;
+    currentIndex: number;
 }
 interface IArray {
     length: number;
+}
+interface ITreeEachReturn {
+    stack: [IArray | INode[], number];
+    return: eTreeEach | undefined;
+    array: IArray | INode[];
+    index: number;
 }
 /**
  * 遍历树
@@ -874,12 +894,7 @@ interface IArray {
  * @param {(node:T,step?:ITreeEachStep)=>eTreeEach|undefined} fn 回调函数
  * @param {number} beginIndex 遍历起始位置
  */
-declare function treeEach<T>(array: T[] | IArray, propertyName: string, fn: (node: T, step: ITreeEachStep) => (eTreeEach | void), beginIndex?: number): {
-    stack: [IArray | T[], number];
-    state: eTreeEach;
-    array: IArray | T[];
-    index: number;
-};
+declare function treeEach<T>(array: T[] | IArray, propertyName: string, fn: (node: T, state: ITreeEachState<T>) => (eTreeEach | void), beginIndex?: number): ITreeEachReturn | undefined;
 interface Window {
     ActiveXObject?: Object;
 }
@@ -893,9 +908,10 @@ declare class TemplateList extends EventEmitter {
     toString(): string;
 }
 declare class Service extends TemplateList {
+    [index: string]: Object;
     private __defineCallbacks__;
     constructor(serv?: Service);
-    require(n: any): any;
+    require(n: any): Object;
     define(name: any, s: any): void;
     toDefineString(): string;
 }
@@ -912,61 +928,1488 @@ declare class BasePath {
     toString(): string;
 }
 declare class TemplateConfig {
-    ["XMP"]: {};
-    ["TEMPLATE"]: {};
-    ["TITLE"]: {
+    [index: string]: Object;
+    XMP: {};
+    TEMPLATE: {};
+    TITLE: {
         getData: (node: IHTMLTitleElement) => string;
     };
-    ["STYLE"]: {
+    STYLE: {
         xmp: any;
     };
-    ["SCRIPT"]: {
+    SCRIPT: {
         xmp: any;
     };
-    ["TEXTAREA"]: {
+    TEXTAREA: {
         xmp: any;
         getData: (node: IHTMLTextAreaElement) => string;
     };
     toString(): string;
-    readonly items: Array<NameItem>;
+    readonly items: NameItem[];
     findByString(str: string): RegExpMatchArray | undefined;
 }
 declare let templateConfig: TemplateConfig;
 declare let baseUIPath: BasePath;
-declare let withthis: string, _execValueByScope: Function, _execByScope: Function, _execExpressionsByScope: Function;
-declare function execValueByScope(node: INode, s: string, v: any, scope: Scope, outerChildNodes: INode[], outerElement: IHTMLElement[], props: any, part: Part): any;
-declare let execTemplateScript: (s: string, node: INode, outerChildNodes: INode[], outerElement: any, props: any, part: any) => string;
-declare class RootScope {
-    __actionNode__: HTMLElement;
-    __children__: Scope[];
-    constructor();
-}
-declare let $rootScope: RootScope;
 interface INode {
     __scope__?: Scope;
 }
 declare class Scope {
-    __commentNode__: INode;
     __name__: string;
-    __actionNode__: INode | null;
-    __parent__: Scope | RootScope | null;
+    __actionNode__: INode;
+    __parent__: Scope | null;
     __children__: Scope[];
-    __proto__: Object | Scope;
-    constructor(__commentNode__: INode, parent: Scope | RootScope, __name__?: string);
+    __proto__: Scope | null;
+    constructor(commentNode: IComment, parent: Scope | null, __name__?: string);
 }
+declare class RootScope implements Scope {
+    document: INode;
+    __actionNode__: INode;
+    __parent__: null;
+    __children__: Scope[];
+    __proto__: Scope | null;
+    constructor(document: INode);
+}
+declare class IAttr {
+    readonly name: string;
+    value: string;
+    constructor(name: string, value: string);
+}
+declare class VNamedNodeMap {
+    [index: number]: IAttr;
+    private _length;
+    indexOfName(name: string): number;
+    indexOf(o: any): number;
+    getNamedItem(name: string): IAttr | null;
+    item(index: number): IAttr | undefined;
+    readonly length: number;
+    removeNamedItem(v: string | Object): void;
+    setNamedItem(arg: IAttr): void;
+    toJS(): string;
+}
+declare let styleListRE: RegExp;
+declare class VStyle {
+    constructor(elem: VElement);
+}
+declare function indexOfStyleName(t: any, name: string): number;
+declare function updateStyleAttribyte(t: any): void;
+declare function setVStyleGetSet(name: string): void;
+declare var VStyleprototype: {};
+declare var styleNode: {};
+/**
+ * 一个普通对象
+ * @param {string} s 格式为:xxx,yyy,zzz
+ * @param {any} defaultValue 初始化时每个属性的默认值
+ */
+declare class HashObject {
+    constructor(s: string, defaultValue?: any);
+}
+interface IHashObject<T> {
+    [index: string]: T;
+}
+declare class HashObjectManage<T> {
+    static clean<T>(data: IHashObject<T>): void;
+    static take<T>(data: IHashObject<T>, name: string): T | null;
+}
+interface IKeyArrayHashObject<T> {
+    [index: string]: ArrayEx<T>;
+}
+declare class KeyArrayHashObjectManage {
+    private static isArray<T>(p);
+    static clean<T>(data: IKeyArrayHashObject<T>): void;
+    static take<T>(data: IKeyArrayHashObject<T>, name: string): ArrayEx<T> | null;
+    static getKeyArray<T>(data: IKeyArrayHashObject<T>): ArrayEx<ArrayEx<T>>;
+    static pop<T>(data: IKeyArrayHashObject<T>, key: string): T;
+    static push<T>(data: IKeyArrayHashObject<T>, key: string | string[], value: T): void;
+}
+declare let classSplitRE: RegExp;
+declare class ClassList {
+    private element;
+    constructor(element: IElement);
+    add(value: string): void;
+    remove(value: string): void;
+    toggle(value: string): void;
+    contains(value: string): boolean;
+    item(i: number): string;
+}
+declare class VNodeList {
+    length: number;
+    item(index: number): VNode & IVNodeMethod | undefined;
+    [index: number]: VNode & IVNodeMethod | undefined;
+    static clear(vNodeList: VNodeList): void;
+}
+declare class VHTMLCollection {
+    /**
+      * Sets or retrieves the number of objects in a collection.
+      */
+    length: number;
+    /**
+      * Retrieves an object from various collections.
+      */
+    item(index: number): VElement & IVNodeMethod | null;
+    /**
+      * Retrieves a select object or an object from an options collection.
+      */
+    namedItem(name: string): VElement & IVNodeMethod | null;
+    [index: number]: VElement & IVNodeMethod | undefined;
+}
+declare class VNodeVMData {
+    data: string;
+    __: Object;
+    domNode: Node | null;
+    /**是否闭合 */
+    isClose: boolean;
+    /**是否自闭合 */
+    /** */
+    closeSelf: boolean;
+}
+interface Node {
+    __vdomNode__: VNode & IVNodeMethod;
+}
+declare const enum ENodeType {
+    Element = 1,
+    Text = 3,
+    Comment = 8,
+    Document = 9,
+    DocumentType = 10,
+    DocumentFragment = 11,
+    PlaceHolder = 20,
+    Member = 21,
+    Script = 22,
+}
+interface IVNodeMethod {
+    (nodeName: string, nodeType: ENodeType): VNode & IVNodeMethod;
+}
+declare let emptyTextNodeRE: RegExp, stringNode: {
+    SCRIPT: RegExp;
+    TEMPLATE: RegExp;
+    STYLE: RegExp;
+    TITLE: RegExp;
+    TEXTAREA: RegExp;
+    XMP: RegExp;
+};
+declare let functionCommentRE: RegExp;
+declare function getFunctionComment(fn: Function): string;
+declare abstract class VNode implements INode {
+    vmData: VNodeVMData;
+    abstract nodeType: ENodeType;
+    abstract nodeName: string;
+    abstract toJS(space?: number): string;
+    abstract toCreateJS(space?: number): string;
+    readonly childNodes: VNodeList;
+    parentNode: VNode & IVNodeMethod | null;
+    /**
+     * 添加子节点，并返回子节点
+     */
+    $$(this: VNode & IVNodeMethod, vNode: VNode & IVNodeMethod): VNode & IVNodeMethod;
+    /**
+     * 添加子节点，并返回自身
+     */
+    $$$(this: VNode & IVNodeMethod, vNode: VNode & IVNodeMethod): VNode & IVNodeMethod;
+    /**
+     * 返回父节点，如果无，返回自己
+     */
+    readonly $: VElement & IVNodeMethod;
+    addEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
+    dispatchEvent(evt: Event): boolean;
+    removeEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
+    addText(this: VNode & IVNodeMethod, ...args: string[]): VNode & IVNodeMethod;
+    addText2(this: VNode & IVNodeMethod, fn: Function): VNode & IVNodeMethod;
+    append(this: VNode, name: string, nodeType: ENodeType): VNode & IVNodeMethod;
+    /**
+     * 添加子节点，并返回子节点
+     */
+    appendChild(this: VNode, vNode: VNode & IVNodeMethod): VNode & IVNodeMethod;
+    protected doAppendChild(this: VNode, vNode: VNode & IVNodeMethod): VNode & IVNodeMethod;
+    insertBefore(this: VNode & IVNodeMethod, newNode: VNode & IVNodeMethod, refChild: VNode & IVNodeMethod): VNode & IVNodeMethod;
+    insertBefore2(this: VNode & IVNodeMethod, newNode: VNode & IVNodeMethod, node: VNode & IVNodeMethod): VNode & IVNodeMethod;
+    remove(): void;
+    removeChild(this: VNode & IVNodeMethod, vNode: VNode & IVNodeMethod): VNode & IVNodeMethod;
+    getData(this: VNode): string;
+    abstract cloneNode(deep: boolean): VNode & IVNodeMethod;
+    abstract toHTMLString(): string[];
+    toJSString(space?: number): string;
+    beDOM(): Node;
+    protected doToDOM(): Node;
+    private copyPropertyToNode(elem);
+    /**与真实DOM交互 */
+    protected connectParent<T extends IVNodeMethod>(this: VNode, elem: Node): void;
+    protected createHomologyFunction(name: string): (this: VNode & IVNodeMethod) => any;
+    protected createBridgeFunction(name: string): (this: VNode) => any;
+    protected setBridgeGet(name: string): void;
+    protected setBridgeGetSet(name: string): void;
+    /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
+    protected abstract emulation(): void;
+    readonly previousSibling: VNode & IVNodeMethod | null;
+    readonly nextSibling: VNode & IVNodeMethod | null;
+}
+interface IBindClassToFunction {
+    [index: number]: (node: IVNodeMethod & VNode, nodeName: string) => void;
+}
+declare let bindClassToFunctionHelper: IBindClassToFunction;
+declare function bindClassToFunction(node: IVNodeMethod & VNode, nodeName: string, nodeType?: ENodeType | undefined): string;
+declare function getVNodeMethod(): VNode & IVNodeMethod;
+declare let VNodeHelp: IVNodeMethod;
+interface VElementVMData extends VNodeVMData {
+    events: [string, EventListenerOrEventListenerObject | undefined, boolean][];
+}
+declare abstract class VElement extends VNode {
+    vmData: VElementVMData;
+    attributes: VNamedNodeMap;
+    style: VStyle;
+    children: VHTMLCollection;
+    constructor();
+    removeAttribute(name: string): void;
+    removeAttributeNode(item: Object): void;
+    hasAttribute(name: string): boolean;
+    setAttribute(name: string, value: string): VElement & IVNodeMethod;
+    _(this: VElement & IVNodeMethod, name: string, value?: string): VElement & IVNodeMethod;
+    getAttribute(name: string): string | null;
+    innerHTML: VElement & IVNodeMethod;
+    removeChild(this: VElement & IVNodeMethod, vNode: VNode & IVNodeMethod): VNode & IVNodeMethod;
+    toHTMLString(): string[];
+    onpointercancel: (this: this, ev: PointerEvent) => any;
+    onpointerdown: (this: this, ev: PointerEvent) => any;
+    onpointerenter: (this: this, ev: PointerEvent) => any;
+    onpointerleave: (this: this, ev: PointerEvent) => any;
+    onpointermove: (this: this, ev: PointerEvent) => any;
+    onpointerout: (this: this, ev: PointerEvent) => any;
+    onpointerover: (this: this, ev: PointerEvent) => any;
+    onpointerup: (this: this, ev: PointerEvent) => any;
+    onwheel: (this: this, ev: WheelEvent) => any;
+    onariarequest: (this: this, ev: AriaRequestEvent) => any;
+    oncommand: (this: this, ev: CommandEvent) => any;
+    ongotpointercapture: (this: this, ev: PointerEvent) => any;
+    onlostpointercapture: (this: this, ev: PointerEvent) => any;
+    onmsgesturechange: (this: this, ev: MSGestureEvent) => any;
+    onmsgesturedoubletap: (this: this, ev: MSGestureEvent) => any;
+    onmsgestureend: (this: this, ev: MSGestureEvent) => any;
+    onmsgesturehold: (this: this, ev: MSGestureEvent) => any;
+    onmsgesturestart: (this: this, ev: MSGestureEvent) => any;
+    onmsgesturetap: (this: this, ev: MSGestureEvent) => any;
+    onmsgotpointercapture: (this: this, ev: MSPointerEvent) => any;
+    onmsinertiastart: (this: this, ev: MSGestureEvent) => any;
+    onmslostpointercapture: (this: this, ev: MSPointerEvent) => any;
+    onmspointercancel: (this: this, ev: MSPointerEvent) => any;
+    onmspointerdown: (this: this, ev: MSPointerEvent) => any;
+    onmspointerenter: (this: this, ev: MSPointerEvent) => any;
+    onmspointerleave: (this: this, ev: MSPointerEvent) => any;
+    onmspointermove: (this: this, ev: MSPointerEvent) => any;
+    onmspointerout: (this: this, ev: MSPointerEvent) => any;
+    onmspointerover: (this: this, ev: MSPointerEvent) => any;
+    onmspointerup: (this: this, ev: MSPointerEvent) => any;
+    ontouchcancel: (ev: TouchEvent) => any;
+    ontouchend: (ev: TouchEvent) => any;
+    ontouchmove: (ev: TouchEvent) => any;
+    ontouchstart: (ev: TouchEvent) => any;
+    onwebkitfullscreenchange: (this: this, ev: Event) => any;
+    onwebkitfullscreenerror: (this: this, ev: Event) => any;
+}
+declare let encodeHTML: (value: string) => string;
+declare let decodeHTML: (value: string) => string;
+declare namespace VMElement {
+    function mergeClass<U>(v: U): (constructor: {
+        prototype: VMElement.VHtmlElement & U;
+    }) => void;
+}
+interface IVNodeMethod {
+    (nodeName: string, nodeType?: ENodeType.Element): VMElement.VHtmlElement & IVNodeMethod;
+    (nodeName: 'html', nodeType?: ENodeType.Element): VMElement.VHtmlElement & IVNodeMethod;
+}
+declare function isVHTMLElement(node: VNode): node is VMElement.VHtmlElement;
+declare namespace VMElement {
+    class VHtmlElement extends VElement {
+        nodeType: ENodeType.Element;
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+        cloneNode(deep?: boolean): VHtmlElement & IVNodeMethod;
+        getData(): string;
+        innerText: string;
+        insertBefore(newNode: VNode & IVNodeMethod, refChild: VNode & IVNodeMethod): VNode & IVNodeMethod;
+        protected doAppendChild(vNode: VNode & IVNodeMethod): VNode & IVNodeMethod;
+        protected doBaseToDOM(): HTMLElement;
+        protected doToDOM(): Node;
+        toCreateJS(space?: number): string;
+        childNodesToJS(space?: number): string;
+        toJS(space?: number): string;
+        /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
+        protected emulation(): void;
+        outerHTML: VHtmlElement & IVNodeMethod;
+        outerText: string;
+    }
+}
+declare abstract class VCharacterData extends VNode {
+    abstract data: string;
+    getData(): string;
+    readonly length: number;
+    appendData(arg: string): void;
+    deleteData(offset: number, count: number): void;
+    insertData(offset: number, arg: string): void;
+    replaceData(offset: number, count: number, arg: string): void;
+    substringData(offset: number, count: number): string;
+}
+interface IVNodeMethod {
+    (nodeName: any, nodeType: ENodeType.Text): VText & IVNodeMethod;
+}
+declare function isVText(node: VNode): node is VText;
+declare let getFunctionBlock: (fn: Function) => string;
+declare class VText extends VCharacterData {
+    nodeName: string;
+    nodeType: ENodeType.Text;
+    private __value__;
+    cloneNode(deep: boolean): VText & IVNodeMethod;
+    constructor(data: any);
+    data: string;
+    value: string;
+    toCreateJS(space?: number): string;
+    toJS(space?: number): string;
+    toHTMLString(): string[];
+    protected doToDOM(): Text;
+    /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
+    protected emulation(): void;
+}
+interface IVNodeMethod {
+    (nodeName: string, nodeType: ENodeType.Comment): VComment & IVNodeMethod;
+}
+declare function isVComment(node: VNode): node is VComment;
+interface VNodeVMData {
+    /**是否有两个- */
+    doubleMinus?: boolean;
+}
+declare class VComment extends VCharacterData {
+    nodeName: string;
+    nodeType: ENodeType.Comment;
+    private __value__;
+    cloneNode(deep: boolean): VComment & IVNodeMethod;
+    constructor(data: string);
+    data: string;
+    textContent: string;
+    /**
+     * 用自身做环境调用函数,并返回父
+     */
+    __(fn: (node: VNode) => void): VElement & IVNodeMethod;
+    toCreateJS(space?: number): string;
+    toJS(space?: number): string;
+    toHTMLString(): string[];
+    protected doToDOM(): Comment;
+    /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
+    protected emulation(): void;
+}
+interface IVNodeMethod {
+    (nodeName: string, nodeType: ENodeType.DocumentType): VDocumentType & IVNodeMethod;
+}
+declare function isVDocType(node: VNode): node is VDocumentType;
+declare class VDocumentType extends VNode {
+    nodeType: ENodeType.DocumentType;
+    nodeName: string;
+    cloneNode(deep: boolean): VDocumentType & IVNodeMethod;
+    toCreateJS(space?: number): string;
+    toJS(): string;
+    /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
+    protected emulation(): void;
+    toHTMLString(): string[];
+}
+interface IVNodeMethod {
+    (nodeName: "#document", nodeType?: ENodeType.Element): VDocument & IVNodeMethod;
+}
+declare class VDocument extends VNode {
+    nodeType: ENodeType.Element;
+    nodeName: string;
+    cloneNode(deep: boolean): VDocument & IVNodeMethod;
+    toCreateJS(space?: number): string;
+    toJS(): string;
+    protected emulation(): void;
+    toHTMLString(): string[];
+}
+interface IVNodeMethod {
+    (nodeName: "a", nodeType?: 1): VMElement.VAElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VAElement extends VHtmlElement {
+        nodeName: string;
+        target: string;
+        download: string;
+        ping: string;
+        rel: string;
+        hreflang: string;
+        type: string;
+        coords: string;
+        charset: string;
+        name: string;
+        rev: string;
+        shape: string;
+        href: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "area", nodeType?: 1): VMElement.VAreaElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VAreaElement extends VHtmlElement {
+        nodeName: string;
+        alt: string;
+        coords: string;
+        shape: string;
+        target: string;
+        ping: string;
+        noHref: string;
+        href: string;
+        constructor();
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "base", nodeType?: 1): VMElement.VBaseElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VBaseElement extends VHtmlElement {
+        nodeName: string;
+        href: string;
+        target: string;
+        constructor();
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "basefont", nodeType?: 1): VMElement.VBasefontElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VBasefontElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+        constructor();
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "blockquote", nodeType?: 1): VMElement.VBlockquoteElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VBlockquoteElement extends VHtmlElement {
+        nodeName: string;
+        cite: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "body", nodeType?: 1): VMElement.VBodyElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VBodyElement extends VHtmlElement {
+        nodeName: string;
+        text: string;
+        link: string;
+        vLink: string;
+        aLink: string;
+        bgColor: string;
+        background: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "br", nodeType?: 1): VMElement.VBrElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VBrElement extends VHtmlElement {
+        nodeName: string;
+        clear: string;
+        constructor();
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "canvas", nodeType?: 1): VMElement.VCanvasElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VCanvasElement extends VHtmlElement {
+        nodeName: string;
+        width: string;
+        height: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "caption", nodeType?: 1): VMElement.VCaptionElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VCaptionElement extends VHtmlElement {
+        nodeName: string;
+        align: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "col", nodeType?: 1): VMElement.VColElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VColElement extends VHtmlElement {
+        nodeName: string;
+        span: string;
+        align: string;
+        vAlign: string;
+        width: string;
+        constructor();
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "colgroup", nodeType?: 1): VMElement.VColgroupElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VColgroupElement extends VHtmlElement {
+        nodeName: string;
+        span: string;
+        align: string;
+        vAlign: string;
+        width: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "dialog", nodeType?: 1): VMElement.VDialogElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VDialogElement extends VHtmlElement {
+        nodeName: string;
+        open: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "dir", nodeType?: 1): VMElement.VDirElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VDirElement extends VHtmlElement {
+        nodeName: string;
+        compact: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "div", nodeType?: 1): VMElement.VDivElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VDivElement extends VHtmlElement {
+        nodeName: string;
+        align: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "dl", nodeType?: 1): VMElement.VDlElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VDlElement extends VHtmlElement {
+        nodeName: string;
+        compact: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "fieldset", nodeType?: 1): VMElement.VFieldsetElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VFieldsetElement extends VHtmlElement {
+        nodeName: string;
+        disabled: string;
+        name: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "frame", nodeType?: 1): VMElement.VFrameElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VFrameElement extends VHtmlElement {
+        nodeName: string;
+        name: string;
+        scrolling: string;
+        frameBorder: string;
+        marginHeight: string;
+        marginWidth: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+        constructor();
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "h1", nodeType?: 1): VMElement.VH1Element & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VH1Element extends VHtmlElement {
+        nodeName: string;
+        align: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "h2", nodeType?: 1): VMElement.VH2Element & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VH2Element extends VHtmlElement {
+        nodeName: string;
+        align: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "h3", nodeType?: 1): VMElement.VH3Element & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VH3Element extends VHtmlElement {
+        nodeName: string;
+        align: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "h4", nodeType?: 1): VMElement.VH4Element & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VH4Element extends VHtmlElement {
+        nodeName: string;
+        align: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "h5", nodeType?: 1): VMElement.VH5Element & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VH5Element extends VHtmlElement {
+        nodeName: string;
+        align: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "h6", nodeType?: 1): VMElement.VH6Element & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VH6Element extends VHtmlElement {
+        nodeName: string;
+        align: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "head", nodeType?: 1): VMElement.VHeadElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VHeadElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "hr", nodeType?: 1): VMElement.VHrElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VHrElement extends VHtmlElement {
+        nodeName: string;
+        align: string;
+        color: string;
+        noShade: string;
+        size: string;
+        width: string;
+        constructor();
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "iframe", nodeType?: 1): VMElement.VIframeElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VIframeElement extends VHtmlElement {
+        nodeName: string;
+        src: string;
+        srcdoc: string;
+        name: string;
+        sandbox: string;
+        allowFullscreen: string;
+        width: string;
+        height: string;
+        align: string;
+        scrolling: string;
+        frameBorder: string;
+        longDesc: string;
+        marginHeight: string;
+        marginWidth: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "img", nodeType?: 1): VMElement.VImgElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VImgElement extends VHtmlElement {
+        nodeName: string;
+        alt: string;
+        src: string;
+        srcset: string;
+        sizes: string;
+        crossOrigin: string;
+        useMap: string;
+        isMap: string;
+        width: string;
+        height: string;
+        name: string;
+        lowsrc: string;
+        align: string;
+        hspace: string;
+        vspace: string;
+        longDesc: string;
+        border: string;
+        constructor();
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "input", nodeType?: 1): VMElement.VInputElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VInputElement extends VHtmlElement {
+        nodeName: string;
+        accept: string;
+        alt: string;
+        autocomplete: string;
+        autofocus: string;
+        checked: string;
+        dirName: string;
+        disabled: string;
+        formAction: string;
+        formEnctype: string;
+        formMethod: string;
+        formNoValidate: string;
+        formTarget: string;
+        height: string;
+        max: string;
+        maxLength: string;
+        min: string;
+        minLength: string;
+        multiple: string;
+        name: string;
+        pattern: string;
+        placeholder: string;
+        readOnly: string;
+        required: string;
+        size: string;
+        src: string;
+        step: string;
+        type: string;
+        value: string;
+        width: string;
+        align: string;
+        useMap: string;
+        autocapitalize: string;
+        webkitdirectory: string;
+        incremental: string;
+        constructor();
+        /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
+        protected emulation(): void;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "ins", nodeType?: 1): VMElement.VInsElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VInsElement extends VHtmlElement {
+        nodeName: string;
+        cite: string;
+        dateTime: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "keygen", nodeType?: 1): VMElement.VKeygenElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VKeygenElement extends VHtmlElement {
+        nodeName: string;
+        autofocus: string;
+        challenge: string;
+        disabled: string;
+        keytype: string;
+        name: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "legend", nodeType?: 1): VMElement.VLegendElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VLegendElement extends VHtmlElement {
+        nodeName: string;
+        align: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "li", nodeType?: 1): VMElement.VLiElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VLiElement extends VHtmlElement {
+        nodeName: string;
+        value: string;
+        type: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "link", nodeType?: 1): VMElement.VLinkElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VLinkElement extends VHtmlElement {
+        nodeName: string;
+        disabled: string;
+        href: string;
+        crossOrigin: string;
+        rel: string;
+        media: string;
+        hreflang: string;
+        type: string;
+        charset: string;
+        rev: string;
+        target: string;
+        integrity: string;
+        constructor();
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "map", nodeType?: 1): VMElement.VMapElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VMapElement extends VHtmlElement {
+        nodeName: string;
+        name: string;
+        constructor();
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "menu", nodeType?: 1): VMElement.VMenuElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VMenuElement extends VHtmlElement {
+        nodeName: string;
+        compact: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "meta", nodeType?: 1): VMElement.VMetaElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VMetaElement extends VHtmlElement {
+        nodeName: string;
+        name: string;
+        content: string;
+        scheme: string;
+        constructor();
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "meter", nodeType?: 1): VMElement.VMeterElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VMeterElement extends VHtmlElement {
+        nodeName: string;
+        value: string;
+        min: string;
+        max: string;
+        low: string;
+        high: string;
+        optimum: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "ol", nodeType?: 1): VMElement.VOlElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VOlElement extends VHtmlElement {
+        nodeName: string;
+        reversed: string;
+        start: string;
+        type: string;
+        compact: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "optgroup", nodeType?: 1): VMElement.VOptgroupElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VOptgroupElement extends VHtmlElement {
+        nodeName: string;
+        disabled: string;
+        label: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "option", nodeType?: 1): VMElement.VOptionElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VOptionElement extends VHtmlElement {
+        nodeName: string;
+        disabled: string;
+        label: string;
+        selected: string;
+        value: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "output", nodeType?: 1): VMElement.VOutputElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VOutputElement extends VHtmlElement {
+        nodeName: string;
+        name: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "param", nodeType?: 1): VMElement.VParamElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VParamElement extends VHtmlElement {
+        nodeName: string;
+        name: string;
+        value: string;
+        type: string;
+        valueType: string;
+        constructor();
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "p", nodeType?: 1): VMElement.VPElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VPElement extends VHtmlElement {
+        nodeName: string;
+        align: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "pre", nodeType?: 1): VMElement.VPreElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VPreElement extends VHtmlElement {
+        nodeName: string;
+        width: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "progress", nodeType?: 1): VMElement.VProgressElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VProgressElement extends VHtmlElement {
+        nodeName: string;
+        value: string;
+        max: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "q", nodeType?: 1): VMElement.VQElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VQElement extends VHtmlElement {
+        nodeName: string;
+        cite: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "script", nodeType?: 1): VMElement.VScriptElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VScriptElement extends VHtmlElement {
+        nodeName: string;
+        src: string;
+        type: string;
+        charset: string;
+        async: string;
+        defer: string;
+        crossOrigin: string;
+        event: string;
+        integrity: string;
+        toJS(space?: number): string;
+        private toScriptText();
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "select", nodeType?: 1): VMElement.VSelectElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VSelectElement extends VHtmlElement {
+        nodeName: string;
+        autofocus: string;
+        disabled: string;
+        multiple: string;
+        name: string;
+        required: string;
+        size: string;
+        /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
+        protected emulation(): void;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "source", nodeType?: 1): VMElement.VSourceElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VSourceElement extends VHtmlElement {
+        nodeName: string;
+        src: string;
+        type: string;
+        srcset: string;
+        sizes: string;
+        media: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "style", nodeType?: 1): VMElement.VStyleElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VStyleElement extends VHtmlElement {
+        nodeName: string;
+        media: string;
+        type: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "table", nodeType?: 1): VMElement.VTableElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VTableElement extends VHtmlElement {
+        nodeName: string;
+        align: string;
+        border: string;
+        frame: string;
+        rules: string;
+        summary: string;
+        width: string;
+        bgColor: string;
+        cellPadding: string;
+        cellSpacing: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "tbody", nodeType?: 1): VMElement.VTbodyElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VTbodyElement extends VHtmlElement {
+        nodeName: string;
+        align: string;
+        vAlign: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "td", nodeType?: 1): VMElement.VTdElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VTdElement extends VHtmlElement {
+        nodeName: string;
+        colSpan: string;
+        rowSpan: string;
+        headers: string;
+        align: string;
+        axis: string;
+        height: string;
+        width: string;
+        noWrap: string;
+        vAlign: string;
+        bgColor: string;
+        abbr: string;
+        scope: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "textarea", nodeType?: 1): VMElement.VTextareaElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VTextareaElement extends VHtmlElement {
+        nodeName: string;
+        autofocus: string;
+        cols: string;
+        dirName: string;
+        disabled: string;
+        maxLength: string;
+        minLength: string;
+        name: string;
+        placeholder: string;
+        readOnly: string;
+        required: string;
+        rows: string;
+        wrap: string;
+        autocapitalize: string;
+        value: string;
+        /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
+        protected emulation(): void;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "tfoot", nodeType?: 1): VMElement.VTfootElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VTfootElement extends VHtmlElement {
+        nodeName: string;
+        align: string;
+        vAlign: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "thead", nodeType?: 1): VMElement.VTheadElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VTheadElement extends VHtmlElement {
+        nodeName: string;
+        align: string;
+        vAlign: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "th", nodeType?: 1): VMElement.VThElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VThElement extends VHtmlElement {
+        nodeName: string;
+        colSpan: string;
+        rowSpan: string;
+        headers: string;
+        align: string;
+        axis: string;
+        height: string;
+        width: string;
+        noWrap: string;
+        vAlign: string;
+        bgColor: string;
+        abbr: string;
+        scope: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "track", nodeType?: 1): VMElement.VTrackElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VTrackElement extends VHtmlElement {
+        nodeName: string;
+        kind: string;
+        src: string;
+        srclang: string;
+        label: string;
+        default: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "tr", nodeType?: 1): VMElement.VTrElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VTrElement extends VHtmlElement {
+        nodeName: string;
+        align: string;
+        vAlign: string;
+        bgColor: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "ul", nodeType?: 1): VMElement.VUlElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VUlElement extends VHtmlElement {
+        nodeName: string;
+        compact: string;
+        type: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "video", nodeType?: 1): VMElement.VVideoElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VVideoElement extends VHtmlElement {
+        nodeName: string;
+        width: string;
+        height: string;
+        poster: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "xmp", nodeType?: 1): VMElement.VXmpElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VXmpElement extends VHtmlElement {
+        nodeName: string;
+        width: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "title", nodeType?: 1): VMElement.VTitleElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VTitleElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "span", nodeType?: 1): VMElement.VSpanElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VSpanElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "em", nodeType?: 1): VMElement.VEmElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VEmElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "i", nodeType?: 1): VMElement.VIElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VIElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "b", nodeType?: 1): VMElement.VBElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VBElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "form", nodeType?: 1): VMElement.VFormElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VFormElement extends VHtmlElement {
+        nodeName: string;
+        name: string;
+        target: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "label", nodeType?: 1): VMElement.VLabelElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VLabelElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "dt", nodeType?: 1): VMElement.VDtElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VDtElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "dd", nodeType?: 1): VMElement.VDdElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VDdElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "embed", nodeType?: 1): VMElement.VEmbedElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VEmbedElement extends VHtmlElement {
+        nodeName: string;
+        type: string;
+        width: string;
+        height: string;
+        align: string;
+        name: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "strong", nodeType?: 1): VMElement.VStrongElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VStrongElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "button", nodeType?: 1): VMElement.VButtonElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VButtonElement extends VHtmlElement {
+        nodeName: string;
+        formTarget: string;
+        name: string;
+        value: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "object", nodeType?: 1): VMElement.VObjectElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VObjectElement extends VHtmlElement {
+        nodeName: string;
+        type: string;
+        name: string;
+        useMap: string;
+        width: string;
+        height: string;
+        align: string;
+        archive: string;
+        code: string;
+        standby: string;
+        codeType: string;
+        border: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "svg", nodeType?: 1): VMElement.VSvgElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VSvgElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "circle", nodeType?: 1): VMElement.VCircleElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VCircleElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "header", nodeType?: 1): VMElement.VHeaderElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VHeaderElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "footer", nodeType?: 1): VMElement.VFooterElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VFooterElement extends VHtmlElement {
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+    }
+}
+interface IVNodeMethod {
+    (nodeName: "domhelper", nodeType?: ENodeType.Element): VMElement.VDomhelperElement & IVNodeMethod;
+}
+declare namespace VMElement {
+    class VDomhelperElement extends VHtmlElement {
+        nodeName: string;
+    }
+}
+interface IMember {
+    index: number;
+    node: VNode & IVNodeMethod;
+    action: string;
+    length: number;
+    textNodeStart: number;
+    htmlNodeStart: number;
+    htmlNodeNameStart: number;
+    attrStart: number;
+    attrNameEnd: number;
+    equlIndex: number;
+    stringStart: number;
+    stringStartChar: string;
+    betweenSpaceStart: number;
+    stringNodeStart: number;
+    stringNodeRegExp: RegExp | null;
+    stringNodeKeyLength: number;
+    commentStart: number;
+}
+interface IVDOMBuilder {
+    (html: string, vNode?: undefined): VNode & IVNodeMethod | (VNode & IVNodeMethod)[];
+    (html: string, vNode: VNode & IVNodeMethod): VNode & IVNodeMethod;
+}
+declare let VDOM: IVDOMBuilder, VTemplate: IVDOMBuilder;
+declare let $$$: IVNodeMethod;
+declare let $rootScope: RootScope;
 declare class DOMScope {
-    static stack: Array<Scope | RootScope>;
+    static stack: Array<Scope>;
     /**
      * 在dom节点上创建变量作用域对象
      * @param {INode} node - dom节点
      * @param {string} name - 名称
      */
-    static create(node: INode, name: string): Scope;
+    static create(node: IComment, name: string): Scope;
     /**
      * 获取变量作用域对象
      * @param {INode} node - dom节点
      */
-    static get(node: INode): Scope | RootScope;
+    static get(node: INode): Scope;
     /**
      * 切断dom节点和变量作用域对象的链接
      * @param {Scope} scopeVarObject - 变量作用域对象
@@ -979,134 +2422,50 @@ declare class DOMScope {
      */
     static link(scope: Scope, node: INode): void;
 }
-declare function _getBindObject(scope: any, arrNames: Array<string>): any;
-interface IBindInfo {
-    name: string;
-    target: Object;
-    targetName: string;
-    event: IBindFunction;
+interface VComment {
+    __order__?: Order.VOrder;
 }
-declare function addBindInfo(obj: Object, name: string, target: Object, targetName: string, event: IBindFunction): void;
-declare function removeBind(obj: any, name: any, targetName: any): boolean;
-declare function onPropertyChange(obj: any, name: any, fnOnSet: any): void;
-declare function objectPropertyChange(obj: any, name: any, fnOnSet: any): void;
-interface Object {
-    __bind__: IBindInfo[];
-}
-interface IBindFunction {
-    (name: string): any;
-    isBinding: boolean;
-    removeObject: Function;
-    list: {
-        length: number;
+declare namespace Order {
+    function addSubOrderName(name: string): void;
+    /**从注释中读取命令 */
+    function getCommentStringInfo(s: string): ICommentOrderInfo | null;
+    interface ICommentOrderInfo {
+        order?: string;
+        subOrder?: string;
+        condition: string;
+    }
+    interface IOrderConstructor {
+        new (node: IComment, condition: string, ...args: any[]): VOrder;
+        orderName: string;
+        subOrder?: string[];
+        run(this: typeof VOrder, data: IOrderData): void;
+    }
+    let orders: {
+        [index: string]: IOrderConstructor;
     };
+    function register(order: IOrderConstructor): void;
+    function parseComment(this: void, node: VComment): VOrder | undefined;
+    function registerEnvVar(name: string, value: any): void;
+    function exec(this: void, node: INode, script: string): any;
+    /**取消scope保护 */
+    function resetTest(): void;
+    function test(this: void, node: INode, script: string): any;
+    function testSet(this: void, node: INode, name: string, script: string): void;
+    function testSetValue(this: void, node: INode, name: string, value: any): void;
 }
-declare function bindPropertyByName(obj: Object, name: string, obj2: Object, name2: string): IBindFunction;
-declare let bindProperty: (obj: Object, name: string, obj2: Object, name2: string, type?: number) => void;
-declare function bindElementProperty(obj: Object, name: string, obj2: Object, name2: string): void;
-declare function bindNodeProperty(node: INode, proName: string, condition: string): void;
-declare function bindElementPropertyByName(node: IHTMLElement, elementValueName: string, condition: string): void;
-declare function bindPropertyByOrder(node: any, condition: any): void;
-declare function bindExpressionsByOrder(node: any, condition: any): void;
-declare let orderRE: RegExp, orderCaseRE: RegExp, parseForOrderRE: RegExp, parseForOrderRE2: RegExp, SetParseError: IParseError, orderStack: ArrayEx<IOrder>;
-interface IParseError {
-    isError?: boolean;
-    (msg: string): eTreeEach;
+declare namespace Order {
+    interface IOrderData {
+        placeholder: VComment;
+    }
+    abstract class VOrder {
+        data: IOrderData;
+        node: VComment;
+        condition: string;
+        run?(): void;
+        constructor(node: VComment, condition: string);
+        static eachOrder(this: void, array: INode[] | INodeList, fn: (node: VComment, info: ICommentOrderInfo, state: ITreeEachState<INode>) => (eTreeEach | void), beginIndex?: number): ITreeEachReturn | undefined;
+    }
 }
-interface ICommentOrderInfo {
-    order?: string;
-    orderCase?: string;
-    condition: string;
-}
-interface ITurtle {
-    replaceClassStore: IHTMLElement[];
-    defineClassNames: string[];
-}
-declare function replaceCls(): void;
-/**从注释中读取命令 */
-declare function getCommentStringInfo(s: any): ICommentOrderInfo | null;
-/**从注释中读取字符串 */
-declare let getCommentText: (node: IComment) => string;
-declare function parseScopeOrder(info: ICommentOrderInfo, node: IComment, outerChildNodes: any, outerElement: any, props: any, part: any): void;
-declare function parseCommentOrderNoScript(info: ICommentOrderInfo, node: IComment, outerChildNodes: any, outerElement: any, props: any, part: any): {
-    stack: [INode[] | IArray, number];
-    state: eTreeEach;
-    array: INode[] | IArray;
-    index: number;
-};
-declare function parseCommentOrderBlock(node: INode, outerChildNodes: any, outerElement: any, props: any, part: any): {
-    stack: [INode[] | IArray, number];
-    state: eTreeEach;
-    array: INode[] | IArray;
-    index: number;
-};
-interface INode {
-    __order__?: IOrder;
-}
-interface IOrder {
-    name?: string;
-    node?: INode;
-    endNode?: INode | null;
-    condition?: string;
-    parseCommentOrderBlockReturnValue?: {
-        stack: [IArray | INode[], number];
-        state: eTreeEach | undefined;
-        array: IArray | INode[];
-        index: number;
-    } | undefined;
-}
-declare function addOrderToNode(node: INode, info: any, outerChildNodes: any, outerElement: any, props: any, part: any, fnGetOrder: () => IOrder): {
-    stack: [INode[] | IArray, number];
-    state: eTreeEach;
-    array: INode[] | IArray;
-    index: number;
-};
-declare function parseIfOrder(info: any, node: any, outerChildNodes: any, outerElement: any, props: any, part: any): {
-    stack: [INode[] | IArray, number];
-    state: eTreeEach;
-    array: INode[] | IArray;
-    index: number;
-};
-declare function parseBreakOrder(info: any, node: any, outerChildNodes: any, outerElement: any, props: any, part: any): void;
-declare function parseWhileOrder(info: any, node: any, outerChildNodes: any, outerElement: any, props: any, part: any): {
-    stack: [INode[] | IArray, number];
-    state: eTreeEach;
-    array: INode[] | IArray;
-    index: number;
-};
-declare function parseAsyncOrder(info: any, node: any, outerChildNodes: any, outerElement: any, props: any, part: any): {
-    stack: [INode[] | IArray, number];
-    state: eTreeEach;
-    array: INode[] | IArray;
-    index: number;
-};
-declare function parseSwitchOrder(info: any, node: any, outerChildNodes: any, outerElement: any, props: any, part: any): {
-    stack: [INode[] | IArray, number];
-    state: eTreeEach;
-    array: INode[] | IArray;
-    index: number;
-};
-declare function parseForOrder(info: any, node: any, outerChildNodes: any, outerElement: any, props: any, part: any): {
-    stack: [INode[] | IArray, number];
-    state: eTreeEach;
-    array: INode[] | IArray;
-    index: number;
-};
-interface IHTMLBreakElement extends IComment {
-    source?: {
-        run;
-    };
-}
-declare function createBreakElement(nodes: any, order: {
-    run;
-}): IHTMLBreakElement;
-declare function parseCommentOrder(info: ICommentOrderInfo, node: IComment, outerChildNodes: any, outerElement: any, props: any, part: any): void | {
-    stack: [INode[] | IArray, number];
-    state: eTreeEach;
-    array: INode[] | IArray;
-    index: number;
-};
-declare function parseComment(node: any, outerChildNodes: any, outerElement: any, props: any, part: any): void;
 declare class XHR {
     private send(type, url, data, async, fn, fnerror?);
     get(url: string, async: boolean, fn: (s: string) => void, fnerror?: (this: XMLHttpRequest, ev?: ErrorEvent) => any): void;
@@ -1152,39 +2511,28 @@ declare class Config {
     debugMode: number;
 }
 declare let $t: ITurtle;
-declare let $DOM: any, $node: I$Node, operatorRE: RegExp;
-interface I$Node {
-    (name: '__break__', nodeType?: number): IHTMLBreakElement;
-    (name: string, nodeType?: 1): INode;
-    (name: string, nodeType?: 3): IText;
-    (name: string, nodeType?: 8): IComment;
-    (name: string, nodeType?: number): INode | null;
-}
+declare let operatorRE: RegExp;
 interface ITurtle {
     xhr: XHR;
     refs: IKeyArrayHashObject<IHTMLElement>;
+    replaceClassStore: IHTMLElement[];
+    defineClassNames: string[];
 }
+declare function replaceCls(): void;
 declare function getScopeBy(scope: any, node: INode): any;
-declare function execByScope(node: INode, s: string, scope: any, outer: any, outerElement: any, props: any, part: any): any;
-declare function execScope(s: string, node: INode, outerChildNodes: any, outerElement: any, props: any, part: any): void;
 declare function setNodeProperty(node: any, proName: any, condition: any, outerChildNodes: any, outerElement: any, props: any, part: any): void;
 declare function setQuestionAtrr(node: IHTMLElement, outerChildNodes: any, outerElement: any, props: any, part: any): void;
 declare function getTemplate(node: IHTMLElement): string;
 declare function defineServiceByNode(node: IHTMLElement): void;
-declare function getExtendsByNode(node: IHTMLElement, sortPath: string): any;
-declare function defineUIByNode(node: IHTMLElement): void;
 declare function defineClasses(node: IHTMLElement): void;
 declare function parseDefine(node: IHTMLElement): void;
 declare function isDefine(node: IHTMLElement): boolean;
 declare function isTemplate(node: IHTMLElement): node is IHTMLElement;
 declare function findTemplates(nodes: IHTMLElement[] | IArray): IElement[] | IArray;
-declare function parseUITemplate(uiName: string, uiSortPath: string, uiPath: string, sHTML: string): void;
-declare function importUIHTML(uiName: string, uiSortPath: string): any;
-declare function getExtends(extName: any, sortPath: any): any;
 /**从DOM树获取父组件
  * @param {}
  */
-declare function getParentPart(node: INode): Part | null;
+declare function getParentPart(node: VNode): Part | null;
 declare function parseAsync(node: IHTMLElement, outerChildNodes: any, outerElement: any, props: any, part: any): void;
 declare function parseLazy(node: IHTMLElement, outerChildNodes: any, outerElement: any, props: any, part: any): void;
 declare function getUIInfo(node: IHTMLElement): string | {
@@ -1222,10 +2570,9 @@ declare function bindEval(node: INode, s: any, outer: any, outerElement: any, pr
 declare class ElementParser {
     GET: typeof parseGet;
     SET: typeof parseSet;
-    __BREAK__: typeof parseBreakOrder;
     SCRIPT: typeof parseScript;
 }
-declare function bindShowHide(node: INode, s: any, isBindShow: any, outer: any, outerElement: any, props: any, part: any): void;
+declare function bindShowHide(node: IElement, s: any, isBindShow: any, outer: any, outerElement: any, props: any, part: any): void;
 declare class AttributeParser {
     ref(node: IElement, outerChildNodes: IElement[], outerElement: any, props: any, part: any): void;
     ":"(node: any, outerChildNodes: any, outerElement: any, props: any, part: any): void;
@@ -1241,8 +2588,8 @@ declare class AttributeParser {
 declare let elementParser: ElementParser;
 declare let attributeParser: AttributeParser;
 declare function initHTML(arr: INode[] | INodeList, outerChildNodes?: any, outerElement?: any, props?: any, part?: any): void;
-declare function getParts(childNodes: INode[]): Part[];
-declare function getService(serviceName: string): any;
+declare function getParts(childNodes: VNode[]): Part[];
+declare function getService(serviceName: string): Object;
 /**
  * 可躲过一些js压缩库console.log;
  */
@@ -1258,33 +2605,7 @@ interface String {
 }
 declare let getNameByURL: (url: string) => string;
 declare let getFileNameByURL: (url: string) => string;
-declare function appendQueryString(name: any, value: any): string;
-/**
- * 一个普通对象
- * @param {string} s 格式为:xxx,yyy,zzz
- * @param {any} defaultValue 初始化时每个属性的默认值
- */
-declare class HashObject {
-    constructor(s: string, defaultValue?: any);
-}
-interface IHashObject<T> {
-    [index: string]: T;
-}
-declare class HashObjectManage<T> {
-    static clean<T>(data: IHashObject<T>): void;
-    static take<T>(data: IHashObject<T>, name: string): T | null;
-}
-interface IKeyArrayHashObject<T> {
-    [index: string]: ArrayEx<T>;
-}
-declare class KeyArrayHashObjectManage {
-    private static isArray<T>(p);
-    static clean<T>(data: IKeyArrayHashObject<T>): void;
-    static take<T>(data: IKeyArrayHashObject<T>, name: string): ArrayEx<T> | null;
-    static getKeyArray<T>(data: IKeyArrayHashObject<T>): ArrayEx<ArrayEx<T>>;
-    static pop<T>(data: IKeyArrayHashObject<T>, key: string): T;
-    static push<T>(data: IKeyArrayHashObject<T>, key: string | string[], value: T): void;
-}
+declare function appendQueryString(name: string, value: string): string;
 declare class PartParamFilter {
     static bool(v: any): boolean;
     static intmin(v: any, p: any): any;
@@ -1294,7 +2615,7 @@ declare class PartParamFilter {
     static float(v: any): number;
     static pxtoem(v: any, p: any): string;
     static color(v: any): any;
-    static date(v: any, p: any): any;
+    static date(v: any, p: any): string;
     static only(v: any, p: any): any;
     static udftotrue(v: any): any;
     static anytotrue(v: any): any;
@@ -1342,37 +2663,41 @@ declare class PartTemplate implements IPartTemplate {
     parts: Array<Part>;
     service: Service;
     constructor(name: string, sortPath: string, path: string, s: string | IPartTemplate, ext: any);
-    renderIn(elem: any, outerChildNodes: any, outerElement: any, props: any, part: any, partName: any, reExtends: any): Part;
-    renderBefore(elem: any, outerChildNodes: any, outerElement: any, props: any, part: any, partName: any, reExtends: any): Part;
+    renderIn(elem: any, outerChildNodes: any, outerElement: any, props: any, part: any, partName: any, reExtends: any): any;
+    renderBefore(elem: any, outerChildNodes: any, outerElement: any, props: any, part: any, partName: any, reExtends: any): any;
     /**
      * 渲染dom
      */
-    render(uiNode: IHTMLElement, that: any, outerChildNodes: any, outerElement: any, props: any, part: Part, refPartName: string, reExtends: boolean): Part;
+    render(uiNode: IHTMLElement, that: any, outerChildNodes: any, outerElement: any, props: any, part: Part, refPartName: string, reExtends: boolean): any;
     /**由props构建html字符串
      * @param {Object} props
      * */
     joinDatasByProps(props: Object): string;
     toDefineString(): string;
     parseParamsHelp(p: any): void;
-    getParamsHelp(): {
-        name: string;
-        necessary: any;
-    }[];
+    getParamsHelp(): any[];
 }
-interface IComment {
-    __part__?: Part;
-    __sign__?: number;
+declare namespace ComponentView {
+    interface IView {
+        tops: (VNode & IVNodeMethod)[];
+        initDom(): void;
+    }
+}
+interface VNodeVMData {
+    sign: number;
+    part: Part;
 }
 interface IPartRefs {
     [index: string]: INode | undefined;
     resize?: IHTMLElement;
     main?: IHTMLElement;
-    begin: IComment;
-    end: IComment;
+    begin: VComment & IVNodeMethod;
+    end: VComment & IVNodeMethod;
 }
-declare class Part extends EventEmitterEx {
+declare abstract class Part extends EventEmitterEx {
     template: PartTemplate;
     props: Object;
+    abstract dom: ComponentView.IView;
     /**组件名*/
     partName: string;
     /**
@@ -1384,7 +2709,7 @@ declare class Part extends EventEmitterEx {
      */
     $: Service;
     /** DOM节点存储数组 */
-    protected nodeStore: INode[];
+    protected nodeStore: (VNode & IVNodeMethod)[];
     /**节点命名空间 */
     refs: IPartRefs;
     /**资源路径 */
@@ -1398,20 +2723,20 @@ declare class Part extends EventEmitterEx {
     /**remove事件管理器 */
     $offline: EventHelper<(this: void, part: Part) => void, (this: void, part: Part) => boolean>;
     /**初始化对象 */
-    constructor(template: PartTemplate, props: Object, html: string, outerChildNodes: INode[], outerElement: IHTMLCollection);
+    constructor(template: PartTemplate, props: Object, outerChildNodes: INode[], outerElement: IHTMLCollection);
     /**即时子Part数组 */
     readonly child: Part[];
     /**子节点数目 */
     readonly elementLength: number;
     /**即时读取子节点 */
-    readonly elements: INode[];
+    readonly elements: (VNode & IVNodeMethod)[];
     /**读取父组件 */
     readonly parent: Part;
     /**读取组件下所有DOM节点 */
     readonly innerHTML: string;
     /**读取父节点 */
-    readonly elemParent: INode;
-    readonly scopeNodes: any[];
+    readonly elemParent: VNode & IVNodeMethod;
+    readonly scopeNodes: INode[];
     /**获取组件区块（试验） */
     /**设置组件宽高
      * @param {ClientRect} rect 区块
@@ -1438,10 +2763,8 @@ declare class Ready {
     readyFunctions: Function[];
     isReady: boolean;
 }
-declare let encodeHTML: (value: string) => string;
-declare let decodeHTML: (value: string) => string;
 declare let readyRE: RegExp;
-declare function renderTemplate(tp: any): void;
+declare function renderTemplate(tp: IHTMLElement): void;
 interface IRenderDocument {
     (): void;
     beginTime?: Date;

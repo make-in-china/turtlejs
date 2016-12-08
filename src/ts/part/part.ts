@@ -6,20 +6,22 @@
 /// <reference path='../lib/is.ts'/>
 /// <reference path="Server.ts"/>
 /// <reference path="PartTemplate.ts"/>
+/// <reference path="View.ts"/>
 
-interface IComment {
-    __part__?: Part;
-    __sign__?: number;
+interface VNodeVMData{
+    sign:number
+    part:Part
 }
+
 interface IPartRefs {
     [index: string]: INode | undefined
     resize?: IHTMLElement
     main?: IHTMLElement
-    begin: IComment
-    end: IComment
+    begin: VComment&IVNodeMethod
+    end: VComment&IVNodeMethod
 }
-class Part extends EventEmitterEx {
-    //属性
+abstract class Part extends EventEmitterEx {
+    abstract dom:ComponentView.IView
     /**组件名*/
     partName: string;
     /**
@@ -32,7 +34,7 @@ class Part extends EventEmitterEx {
     $: Service;
 
     /** DOM节点存储数组 */
-    protected nodeStore: INode[] = [];
+    protected nodeStore: (VNode&IVNodeMethod)[] = [];
 
     /**节点命名空间 */
     refs: IPartRefs
@@ -65,7 +67,7 @@ class Part extends EventEmitterEx {
         (this: void, part: Part) => boolean>("offline");
 
     /**初始化对象 */
-    constructor(public template: PartTemplate, public props: Object, html: string, outerChildNodes: INode[], outerElement: IHTMLCollection) {
+    constructor(public template: PartTemplate, public props: Object, outerChildNodes: INode[], outerElement: IHTMLCollection) {
         // constructor(public template: PartTemplate, extPart: Part | undefined, public props: Object, html: string, outerChildNodes: INodeArray, outerElement: IHTMLCollection) {
         super();
         this.$ = new Service(template.service);
@@ -77,19 +79,21 @@ class Part extends EventEmitterEx {
         // if(!isUndefined(extPart)){
         //     this.super=extPart;
         // }
-        let dom = $DOM(html);
-        let nodes = dom.childNodes;
+        
+        let nodes = this.dom.tops;
 
         initHTML(nodes, outerChildNodes, outerElement, props, this);
         for (let i = nodes.length; i > 0; i--) {
-            this.nodeStore.push(dom.removeChild(nodes[0]));
+            this.nodeStore.push(nodes[0]);
         }
         let name = template.name;
-        let begin: IComment = $node(name, 8);// document.createComment('<'+name+'>');
-        let end: IComment = $node('/' + name, 8);//document.createComment('</'+name+'>')
-        end.__part__ = begin.__part__ = this;
-        begin.__sign__ = 1;
-        end.__sign__ = 0;
+        let begin = $$$(name, ENodeType.Comment);// document.createComment('<'+name+'>');
+        let end = $$$('/' + name, ENodeType.Comment);//document.createComment('</'+name+'>')
+        end.vmData.part=begin.vmData.part=this;
+        begin.vmData.sign=1;
+        end.vmData.sign=0;
+        // end.__part__ = begin.__part__ = this;
+
         this.refs = {
             begin: begin,
             end: end
@@ -104,15 +108,15 @@ class Part extends EventEmitterEx {
         // this.basePart.isInDOM=false;
 
 
-        initHTML(nodes, outerChildNodes, outerElement, props, this);
+        // initHTML(nodes, outerChildNodes, outerElement, props, this);
         // if(extPart){
         //     (<ExtendsPart>extPart).to(this);
         // }
         let store = this.nodeStore;
-        store.push.apply(store, nodes);
-        for (let i = nodes.length; i > 0; i--) {
-            dom.removeChild(nodes[0]);
-        }
+        push.apply(store, nodes);
+        // for (let i = nodes.length; i > 0; i--) {
+        //     dom.removeChild(nodes[0]);
+        // }
         store.unshift(begin);
         store.push(end);
         this.$init.emit(this);
@@ -130,13 +134,13 @@ class Part extends EventEmitterEx {
         }
     }
     /**即时读取子节点 */
-    get elements(): INode[] {
+    get elements(): (VNode&IVNodeMethod)[] {
         // if(this.isExtends){
         //     return new ArrayEx<INode>();
         // }
         if (this.isInDOM) {
             try {
-                let elements = new ArrayEx<INode>();
+                let elements: (VNode&IVNodeMethod)[]=[];
                 let node = this.refs.begin.nextSibling;
                 let end = this.refs.end;
                 while (node&&node !== end) {
@@ -146,13 +150,13 @@ class Part extends EventEmitterEx {
                 return elements;
             } catch (e) {
                 // _catch(e);
-                return new ArrayEx<INode>();
+                return [];
             }
         }
         if (isArray(this.nodeStore)) {
             return this.nodeStore.slice().splice(1, this.nodeStore.length - 2);
         } else {
-            return new ArrayEx<INode>();
+            return [];
         }
     }
     /**读取父组件 */
