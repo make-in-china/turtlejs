@@ -81,18 +81,4 @@ class VNamedNodeMap{
         }
     }
     //setNamedItemNS: setNamedItemNS()
-    toJS():string{
-        let sAttr:string= '';
-        if (this.length > 0) {
-            for (let i = 0; i < this.length; i++) {
-                sAttr += '._("' + this[i].name;
-                if (this[i].value) {
-                    sAttr += '","' + this[i].value + '")';
-                } else {
-                    sAttr += '")';
-                }
-            }
-        }
-        return sAttr;
-    }
 }

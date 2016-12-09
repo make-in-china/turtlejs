@@ -36,13 +36,6 @@ class VComment extends VCharacterData{
     set textContent(s:string) {
         this.data=s
     }
-    /**
-     * 用自身做环境调用函数,并返回父
-     */
-    __(fn:(node:VNode)=>void): VElement&IVNodeMethod{
-        fn.call(this)
-        return <VElement&IVNodeMethod>this.parentNode;
-    }
     toCreateJS(space:number=0):string{
         return (new Array(space+1)).join(" ")+'(`'+ this.__value__+'`,ENodeType.Comment)';
     }

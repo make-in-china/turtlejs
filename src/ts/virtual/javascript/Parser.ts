@@ -14,7 +14,7 @@ namespace JS{
     }
     export class Parser{
         private static getInitData(condition:string):IJavaScriptParseState{
-            let root=new JavaScriptBlock("","");
+            let root=new JavaScriptBlock('','');
             return {
                 condition:condition,
                 index: 0,
@@ -482,6 +482,16 @@ namespace JS{
             }
             this.parseEnd(m);
             return m.root;
+        }
+        static parseBlock(condition:string,start:number,begin:string,end:string):JavaScriptBlock{
+            let m=this.getInitData(condition);
+            m.index=start;
+            let length=condition.length;
+            
+            while (m.index <= length && !m.block.isEnd) {
+                this[m.action](m,condition);
+            }
+            return m.block;
         }
     }
 }

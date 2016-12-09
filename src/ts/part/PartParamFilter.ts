@@ -1,9 +1,11 @@
 
-class PartParamFilter{
-    static bool(v){
+namespace PartParamFilter{
+    
+    const colorRE=/^\s*((#[\dabcdefABCDEF]{3,6})|(rgba\(.*\)))\s*$/
+    export function bool(v){
         return parseBool(v);
     }
-    static intmin(v,p){
+    export function intmin(v,p){
         v=parseInt(v);
         p=parseInt(p);
         if(v<p||isNaN(v)){
@@ -11,10 +13,10 @@ class PartParamFilter{
         }
         return v;
     }
-    static string(v){
-        return '"'+v+'"';
+    export function string(v){
+        return '`'+v+'`';
     }
-    static floatmin(v,p){
+    export function floatmin(v,p){
         v=parseFloat(v);
         p=parseFloat(p);
         if(v<p||isNaN(v)){
@@ -22,20 +24,20 @@ class PartParamFilter{
         }
         return v;
     }
-    static int(v){
+    export function int(v){
         return parseInt(v);
     }
-    static float(v){
+    export function float(v){
         return parseFloat(v);
     }
-    static pxtoem(v,p){
+    export function pxtoem(v,p){
         p=parseFloat(p);
         if(isNaN(p)){
             p=0;
         }
         return (parseFloat(v)/16+p)+'em';
     }
-    static color(v){
+    export function color(v){
         
         if(colorRE.test(v)){
             return v;
@@ -43,14 +45,14 @@ class PartParamFilter{
             return 'transparent';    
         }
     }
-    static date(v,p){
+    export function date(v,p){
         let d=new Date(v);
         if(d.toDateString()==='Invalid Date'){
             d=new Date();
         }
         return dateFormat(p,d);
     }
-    static only(v,p){
+    export function only(v,p){
         if(p.indexOf(';')===-1){
             return v;
         }
@@ -69,28 +71,35 @@ class PartParamFilter{
             return filter;
         }
     }
-    static udftotrue(v){
+    /**undefined to true */
+    export function udftotrue(v){
         return v===undefined?true:v;
     }
-    static anytotrue(v){
+    /**any to true */
+    export function anytotrue(v){
         return v!==undefined?true:v;
     }
-    static udftofalse(v){
+    /**undefined to false */
+    export function udftofalse(v){
         return v===undefined?false:v;
     }
-    static anytofalse(v){
+    /**any to false */
+    export function anytofalse(v){
         return v!==undefined?false:v;
     }
-    static udftonull(v){
+    /**undefined to null */
+    export function udftonull(v){
         return v===undefined?null:v;
     }
-    static anytonull(v){
+    /**any to null */
+    export function anytonull(v){
         return v!==undefined?null:v;
     }
-    static udftoemptystr(v){
+    export function udftoemptystr(v){
         return v===undefined?"":v;
     }
-    static anytoemptystr(v){
+    export function anytoemptystr(v){
         return v!==undefined?"":v;
     }
 }
+

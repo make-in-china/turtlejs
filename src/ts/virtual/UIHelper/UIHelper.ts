@@ -1,5 +1,5 @@
 
-/// <reference path='VDOM.ts'/>
+/// <reference path='VDOM2.ts'/>
 /// <reference path='VMember.ts'/>
 /// <reference path='VScript.ts'/>
 /// <reference path='../../lib/TreeEach.ts'/>

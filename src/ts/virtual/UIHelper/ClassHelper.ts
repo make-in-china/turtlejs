@@ -1,11 +1,10 @@
 
+/// <reference path='../../part/PartParam.ts'/>
 namespace UIHelper {
 
     
     function getAttrAndChildsJS(name: string, refNode: VMElement.VHtmlElement): string {
-
-
-        let sAttr = refNode.attributes.toJS();
+        let sAttr = refNode.attributesToJS();
         if (sAttr.length !== 0) {
             sAttr = `this.${name}${sAttr};`;
         }
@@ -41,7 +40,7 @@ namespace UIHelper {
         if (!isString(html)) {
             html = html.toString();
         }
-        let dom = VDOM(html);
+        let dom = VDOM2.parseStructor(html);
         let tops: VNode[];
         let chds: VNode[] | IArray;
         if (isArray(dom)) {
@@ -72,19 +71,19 @@ namespace UIHelper {
                     throw getMakeClassError(path, node, (<Error>e).message, state);
                 }
                 return eTreeEach.c_noIn;
-                //解析命令
             }
         });
 
-
+        let paramInfos:PartParam[]=[];
 
         treeEach(<VNode[]>chds, "childNodes", (node, state) => {
+
+
             if (node instanceof VMElement.VHtmlElement) {
                 //解析ref
                 let v = node.getAttribute("ref");
                 if (v) {
                     refInfo.push(v, <any>node);
-                    // refs.push([v,node]);
                     node.removeAttribute("ref");
                 }
                 //解析class
@@ -145,37 +144,28 @@ namespace UIHelper {
                 propertys.push(name + ':' + toClassName(refNode));
             }
         }
+        function setPropertyInitScript(name:string,node:VMElement.VHtmlElement){
+            propertyInitScript[name] = `this.${name}=<any>$$$${
+                        node.toCreateJS()
+                        };
+            `+ getAttrAndChildsJS(name, node);
+        }
         //生成代码
         for (const info of refInfo.data) {
             if (info.refs.length > 1) {
                 //缓存parent;
                 let refParent = info.refParent;
                 for (const ref of info.refs) {
-                    let name = ref.name;
-                    let refNode = ref.node;
-
-                    propertyInitScript[name] = `this.${name}=<any>$$$${
-                        refNode.toCreateJS()
-                        };
-            `+ getAttrAndChildsJS(name, refNode);
+                    setPropertyInitScript(ref.name,ref.node);
                 }
                 let p = refParent.parentNode;
                 if (p) {
-                    let parentName = RefInfo.getRefParentName(info.refs);
-                    propertyInitScript[parentName] = `this.${parentName}=<any>$$$${
-                        refParent.toCreateJS()
-                        };
-            `+ getAttrAndChildsJS(parentName, refParent);
+                    setPropertyInitScript(RefInfo.getRefParentName(info.refs),refParent);
                 }
             } else {
                 //只拆一次
                 let refInfo = info.refs[0];
-                let name = refInfo.name;
-                let refNode = refInfo.node;
-                propertyInitScript[name] = `this.${name}=<any>$$$${
-                    refNode.toCreateJS()
-                    };
-            `+ getAttrAndChildsJS(name, refNode);
+                setPropertyInitScript(refInfo.name,refInfo.node);
             }
         }
         let topsJS: string[] = [];

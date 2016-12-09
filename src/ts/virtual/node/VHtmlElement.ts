@@ -162,8 +162,24 @@ namespace VMElement{
             }
             return sInner;
         }
+        attributesToJS():string{
+            
+            let sAttr:string= '';
+            let attrs=this.attributes;
+            if (attrs.length > 0) {
+                for (let i = 0; i < attrs.length; i++) {
+                    sAttr += '._("' + attrs[i].name;
+                    if (attrs[i].value) {
+                        sAttr += '","' + attrs[i].value + '")';
+                    } else {
+                        sAttr += '")';
+                    }
+                }
+            }
+            return sAttr;
+        }
         toJS(space:number=0):string{
-            return this.toCreateJS(space)+this.attributes.toJS()+this.childNodesToJS(space);
+            return this.toCreateJS(space)+this.attributesToJS()+this.childNodesToJS(space);
         }
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation():void{
@@ -261,7 +277,7 @@ namespace VMElement{
             if(!p){
                 throw new Error("This element has no parent node.");
             }
-            let vNodes=VDOM(v);
+            let vNodes=VDOM.parseStructor(v);
             if(!isArray(vNodes)){
                 p.insertBefore(<VNode & IVNodeMethod>vNodes,this);
             }else{

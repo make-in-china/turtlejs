@@ -424,7 +424,7 @@ abstract class VDOM {
             commentStart: 0
         };
     }
-    protected static parseStructor<IVDOMBuilder>(html: string, vNode?: VNode & IVNodeMethod) {
+    static readonly parseStructor:IVDOMBuilder=function(html: string, vNode?: VNode & IVNodeMethod) {
         let m = this.getInitData(vNode, html.length);
         let parent = m.node;
         while (m.index < html.length) {

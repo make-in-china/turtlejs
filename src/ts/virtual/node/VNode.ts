@@ -53,6 +53,21 @@ abstract class VNode implements INode{
     parentNode: VNode&IVNodeMethod | null;
     
     /**
+     * 用自身做环境调用函数,并返回父
+     */
+    __(fn:(node:VNode)=>void): VElement&IVNodeMethod{
+        fn.call(this)
+        return <VElement&IVNodeMethod>this.parentNode;
+    }
+    
+    /**
+     * 用自身做环境调用函数,并返回自身
+     */
+    ___(this:VNode&IVNodeMethod,fn:(node:VNode)=>void): VNode&IVNodeMethod{
+        fn.call(this)
+        return this;
+    }
+    /**
      * 添加子节点，并返回子节点
      */
     $$(this: VNode&IVNodeMethod, vNode: VNode&IVNodeMethod): VNode&IVNodeMethod{

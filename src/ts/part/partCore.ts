@@ -8,6 +8,11 @@
 /// <reference path='Store.ts'/>
 /// <reference path='../main/Config.ts'/>
 
+interface ITurtle{
+    parts:IKeyArrayHashObject<Part>;
+    service:Service;
+    T:Template;
+}
 declare let $t:ITurtle;
 let
     // $DOM,

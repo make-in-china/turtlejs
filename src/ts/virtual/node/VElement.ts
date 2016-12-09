@@ -29,6 +29,7 @@ abstract class VElement extends VNode{
             return <any>this;
         }
     }
+    /**添加attribute */
     _(this:VElement&IVNodeMethod,name:string,value?:string): VElement&IVNodeMethod{
         this.setAttribute(name, value?value:"");
         return this;
@@ -47,7 +48,7 @@ abstract class VElement extends VNode{
         if (this.nodeName in stringNode) {
             this.appendChild($$$(s, 3));
         } else {
-            VDOM(s, this);
+            VDOM.parseStructor(s, this);
         }
     }
     get innerHTML(this: VElement&IVNodeMethod):string {
