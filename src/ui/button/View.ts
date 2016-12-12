@@ -3,19 +3,26 @@
 //本模块由引擎生成，请勿手动修改此文件
 
 namespace ComponentView{
+    export interface IButtonProps{
+
+    }
     export class Button{
         panel:VMElement.VDivElement&IVNodeMethod;
         ok:VMElement.VInputElement&IVNodeMethod;
         cancel:VMElement.VInputElement&IVNodeMethod;
         tops:[VMElement.VDivElement&IVNodeMethod];
-        initDOM(){
+        initDOM(props:IButtonProps){
             
             this.cancel=<any>$$$("input");
             this.cancel._("type")._("name")._("value");
             this.ok=<any>$$$("input");
             this.ok._("type")._("name")._("value");
             this.panel=<any>$$$("div");
-            
+            this.panel.___(function(node:VMElement.VDivElement&IVNodeMethod){
+                let xx=props.xx
+                xx=PartParamFilter.date(xx,'yyyy年MM月dd日hh小时mm分ss秒');
+                node._('xxName',xx)
+            });
             this.panel
                     .$$$(this.ok)
                     .$$$(this.cancel);

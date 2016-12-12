@@ -43,7 +43,6 @@ abstract class VDOM2 extends VDOM {
                     throw new Error('不支持：'+block.toString());
                 }
                 m.currentAttrValueFilter.params=block.children[0];
-                debugger;
                 m.index+=length;
                 m.action='attributes';
                 return;
@@ -66,7 +65,6 @@ abstract class VDOM2 extends VDOM {
             }
         }else if(this.varNameKeyWord.indexOf(keyWord)===-1){
             //结束
-            debugger;
             m.currentAttrValueFilter.nameEnd=m.index;
             m.action='attrVarNameFilterParamBlock'
             // m.index++;
@@ -109,21 +107,6 @@ abstract class VDOM2 extends VDOM {
     //             m.action='attributes';
     //     }
     //     m.index++;
-    // }
-    // protected static attributes(html: string, m: IMember2) {
-    //     switch (html[m.index]) {
-    //         case '{':
-    //             if(m.attrVarNameStart===0){
-    //                 m.action = 'attrVarNameStart';
-    //                 m.attrVarNameStart=m.index;
-    //                 m.index++;
-    //             }else{
-    //                 throw new Error('之前的{未闭合');
-    //             }
-    //             break;
-    //         default:
-    //             super.attributes(html,m);
-    //     }
     // }
     // static stringNode(html: string, m: IMember2) {
     //     if (!this.checkTemplate(html, m)) {
@@ -194,55 +177,40 @@ abstract class VDOM2 extends VDOM {
                 defaultValue:undefined,
                 filters:filters
             });
+            m.attrValueFilters=[];
+            m.attrValueStart=0;
+            m.attrValueEnd=0;
+            m.attrStart=0;
+            m.attrNameEnd=0;
+            m.equlIndex=0;
         }else{
-            (<VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
+            super.setAttr(html,m);
         }
     }
-    protected static attrValue(html: string, m: IMember2) {
+    protected static attributes(html: string, m: IMember2) {
         switch (html[m.index]) {
-            case '>':
-                /*忽略等号*/
-                this.setAttr(html,m);
-                m.action = '';
-                m.index++;
-                break;
-            case "/":
-                if (m.length >= m.index + 2) {
-                    if (html.substring(m.index + 1, 1) === '>') {
-                        this.setAttr(html,m);
-                        m.action = '';
-                        m.index += 2;
-                        return;
+            case '=':
+                if(html[m.index+1]==='$'&&m.length>m.index+2&&html[m.index+2]==='{'){
+                    if (m.attrStart > 0 && m.attrNameEnd === 0) {
+                        m.attrNameEnd = m.index;
                     }
-                }
-                m.index++
-                break;
-
-            case '\r':
-            case '\n':
-            case ' ':
-                m.index++;
-                break;
-            case '$':
-                if(m.length>m.index+1&&html[m.index+1]==='{'){
+                    m.equlIndex = m.index;
                     if(m.attrValueStart===0){
                         m.action = 'attrValueStart';
+                        m.index+=3;
                         m.attrValueStart=m.index;
                         m.attrValueFilters=[];
-                        m.index+=2;
+                        break;
                     }else{
                         throw new Error('之前的${未闭合');
                     }
-                    break;
                 }
             default:
-                super.attrValue(html,m);
+                super.attributes(html,m);
         }
     }
     protected static getInitData(vNode: VNode & IVNodeMethod | undefined, length: number): IMember2 {
         let data:IMember2=<IMember2>super.getInitData(vNode,length);
-        // data.attrVarNameStart=0;
-        // data.attrVarNameEnd=0;
         data.attrValueStart=0;
         data.attrValueEnd=0;
         return data;
@@ -256,6 +224,7 @@ VMElement.VHtmlElement.prototype.attributesToJS=function(this:VMElement.VHtmlEle
     //解析directive
     let directives=this.vmData.directives;
     if(directives){
+        
         let fn='';
         for(const directive of directives){
             
@@ -270,16 +239,30 @@ VMElement.VHtmlElement.prototype.attributesToJS=function(this:VMElement.VHtmlEle
             if(directive.filters!==null){
                 for(const filter of directive.filters){
                     fn+=`
-                    ${directive.name}=PartParamFilter.${filter.name}(${directive.name}${filter.params.length>0?',':''}${filter.params.join(',')});`
+                ${directive.name}=PartParamFilter.${filter.name}(${directive.name}${filter.params.length>0?',':''}${filter.params.join(',')});`
                 }
             }
             fn+=`
-                node.__('${directive.attrName}',${directive.name})`;
+                this._('${directive.attrName}',${directive.name})`;
             
         }
-        s+=`___(function(node:VNode){
+        s+=`.___(function(this:${toClassName(this)}){
                 ${fn}
             })`;
     }
     return s;
+}
+
+function toClassName(this: void, node: VNode): string {
+    if (isVComment(node)) {
+        return "VComment&IVNodeMethod"
+    } else if (isVText(node)) {
+        return "VText&IVNodeMethod"
+    } else if (isVDocType(node)) {
+        return "VDocumentType&IVNodeMethod"
+    } else {
+        let nodeName = node.nodeName;
+        nodeName = nodeName[0] + nodeName.substr(1).toLowerCase();
+        return 'VMElement.V' + nodeName + 'Element&IVNodeMethod';
+    }
 }

@@ -5,8 +5,10 @@ var moment=require('moment');
 var sourcemaps = require('gulp-sourcemaps');
 var ts = require('gulp-typescript');
 var merge = require('merge2');  // Requires separate installation
+var del = require('del');
 function tsc(event){
          
+    del(['dest/virtual/*']);
     var tsResult=gulp.src('src/ts/virtual/UIHelper/UIHelper.ts')
         .pipe(sourcemaps.init())
         .pipe(ts({

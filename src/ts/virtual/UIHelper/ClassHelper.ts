@@ -17,20 +17,6 @@ namespace UIHelper {
         return sAttr + s;
     }
 
-    function toClassName(this: void, node: VNode): string {
-        if (isVComment(node)) {
-            return "VComment&IVNodeMethod"
-        } else if (isVText(node)) {
-            return "VText&IVNodeMethod"
-        } else if (isVDocType(node)) {
-            return "VDocumentType&IVNodeMethod"
-        } else {
-            let nodeName = node.nodeName;
-            nodeName = nodeName[0] + nodeName.substr(1).toLowerCase();
-            return 'VMElement.V' + nodeName + 'Element&IVNodeMethod';
-        }
-    }
-
     export function makeClass(this: void, path: string, className?: string) {
         if (!className) {
             className = path.match(/[\s\S]*[\/\\](.*?)[\/\\].*?$/)[1];
@@ -66,7 +52,7 @@ namespace UIHelper {
                             //order达成运行所需未条件，转换为VScript节点
                             OrderEx.toScriptNode(order);
                         }
-                    };
+                    }
                 } catch (e) {
                     throw getMakeClassError(path, node, (<Error>e).message, state);
                 }

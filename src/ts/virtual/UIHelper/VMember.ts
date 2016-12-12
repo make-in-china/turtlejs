@@ -11,5 +11,5 @@ class VMember extends VPlaceHolder{
 }
 bindClassToFunctionHelper[ENodeType.Member]=function(node:IVNodeMethod & VNode,nodeName: string){
     node.__proto__=VMember.prototype;
-    VMember.call(node);
+    VMember.call(node,nodeName);
 }

@@ -14,15 +14,21 @@ namespace JS{
             }
         }
         split(separator: string):string[]{
-            var ret:string[]=[];
-            var s:string='';
+            let ret:string[]=[];
+            let s:string='';
+            let isAreadyPush:boolean=false;
             for(const item of this.children){
                 if(isString(item)&&item===separator){
                     ret.push(s);
                     s='';
+                    isAreadyPush=true;
                 }else{
                     s+=item.toString();
+                    isAreadyPush=false;
                 }
+            }
+            if(!isAreadyPush){
+                ret.push(s);
             }
             return ret;
         }

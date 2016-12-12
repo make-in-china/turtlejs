@@ -22,9 +22,6 @@ class VText extends VCharacterData{
     nodeName="#text"
     nodeType:ENodeType.Text=ENodeType.Text
     private __value__=""
-    cloneNode(deep:boolean):VText&IVNodeMethod{
-        return $$$(this.__value__,ENodeType.Text);
-    }
     constructor(data:any){
         super();
         if(isString(data)){
@@ -34,6 +31,9 @@ class VText extends VCharacterData{
         }else{
             this.__value__=data.toString();
         }
+    }
+    cloneNode(deep:boolean):VText&IVNodeMethod{
+        return $$$(this.__value__,ENodeType.Text);
     }
     
     // wholeText: string;

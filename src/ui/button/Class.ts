@@ -1,9 +1,9 @@
-/// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
+
 /// <reference path="./View.ts"/>
 namespace Component{
     export class Button{
         constructor(
-            props:Object,
+            public props:ComponentView.IButtonProps,
             public outerChildNodes:INode[],
             public outerElement:IHTMLCollection
         ) {

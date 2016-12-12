@@ -213,6 +213,10 @@ abstract class VDOM {
         }
         m.index++;
     }
+    protected static setAttr(html:string,m:IMember){
+        (<VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
+        m.attrStart = m.attrNameEnd = 0;
+    }
     protected static attributes(html: string, m: IMember) {
         switch (html[m.index]) {
             case '/':
@@ -222,14 +226,13 @@ abstract class VDOM {
                             if (m.attrNameEnd === 0) {
                                 m.attrNameEnd = m.index;
                             }
-                            (<VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
+                            this.setAttr(html,m);
                         }
                         m.action = '';
                         m.index += 2;
                         break;
                     }
                 }
-                m.attrStart = m.attrNameEnd = 0;
                 m.action = '';
                 m.index++;
                 break;
@@ -238,9 +241,8 @@ abstract class VDOM {
                     if (m.attrNameEnd === 0) {
                         m.attrNameEnd = m.index;
                     }
-                    (<VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
+                    this.setAttr(html,m);
                 }
-                m.attrStart = m.attrNameEnd = 0;
                 m.action = '';
                 m.index++;
                 break;
@@ -264,10 +266,10 @@ abstract class VDOM {
                 if (m.attrStart === 0) {
                     m.attrStart = m.index;
                 } else if (m.equlIndex > 0) {
-                    (<VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
+                    this.setAttr(html,m);
                     this.setAttrStart(m);
                 } else if (m.attrNameEnd !== 0) {
-                    (<VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
+                    this.setAttr(html,m);
                     this.setAttrStart(m);
                     m.attrStart = m.index;
                 }
@@ -295,14 +297,14 @@ abstract class VDOM {
                 break;
             case '>':
                 /*忽略等号*/
-                (<VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
+                this.setAttr(html,m);
                 m.action = '';
                 m.index++;
                 break;
             case "/":
                 if (m.length >= m.index + 2) {
                     if (html.substring(m.index + 1, 1) === '>') {
-                        (<VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
+                        this.setAttr(html,m);
                         m.action = '';
                         m.index += 2;
                         return;

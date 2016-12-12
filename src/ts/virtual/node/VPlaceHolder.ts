@@ -18,5 +18,5 @@ class VPlaceHolder extends VComment{
 }
 bindClassToFunctionHelper[ENodeType.PlaceHolder]=function(node:IVNodeMethod & VNode,nodeName: string){
     node.__proto__=VPlaceHolder.prototype;
-    VPlaceHolder.call(node);
+    VPlaceHolder.call(node,nodeName);
 }

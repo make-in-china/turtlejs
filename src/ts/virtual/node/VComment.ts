@@ -14,12 +14,18 @@ class VComment extends VCharacterData{
     nodeName="#Comment"
     nodeType:ENodeType.Comment=ENodeType.Comment
     private __value__=""
+    constructor(data:any){
+        super();
+        if(isString(data)){
+            this.__value__=data;
+        }else if(isFunction(data)){
+            this.__value__=getFunctionBlock(data);
+        }else{
+            this.__value__=data.toString();
+        }
+    }
     cloneNode(deep:boolean):VComment&IVNodeMethod{
         return $$$(this.__value__,ENodeType.Comment);
-    }
-    constructor(data:string){
-        super();
-        this.__value__=data;
     }
     get data() {
         return this.__value__;

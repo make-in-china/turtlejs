@@ -6,22 +6,25 @@ namespace UIHelper{
         return `namespace ComponentScript{
     export class ${className}{
         constructor(part:Component.${className}){
-            part.dom.initDOM();
+            part.dom.initDOM(part.props);
         }
     }
 }`
     }
 
     
-    export function getViewString(className:string,propertyInfo:string,varInfo:string,domInitScript:string,scripts:string){
+    export function getViewString(className:string,propertyInfo:string,varInfo:string,domInitScript:string,scripts:string,props:string){
         return `/// <reference path="../../../dest/virtual/UIHelper.0.1.d.ts"/>
 
 //本模块由引擎生成，请勿手动修改此文件
 
 namespace ComponentView{
+    export interface I${className}Props{
+        ${props}
+    }
     export class ${className}{
         ${propertyInfo}
-        initDOM(){
+        initDOM(props:I${className}Props){
             ${varInfo}${domInitScript}
         }
     }
@@ -37,7 +40,7 @@ ${scripts!==''?`
 namespace Component{
     export class ${className} extends Part{
         constructor(
-            props:Object,
+            public props:ComponentView.I${className}Props,
             public outerChildNodes:INode[],
             public outerElement:IHTMLCollection
         ) {
