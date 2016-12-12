@@ -39,7 +39,7 @@ abstract class VDOM2 extends VDOM {
                 let block=JS.Parser.parseBlock(html,m.index,'(',')');
                 let length=block.toString().length;
                 JS.deleteSpace(block,true);
-                if(block.children.length!==1){
+                if(block.children.length>1){
                     throw new Error('不支持：'+block.toString());
                 }
                 m.currentAttrValueFilter.params=block.children[0];
@@ -71,32 +71,30 @@ abstract class VDOM2 extends VDOM {
             return;
         }
         m.index++;
-        // switch(keyWord){
-        //     case ' ':
-        //     case '\r':
-        //     case '\n':
-        //         break;
-        //     default:
-        //         throw new Error('错误的标识符:'+keyWord);
-        // }
         
     }
-    
-    protected static attrValueStart(html:string,m:IMember2){
+    protected static dot(html:string,m:IMember2){
+        let keyWord=html[m.index];
+        switch(keyWord){
+            case '\r':
+            case '\n':
+            case ' ':
+                m.index++; 
+                return;
+            case '.':
+                m.currentAttrValueFilter=new AttrValueFilter
+                m.attrValueFilters.push(m.currentAttrValueFilter);
+                m.action='attrVarNameFilter';
+                m.index++;
+                return;
+        }
+        m.action='attributes';
+    }
+    protected static attrValue2(html:string,m:IMember2){
         switch (html[m.index]) {
             case '}':
                 m.attrValueEnd=m.index;
-                if(html[m.index+1]==='.'){
-                    m.currentAttrValueFilter=new AttrValueFilter
-                    m.attrValueFilters.push(m.currentAttrValueFilter);
-                    m.action='attrVarNameFilter';
-                    m.index+=2;
-                    return;
-                }else{
-                    m.action='attributes';
-                    m.index++;
-                    return;
-                }
+                m.action='dot';
         }
         m.index++;
     }
@@ -142,22 +140,16 @@ abstract class VDOM2 extends VDOM {
                 params:string[]
             }[]=[];
             for(const filter of m.attrValueFilters){
-                let params:string[]=filter.params.split(',');
-                for(const param of params){
-                    let v=JS.toConst(param);
-                    if(isString(v)&&v.length>=2){
-                        switch(v[0]){
-                            case "'":
-                            case '"':
-                            case '`':
-                                if(v[v.length-1]===v[0]){
-                                    break
-                                }
-                            default:
-                                throw new Error('filter参数仅支持常量！')
+                let params:string[];
+                if(filter.params){
+                    params=filter.params.split(',');
+                    for(const param of params){
+                        if(!isConst(param)){
+                            throw new Error('filter参数仅支持常量！')
                         }
-                    }
-
+                    } 
+                }else{
+                    params=[];
                 }
                 let filterInfo={
                     name:html.substring(filter.nameStart, filter.nameEnd),
@@ -170,11 +162,19 @@ abstract class VDOM2 extends VDOM {
             if(nameArr.length===2){
                 name=nameArr[0];
                 defaultValue=nameArr[1];
+                let v=JS.toConst(defaultValue);
+                if(isString(v)){
+                    if(!isStringConst(defaultValue)){
+                        throw new Error('默认值仅支持常量！');
+                    }
+                }else{
+                    defaultValue="'"+defaultValue+"'";
+                }
             }
             directives.push({
                 attrName:html.substring(m.attrStart, m.attrNameEnd),
                 name:name,
-                defaultValue:undefined,
+                defaultValue:defaultValue,
                 filters:filters
             });
             m.attrValueFilters=[];
@@ -196,7 +196,7 @@ abstract class VDOM2 extends VDOM {
                     }
                     m.equlIndex = m.index;
                     if(m.attrValueStart===0){
-                        m.action = 'attrValueStart';
+                        m.action = 'attrValue2';
                         m.index+=3;
                         m.attrValueStart=m.index;
                         m.attrValueFilters=[];
@@ -217,7 +217,8 @@ abstract class VDOM2 extends VDOM {
     }
 }
 
-//修改attributesToJS;
+//修改attributesToJS;   
+//tag:hook
 let VHtmlElement_attributesToJS=VMElement.VHtmlElement.prototype.attributesToJS;
 VMElement.VHtmlElement.prototype.attributesToJS=function(this:VMElement.VHtmlElement&IVNodeMethod):string{
     let s:string=VHtmlElement_attributesToJS.call(this);
@@ -228,26 +229,27 @@ VMElement.VHtmlElement.prototype.attributesToJS=function(this:VMElement.VHtmlEle
         let fn='';
         for(const directive of directives){
             
-            fn+=`let ${directive.name}=props.${directive.name}`;
+            fn+=`
+                let $${directive.name}:any=props.${directive.name};`;
 
             if(directive.defaultValue){
-                fn+=`if(${directive.name}===undefined){
-                    ${directive.name}='${directive.defaultValue};'
+                fn+=`
+                if($${directive.name}===undefined){
+                    $${directive.name}=${directive.defaultValue};
                 }`
             }
             let paramInfo=new PartParam(directive.name);
             if(directive.filters!==null){
                 for(const filter of directive.filters){
                     fn+=`
-                ${directive.name}=PartParamFilter.${filter.name}(${directive.name}${filter.params.length>0?',':''}${filter.params.join(',')});`
+                $${directive.name}=PartParamFilter.${filter.name}($${directive.name}${filter.params.length>0?',':''}${filter.params.join(',')});`
                 }
             }
             fn+=`
-                this._('${directive.attrName}',${directive.name})`;
+                this._('${directive.attrName}',$${directive.name}.toString());`;
             
         }
-        s+=`.___(function(this:${toClassName(this)}){
-                ${fn}
+        s+=`.___(function(this:${toClassName(this)}){${fn}
             })`;
     }
     return s;
@@ -265,4 +267,26 @@ function toClassName(this: void, node: VNode): string {
         nodeName = nodeName[0] + nodeName.substr(1).toLowerCase();
         return 'VMElement.V' + nodeName + 'Element&IVNodeMethod';
     }
+}
+function isConst(value:string):boolean{
+    let v=JS.toConst(value);
+    if(isString(v)){
+        return isStringConst(value);
+    }
+    return true;
+}
+function isStringConst(value:string):boolean{
+    if(value.length>=2){
+        switch(value[0]){
+            case "'":
+            case '"':
+            case '`':
+                if(value[value.length-1]===value[0]){
+                    return true;
+                }
+            default:
+                return false;
+        }
+    }
+    return false;
 }

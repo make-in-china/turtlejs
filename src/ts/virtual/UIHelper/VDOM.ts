@@ -265,10 +265,7 @@ abstract class VDOM {
             default:
                 if (m.attrStart === 0) {
                     m.attrStart = m.index;
-                } else if (m.equlIndex > 0) {
-                    this.setAttr(html,m);
-                    this.setAttrStart(m);
-                } else if (m.attrNameEnd !== 0) {
+                } else if (m.equlIndex > 0||m.attrNameEnd !== 0) {
                     this.setAttr(html,m);
                     this.setAttrStart(m);
                     m.attrStart = m.index;

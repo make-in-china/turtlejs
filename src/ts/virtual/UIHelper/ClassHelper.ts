@@ -61,11 +61,24 @@ namespace UIHelper {
         });
 
         let paramInfos:PartParam[]=[];
-
+        let props:string[]=[];
+        let defaultValues:string[]=[];
         treeEach(<VNode[]>chds, "childNodes", (node, state) => {
 
+            
 
             if (node instanceof VMElement.VHtmlElement) {
+                let directives=node.vmData.directives;
+                if(directives){
+                    for(const directive of directives){
+                        if(directive.defaultValue){
+                            props.push(directive.name+'?:string');
+                            defaultValues.push(`'${directive.name}'`);
+                        }else{
+                            props.push(directive.name+':string');
+                        }
+                    }
+                }
                 //解析ref
                 let v = node.getAttribute("ref");
                 if (v) {
@@ -175,7 +188,9 @@ namespace UIHelper {
         }
         let propertyInfo: string = propertys.join(';\n        ');
         let varInfo: string = vars.join(';\n            ');
-        fs.writeFileSync(path.replace(/View\.html$/, 'View.ts'), getViewString(className, propertyInfo, varInfo, domInitScript, scriptFunctions));
+        let propsInfo:string=props.join('\n        ');
+        let defaultValuesInfo:string=defaultValues.join(',');
+        fs.writeFileSync(path.replace(/View\.html$/, 'View.ts'), getViewString(className, propertyInfo, varInfo, domInitScript, scriptFunctions,propsInfo,defaultValuesInfo));
 
         //mixin .css  to  变量
     }

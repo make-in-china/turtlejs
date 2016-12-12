@@ -18,12 +18,16 @@ namespace JS{
         return isVarNameRegExp.test(keyWord);
     }
     let isNumberRegExp=/^(\d+)|(\de3)|([1-9]\d+e\d+)$/;
-    export function toConst(value:string):null|number|string{
+    export function toConst(value:string):null|number|string|boolean{
         switch(value){
             case "NaN":
                 return NaN;
             case "null":
                 return null;
+            case 'false':
+                return false;
+            case 'true':
+                return true;
             // case "undefined":
             // maybe be hook，so don't return
             //     return undefined;

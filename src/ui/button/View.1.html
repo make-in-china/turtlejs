@@ -1,0 +1,26 @@
+
+    可完整预编译的例子
+    <!for var x=0;x<5;x++>
+        <!= x>
+    <!end>
+
+    不可完整预编译的例子，只能生成中间数据（xx未定义）
+    <!for ;xx<5;xx++>
+        <!= xx>
+    <!end>
+
+
+    可完整预编译的例子
+    <!switch true>
+    <!case x===5555>case x===555<!break>2+2
+    <!case 3+3>case 3+3
+    <!default>case 4
+    <!end>
+
+
+    不可完整预编译的例子，只能生成中间数据（xx未定义）
+    <!switch true>
+    <!case xx===5>case xx===5<!break>2+2
+    <!case 3+3>case 3+3
+    <!default>case 4
+    <!end>

@@ -13,7 +13,7 @@ namespace UIHelper{
     }
 
     
-    export function getViewString(className:string,propertyInfo:string,varInfo:string,domInitScript:string,scripts:string,props:string){
+    export function getViewString(className:string,propertyInfo:string,varInfo:string,domInitScript:string,scripts:string,props:string,defaultValuesInfo:string){
         return `/// <reference path="../../../dest/virtual/UIHelper.0.1.d.ts"/>
 
 //本模块由引擎生成，请勿手动修改此文件
@@ -22,7 +22,8 @@ namespace ComponentView{
     export interface I${className}Props{
         ${props}
     }
-    export class ${className}{
+    export class ${className}{${defaultValuesInfo!==''?`
+        static defaultValuesInfo=[${defaultValuesInfo}];`:``}
         ${propertyInfo}
         initDOM(props:I${className}Props){
             ${varInfo}${domInitScript}
