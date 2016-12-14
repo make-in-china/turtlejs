@@ -227,12 +227,7 @@ namespace JS{
                     m.action="comment2";
                     break;
                 default:
-                    if(!this['*/<>'](m,'/')){
-                        this.parseKeyWord(m);
-                        this.pushKeyWord(m,'/');
-                        m.index+=2;
-                        m.action="";
-                    }
+                    this['*/<>'](m,'/');
             }
         }
         private static '+-%'(m:IJavaScriptParseState,keyWord:string){
@@ -350,7 +345,10 @@ namespace JS{
             if(m.block.begin!==keyWordBegin){
                 throw new Error("缺少'"+keyWordBegin+"'");
             }
-            m.block.isEnd=true;
+            let block=m.block;
+            block.isEnd=true;
+            debugger;
+            m.block=block.parent.parent;
             m.index++;
             m.action="";
         }

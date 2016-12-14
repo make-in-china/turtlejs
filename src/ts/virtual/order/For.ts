@@ -65,9 +65,6 @@ namespace Order {
                 throw new Error("错误的for表达式！");
             }
         }
-        run(){
-            For.run(this.data);
-        }
         static run(data:IOrderDataFor){
             
             if (data.forMode === JS.EForMode.In) {

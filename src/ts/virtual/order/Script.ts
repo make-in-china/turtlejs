@@ -12,10 +12,6 @@ namespace Order {
         init(){
             this.block=JS.Parser.parseStructor(this.condition);
         }
-        run(){
-            Script.run(this.data);
-            // replaceNodeByNode(this.node,$$$(exec(this.node,this.condition),3));
-        }
         static run(data:IOrderData){
 
         }

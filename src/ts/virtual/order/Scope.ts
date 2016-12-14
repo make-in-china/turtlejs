@@ -16,9 +16,6 @@ namespace Order {
                 this.block=this.getBlock(conditionArr[1]);
             }
         }
-        run(){
-            ScopeOrder.run(this.data);
-        }
         static run(data:IOrderDataScope){
             let scope=DOMScope.create(data.placeholder,data.scopeName);
             if(data.varInfos&&data.varInfos.length>0){

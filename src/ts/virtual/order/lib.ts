@@ -43,7 +43,7 @@ namespace Order {
         new (node: IComment, condition: string,...args:any[]): VOrder;
         orderName: string;
         subOrder?:string[];
-        run(this:typeof VOrder,data:IOrderData):void;
+        run(data:IOrderData):void;
     }
     export let orders: { [index: string]: IOrderConstructor } = {};
     function makeOrderRegExp(names:string[]):RegExp{

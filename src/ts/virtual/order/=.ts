@@ -13,9 +13,6 @@ namespace Order {
             super(node,condition);
             this.data.condition=condition;
         }
-        run(){
-            Equal.run(this.data);
-        }
         static run(this:void,data:IOrderDataEqual){
             let v=exec(data.placeholder,data.condition);
             if(v instanceof VNode){

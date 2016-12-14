@@ -5,7 +5,6 @@
 /// <reference path='../lib/lib.ts'/>
 /// <reference path='../lib/is.ts'/>
 /// <reference path="Server.ts"/>
-/// <reference path="PartTemplate.ts"/>
 /// <reference path="View.ts"/>
 
 interface VNodeVMData{
@@ -23,7 +22,7 @@ interface IPartRefs {
 abstract class Part extends EventEmitterEx {
     abstract dom:ComponentView.IView
     /**组件名*/
-    partName: string;
+    abstract partName: string;
     /**
      * 是否已插入DOM
      */
@@ -67,11 +66,11 @@ abstract class Part extends EventEmitterEx {
         (this: void, part: Part) => boolean>("offline");
 
     /**初始化对象 */
-    constructor(public template: PartTemplate, public props: Object, outerChildNodes: INode[], outerElement: IHTMLCollection) {
+    constructor(public props: Object, outerChildNodes: INode[], outerElement: IHTMLCollection) {
         // constructor(public template: PartTemplate, extPart: Part | undefined, public props: Object, html: string, outerChildNodes: INodeArray, outerElement: IHTMLCollection) {
         super();
-        this.$ = new Service(template.service);
-        this.partName = template.partName;
+        // this.$ = new Service(template.service);
+        this.partName = this.partName;
         // if(extPart){
         //     /**继承 */
         //     this.__proto__=extPart;   
@@ -86,7 +85,7 @@ abstract class Part extends EventEmitterEx {
         for (let i = nodes.length; i > 0; i--) {
             this.nodeStore.push(nodes[0]);
         }
-        let name = template.name;
+        let name = this.partName;
         let begin = $$$(name, ENodeType.Comment);// document.createComment('<'+name+'>');
         let end = $$$('/' + name, ENodeType.Comment);//document.createComment('</'+name+'>')
         end.vmData.part=begin.vmData.part=this;
@@ -99,7 +98,7 @@ abstract class Part extends EventEmitterEx {
             end: end
         };
         // this.super=extPart;
-        this.resPath = template.path + '/' + template.name + '.res';
+        // this.resPath = template.path + '/' + template.name + '.res';
         // let sp:PartBase=this;
         // while(sp.super){
         //     sp=sp.super
@@ -297,7 +296,7 @@ abstract class Part extends EventEmitterEx {
     //     }
     // }
     toString() {
-        return this.template.partName + ":" + JSON.stringify(this.props);
+        return this.partName + ":" + JSON.stringify(this.props);
     }
     treeDiagram(tabSpace) {
         if (tabSpace === undefined) {

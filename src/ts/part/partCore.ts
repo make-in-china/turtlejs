@@ -11,7 +11,10 @@
 interface ITurtle{
     parts:IKeyArrayHashObject<Part>;
     service:Service;
-    T:Template;
+    T:IHashObject<{
+        prototype:Part
+        new(props: Object, outerChildNodes: INode[], outerElement: IHTMLCollection):Part
+    }>;
 }
 declare let $t:ITurtle;
 let
@@ -102,27 +105,27 @@ function getTemplate(node: IHTMLElement): string {
     }
     return "";
 }
-function defineServiceByNode(node: IHTMLElement) {
-    let name: string = node.getAttribute('service');
-    if (name) {
-        let partType: string = node.getAttribute('ui');
-        if (partType) {
-            if ($t.T.hasOwnProperty(partType)) {
-                /*把服务定义到组件*/
-                $t.T[partType].service.define(name, getTemplate(node));
-            } else {
-                throw new Error('不能定义service：' + name + '到' + partType + '上');
-            }
-        } else {
-            if (!$t.service.hasOwnProperty(name)) {
-                $t.service.define(name, getTemplate(node));
-            } else {
-                throw new Error('不能重复定义service：' + name);
-            }
-        }
-    }
-    removeNode(node);
-}
+// function defineServiceByNode(node: IHTMLElement) {
+//     let name: string = node.getAttribute('service');
+//     if (name) {
+//         let partType: string = node.getAttribute('ui');
+//         if (partType) {
+//             if ($t.T.hasOwnProperty(partType)) {
+//                 /*把服务定义到组件*/
+//                 $t.T[partType].service.define(name, getTemplate(node));
+//             } else {
+//                 throw new Error('不能定义service：' + name + '到' + partType + '上');
+//             }
+//         } else {
+//             if (!$t.service.hasOwnProperty(name)) {
+//                 $t.service.define(name, getTemplate(node));
+//             } else {
+//                 throw new Error('不能重复定义service：' + name);
+//             }
+//         }
+//     }
+//     removeNode(node);
+// }
 // function getExtendsByNode(node: IHTMLElement, sortPath: string) {
 //     let ext = getAttr(node, 'extends', null);
 //     if (isString(ext)) {
@@ -144,19 +147,19 @@ function defineClasses(node: IHTMLElement) {
     }
     removeNode(node);
 }
-function parseDefine(node: IHTMLElement) {
-    switch (true) {
-        case node.hasAttribute('service'):
-            defineServiceByNode(node);
-            break;
-        // case node.hasAttribute('ui'):
-        //     defineUIByNode(node);
-        //     break;
-        case node.hasAttribute('class'):
-            defineClasses(node);
-            break;
-    }
-}
+// function parseDefine(node: IHTMLElement) {
+//     switch (true) {
+//         case node.hasAttribute('service'):
+//             defineServiceByNode(node);
+//             break;
+//         // case node.hasAttribute('ui'):
+//         //     defineUIByNode(node);
+//         //     break;
+//         case node.hasAttribute('class'):
+//             defineClasses(node);
+//             break;
+//     }
+// }
 function isDefine(node: IHTMLElement): boolean {
     switch (true) {
         case node.hasAttribute('service'):
@@ -186,45 +189,52 @@ function findTemplates(nodes: IHTMLElement[] | IArray): IElement[] | IArray {
     });
     return temps;
 }
-function parseUITemplate(uiName: string, uiSortPath: string, uiPath: string, sHTML: string) {
-    let
-        vDOM = $DOM(sHTML),
-        cs = vDOM.children,
-        i = 0,
-        node,
-        s,
-        name,
-        nodeName;
-    for (; i < cs.length; i++) {
-        node = cs[i];
-        if (!isTemplate(node)) {
-            alert('最上层必须是ui/service模板标签');
-            return;
-        }
-        if (node.hasAttribute('service')) {
-            defineServiceByNode(node);
-            i--;
-        } else {
-            nodeName = node.getAttribute('ui');
-            if (!nodeName) nodeName = uiName;
-            if (!$t.T.hasOwnProperty(nodeName)) {
-                s = getTemplate(node);
-                $t.T.define(nodeName, uiSortPath, uiPath, s, getExtendsByNode(node, uiSortPath));
-            } else {
-                alert('不能重复定义ui：' + nodeName);
-            }
-        }
-    }
-}
+// function parseUITemplate(uiName: string, uiSortPath: string, uiPath: string, sHTML: string) {
+//     let
+//         vDOM = VDOM2.parseStructor(sHTML),
+//         i = 0,
+//         node,
+//         s,
+//         name,
+//         nodeName;
+//     let cs:VNode[];
+//     if(isArray(vDOM)){
+//         cs=vDOM;
+//     }else{
+//         cs=[vDOM];
+//     }
+//     for (; i < cs.length; i++) {
+//         node = cs[i];
+//         if (!isTemplate(node)) {
+//             alert('最上层必须是ui/service模板标签');
+//             return;
+//         }
+//         if (node.hasAttribute('service')) {
+//             defineServiceByNode(node);
+//             i--;
+//         } else {
+//             nodeName = node.getAttribute('ui');
+//             if (!nodeName) nodeName = uiName;
+//             if (!$t.T.hasOwnProperty(nodeName)) {
+//                 s = getTemplate(node);
+//                 $t.T.define(nodeName, uiSortPath, uiPath, s);//, getExtendsByNode(node, uiSortPath)
+//             } else {
+//                 alert('不能重复定义ui：' + nodeName);
+//             }
+//         }
+//     }
+// }
+
 /**
  * 加载UI
  */
-function importUI(uiName: string, uiSortPath: string):Part {
+function importUI(uiName: string, uiSortPath: string){
 
     if (!$t.T.hasOwnProperty(uiName)) {
         let uiPath = baseUIPath.getPathBySortPath(uiSortPath);
         let path=uiPath + '/' + (uiName + '.html').toLowerCase();
         
+        $t.T[uiName]=require(path);
         // $t.xhr.get(path, false, function (text: string) {
         //     parseUITemplate(uiName, uiSortPath, uiPath, text);
         // });
@@ -299,37 +309,7 @@ function getUIInfo(node: IHTMLElement) {
         }
     }
 }
-function parseUI(node: IHTMLElement, uiInfo, step, part) {
-    let
-        partName,
-        reExtends,
-        outerChildNodes,
-        outerElement,
-        cpn,
-        ui = importUI(uiInfo.name, uiInfo.sortPath);
 
-    if (!ui) {
-        removeNode(node);
-        throw new Error(uiInfo.name + '组件不存在！');
-    }
-
-    partName = takeAttr(node, 'p-name');
-
-
-    reExtends = takeAttr(node, 're-extends');
-
-    outerChildNodes = slice.call(node.childNodes);
-    outerElement = slice.call(node.children);
-    let chds = node.childNodes;
-    for (let i = chds.length; i > 0; i--) {
-        node.removeChild(<INode>chds[0]);
-    }
-
-    cpn = ui.render(node, node.parentNode, outerChildNodes, outerElement, null, part, partName, reExtends);
-    if (cpn) {
-        step.next = cpn.elementLength;
-    }
-}
 
 function parseGet(node: IHTMLElement, outerChildNodes, outerElement, props, part) {
     removeNode(node);
@@ -771,6 +751,96 @@ class AttributeParser {
         }
     }
 };
+function render(
+    this:void,
+    uiNode:IHTMLElement|null,
+    outerChildNodes: INode[], 
+    outerElement: IHTMLCollection,
+    props:Object|null,
+    uiInfo: string | {
+        sortPath: string;
+        name: string;
+    }
+){
+    let name:string
+    let sortPath:string
+    if(isString(uiInfo)){
+        name=uiInfo;
+        sortPath='ui';
+    }else{
+        name=uiInfo.name;
+        sortPath=uiInfo.sortPath;
+    }
+    let UI= importUI(name, sortPath);
+
+    if (!UI) {
+        if(uiNode){
+            removeNode(uiNode);
+        }
+        throw new Error(name + '组件不存在！');
+    }
+    let ui=new UI({},outerChildNodes,outerElement);  
+
+    if(props===null){
+        props={};
+    }
+
+    let 
+        ext,
+        attrs:INamedNodeMap,
+        len,
+        html;
+        
+    
+    
+    if(uiNode===null){
+        uiNode=<IHTMLElement>$node('ui:render');//document.createElement("ui:render");
+    }else{
+        // setQuestionAtrr(uiNode,outerChildNodes,outerElement,part?part.props:props,part);
+    
+        attrs=uiNode.attributes;
+        len=attrs.length;
+        for(let i=0;i<len;i++){
+            let name=attrs[0].name;
+            if(!props.hasOwnProperty(name)){
+                props[name]=attrs[0].value;    
+            }
+            uiNode.removeAttributeNode(attrs[0]);
+        }
+    }
+    html=this.joinDatasByProps(props);
+    if(html===undefined){
+        return;
+    }
+    
+    if(reExtends){
+        ext=getExtends(reExtends,this.sortPath);
+    }
+    if(!ext){
+        ext=this.extends;
+    }
+    // if(ext instanceof PartTemplate){
+    //     ext=ext.beExtends(uiNode,that,outerChildNodes,outerElement,props,part);
+    // }
+    // let newPart=new Part(this,ext,props,html,outerChildNodes,outerElement);
+    let newPart=new Part(this,props,html,outerChildNodes,outerElement);
+    if(refPartName){
+        /**放置到全局引用 */
+        KeyArrayHashObjectManage.push($t.parts,refPartName,newPart);
+    }
+    this.parts.push(newPart);
+    
+    if(uiNode.parentNode!==null){
+        //let p=uiNode.parentNode.__domNode__;
+        newPart.insertBefore(uiNode);
+        removeNode(uiNode);
+        /*if(p){
+            debugger;
+            vNodesToDOM(part.store);
+        }*/
+    }
+    return newPart;
+}
 let elementParser = new ElementParser;
 let attributeParser = new AttributeParser;
 function initHTML(arr: INode[]|INodeList, outerChildNodes?, outerElement?, props?, part?) {
@@ -795,7 +865,24 @@ function initHTML(arr: INode[]|INodeList, outerChildNodes?, outerElement?, props
         }
         let uiInfo = getUIInfo(node);
         if (uiInfo) {
-            parseUI(node, uiInfo, step, part);
+            render(node,outerChildNodes,outerElement,null,uiInfo);
+            
+            // partName = takeAttr(node, 'p-name');
+
+
+            // reExtends = takeAttr(node, 're-extends');
+
+            // outerChildNodes = slice.call(node.childNodes);
+            // outerElement = slice.call(node.children);
+            // let chds = node.childNodes;
+            // for (let i = chds.length; i > 0; i--) {
+            //     node.removeChild(<INode>chds[0]);
+            // }
+            
+            // cpn = ui.render(node, node.parentNode, outerChildNodes, outerElement, null, part, partName, reExtends);
+            // if (cpn) {
+            //     step.next = cpn.elementLength;
+            // }
             return eTreeEach.c_noIn | eTreeEach.c_noRepeat;
         }
         /*if(isTemplate(node)){

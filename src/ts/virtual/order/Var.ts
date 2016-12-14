@@ -42,9 +42,6 @@ namespace Order {
             }
             
         }
-        run(){
-            Var.run(this.data);
-        }
         static run(data:IOrderDataVar){
             runVarInfos(DOMScope.get(data.placeholder),data.placeholder,data.varInfos);
             removeNode(data.placeholder);

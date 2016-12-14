@@ -13,9 +13,6 @@ namespace Order {
             super(node, condition,'while');
             this.data.condition=condition;
         }
-        run(){
-            While.run(this.data);
-        }
         static run(data:IOrderDataWhile){
             super.run(data,canRepeat);
         }

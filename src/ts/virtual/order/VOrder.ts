@@ -9,7 +9,9 @@ namespace Order {
         data:IOrderData=<any>{};
         node: VComment
         condition: string
-        run?(): void
+        run(){
+            (<IOrderConstructor>this.constructor).run(this.data);
+        }
         constructor(node: VComment, condition: string) {
             this.node = node;
             this.condition = condition;

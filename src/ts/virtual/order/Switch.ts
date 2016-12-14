@@ -25,9 +25,6 @@ namespace Order {
             }
             return false
         }
-        run(){
-            Switch.run(this.data);
-        }
         static run(data:IOrderDataSwitch){
             
             let hit=-1

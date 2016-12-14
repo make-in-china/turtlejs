@@ -25,9 +25,6 @@ namespace Order {
             }
             return false
         }
-        run() {
-            If.run(this.data);
-        }
         static run(this:void,data:IOrderDataIf){
 
             let hit=-1;

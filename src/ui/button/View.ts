@@ -4,35 +4,34 @@
 
 namespace ComponentView{
     export interface IButtonProps{
-        date?:string
-        bool?:string
+        
     }
     export class Button{
-        static defaultValuesInfo=['date','bool'];
-        panel:VMElement.VDivElement&IVNodeMethod;
         tops:[VMElement.VDivElement&IVNodeMethod];
         initDOM(props:IButtonProps){
             
-            this.panel=<any>$$$("div");
-            this.panel.___(function(this:VMElement.VDivElement&IVNodeMethod){
-                let $date:any=props.date;
-                if($date===undefined){
-                    $date='2016年12月12日11小时01分20秒';
-                }
-                $date=PartParamFilter.date($date,'yyyy年MM月dd日hh小时mm分ss秒');
-                this._('date',$date.toString());
-                let $bool:any=props.bool;
-                if($bool===undefined){
-                    $bool='false';
-                }
-                $bool=PartParamFilter.bool($bool);
-                this._('bool',$bool.toString());
-            });
             push.call(this.tops,<any>[
                     $$$("div")
-                    .$$$(this.panel)
+('',ENodeType.PlaceHolder).__(order0)
             ]);
         }
     }
 
+    //因为无法推测运行结果，所以生成中间数据算法在此
+    
+    function order0(this:VPlaceHolder){
+        Order.For.run({
+            forStepInfo:{first:'data,{arr:[0]},true,i,0,false',exec:'i<3',step:'i++,data.arr.push(i)'},
+            forInInfo:undefined,
+            forMode:1,
+            placeholder:this,
+            blocks:[
+                {
+                order:'for',
+                condition:'var data={arr:[0]},i=0;i<3;i++,data.arr.push(i)',
+                nodes:[$$$(`- ((data).arr)[(i+1-1)*2/2]`,ENodeType.Comment).$]
+            }]
+        });
+
+    }
 }

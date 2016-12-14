@@ -65,8 +65,6 @@ namespace UIHelper {
         let defaultValues:string[]=[];
         treeEach(<VNode[]>chds, "childNodes", (node, state) => {
 
-            
-
             if (node instanceof VMElement.VHtmlElement) {
                 let directives=node.vmData.directives;
                 if(directives){
