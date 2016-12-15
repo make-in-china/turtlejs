@@ -40,9 +40,9 @@ namespace JS{
             if(isString(keyWord)){
                 switch(JS.getKeyWordType(keyWord)){
                     case JS.EKeyWordType.Member_Access_Operator:
-                        if(isPush===false&&exp!==''){
-                            exps.push(exp);
-                        }
+                        exp+=keyWord;
+                        exps.push(exp);
+                        exp='';
                         isPush=true;
                         break;
                     case JS.EKeyWordType.Unary_Operator:

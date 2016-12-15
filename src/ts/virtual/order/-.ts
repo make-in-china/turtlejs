@@ -3,7 +3,9 @@
 /// <reference path='../javascript/JavaScriptExpressions.ts'/>
 /// <reference path='VOrder.ts'/>
 namespace Order {
-    
+    interface IBindExpressionsFunction{
+        __me__:IBindExpressionsFunction
+    }
     // function bindExpressionsByOrder(node:INode, condition:string) {
     //     let cdtn = splitByOnce(condition, '|');
     //     if (cdtn.length < 2)
@@ -40,9 +42,9 @@ namespace Order {
     //     textNode['data'] = <any>exp.__me__;
     // }
     export interface IOrderDataBindExpressions  extends IOrderData{
-        var:string
+        function:Function
         propertyName:JS.JavaScriptExpressions|string
-        exps:JS.JavaScriptExpressions
+        exps:JS.JavaScriptExpressions|null
     }
 
     @register
@@ -52,25 +54,36 @@ namespace Order {
         constructor(node:VComment,condition:string){
             super(node,condition);
             let data=this.data;
-            let cdtn = splitByOnce(condition, ':');
-            if (cdtn.length < 2){
-                cdtn.unshift('v');
-            }
-            data.var = cdtn[0];
-            
-            let block=JS.Parser.parseStructor(cdtn[1]);
+
+            let block=JS.Parser.parseStructor(condition);
             //只支持一个语句
             if(block.children.length!==1){
-                throw new Error('必须为合法的语句！');
+                throw new Error('语句超出范围：'+condition);
             }
-            //并且语句的最后必须为xx1.xx2或xx1['xx2']，即需求一个父对象，一个子属性
-            //xx1可以为一个表达式
+
+            //  xx1   、  xx1.xx2   或    xx1['xx2']  
 
             //取后面的访问
             let statement=block.children[0];
+            let statements= statement.splitKeyWord(':');
+
+            if(statements.length!==2){
+                throw new Error('语句应该是如下格式：\n表达式:函数');
+            }
+
+
+            statement=statements[0];
+
             JS.deleteStatementSpace(statement,true);//删除空格回车换行
-            if(statement.children.length<2){
-                throw new Error(`"${statement}"无法识别为xx.xx或xx['xx']`)
+            // if(statement.children.length<2){
+            //     throw new Error(`"${statement}"无法识别为xx1、xx1.xx或xx1['xx']`)
+            // }
+            
+            if(statement.children.length===1){
+                let keyWord=statement.children[0];
+                if(isString(keyWord)&&JS.isVarName(keyWord)){
+                    data.propertyName=keyWord;
+                }
             }
             let chds=statement.children;
             let keyWord=chds.pop();
@@ -102,8 +115,27 @@ namespace Order {
         /** 计算*/
         
         static run(data:IOrderDataBindExpressions){
-            console.log(data);
-            debugger;
+            let obj=exec(data.placeholder,data.exps.toString());
+            if(!obj){
+                throw new Error('获取对象失败：'+data.exps);
+            }
+            let propertyName:string;
+            if(isString(data.propertyName)){
+                propertyName=data.propertyName;
+            }else{
+                propertyName=exec(data.placeholder,data.propertyName.toString());
+            }
+            let exp:IBindExpressionsFunction = <any>function (v:string) {
+                // try {_execExpressionsByScope.call(scope, cdtn[1], v, node);
+                return exec(textNode,)
+                // } catch (e) { _catch(e) }
+            }
+            exp.__me__ = exp;
+            bindProperty(obj, data.var, exp, '__me__');
+            let textNode=$$$('',ENodeType.Text);
+            replaceNodeByNode(data.placeholder, textNode);
+            bindElementProperty(exp, '__me__', textNode, 'data');
+            textNode['data'] = <any>exp.__me__;
         }
     }
 }

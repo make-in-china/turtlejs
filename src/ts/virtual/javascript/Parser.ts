@@ -293,7 +293,13 @@ namespace JS{
         }
         private static '.'(m:IJavaScriptParseState){
             if(!this.parseKeyWord(m)){
-                throw new Error("此处不该有'.'");
+                let statement=<JavaScriptStatement>last.call(m.block.children);
+                if(statement.children.length>0){
+                    let lastKeyWord=<string | JavaScriptBlock | JavaScriptComment | JavaScriptString>last.call(statement.children);
+                    if(!(lastKeyWord instanceof JavaScriptBlock&&lastKeyWord.begin==='(')){
+                        throw new Error("此处不该有'.'");
+                    }
+                }
             }
             this.pushKeyWord(m,'.');
             m.action="";
@@ -347,7 +353,6 @@ namespace JS{
             }
             let block=m.block;
             block.isEnd=true;
-            debugger;
             m.block=block.parent.parent;
             m.index++;
             m.action="";
@@ -475,7 +480,7 @@ namespace JS{
         static parseStructor(condition:string):JavaScriptBlock{
             let m=this.getInitData(condition);
             let length=condition.length;
-            while (m.index <= length) {
+            while (m.index < length) {
                 this[m.action](m,condition);
             }
             this.parseEnd(m);
@@ -486,7 +491,7 @@ namespace JS{
             m.index=start;
             let length=condition.length;
             
-            while (m.index <= length && !m.block.isEnd) {
+            while (m.index < length && !m.block.isEnd) {
                 this[m.action](m,condition);
             }
             return m.block;

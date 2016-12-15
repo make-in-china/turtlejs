@@ -32,6 +32,25 @@ namespace JS{
             }
             return ret;
         }
+        splitKeyWord(separator: string){
+            let ret:JavaScriptStatement[]=[];
+            let arr:JavaScriptStatement=new JavaScriptStatement;
+            let isAreadyPush:boolean=false;
+            for(const item of this.children){
+                if(isString(item)&&item===separator){
+                    ret.push(arr);
+                    arr=new JavaScriptStatement;
+                    isAreadyPush=true;
+                }else{
+                    arr.push(item);
+                    isAreadyPush=false;
+                }
+            }
+            if(!isAreadyPush){
+                ret.push(arr);
+            }
+            return ret;
+        }
         toString():string{
             let ret="";
             for(const item of this.children){

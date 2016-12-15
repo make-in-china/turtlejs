@@ -82,7 +82,7 @@ namespace Order {
         
         return order;
     }
-    let _exec:{call(that:any,$$turtle$$: string,node:INode):any} = Function('$$turtle$$,node', 'with(this){return eval($$turtle$$)};');
+    let _exec:{call(that:any,$$turtle$$: string,node:INode):any} = Function('$$turtle$$,node', 'with(this){return eval("("+$$turtle$$+")")};');
     export function registerEnvVar(name:string,value:any){
         if(name in $rootScope){
             throw new Error(name+"无法重复注册到环境！");

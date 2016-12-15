@@ -51,7 +51,7 @@ namespace Order {
     export function tryRunVarInfos(this:void,node:INode,varInfos:[string,string|undefined,boolean][]){
         for(const varInfo of varInfos){
             if(varInfo[2]){
-                testSet(node,varInfo[0],test(node,<string>varInfo[1]));
+                testSet(node,varInfo[0],<string>varInfo[1]);
             }else{
                 testSetValue(node,varInfo[0],varInfo[1]);
             }
