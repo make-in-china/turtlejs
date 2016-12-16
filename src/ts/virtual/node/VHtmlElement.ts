@@ -9,7 +9,7 @@ interface IVNodeMethod{
     (nodeName: string, nodeType?: ENodeType.Element): VMDOM.VHtmlElement&IVNodeMethod;
     (nodeName: 'html', nodeType?: ENodeType.Element): VMDOM.VHtmlElement&IVNodeMethod;
 }
-function isVHTMLElement(node: VNode): node is VMDOM.VHtmlElement {
+function isVHTMLElement(node: VMDOM.VNode): node is VMDOM.VHtmlElement {
     return node.nodeType === ENodeType.Element
 }
 namespace VMDOM{

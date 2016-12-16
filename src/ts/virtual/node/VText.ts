@@ -9,7 +9,7 @@ function isVText(node: VMDOM.VNode): node is VMDOM.VText {
 }
 
 namespace VMDOM{
-    let getFunctionBlock=(function(){
+    export let getFunctionBlock=(function(){
         let re=/(^.*?(function.*?\(.*?\).*?\{)|(\(.*?\)\=>\{))([\s\S\w\W]*)\}$/;
         return function getFunctionBlock(fn:Function):string{
             var ret=fn.toString();

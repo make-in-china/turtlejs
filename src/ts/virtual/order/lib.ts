@@ -87,8 +87,8 @@ namespace Order {
         }
     }
     
-    export function parseOrder(this:void,node: VOrder): VOrder | undefined {
-        let info = getCommentStringInfo(node.data);
+    export function parseOrder(this:void,node: VMDOM.VOrder): VOrder | undefined {
+        let info = getOrderInfo(node);
         if (!info) {
             return;
         }

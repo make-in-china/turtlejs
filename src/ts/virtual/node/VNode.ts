@@ -30,7 +30,7 @@ interface IVNodeMethod{
 
 namespace VMDOM{
     export let emptyTextNodeRE = /^\s*$/;
-    let stringNode = {
+    export let stringNode = {
         SCRIPT: /^\/script[>\s]/i,
         TEMPLATE: /^\/template[>\s]/i,
         STYLE: /^\/style[>\s]/i,
