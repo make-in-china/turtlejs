@@ -32,7 +32,7 @@ namespace Order {
     export class For extends RepeatBlockOrder {
         static orderName = "for"
         data:IOrderDataFor
-        constructor(node: VComment, condition: string) {
+        constructor(node: VMDOM.VComment, condition: string) {
             super(node, condition,'for');
             let jsblock=JS.Parser.parseStructor(condition);
             let info=JS.For.parseConditions(jsblock);

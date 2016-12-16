@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "track", nodeType?: 1): VMElement.VTrackElement&IVNodeMethod
+    (nodeName: "track", nodeType?: 1): VMDOM.VTrackElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({kind:'',src:'',srclang:'',label:'',default:''})
     export class  VTrackElement extends VHtmlElement{
         nodeName="TRACK";

@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "optgroup", nodeType?: 1): VMElement.VOptgroupElement&IVNodeMethod
+    (nodeName: "optgroup", nodeType?: 1): VMDOM.VOptgroupElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({disabled:'',label:''})
     export class  VOptgroupElement extends VHtmlElement{
         nodeName="OPTGROUP";

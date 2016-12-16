@@ -1,8 +1,8 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "button", nodeType?: 1): VMElement.VButtonElement&IVNodeMethod
+    (nodeName: "button", nodeType?: 1): VMDOM.VButtonElement&IVNodeMethod
 }
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({formTarget:'',name:'',value:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VButtonElement extends VHtmlElement{
         nodeName="BUTTON"

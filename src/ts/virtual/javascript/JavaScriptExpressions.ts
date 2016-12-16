@@ -3,17 +3,16 @@ namespace JS{
         children:(JavaScriptExpressions|string)[]=[]
         push(child:JavaScriptExpressions|string){
             this.children.push(child);
+            return this;
         }
         toString():string{
-            return this.innerText;
-        }
-        get innerText():string{
             let ret="";
             for(const child of this.children){
                 ret+=child;
             }
             return ret;
         }
+        
     }
     /**获得分级代码数组
      * @param {JavaScriptBlock} block 语句块

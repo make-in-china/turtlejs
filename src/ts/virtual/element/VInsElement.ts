@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "ins", nodeType?: 1): VMElement.VInsElement&IVNodeMethod
+    (nodeName: "ins", nodeType?: 1): VMDOM.VInsElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({cite:'',dateTime:''})
     export class  VInsElement extends VHtmlElement{
         nodeName="INS";

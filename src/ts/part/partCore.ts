@@ -403,7 +403,7 @@ function parseSet(node: IHTMLElement, outerChildNodes: INode[], outerElement: IE
 
 let includeJSFiles = (function () {
     class IncludeTask {
-        static jsScript: IHashObject<VMElement.VScriptElement> = {};
+        static jsScript: IHashObject<VMDOM.VScriptElement> = {};
         files: string[];
         constructor(public parent: IncludeTask, files: string[] | string, public callback?: () => void) {
             if (parent) {

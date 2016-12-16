@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "progress", nodeType?: 1): VMElement.VProgressElement&IVNodeMethod
+    (nodeName: "progress", nodeType?: 1): VMDOM.VProgressElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({value:'',max:''})
     export class  VProgressElement extends VHtmlElement{
         nodeName="PROGRESS";

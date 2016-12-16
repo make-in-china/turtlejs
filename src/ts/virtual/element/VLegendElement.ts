@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "legend", nodeType?: 1): VMElement.VLegendElement&IVNodeMethod
+    (nodeName: "legend", nodeType?: 1): VMDOM.VLegendElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({align:''})
     export class  VLegendElement extends VHtmlElement{
         nodeName="LEGEND";

@@ -1,8 +1,8 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "dialog", nodeType?: 1): VMElement.VDialogElement&IVNodeMethod
+    (nodeName: "dialog", nodeType?: 1): VMDOM.VDialogElement&IVNodeMethod
 }
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({open:''})
     export class  VDialogElement extends VHtmlElement{
         nodeName="DIALOG";

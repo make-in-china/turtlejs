@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "select", nodeType?: 1): VMElement.VSelectElement&IVNodeMethod
+    (nodeName: "select", nodeType?: 1): VMDOM.VSelectElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({autofocus:'',disabled:'',multiple:'',name:'',required:'',size:''})
     export class  VSelectElement extends VHtmlElement{
         nodeName="SELECT";

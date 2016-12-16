@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "img", nodeType?: 1): VMElement.VImgElement&IVNodeMethod
+    (nodeName: "img", nodeType?: 1): VMDOM.VImgElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({alt:'',src:'',srcset:'',sizes:'',crossOrigin:'',useMap:'',isMap:'',width:'',height:'',name:'',lowsrc:'',align:'',hspace:'',vspace:'',longDesc:'',border:''})
     export class  VImgElement extends VHtmlElement{
         nodeName="IMG";

@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "meter", nodeType?: 1): VMElement.VMeterElement&IVNodeMethod
+    (nodeName: "meter", nodeType?: 1): VMDOM.VMeterElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({value:'',min:'',max:'',low:'',high:'',optimum:''})
     export class  VMeterElement extends VHtmlElement{
         nodeName="METER";

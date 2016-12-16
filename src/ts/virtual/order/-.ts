@@ -1,60 +1,27 @@
 
 
 /// <reference path='../javascript/JavaScriptExpressions.ts'/>
+/// <reference path='../javascript/logic/Function.ts'/>
 /// <reference path='VOrder.ts'/>
 namespace Order {
     interface IBindExpressionsFunction{
         __me__:IBindExpressionsFunction
     }
-    // function bindExpressionsByOrder(node:INode, condition:string) {
-    //     let cdtn = splitByOnce(condition, '|');
-    //     if (cdtn.length < 2)
-    //         cdtn.push('v');
-    //     let
-    //         name,
-    //         scope:Scope,
-    //         obj,
-    //         bindVar = cdtn[0],
-    //         arrBindVar: Array<string>,
-    //         exp: IExp,
-    //         textNode: IText = $node(' ', 3);
-
-    //     if (bindVar.indexOf(".") != -1) {
-    //         arrBindVar = bindVar.split(".");
-    //     } else {
-    //         arrBindVar = [bindVar];
-    //     }
-    //     name = bindVar[bindVar.length - 1];
-    //     scope = DOMScope.get(node);
-    //     obj = _getBindObject(scope, arrBindVar);
-    //     if (obj === null) {
-    //         throw new Error('不能获取绑定属性:' + cdtn[0]);
-    //     }
-    //     exp = <any>function (v:string) {
-    //         // try {
-    //         return _execExpressionsByScope.call(scope, cdtn[1], v, node);
-    //         // } catch (e) { _catch(e) }
-    //     }
-    //     exp.__me__ = exp;
-    //     bindProperty(obj, name, exp, '__me__');
-    //     replaceNodeByNode(node, textNode);
-    //     bindElementProperty(exp, '__me__', textNode, 'data');
-    //     textNode['data'] = <any>exp.__me__;
-    // }
     export interface IOrderDataBindExpressions  extends IOrderData{
-        function:Function
-        propertyName:JS.JavaScriptExpressions|string
-        exps:JS.JavaScriptExpressions|null
+        function:{
+            params:string[],
+            content:string
+        }|null
+    object:[string,string]
     }
 
     @register
     export class BindExpressions extends VOrder {
         static orderName = "-"
         data:IOrderDataBindExpressions
-        constructor(node:VComment,condition:string){
+        constructor(node:VMDOM.VComment,condition:string){
             super(node,condition);
             let data=this.data;
-
             let block=JS.Parser.parseStructor(condition);
             //只支持一个语句
             if(block.children.length!==1){
@@ -67,76 +34,129 @@ namespace Order {
             let statement=block.children[0];
             let statements= statement.splitKeyWord(':');
 
-            if(statements.length!==2){
-                throw new Error('语句应该是如下格式：\n表达式:函数');
+            if(statements.length>2){
+                throw new Error('语句应该是如下格式：\n(表达式):(回调函数)');
             }
 
 
             statement=statements[0];
 
-            JS.deleteStatementSpace(statement,true);//删除空格回车换行
-            // if(statement.children.length<2){
-            //     throw new Error(`"${statement}"无法识别为xx1、xx1.xx或xx1['xx']`)
-            // }
+            JS.deleteStatementSpace(statement,false);//删除空格回车换行
+
             
             if(statement.children.length===1){
                 let keyWord=statement.children[0];
                 if(isString(keyWord)&&JS.isVarName(keyWord)){
-                    data.propertyName=keyWord;
-                }
-            }
-            let chds=statement.children;
-            let keyWord=chds.pop();
-            if(keyWord instanceof JS.JavaScriptBlock){
-                if(keyWord.begin==='['){
-                    data.propertyName=JS.getExps(keyWord);;
-                }else{
-                    throw new Error(`"${keyWord}"不是一个合法的变量名`);
-                }
-            }else if(isString(keyWord)){
-                if(JS.isVarName(keyWord)){
-                    data.propertyName=keyWord;
-                    //再去掉一个.
-                    keyWord=last.call(chds);
-                    if(keyWord==='.'){
-                        chds.pop();
-                    }
-                }else{
-                    throw new Error(`"${keyWord}"不是一个合法的变量名`);
+                    data.object=['',keyWord];
                 }
             }else{
-                //什么鬼
-                throw new Error('无非识别的keyWord:'+keyWord);
+                let chds=statement.children;
+                let keyWord=chds.pop();
+                data.object=<any>[JS.getStatementExps(statement).toString()];
+                if(keyWord instanceof JS.JavaScriptBlock){
+                    if(keyWord.begin==='['){
+                        let propertyName=JS.getExps(keyWord);
+                        let chds=propertyName.children;
+                        chds.shift();
+                        chds.pop();
+                        data.object.push(propertyName.toString());
+                    }else{
+                        throw new Error(`"${keyWord}"不是一个合法的变量名`);
+                    }
+                }else if(isString(keyWord)){
+                    if(JS.isVarName(keyWord)){
+                        data.object.push(keyWord);
+                        //再去掉一个.
+                        keyWord=last.call(chds);
+                        if(keyWord==='.'){
+                            chds.pop();
+                        }
+                    }else{
+                        throw new Error(`"${keyWord}"不是一个合法的变量名`);
+                    }
+                }else{
+                    //什么鬼
+                    throw new Error('无非识别的keyWord:'+keyWord);
+                }
+                
             }
-            
-            this.data.exps=JS.getStatementExps(statement);
+            if(statements.length===1){
+                data.function=null;
+                return ;
+            }
+            statement=statements[1];
+            JS.mergeStatementSpace(statement,false);//删除空格回车换行
+            let fn=JS.Function.new(statement);
+            if(fn){
+                if(fn.params.length!==1){
+                    throw new Error('函数参数数量不正确！');
+                }
+                let content:string;
+                if(isString(fn.content)){
+                    content=fn.content;
+                }else{
+                    content='function(){'+fn.content.innerText+'}()';
+                }
+                data.function={
+                    content:content,
+                    params:fn.params
+                };
+            }else{
+                data.function=null;
+            }
         }
         
         /** 计算*/
         
         static run(data:IOrderDataBindExpressions){
-            let obj=exec(data.placeholder,data.exps.toString());
-            if(!obj){
-                throw new Error('获取对象失败：'+data.exps);
-            }
             let propertyName:string;
-            if(isString(data.propertyName)){
-                propertyName=data.propertyName;
-            }else{
-                propertyName=exec(data.placeholder,data.propertyName.toString());
-            }
-            let exp:IBindExpressionsFunction = <any>function (v:string) {
-                // try {_execExpressionsByScope.call(scope, cdtn[1], v, node);
-                return exec(textNode,)
-                // } catch (e) { _catch(e) }
-            }
-            exp.__me__ = exp;
-            bindProperty(obj, data.var, exp, '__me__');
             let textNode=$$$('',ENodeType.Text);
+            let obj:any;
+            let objectExps=data.object[0];
+            let objectName=data.object[1];
+            if(objectExps!==''){
+                //对象+属性
+                obj=exec(data.placeholder,objectExps);
+                if(!obj){
+                    throw new Error('获取对象失败：'+objectExps);
+                }
+                if(isString(objectName)){
+                    propertyName=objectName;
+                }else{
+                    propertyName=exec(data.placeholder,objectName);
+                }
+                
+            }else{
+                //scope+属性
+                obj=DOMScope.get(data.placeholder);
+                propertyName=<string>objectName;
+            }
+            
+            if(data.function){
+                let fn:Function=makeExpressFunction(data.function.content,data.function.params);
+                let exp:IBindExpressionsFunction = <any>function (v:any) {
+                    return  fn(data.placeholder,[v]);
+                }
+                exp.__me__ = exp;
+                bindProperty(obj, propertyName, exp, '__me__');
+                bindElementProperty(exp, '__me__', textNode, 'data');
+                textNode['data'] = <any>exp.__me__;
+            }else{
+
+                bindElementProperty(obj, propertyName, textNode, 'data');
+                textNode['data'] = <any>obj[propertyName];
+            }
             replaceNodeByNode(data.placeholder, textNode);
-            bindElementProperty(exp, '__me__', textNode, 'data');
-            textNode['data'] = <any>exp.__me__;
         }
+    }
+    export function makeExpressFunction(this:void,content:string,params:string[]){
+        let scopeFun=Order.newScopeFunction(params);
+        return function(node:INode,args:any[]):any{
+            let scope=DOMScope.get(node);
+            args.push(content);
+            args.push(node);
+            return scopeFun.apply(scope,args);
+        };
     }
 }
 

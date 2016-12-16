@@ -1,8 +1,8 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "frame", nodeType?: 1): VMElement.VFrameElement&IVNodeMethod
+    (nodeName: "frame", nodeType?: 1): VMDOM.VFrameElement&IVNodeMethod
 }
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({name:'',scrolling:'',frameBorder:'',marginHeight:'',marginWidth:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VFrameElement extends VHtmlElement{
         nodeName="FRAME"

@@ -1,8 +1,8 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "dd", nodeType?: 1): VMElement.VDdElement&IVNodeMethod
+    (nodeName: "dd", nodeType?: 1): VMDOM.VDdElement&IVNodeMethod
 }
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VDdElement extends VHtmlElement{
         nodeName="DD"

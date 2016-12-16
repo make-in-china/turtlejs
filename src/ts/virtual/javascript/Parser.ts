@@ -13,11 +13,11 @@ namespace JS{
         stringStartBy:string
     }
     export class Parser{
-        private static getInitData(condition:string):IJavaScriptParseState{
+        private static getInitData(condition:string,start:number=0):IJavaScriptParseState{
             let root=new JavaScriptBlock('','');
             return {
                 condition:condition,
-                index: 0,
+                index: start,
                 action: '',
                 length: condition.length,
                 block:root,
@@ -477,24 +477,35 @@ namespace JS{
                     m.index++;
             }
         }
-        static parseStructor(condition:string):JavaScriptBlock{
-            let m=this.getInitData(condition);
+        static parseStructor(condition:string,start:number=0,checkCallback?:(m:IJavaScriptParseState)=>boolean):JavaScriptBlock{
+            let m=this.getInitData(condition,start);
             let length=condition.length;
-            while (m.index < length) {
-                this[m.action](m,condition);
+            if(checkCallback){
+                while (m.index < length) {
+                    if(checkCallback(m)){
+                        break;
+                    }
+                    this[m.action](m,condition);
+                }
+            }else{
+                while (m.index < length) {
+                    this[m.action](m,condition);
+                }
+                this.parseEnd(m);
             }
-            this.parseEnd(m);
             return m.root;
         }
-        static parseBlock(condition:string,start:number,begin:string,end:string):JavaScriptBlock{
-            let m=this.getInitData(condition);
-            m.index=start;
+        static parseBlock(condition:string,start:number,begin:string,end:string):{
+            length:number,
+            block:JavaScriptBlock
+        }{
+            let m=this.getInitData(condition,start);
             let length=condition.length;
             
             while (m.index < length && !m.block.isEnd) {
                 this[m.action](m,condition);
             }
-            return m.block;
+            return {length:m.index-start,block:m.block};
         }
     }
 }

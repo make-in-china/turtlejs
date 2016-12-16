@@ -3,23 +3,23 @@
 
 namespace Order {
     export interface IOrderData{
-        placeholder:VComment
+        placeholder:VMDOM.VComment
     }
     export abstract class VOrder {
         data:IOrderData=<any>{};
-        node: VComment
+        node: VMDOM.VComment
         condition: string
         run(){
             (<IOrderConstructor>this.constructor).run(this.data);
         }
-        constructor(node: VComment, condition: string) {
+        constructor(node: VMDOM.VComment, condition: string) {
             this.node = node;
             this.condition = condition;
             this.data.placeholder=node;
         }
-        static eachOrder(this:void,array:INode[]|INodeList,fn:(node:VComment,info:ICommentOrderInfo,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
+        static eachOrder(this:void,array:INode[]|INodeList,fn:(node:VMDOM.VComment,info:IOrderInfo,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
             return treeEach(array, 'childNodes', (node: INode, state)=> {
-                if (!(node instanceof VComment)) {
+                if (!(node instanceof VMDOM.VComment)) {
                     return;
                 }
                 let info = getCommentStringInfo(node.data);

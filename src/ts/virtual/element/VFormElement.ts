@@ -1,8 +1,8 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "form", nodeType?: 1): VMElement.VFormElement&IVNodeMethod
+    (nodeName: "form", nodeType?: 1): VMDOM.VFormElement&IVNodeMethod
 }
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({name:'',target:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VFormElement extends VHtmlElement{
         nodeName="FORM"

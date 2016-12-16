@@ -3,7 +3,7 @@
 namespace UIHelper {
 
     
-    function getAttrAndChildsJS(name: string, refNode: VMElement.VHtmlElement): string {
+    function getAttrAndChildsJS(name: string, refNode: VMDOM.VHtmlElement): string {
         let sAttr = refNode.attributesToJS();
         if (sAttr.length !== 0) {
             sAttr = `this.${name}${sAttr};`;
@@ -27,8 +27,8 @@ namespace UIHelper {
             html = html.toString();
         }
         let dom = VDOM2.parseStructor(html);
-        let tops: VNode[];
-        let chds: VNode[] | IArray;
+        let tops: VMDOM.VNode[];
+        let chds: VMDOM.VNode[] | IArray;
         if (isArray(dom)) {
             chds = dom;
             tops = dom
@@ -38,9 +38,9 @@ namespace UIHelper {
         }
 
         let refInfo = new RefInfo;
-        let scripts: VScript[] = [];
-        treeEach(<VNode[]>chds, "childNodes", (node, state) => {
-            if (node instanceof VComment) {
+        let scripts: VMDOM.VScript[] = [];
+        treeEach(<VMDOM.VNode[]>chds, "childNodes", (node, state) => {
+            if (node instanceof VMDOM.VComment) {
                 //解析注释里的命令
                 try {
                     let order = Order.parseComment(node);
@@ -57,15 +57,22 @@ namespace UIHelper {
                     throw getMakeClassError(path, node, (<Error>e).message, state);
                 }
                 return eTreeEach.c_noIn;
+            }else if(node instanceof VMDOM.VOrder){
+                
+                try {
+                    node
+                } catch (e) {
+                    throw getMakeClassError(path, node, (<Error>e).message, state);
+                }
             }
         });
 
         let paramInfos:PartParam[]=[];
         let props:string[]=[];
         let defaultValues:string[]=[];
-        treeEach(<VNode[]>chds, "childNodes", (node, state) => {
+        treeEach(<VMDOM.VNode[]>chds, "childNodes", (node, state) => {
 
-            if (node instanceof VMElement.VHtmlElement) {
+            if (node instanceof VMDOM.VHtmlElement) {
                 let directives=node.vmData.directives;
                 if(directives){
                     for(const directive of directives){
@@ -84,18 +91,27 @@ namespace UIHelper {
                     node.removeAttribute("ref");
                 }
                 //解析class
-            } else if (node instanceof VScript) {
+            } else if (node instanceof VMDOM.VScript) {
                 scripts.push(node);
             }
         });
-
+        let functionHash:{[index:string]:VMDOM.VScript}={}
         let scriptFunctions: string = '';
+        let index=0;
         for (let i = scripts.length - 1; i >= 0; i--) {
             let script = scripts[i];
-            let p = <VElement & IVNodeMethod>scripts[i].parentNode;
-            let name = 'order' + i;
-            script.propertyName = name;
-            scriptFunctions += '\n    ' + script.toFunction();
+            let p = <VMDOM.VElement & IVNodeMethod>scripts[i].parentNode;
+            let name = 'order' + index;
+            let hashScript=functionHash[script.toFunction()];
+            if(hashScript){
+                script.propertyName=hashScript.propertyName;
+                // scriptFunctions += '\n    let ' + name+'='+hashScript.propertyName;
+            }else{
+                functionHash[script.toFunction()]=script;
+                script.propertyName = name;
+                scriptFunctions += '\n    ' + script.toFunction();
+                index++;
+            }
         }
 
         let propertys: string[] = [];
@@ -109,7 +125,7 @@ namespace UIHelper {
                 let refParent = info.refParent;
                 for (const ref of info.refs) {
                     let name = ref.name;
-                    let refNode: VElement & IVNodeMethod = ref.node;
+                    let refNode: VMDOM.VElement & IVNodeMethod = ref.node;
                     let mem = $$$(name, ENodeType.Member);
                     replaceNodeByNode(refNode, mem);
                     names.push(name);
@@ -133,15 +149,15 @@ namespace UIHelper {
                 //只拆一次
                 let refInfo = info.refs[0];
                 let name = refInfo.name;
-                let refNode: VElement & IVNodeMethod = <any>refInfo.node;
-                let p = <VElement & IVNodeMethod>refNode.parentNode;
+                let refNode: VMDOM.VElement & IVNodeMethod = <any>refInfo.node;
+                let p = <VMDOM.VElement & IVNodeMethod>refNode.parentNode;
                 p.insertBefore($$$(name, ENodeType.Member), refNode);
                 p.removeChild(refNode);
                 names.push(name);
                 propertys.push(name + ':' + toClassName(refNode));
             }
         }
-        function setPropertyInitScript(name:string,node:VMElement.VHtmlElement){
+        function setPropertyInitScript(name:string,node:VMDOM.VHtmlElement){
             propertyInitScript[name] = `this.${name}=<any>$$$${
                         node.toCreateJS()
                         };

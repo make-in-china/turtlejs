@@ -3,7 +3,7 @@
 /// <reference path='Break.ts'/>
 namespace Order {
     export interface IOrderDataBlock extends IOrderData {
-        placeholder: VPlaceHolder
+        placeholder: VMDOM.VPlaceHolder
         blocks: IOrderBlock[]
     }
     export interface IOrderDataBlockRun extends IOrderDataBlock {
@@ -12,12 +12,12 @@ namespace Order {
     export interface IOrderBlock {
         order: string
         condition: string
-        nodes: VNode[]
+        nodes: VMDOM.VNode[]
     }
     export abstract class BlockOrder extends VOrder {
         data: IOrderDataBlock
-        endNode: VComment
-        constructor(node: VComment, condition: string, orderName: string,isBlockStart:(subOrder: string) => boolean) {
+        endNode: VMDOM.VComment
+        constructor(node: VMDOM.VComment, condition: string, orderName: string,isBlockStart:(subOrder: string) => boolean) {
             super(node, condition);
             let data = this.data;
             data.blocks = [];
@@ -31,14 +31,14 @@ namespace Order {
                 switch (subOrder) {
                     case 'end':
                         blockNodes.push(preNode);
-                        data.blocks.push({ order: orderName, condition: preCondition, nodes: <VNode[]>takeBlockBetween(preOrderNode, node) });
+                        data.blocks.push({ order: orderName, condition: preCondition, nodes: <VMDOM.VNode[]>takeBlockBetween(preOrderNode, node) });
                         this.endNode = node;
                         return eTreeEach.c_stopEach;
                     case 'break':
                         return;
                     default:
                         blockNodes.push(preNode);
-                        data.blocks.push({ order: orderName, condition: preCondition, nodes: <VNode[]>takeBlockBetween(preOrderNode, node) });
+                        data.blocks.push({ order: orderName, condition: preCondition, nodes: <VMDOM.VNode[]>takeBlockBetween(preOrderNode, node) });
                         preOrderNode = node;
                         preCondition = condition;
                         preNode = node;
@@ -60,7 +60,7 @@ namespace Order {
 
 
 
-    function parseOrders(this:void,data:IOrderDataBlock,isBlockStart: (subOrder: string) => boolean,array:INode[]|INodeList,run:boolean,fn?:(node:VComment,subOrder:string,condition:string,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
+    function parseOrders(this:void,data:IOrderDataBlock,isBlockStart: (subOrder: string) => boolean,array:INode[]|INodeList,run:boolean,fn?:(node:VMDOM.VComment,subOrder:string,condition:string,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
         return VOrder.eachOrder(array, (node,info, state)=> {
             
             if (info.order) {
@@ -88,11 +88,12 @@ namespace Order {
         }, beginIndex);
     }
     
-    function runOrder(this:void,info: ICommentOrderInfo, node: VComment): VOrder|null {
+    function runOrder(this:void,info: IOrderInfo, node: VMDOM.VComment): VOrder|null {
         let orderName: string = <string>info.order;
 
         if (orderName in orders) {
             let order=new orders[orderName](node,info.condition);
+            
             if(order.run&&OrderEx.canRunAtService(order)){
                 order.run();
             }
@@ -100,7 +101,7 @@ namespace Order {
         }
         return null;
     }
-    function parseBlock(this:void,info: ICommentOrderInfo, node: VComment): BlockOrder|null {
+    function parseBlock(this:void,info: IOrderInfo, node: VMDOM.VComment): BlockOrder|null {
         let orderName: string = <string>info.order;
 
         if (orderName in orders) {
@@ -112,7 +113,7 @@ namespace Order {
         return null;
     }
     export function parseBreakOrder(this:void,data: IOrderDataBlockRun,isBlockStart: (subOrder: string) => boolean,blocks:INode[],p:INode){
-        parseOrders(data,isBlockStart,blocks,true,(node:VComment,subOrder,condition,step)=>{
+        parseOrders(data,isBlockStart,blocks,true,(node:VMDOM.VComment,subOrder,condition,step)=>{
             if(subOrder==='break'){
                 data.isBreak=true;
                 //级联删除break后面的数据直至当前层；

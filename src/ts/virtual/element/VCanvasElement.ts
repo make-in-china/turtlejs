@@ -1,8 +1,8 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "canvas", nodeType?: 1): VMElement.VCanvasElement&IVNodeMethod
+    (nodeName: "canvas", nodeType?: 1): VMDOM.VCanvasElement&IVNodeMethod
 }
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({width:'',height:''})
     export class  VCanvasElement extends VHtmlElement{
         nodeName="CANVAS";

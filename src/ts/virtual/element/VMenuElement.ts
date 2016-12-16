@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "menu", nodeType?: 1): VMElement.VMenuElement&IVNodeMethod
+    (nodeName: "menu", nodeType?: 1): VMDOM.VMenuElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({compact:''})
     export class  VMenuElement extends VHtmlElement{
         nodeName="MENU";

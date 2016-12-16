@@ -1,8 +1,8 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "area", nodeType?: 1): VMElement.VAreaElement&IVNodeMethod
+    (nodeName: "area", nodeType?: 1): VMDOM.VAreaElement&IVNodeMethod
 }
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({alt:'',coords:'',shape:'',target:'',ping:'',noHref:'',href:''})
     export class  VAreaElement extends VHtmlElement{
         nodeName="AREA";

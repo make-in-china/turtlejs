@@ -1,8 +1,8 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "basefont", nodeType?: 1): VMElement.VBasefontElement&IVNodeMethod
+    (nodeName: "basefont", nodeType?: 1): VMDOM.VBasefontElement&IVNodeMethod
 }
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VBasefontElement extends VHtmlElement{
         nodeName="BASEFONT"

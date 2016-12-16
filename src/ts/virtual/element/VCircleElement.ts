@@ -1,8 +1,8 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "circle", nodeType?: 1): VMElement.VCircleElement&IVNodeMethod
+    (nodeName: "circle", nodeType?: 1): VMDOM.VCircleElement&IVNodeMethod
 }
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VCircleElement extends VHtmlElement{
         nodeName="CIRCLE"

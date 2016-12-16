@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "pre", nodeType?: 1): VMElement.VPreElement&IVNodeMethod;
+    (nodeName: "pre", nodeType?: 1): VMDOM.VPreElement&IVNodeMethod;
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({width:''})
     export class  VPreElement extends VHtmlElement{
         nodeName="PRE";

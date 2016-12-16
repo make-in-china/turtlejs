@@ -44,7 +44,6 @@ let last:{
 interface Constructor{
     prototype:Object
 }
-    
 function extend<T>(elem:T,elemEx:any):T{
     for(let e in elemEx){
         elem[e]=elemEx[e];

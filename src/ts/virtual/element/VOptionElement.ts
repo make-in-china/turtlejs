@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "option", nodeType?: 1): VMElement.VOptionElement&IVNodeMethod
+    (nodeName: "option", nodeType?: 1): VMDOM.VOptionElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({disabled:'',label:'',selected:'',value:''})
     export class  VOptionElement extends VHtmlElement{
         nodeName="OPTION";

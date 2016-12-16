@@ -9,9 +9,9 @@ class VElementHelper{
         `)+':string';
         return `/// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "${name.toLowerCase()}", nodeType?: 1): VMElement.${className}&IVNodeMethod;
+    (nodeName: "${name.toLowerCase()}", nodeType?: 1): VMDOM.${className}&IVNodeMethod;
 }
-namespace VMElement{
+namespace VMDOM{
     export class ${className} extends VHtmlElement{
         nodeName="${name.toUpperCase()}"
         ${propertys}

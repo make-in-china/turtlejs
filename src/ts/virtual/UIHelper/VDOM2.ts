@@ -36,8 +36,9 @@ abstract class VDOM2 extends VDOM {
         switch(keyWord){
             case '(':
                 
-                let block=JS.Parser.parseBlock(html,m.index,'(',')');
-                let length=block.toString().length;
+                let {length,block}=JS.Parser.parseBlock(html,m.index,'(',')');
+                debugger;
+                //block.toString().length;
                 JS.deleteSpace(block,true);
                 if(block.children.length>1){
                     throw new Error('不支持：'+block.toString());
@@ -209,7 +210,26 @@ abstract class VDOM2 extends VDOM {
                 super.attributes(html,m);
         }
     }
-    protected static getInitData(vNode: VNode & IVNodeMethod | undefined, length: number): IMember2 {
+    
+    protected static textNode(html: string, m: IMember2) {
+        let data;
+        switch (html[m.index]) {
+            case '@':
+                if(m.index<m.length-2&&html[m.index+1]==='{'){
+                    
+                    m.index++;
+                    let {length,block}=JS.Parser.parseBlock(html,m.index,'{','}');
+                    m.index+=length;
+                    let order=$$$(block,ENodeType.Order);
+                    m.node.appendChild(order);
+
+                    break;
+                }
+            default:
+                super.textNode(html,m);
+        }
+    }
+    protected static getInitData(vNode: VMDOM.VNode & IVNodeMethod | undefined, length: number): IMember2 {
         let data:IMember2=<IMember2>super.getInitData(vNode,length);
         data.attrValueStart=0;
         data.attrValueEnd=0;
@@ -219,8 +239,8 @@ abstract class VDOM2 extends VDOM {
 
 //修改attributesToJS;   
 //tag:hook
-let VHtmlElement_attributesToJS=VMElement.VHtmlElement.prototype.attributesToJS;
-VMElement.VHtmlElement.prototype.attributesToJS=function(this:VMElement.VHtmlElement&IVNodeMethod):string{
+let VHtmlElement_attributesToJS=VMDOM.VHtmlElement.prototype.attributesToJS;
+VMDOM.VHtmlElement.prototype.attributesToJS=function(this:VMDOM.VHtmlElement&IVNodeMethod):string{
     let s:string=VHtmlElement_attributesToJS.call(this);
     //解析directive
     let directives=this.vmData.directives;
@@ -255,7 +275,7 @@ VMElement.VHtmlElement.prototype.attributesToJS=function(this:VMElement.VHtmlEle
     return s;
 }
 
-function toClassName(this: void, node: VNode): string {
+function toClassName(this: void, node: VMDOM.VNode): string {
     if (isVComment(node)) {
         return "VComment&IVNodeMethod"
     } else if (isVText(node)) {
@@ -265,7 +285,7 @@ function toClassName(this: void, node: VNode): string {
     } else {
         let nodeName = node.nodeName;
         nodeName = nodeName[0] + nodeName.substr(1).toLowerCase();
-        return 'VMElement.V' + nodeName + 'Element&IVNodeMethod';
+        return 'VMDOM.V' + nodeName + 'Element&IVNodeMethod';
     }
 }
 function isConst(value:string):boolean{

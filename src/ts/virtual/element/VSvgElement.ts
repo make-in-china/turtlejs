@@ -1,8 +1,8 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "svg", nodeType?: 1): VMElement.VSvgElement&IVNodeMethod
+    (nodeName: "svg", nodeType?: 1): VMDOM.VSvgElement&IVNodeMethod
 }
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VSvgElement extends VHtmlElement{
         nodeName="SVG"

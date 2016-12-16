@@ -1,15 +1,15 @@
 
 interface IRefs{
     name:string
-    node:VMElement.VHtmlElement&IVNodeMethod
+    node:VMDOM.VHtmlElement&IVNodeMethod
 }
 
 class RefInfo{
     data:{
-        refParent:VMElement.VHtmlElement&IVNodeMethod
+        refParent:VMDOM.VHtmlElement&IVNodeMethod
         refs:IRefs[]
     }[]=[]
-    getRefNodeName(node:VMElement.VHtmlElement&IVNodeMethod){
+    getRefNodeName(node:VMDOM.VHtmlElement&IVNodeMethod){
         for(const data of this.data){
             for(const ref of data.refs){
                 if(ref.node===node){
@@ -19,8 +19,8 @@ class RefInfo{
         }
         return null;
     }
-    push(name:string,refNode:VMElement.VHtmlElement&IVNodeMethod){
-        let p:VMElement.VHtmlElement&IVNodeMethod=<any>refNode.parentNode;
+    push(name:string,refNode:VMDOM.VHtmlElement&IVNodeMethod){
+        let p:VMDOM.VHtmlElement&IVNodeMethod=<any>refNode.parentNode;
         for(const data of this.data){
             if(data.refParent===p){
                 data.refs.push({name:name,node:refNode});

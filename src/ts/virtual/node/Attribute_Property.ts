@@ -1,6 +1,6 @@
 
-namespace VMElement{
-    function getAttr(node:VMElement.VHtmlElement,name:string):string{
+namespace VMDOM{
+    function getAttr(node:VMDOM.VHtmlElement,name:string):string{
         var ret:string|null=node.getAttribute(name);
         if(ret){
             return ret;
@@ -8,38 +8,38 @@ namespace VMElement{
             return ""
         }
     }
-    function setAttr(node:VMElement.VHtmlElement,name:string,value:string){
+    function setAttr(node:VMDOM.VHtmlElement,name:string,value:string){
         node.setAttribute(name,value);
     }
 
     let apNames:string[];
 
-    export function mergeClass<U>(v:U):(constructor:{prototype:VMElement.VHtmlElement&U})=>void{
+    export function mergeClass<U>(v:U):(constructor:{prototype:VMDOM.VHtmlElement&U})=>void{
         //不重复创建类装饰器，而是使用外部变量转存参数，因此不支持异步
         apNames=Object.keys(v);;
         return <any>setA_PToClassPrototype;
     }
-    function setA_PToClassPrototype(constructor:typeof VMElement.VHtmlElement){
+    function setA_PToClassPrototype(constructor:typeof VMDOM.VHtmlElement){
         let prototype=constructor.prototype;
-        let clazzSuperPrototype=(<typeof VMElement.VHtmlElement><any>prototype).prototype;//这里只是让后面的比较正常,类型并不准
+        let clazzSuperPrototype=(<typeof VMDOM.VHtmlElement><any>prototype).prototype;//这里只是让后面的比较正常,类型并不准
         for(const name of apNames){
             Object.defineProperty(prototype,name,{
-                get:function(this:VMElement.VHtmlElement):string{
+                get:function(this:VMDOM.VHtmlElement):string{
                     return getAttr(this,name);
                 },
-                set:function(this:VMElement.VHtmlElement,v:string){
+                set:function(this:VMDOM.VHtmlElement,v:string){
                     setAttr(this,name,v);
                 }
             })
         }
-        prototype.cloneNode=function(this:VMElement.VHtmlElement&IVNodeMethod,deep?:boolean):VMElement.VHtmlElement&IVNodeMethod{
+        prototype.cloneNode=function(this:VMDOM.VHtmlElement&IVNodeMethod,deep?:boolean):VMDOM.VHtmlElement&IVNodeMethod{
             let newNode=clazzSuperPrototype.cloneNode(deep);
             for(const name of apNames){
                 if(this[name]!==""){
                     newNode[name]=this[name];
                 }
             }
-            return <VMElement.VHtmlElement&IVNodeMethod>newNode;
+            return <VMDOM.VHtmlElement&IVNodeMethod>newNode;
         }
     }
 }

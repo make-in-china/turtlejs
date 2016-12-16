@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "textarea", nodeType?: 1): VMElement.VTextareaElement&IVNodeMethod
+    (nodeName: "textarea", nodeType?: 1): VMDOM.VTextareaElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({autofocus:'',cols:'',dirName:'',disabled:'',maxLength:'',minLength:'',name:'',placeholder:'',readOnly:'',required:'',rows:'',wrap:'',autocapitalize:''})
     export class  VTextareaElement extends VHtmlElement{
         nodeName="TEXTAREA";

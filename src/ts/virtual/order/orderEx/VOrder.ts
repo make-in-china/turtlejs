@@ -1,5 +1,6 @@
 
 /// <reference path='../VOrder.ts'/>
+
 namespace OrderEx {
     export const tryRun='tryRun'
     export const replaceToScriptNode='replaceToScriptNode'

@@ -1,10 +1,10 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 /// <reference path="../../core/node.ts"/>
 interface IVNodeMethod{
-    (nodeName: "script", nodeType?: 1): VMElement.VScriptElement&IVNodeMethod
+    (nodeName: "script", nodeType?: 1): VMDOM.VScriptElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({src:'',type:'',charset:'',async:'',defer:'',crossOrigin:'',event:'',integrity:''})
     export class  VScriptElement extends VHtmlElement{
         nodeName="SCRIPT";

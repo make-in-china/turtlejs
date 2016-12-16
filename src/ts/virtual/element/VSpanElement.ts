@@ -1,8 +1,8 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "span", nodeType?: 1): VMElement.VSpanElement&IVNodeMethod
+    (nodeName: "span", nodeType?: 1): VMDOM.VSpanElement&IVNodeMethod
 }
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VSpanElement extends VHtmlElement{
         nodeName="SPAN"

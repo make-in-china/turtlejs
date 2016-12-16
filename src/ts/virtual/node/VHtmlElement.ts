@@ -6,13 +6,13 @@
 /// <reference path='Attribute_Property.ts'/>
 
 interface IVNodeMethod{
-    (nodeName: string, nodeType?: ENodeType.Element): VMElement.VHtmlElement&IVNodeMethod;
-    (nodeName: 'html', nodeType?: ENodeType.Element): VMElement.VHtmlElement&IVNodeMethod;
+    (nodeName: string, nodeType?: ENodeType.Element): VMDOM.VHtmlElement&IVNodeMethod;
+    (nodeName: 'html', nodeType?: ENodeType.Element): VMDOM.VHtmlElement&IVNodeMethod;
 }
-function isVHTMLElement(node: VNode): node is VMElement.VHtmlElement {
+function isVHTMLElement(node: VNode): node is VMDOM.VHtmlElement {
     return node.nodeType === ENodeType.Element
 }
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VHtmlElement extends VElement{
         nodeType:ENodeType.Element=ENodeType.Element;

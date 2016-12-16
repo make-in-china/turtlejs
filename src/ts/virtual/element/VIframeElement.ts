@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "iframe", nodeType?: 1): VMElement.VIframeElement&IVNodeMethod
+    (nodeName: "iframe", nodeType?: 1): VMDOM.VIframeElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({src:'',srcdoc:'',name:'',sandbox:'',allowFullscreen:'',width:'',height:'',align:'',scrolling:'',frameBorder:'',longDesc:'',marginHeight:'',marginWidth:''})
     export class  VIframeElement extends VHtmlElement{
         nodeName="IFRAME";

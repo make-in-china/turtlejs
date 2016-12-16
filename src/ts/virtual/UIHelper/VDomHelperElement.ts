@@ -1,7 +1,7 @@
 interface IVNodeMethod{
-    (nodeName: "domhelper", nodeType?: ENodeType.Element): VMElement.VDomhelperElement&IVNodeMethod;
+    (nodeName: "domhelper", nodeType?: ENodeType.Element): VMDOM.VDomhelperElement&IVNodeMethod;
 }
-namespace VMElement{
+namespace VMDOM{
     export class VDomhelperElement extends VHtmlElement{
         nodeName="DOMHELPER"
     }

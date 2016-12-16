@@ -9,13 +9,13 @@ namespace Order {
     export class Equal extends VOrder {
         static orderName = "="
         data:IOrderDataEqual
-        constructor(node:VComment,condition:string){
+        constructor(node:VMDOM.VComment,condition:string){
             super(node,condition);
             this.data.condition=condition;
         }
         static run(this:void,data:IOrderDataEqual){
             let v=exec(data.placeholder,data.condition);
-            if(v instanceof VNode){
+            if(v instanceof VMDOM.VNode){
                 replaceNodeByNode(data.placeholder,v);
                 return;
             }

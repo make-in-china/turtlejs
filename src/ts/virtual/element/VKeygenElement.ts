@@ -1,9 +1,9 @@
 /// <reference path="../node/Attribute_Property.ts"/>
 interface IVNodeMethod{
-    (nodeName: "keygen", nodeType?: 1): VMElement.VKeygenElement&IVNodeMethod
+    (nodeName: "keygen", nodeType?: 1): VMDOM.VKeygenElement&IVNodeMethod
 }
 
-namespace VMElement{
+namespace VMDOM{
     @mergeClass({autofocus:'',challenge:'',disabled:'',keytype:'',name:''})
     export class  VKeygenElement extends VHtmlElement{
         nodeName="KEYGEN";
