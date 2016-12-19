@@ -36,7 +36,7 @@ abstract class VDOM2 extends VDOM {
         switch(keyWord){
             case '(':
                 
-                let {length,block}=JS.Parser.parseBlock(html,m.index,'(',')');
+                let {length,block}=JS.Parser.parseBlock(html,m.index);
                 debugger;
                 //block.toString().length;
                 JS.deleteSpace(block,true);
@@ -218,7 +218,7 @@ abstract class VDOM2 extends VDOM {
                 if(m.index<m.length-2&&html[m.index+1]==='{'){
                     
                     m.index++;
-                    let {length,block}=JS.Parser.parseBlock(html,m.index,'{','}');
+                    let {length,block}=JS.Parser.parseBlock(html,m.index);
                     m.index+=length;
                     let order=$$$(block,ENodeType.Order);
                     m.node.appendChild(order);

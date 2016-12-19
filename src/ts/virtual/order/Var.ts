@@ -5,14 +5,14 @@
 namespace Order {
     export interface IOrderDataVar extends IOrderData{
         varInfos:[string,string|undefined,boolean][]
-        placeholder:VComment
+        placeholder:VMDOM.VComment
     }
     @register
     export class Var extends VOrder {
         static orderName = "var";
         data:IOrderDataVar
         block:JS.JavaScriptBlock
-        constructor(node:VComment , condition:string){
+        constructor(node:VMDOM.VComment , condition:string){
             super(node,condition);
             this.initStatement();
             this.initvarInfos();
@@ -57,7 +57,7 @@ namespace Order {
             }
         }
     }
-    export function runVarInfos(this:void,scope:Scope,node:VNode,varInfos:[string,string|undefined,boolean][]){
+    export function runVarInfos(this:void,scope:Scope,node:VMDOM.VNode,varInfos:[string,string|undefined,boolean][]){
         for(const varInfo of varInfos){
             if(varInfo[2]){
                 scope[varInfo[0]]=exec(node,<any>varInfo[1]);

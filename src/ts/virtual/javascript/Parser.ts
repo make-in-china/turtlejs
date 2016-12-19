@@ -1,6 +1,6 @@
 /// <reference path='JavaScriptStatement.ts'/>
 namespace JS{
-    interface IJavaScriptParseState{
+    export interface IJavaScriptParseState{
         condition:string
         index: number
         action: string
@@ -495,17 +495,26 @@ namespace JS{
             }
             return m.root;
         }
-        static parseBlock(condition:string,start:number,begin:string,end:string):{
+        static parseBlock(condition:string,start:number):{
             length:number,
             block:JavaScriptBlock
         }{
             let m=this.getInitData(condition,start);
             let length=condition.length;
-            
-            while (m.index < length && !m.block.isEnd) {
+            let block:JavaScriptBlock|null=null;
+            while (m.index < length) {
+                if(!block&&m.block!==m.root){
+                    //记录第一个block
+                    block=m.block;
+                }
+                if(block&&block.isEnd){
+                    break;
+                }
+                
                 this[m.action](m,condition);
             }
             return {length:m.index-start,block:m.block};
         }
+        
     }
 }

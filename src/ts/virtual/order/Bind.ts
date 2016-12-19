@@ -16,7 +16,7 @@ namespace Order {
     export class Bind extends VOrder {
         static orderName = "-"
         data:IOrderDataBind
-        constructor(node:VComment,condition:string){
+        constructor(node:VMDOM.VComment,condition:string){
             super(node,condition);
             let data=this.data;
             

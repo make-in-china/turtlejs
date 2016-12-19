@@ -60,7 +60,7 @@ namespace UIHelper {
             }else if(node instanceof VMDOM.VOrder){
                 
                 try {
-                    node
+                    let order=Order.parseOrder(node);
                 } catch (e) {
                     throw getMakeClassError(path, node, (<Error>e).message, state);
                 }

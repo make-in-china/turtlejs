@@ -3,7 +3,7 @@
 /// <reference path='VDomhelperElement.ts'/>
 interface IMember {
     index: number
-    node: VNode & IVNodeMethod
+    node: VMDOM.VNode & IVNodeMethod
     action: string
     length: number
     textNodeStart: number
@@ -21,8 +21,8 @@ interface IMember {
     commentStart: number
 }
 interface IVDOMBuilder {
-    (html: string, vNode?: undefined): VNode & IVNodeMethod | (VNode & IVNodeMethod)[]
-    (html: string, vNode: VNode & IVNodeMethod): VNode & IVNodeMethod
+    (html: string, vNode?: undefined): VMDOM.VNode & IVNodeMethod | (VMDOM.VNode & IVNodeMethod)[]
+    (html: string, vNode: VMDOM.VNode & IVNodeMethod): VMDOM.VNode & IVNodeMethod
 }
 
 abstract class VDOM {
@@ -33,9 +33,9 @@ abstract class VDOM {
             m.node = <any>m.node.parentNode;
             m.action = 'textNode';
             m.textNodeStart = m.index;
-        } else if (stringNode.hasOwnProperty(nodeName)) {
+        } else if (VMDOM.stringNode.hasOwnProperty(nodeName)) {
             m.action = 'stringNode';
-            m.stringNodeRegExp = stringNode[nodeName];
+            m.stringNodeRegExp = VMDOM.stringNode[nodeName];
             m.stringNodeKeyLength = nodeName.length + 2;
             m.stringNodeStart = m.index;
             return;
@@ -52,7 +52,7 @@ abstract class VDOM {
 
                     if (m.textNodeStart !== m.index) {
                         data = html.substring(m.textNodeStart, m.index);
-                        if (!emptyTextNodeRE.test(data)) {
+                        if (!VMDOM.emptyTextNodeRE.test(data)) {
                             m.node(data, 3);
                         }
                         m.textNodeStart = 0;
@@ -81,7 +81,7 @@ abstract class VDOM {
 
     }
     protected static setHTMLNodeClose(html: string, m: IMember) {
-        let n: (VNode & IVNodeMethod) | null = m.node;
+        let n: (VMDOM.VNode & IVNodeMethod) | null = m.node;
         let name = trim(html.substring(m.htmlNodeNameStart, m.index)).toUpperCase();
         while (n) {
             if (n.nodeName === name) {
@@ -214,7 +214,7 @@ abstract class VDOM {
         m.index++;
     }
     protected static setAttr(html:string,m:IMember){
-        (<VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
+        (<VMDOM.VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd));
         m.attrStart = m.attrNameEnd = 0;
     }
     protected static attributes(html: string, m: IMember) {
@@ -318,17 +318,17 @@ abstract class VDOM {
     protected static atvbetweenSpace(html: string, m: IMember) {
         switch (html[m.index]) {
             case ' ':
-                (<VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
+                (<VMDOM.VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
                 this.setAttrStart(m);
                 m.index++;
                 break;
             case '>':
-                (<VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
+                (<VMDOM.VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
                 this.setAttrStart(m);
                 break;
             case "/":
                 if (m.length >= m.index + 2) {
-                    (<VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
+                    (<VMDOM.VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.betweenSpaceStart, m.index));
                     if (html.substring(m.index + 1, 1) === '>') {
                         this.setAttrStart(m);
                         m.index++;
@@ -346,7 +346,7 @@ abstract class VDOM {
                 m.index += 2;
                 break;
             case m.stringStartChar:
-                (<VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.stringStart, m.index));
+                (<VMDOM.VElement & IVNodeMethod>m.node)._(html.substring(m.attrStart, m.attrNameEnd), html.substring(m.stringStart, m.index));
                 this.setAttrStart(m);
                 m.index++;
                 break;
@@ -359,7 +359,7 @@ abstract class VDOM {
             if (m.length >= m.index + m.stringNodeKeyLength + 1) {
                 if (m.stringNodeRegExp && m.stringNodeRegExp.test(html.substr(m.index + 1, m.stringNodeKeyLength))) {
                     let s = html.substring(m.stringNodeStart, m.index);
-                    if (!emptyTextNodeRE.test(s)) {
+                    if (!VMDOM.emptyTextNodeRE.test(s)) {
                         m.node.addText(s);
                     }
                     m.stringNodeStart = 0;
@@ -388,7 +388,7 @@ abstract class VDOM {
         if (m.action === 'textNode') {
             if (m.textNodeStart !== m.index) {
                 let data = html.substring(m.textNodeStart, m.index);
-                if (!emptyTextNodeRE.test(data)) {
+                if (!VMDOM.emptyTextNodeRE.test(data)) {
                     m.node(data, 3);
                 }
                 m.textNodeStart = 0;
@@ -398,7 +398,7 @@ abstract class VDOM {
             debugger;
         }
     }
-    protected static getInitData(vNode: VNode & IVNodeMethod | undefined, length: number): IMember {
+    protected static getInitData(vNode: VMDOM.VNode & IVNodeMethod | undefined, length: number): IMember {
         if (!vNode) {
             vNode = $$$('domhelper');
             vNode.vmData.isClose = true;
@@ -423,7 +423,7 @@ abstract class VDOM {
             commentStart: 0
         };
     }
-    static readonly parseStructor:IVDOMBuilder=function(html: string, vNode?: VNode & IVNodeMethod) {
+    static readonly parseStructor:IVDOMBuilder=function(html: string, vNode?: VMDOM.VNode & IVNodeMethod) {
         let m = this.getInitData(vNode, html.length);
         let parent = m.node;
         while (m.index < html.length) {
@@ -436,11 +436,11 @@ abstract class VDOM {
             let ret;
             if (parent.childNodes.length === 1) {
                 ret = parent.childNodes[0];
-                VNodeList.clear(parent.childNodes);
+                VMDOM.VNodeList.clear(parent.childNodes);
                 return ret;
             } else {
                 ret = slice.call(parent.childNodes);
-                VNodeList.clear(parent.childNodes);
+                VMDOM.VNodeList.clear(parent.childNodes);
                 return ret;
             }
         }

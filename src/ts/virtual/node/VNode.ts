@@ -396,8 +396,8 @@ interface IBindClassToFunction{
 }
 let bindClassToFunctionHelper:IBindClassToFunction=<any>{
     [ENodeType.DocumentType](node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-        node.__proto__=VDocumentType.prototype;
-        VDocumentType.call(node);
+        node.__proto__=VMDOM.VDocumentType.prototype;
+        VMDOM.VDocumentType.call(node);
     },
     [ENodeType.Comment](node:IVNodeMethod & VMDOM.VNode,nodeName: string){
         node.__proto__=VMDOM.VComment.prototype;
@@ -408,8 +408,8 @@ let bindClassToFunctionHelper:IBindClassToFunction=<any>{
         VMDOM.VText.call(node,nodeName);
     },
     [ENodeType.Document](node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-        node.__proto__=VDocument.prototype;
-        VDocument.call(node);
+        node.__proto__=VMDOM.VDocument.prototype;
+        VMDOM.VDocument.call(node);
     }
 }
 function bindClassToFunction(node:IVNodeMethod & VMDOM.VNode,nodeName: string, nodeType?: ENodeType|undefined){
@@ -432,8 +432,8 @@ function bindClassToFunction(node:IVNodeMethod & VMDOM.VNode,nodeName: string, n
                     (<any>VMDOM.VComment).call(node,nodeName);
                     break;
                 case "#document":
-                    node.__proto__=VDocument.prototype;
-                    (<any>VDocument).call(node);
+                    node.__proto__=VMDOM.VDocument.prototype;
+                    (<any>VMDOM.VDocument).call(node);
                     break;
                 case "#document-fragment":
                     //未实现

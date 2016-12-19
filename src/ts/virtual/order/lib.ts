@@ -54,7 +54,36 @@ namespace Order {
     }
     /**从VOrder中读取命令 */
     export function getOrderInfo(vOrder: VMDOM.VOrder): IOrderInfo | null {
-        let block=vOrder
+        debugger;
+        let statements=vOrder.block.children;
+        if(statements.length===0){
+            return null;
+        }
+        let statement=statements[0];
+        let keyWords=statement.children;
+        for(let i=0;i<keyWords.length;){
+            let keyWord=keyWords[i];
+            if(keyWord===' '){
+                keyWords.shift();
+                continue;
+            }
+            if(isString(keyWord)){
+                let order = keyWord.match(orderRE);
+                debugger;
+                if (order) {
+                    return { order: trim(order[0]), condition: keyWord.substring(order[0].length, keyWord.length) }
+                } else {
+                    let subOrder = keyWord.match(subOrderRE);
+                    if (subOrder) {
+                        return { subOrder: trim(subOrder[0]), condition: keyWord.substring(subOrder[0].length, keyWord.length) }
+                    }
+                }
+                break;
+            }else{
+                throw new Error('order第一个单词必须是指令名，不能为：'+keyWord.toString());
+            }
+            
+        }
         return null;
     }
 

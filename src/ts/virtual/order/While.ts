@@ -9,7 +9,7 @@ namespace Order {
     export class While extends RepeatBlockOrder {
         static orderName = "while"
         data:IOrderDataWhile
-        constructor(node: VComment, condition: string) {
+        constructor(node: VMDOM.VComment, condition: string) {
             super(node, condition,'while');
             this.data.condition=condition;
         }

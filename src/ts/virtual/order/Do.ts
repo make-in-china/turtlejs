@@ -8,7 +8,7 @@ namespace Order {
     export class Do extends RepeatBlockOrder {
         static orderName = "do"
         data:IOrderDataDo
-        constructor(node: VComment, condition: string) {
+        constructor(node: VMDOM.VComment, condition: string) {
             super(node, condition,'do');
             this.data.isFirst=true;
             this.data.condition=condition;

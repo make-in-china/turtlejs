@@ -5,7 +5,7 @@ namespace Order {
     class Script extends VOrder {
         static orderName = ":"
         block:JS.JavaScriptBlock
-        constructor(node:VComment , condition:string){
+        constructor(node:VMDOM.VComment , condition:string){
             super(node,condition);
             this.init();
         }

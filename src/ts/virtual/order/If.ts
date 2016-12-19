@@ -12,7 +12,7 @@ namespace Order {
         static orderName = "if"
         static subOrder=["else if","else"];
         data:IOrderDataIf
-        constructor(node: VComment, condition: string) {
+        constructor(node: VMDOM.VComment, condition: string) {
             super(node, condition,'if',If.isBlockStart);
             this.data.condition=condition;
         }

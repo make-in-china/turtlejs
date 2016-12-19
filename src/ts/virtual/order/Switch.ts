@@ -13,7 +13,7 @@ namespace Order {
         static orderName = "switch"
         static subOrder=["case","default"];
         data:IOrderDataSwitch
-        constructor(node: VComment, condition: string) {
+        constructor(node: VMDOM.VComment, condition: string) {
             super(node, condition,'switch',Switch.isBlockStart);
             this.data.condition=condition;
         }

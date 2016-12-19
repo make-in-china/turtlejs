@@ -3,7 +3,7 @@
 namespace Order {
     
     export abstract class RepeatBlockOrder extends BlockOrder {
-        constructor(node: VComment, condition: string, orderName: string) {
+        constructor(node: VMDOM.VComment, condition: string, orderName: string) {
             super(node,condition,orderName,RepeatBlockOrder.isBlockStart);
         }
         static run(data:IOrderDataBlock,canRepeat:(data:IOrderDataBlock)=>boolean){
