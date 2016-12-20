@@ -7,7 +7,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     export class VPlaceHolder extends VComment{
         nodeName="#placeholder"
-
+        nodeType:ENodeType=ENodeType.PlaceHolder
         toHTMLString(): string[] {
             throw new Error("Can't toHTMLString");
         }

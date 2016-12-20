@@ -4,5 +4,8 @@ namespace JS{
         toString():string{
             return this.data;
         }
+        clone():JavaScriptComment{
+            return new JavaScriptComment(this.data);
+        }
     }
 }

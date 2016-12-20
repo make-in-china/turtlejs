@@ -1,4 +1,4 @@
-/// <reference path="../node/Attribute_Property.ts"/>
+
 interface IVNodeMethod{
     (nodeName: "h6", nodeType?: 1): VMDOM.VH6Element&IVNodeMethod
 }

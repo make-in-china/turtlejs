@@ -18,7 +18,7 @@
 /// <reference path='../order/-.ts'/>
 /// <reference path='../order/Script.ts'/>
 /// <reference path='../order/orderEx/Index.ts'/>
-/// <reference path='UIHelper.template.ts'/>
+/// <reference path='Template.ts'/>
 /// <reference path='RefInfo.ts'/>
 /// <reference path='ProjectHelper.ts'/>
 /// <reference path='ClassHelper.ts'/>

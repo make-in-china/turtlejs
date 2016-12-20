@@ -216,13 +216,22 @@ abstract class VDOM2 extends VDOM {
         switch (html[m.index]) {
             case '@':
                 if(m.index<m.length-2&&html[m.index+1]==='{'){
-                    
+                    let data:string;
+                    if (m.textNodeStart !== m.index) {
+                        data = html.substring(m.textNodeStart, m.index);
+                        if (!VMDOM.emptyTextNodeRE.test(data)) {
+                            m.node(data, 3);
+                        }
+                    }
+
                     m.index++;
                     let {length,block}=JS.Parser.parseBlock(html,m.index);
                     m.index+=length;
+                    
                     let order=$$$(block,ENodeType.Order);
                     m.node.appendChild(order);
 
+                    m.textNodeStart = m.index;
                     break;
                 }
             default:

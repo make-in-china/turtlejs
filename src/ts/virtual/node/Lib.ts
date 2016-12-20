@@ -1,5 +1,17 @@
 
 namespace VMDOM{
+
+    export let bindClassToFunctionHelper:IBindClassToFunction={};
+    export let bindClassToFunction2Helper:IBindClassToFunction={};
+    export function register(nodeName:string,nodeType:ENodeType):(constructor:{prototype:VNode})=>void{
+        return function(constructor:{prototype:VNode}){
+            bindClassToFunction2Helper[nodeName]=bindClassToFunctionHelper[nodeType]=function(node:IVNodeMethod & VNode){
+                node.__proto__=constructor.prototype;
+                (<typeof VNode>constructor).call(node,arguments[1]);
+            }
+        }
+    }
+
     function getAttr(node:VMDOM.VHtmlElement,name:string):string{
         var ret:string|null=node.getAttribute(name);
         if(ret){

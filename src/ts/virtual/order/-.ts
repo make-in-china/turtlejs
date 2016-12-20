@@ -45,11 +45,16 @@ namespace Order {
 
             
             if(statement.children.length===1){
+                //如果只有一个单词，并且符合变量名规则，则确认为绑定scope变量
                 let keyWord=statement.children[0];
                 if(isString(keyWord)&&JS.isVarName(keyWord)){
                     data.object=['',keyWord];
                 }
-            }else{
+            }else if(statement.children.length===0){
+                throw new Error("语句应该是如下格式：\n(表达式):(回调函数)");
+            }
+            
+            if(!data.object){
                 let chds=statement.children;
                 let keyWord=chds.pop();
                 data.object=<any>[JS.getStatementExps(statement).toString()];

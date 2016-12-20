@@ -1,4 +1,4 @@
-/// <reference path="../node/Attribute_Property.ts"/>
+
 interface IVNodeMethod{
     (nodeName: "dl", nodeType?: 1): VMDOM.VDlElement&IVNodeMethod
 }

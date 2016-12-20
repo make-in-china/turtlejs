@@ -20,6 +20,7 @@ namespace VMDOM{
             return "";
         }
     }());
+    @register('#text',ENodeType.Text)
     export class VText extends VCharacterData{
         nodeName="#text"
         nodeType:ENodeType.Text=ENodeType.Text

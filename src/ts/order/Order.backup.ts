@@ -8,7 +8,7 @@ interface IHTMLBreakElement extends IComment{
 class xxxxOrder{
     
     /**从注释中读取命令 */
-    getCommentStringInfo(s:string):ICommentOrderInfo|null{
+    getOrderInfoByString(s:string):ICommentOrderInfo|null{
         let order=s.match(orderRE);
         if(order){
             return {order:trim(order[0]),condition:s.substring(order[0].length,s.length)}    
@@ -70,7 +70,7 @@ class xxxxOrder{
             if(!isCommentNode(node)){
                 return;
             }
-            let info=this.getCommentStringInfo(getCommentText(node));
+            let info=this.getOrderInfoByString(getCommentText(node));
             if(!info){
                 return;
             }
@@ -125,7 +125,7 @@ class xxxxOrder{
                         if(!isCommentNode(node)){
                             return;
                         }
-                        let info=this.getCommentStringInfo(getCommentText(node));
+                        let info=this.getOrderInfoByString(getCommentText(node));
                         if(!info)return;
                         if(node.__order__&&node.__order__.node){
                             step.next=getNodeIndex2(node.__order__.node)-getNodeIndex2(node);
@@ -267,7 +267,7 @@ class xxxxOrder{
                         if(!isCommentNode(node)){
                             return;
                         }
-                        let info=this.getCommentStringInfo(getCommentText(node));
+                        let info=this.getOrderInfoByString(getCommentText(node));
                         if(!info){
                             return;
                         }
@@ -385,7 +385,7 @@ class xxxxOrder{
         }
     }
     parseComment(node:IComment,outerChildNodes:INode[],outerChildren:IHTMLCollection,props:{},part){
-        let info=this.getCommentStringInfo(getCommentText(node));
+        let info=this.getOrderInfoByString(getCommentText(node));
         if(!info)return;
         if(!info.order){
             throw new Error("语法错误：不恰当的"+info.subOrder);

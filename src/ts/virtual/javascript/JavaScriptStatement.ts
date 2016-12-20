@@ -39,6 +39,7 @@ namespace JS{
             for(const item of this.children){
                 if(isString(item)&&item===separator){
                     ret.push(arr);
+                    arr.isEnd=true;
                     arr=new JavaScriptStatement;
                     isAreadyPush=true;
                 }else{
@@ -48,6 +49,7 @@ namespace JS{
             }
             if(!isAreadyPush){
                 ret.push(arr);
+                arr.isEnd=true;
             }
             return ret;
         }
@@ -55,6 +57,17 @@ namespace JS{
             let ret="";
             for(const item of this.children){
                 ret+=item;
+            }
+            return ret;
+        }
+        clone():JavaScriptStatement{
+            let ret:JavaScriptStatement=new JavaScriptStatement();
+            for(const keyWord of this.children){
+                if(isString(keyWord)){
+                    ret.push(keyWord);
+                }else{
+                    ret.push(keyWord.clone());
+                }
             }
             return ret;
         }

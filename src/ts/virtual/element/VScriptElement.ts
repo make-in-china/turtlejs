@@ -1,4 +1,4 @@
-/// <reference path="../node/Attribute_Property.ts"/>
+
 /// <reference path="../../core/node.ts"/>
 interface IVNodeMethod{
     (nodeName: "script", nodeType?: 1): VMDOM.VScriptElement&IVNodeMethod

@@ -33,11 +33,14 @@ namespace JS{
                 case " ":
                     m.action="space";
                     m.index++;
+                    break;
                 case "\n":
                     m.index++;
+                    break;
                 default:
                     m.action="keyWord";
                     m.keyWordStart=m.index;
+                    break;
                     // m.index++;
             }
         }
@@ -513,7 +516,7 @@ namespace JS{
                 
                 this[m.action](m,condition);
             }
-            return {length:m.index-start,block:m.block};
+            return {length:m.index-start,block:<any>block};
         }
         
     }

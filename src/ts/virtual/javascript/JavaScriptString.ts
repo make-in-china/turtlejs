@@ -4,5 +4,8 @@ namespace JS{
         toString():string{
             return this.data;
         }
+        clone():JavaScriptString{
+            return new JavaScriptString(this.data);
+        }
     }
 }

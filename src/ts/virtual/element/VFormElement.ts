@@ -1,4 +1,4 @@
-/// <reference path="../node/Attribute_Property.ts"/>
+
 interface IVNodeMethod{
     (nodeName: "form", nodeType?: 1): VMDOM.VFormElement&IVNodeMethod
 }

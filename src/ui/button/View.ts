@@ -12,21 +12,33 @@ namespace ComponentView{
             
             push.call(this.tops,<any>[
                     $$$("div")
-
-
-
-
-                    (`
-
-    @{for var data={arr:[0]},i=0;i<3;i++,data.arr.push(i)}
-        @{- 
-            ((data).arr)[(i+1-1)*2/2]:v=>'v+i='+(v+i)+';'
-        }
-        @{- i}
-    @{end}
-`,ENodeType.Text).$
+('',ENodeType.PlaceHolder).__(order1)
+('',ENodeType.PlaceHolder).__(order0)
+('',ENodeType.PlaceHolder).__(order1)
+('',ENodeType.PlaceHolder).__(order0)
+('',ENodeType.PlaceHolder).__(order1)
+('',ENodeType.PlaceHolder).__(order0)
             ]);
         }
     }
 
+    //因为无法推测运行结果，所以生成中间数据算法在此
+    
+    function order0(this:VMDOM.VPlaceHolder){
+        Order.BindExpressions.run({
+            object:['','i'],
+            function:null,
+            placeholder:this
+        });
+    }
+    function order1(this:VMDOM.VPlaceHolder){
+        Order.BindExpressions.run({
+            object:['((data).arr)','(i+1-1)*2/2'],
+            function:{
+                params:[`v`],
+                content:`'v+i='+(v+i)+';' `
+            },
+            placeholder:this
+        });
+    }
 }

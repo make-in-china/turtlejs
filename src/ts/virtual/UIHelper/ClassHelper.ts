@@ -16,34 +16,17 @@ namespace UIHelper {
         }
         return sAttr + s;
     }
-
-    export function makeClass(this: void, path: string, className?: string) {
-        if (!className) {
-            className = path.match(/[\s\S]*[\/\\](.*?)[\/\\].*?$/)[1];
-        }
-        className = className[0].toUpperCase() + className.substr(1).toLowerCase();
-        let html = fs.readFileSync(path);
-        if (!isString(html)) {
-            html = html.toString();
-        }
-        let dom = VDOM2.parseStructor(html);
-        let tops: VMDOM.VNode[];
-        let chds: VMDOM.VNode[] | IArray;
-        if (isArray(dom)) {
-            chds = dom;
-            tops = dom
-        } else {
-            chds = dom.childNodes;
-            tops = [dom];
-        }
-
-        let refInfo = new RefInfo;
-        let scripts: VMDOM.VScript[] = [];
+    function initOrder(chds:VMDOM.VNode[] | IArray,path:string){
         treeEach(<VMDOM.VNode[]>chds, "childNodes", (node, state) => {
             if (node instanceof VMDOM.VComment) {
                 //解析注释里的命令
                 try {
-                    let order = Order.parseComment(node);
+                    let order:Order.VOrder|undefined;
+                    if(node instanceof VMDOM.VOrder){
+                        order=Order.parseOrder(node);
+                    }else{
+                        order = Order.parseComment(node);
+                    }
                     if (order && order.run) {
                         if (OrderEx.canRunAtService(order)) {
                             //order达成运行所需条件，运行
@@ -57,19 +40,10 @@ namespace UIHelper {
                     throw getMakeClassError(path, node, (<Error>e).message, state);
                 }
                 return eTreeEach.c_noIn;
-            }else if(node instanceof VMDOM.VOrder){
-                
-                try {
-                    let order=Order.parseOrder(node);
-                } catch (e) {
-                    throw getMakeClassError(path, node, (<Error>e).message, state);
-                }
             }
         });
-
-        let paramInfos:PartParam[]=[];
-        let props:string[]=[];
-        let defaultValues:string[]=[];
+    }
+    function initRefInfo(chds:VMDOM.VNode[] | IArray,props:string[],defaultValues:string[],refInfo:RefInfo,scripts: VMDOM.VScript[]){
         treeEach(<VMDOM.VNode[]>chds, "childNodes", (node, state) => {
 
             if (node instanceof VMDOM.VHtmlElement) {
@@ -95,8 +69,10 @@ namespace UIHelper {
                 scripts.push(node);
             }
         });
+    }
+    function scriptsToString(scripts: VMDOM.VScript[]){
+        let scriptFunctions:string='';
         let functionHash:{[index:string]:VMDOM.VScript}={}
-        let scriptFunctions: string = '';
         let index=0;
         for (let i = scripts.length - 1; i >= 0; i--) {
             let script = scripts[i];
@@ -105,7 +81,6 @@ namespace UIHelper {
             let hashScript=functionHash[script.toFunction()];
             if(hashScript){
                 script.propertyName=hashScript.propertyName;
-                // scriptFunctions += '\n    let ' + name+'='+hashScript.propertyName;
             }else{
                 functionHash[script.toFunction()]=script;
                 script.propertyName = name;
@@ -113,7 +88,41 @@ namespace UIHelper {
                 index++;
             }
         }
+        return scriptFunctions;
+    }
+    let nameMatch=/[\s\S]*[\/\\](.*?)[\/\\].*?$/;
+    export function makeClass(this: void, path: string, className?: string) {
+        if (!className) {
+            className = path.match(nameMatch)[1];
+        }
+        className = className[0].toUpperCase() + className.substr(1).toLowerCase();
+        let html = fs.readFileSync(path);
+        if (!isString(html)) {
+            html = html.toString();
+        }
+        let dom = VDOM2.parseStructor(html);
+        let tops: VMDOM.VNode[];
+        let chds: VMDOM.VNode[] | IArray;
+        if (isArray(dom)) {
+            chds = dom;
+            tops = dom
+        } else {
+            chds = dom.childNodes;
+            tops = [dom];
+        }
 
+        initOrder(chds,path);
+
+        let refInfo = new RefInfo;
+        let scripts: VMDOM.VScript[] = [];
+        let paramInfos:PartParam[]=[];
+        let props:string[]=[];
+        let defaultValues:string[]=[];
+        
+        initRefInfo(chds,props,defaultValues,refInfo,scripts);
+
+        let scriptFunctions: string = scriptsToString(scripts);
+        
         let propertys: string[] = [];
         let names: string[] = [];
         let vars: string[] = [];

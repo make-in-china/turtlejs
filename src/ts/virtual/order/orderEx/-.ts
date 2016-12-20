@@ -24,7 +24,7 @@ namespace OrderEx {
             fn='null';
         }
         return `
-        Order.BindExpressions.run({,
+        Order.BindExpressions.run({
             object:['${data.object[0]}','${data.object[1]}'],
             function:${fn},
             placeholder:this

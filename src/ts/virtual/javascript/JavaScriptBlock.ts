@@ -18,5 +18,12 @@ namespace JS{
             }
             return ret;
         }
+        clone():JavaScriptBlock{
+            let ret:JavaScriptBlock=new JavaScriptBlock(this.begin,this.end);
+            for(const statement of this.children){
+                ret.push(statement.clone());
+            }
+            return ret;
+        }
     }
 }

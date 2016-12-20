@@ -12,9 +12,10 @@ interface VNodeVMData{
 }
 
 namespace VMDOM{
+    @register('#comment',ENodeType.Comment)
     export class VComment extends VCharacterData{
-        nodeName="#Comment"
-        nodeType:ENodeType.Comment=ENodeType.Comment
+        nodeName="#comment"
+        nodeType:ENodeType=ENodeType.Comment
         private __value__=""
         constructor(data:any){
             super();

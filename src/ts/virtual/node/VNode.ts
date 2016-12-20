@@ -9,6 +9,7 @@
 /// <reference path='VNodeList.ts'/>
 /// <reference path='VHTMLCollection.ts'/>
 /// <reference path='VNodeVMData.ts'/>
+/// <reference path='Lib.ts'/>
 interface Node {
     __vdomNode__: VMDOM.VNode&IVNodeMethod
 }
@@ -394,27 +395,26 @@ namespace VMDOM{
 interface IBindClassToFunction{
     [index:number]:(node:IVNodeMethod & VMDOM.VNode,nodeName: any)=>void
 }
-let bindClassToFunctionHelper:IBindClassToFunction=<any>{
-    [ENodeType.DocumentType](node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-        node.__proto__=VMDOM.VDocumentType.prototype;
-        VMDOM.VDocumentType.call(node);
-    },
-    [ENodeType.Comment](node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-        node.__proto__=VMDOM.VComment.prototype;
-        VMDOM.VComment.call(node,nodeName);
-    },
-    [ENodeType.Text](node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-        node.__proto__=VMDOM.VText.prototype;
-        VMDOM.VText.call(node,nodeName);
-    },
-    [ENodeType.Document](node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-        node.__proto__=VMDOM.VDocument.prototype;
-        VMDOM.VDocument.call(node);
-    }
-}
+// bindClassToFunction2Helper["#documenttype"]=bindClassToFunctionHelper[ENodeType.DocumentType]=function(node:IVNodeMethod & VMDOM.VNode,nodeName: string){
+//     node.__proto__=VMDOM.VDocumentType.prototype;
+//     VMDOM.VDocumentType.call(node);
+// }
+// bindClassToFunction2Helper["#comment"]=bindClassToFunctionHelper[ENodeType.Comment]=function(node:IVNodeMethod & VMDOM.VNode,nodeName: string){
+//     node.__proto__=VMDOM.VComment.prototype;
+//     VMDOM.VComment.call(node,nodeName);
+// }
+// bindClassToFunction2Helper["#text"]=bindClassToFunctionHelper[ENodeType.Text]=function(node:IVNodeMethod & VMDOM.VNode,nodeName: string){
+//     node.__proto__=VMDOM.VText.prototype;
+//     VMDOM.VText.call(node,nodeName);
+// }
+// bindClassToFunction2Helper["#document"]=bindClassToFunctionHelper[ENodeType.Document]=function(node:IVNodeMethod & VMDOM.VNode,nodeName: string){
+//     node.__proto__=VMDOM.VDocument.prototype;
+//     VMDOM.VDocument.call(node);
+// }
+
 function bindClassToFunction(node:IVNodeMethod & VMDOM.VNode,nodeName: string, nodeType?: ENodeType|undefined){
     if(nodeType!==undefined){
-        let fn=bindClassToFunctionHelper[nodeType];
+        let fn=VMDOM.bindClassToFunctionHelper[nodeType];
         if(fn){
             fn(node,nodeName);
             return '';
@@ -422,22 +422,10 @@ function bindClassToFunction(node:IVNodeMethod & VMDOM.VNode,nodeName: string, n
     }
     if(nodeType===undefined||nodeType===ENodeType.Element){
         if(nodeName[0]==='#'){
-            switch(nodeName){
-                case "#text":
-                    node.__proto__=VMDOM.VText.prototype;
-                    (<any>VMDOM.VText).call(node,nodeName);
-                    break;
-                case "#comment":
-                    node.__proto__=VMDOM.VComment.prototype;
-                    (<any>VMDOM.VComment).call(node,nodeName);
-                    break;
-                case "#document":
-                    node.__proto__=VMDOM.VDocument.prototype;
-                    (<any>VMDOM.VDocument).call(node);
-                    break;
-                case "#document-fragment":
-                    //未实现
-                    break;
+            let fn=VMDOM.bindClassToFunction2Helper[nodeName];
+            if(fn){
+                fn(node,nodeName);
+                return '';
             }
         }else{
             nodeName=nodeName.toLowerCase();
@@ -455,14 +443,12 @@ function bindClassToFunction(node:IVNodeMethod & VMDOM.VNode,nodeName: string, n
     }
 }
 function getVNodeMethod():VMDOM.VNode&IVNodeMethod{
-    let VNode=<any>function(nodeName: string, nodeType?: ENodeType|undefined):IVNodeMethod & VMDOM.VNode{
+    let VNode:VMDOM.VNode&IVNodeMethod=<any>function(nodeName: string, nodeType?: ENodeType|undefined):IVNodeMethod & VMDOM.VNode{
         let fn=getVNodeMethod()
         bindClassToFunction(fn,nodeName,nodeType);
         VNode.appendChild(fn);
         return fn;
     }
-    delete VNode.name;
-    delete VNode.arguments;
     return VNode;
 }
 let VNodeHelp:IVNodeMethod=<any>function(nodeName: string, nodeType?: ENodeType|undefined):VMDOM.VNode&IVNodeMethod{

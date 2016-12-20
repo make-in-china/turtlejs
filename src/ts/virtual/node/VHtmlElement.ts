@@ -3,7 +3,7 @@
 /// <reference path='VElement.ts'/>
 /// <reference path='../../lib/Encode.ts'/>
 /// <reference path='../../core/Node.ts'/>
-/// <reference path='Attribute_Property.ts'/>
+/// <reference path='Lib.ts'/>
 
 interface IVNodeMethod{
     (nodeName: string, nodeType?: ENodeType.Element): VMDOM.VHtmlElement&IVNodeMethod;

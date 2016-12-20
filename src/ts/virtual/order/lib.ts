@@ -16,12 +16,14 @@ interface IBindFunction {
         length:number
     };
 }
+
 interface IBindInfo {
     name: string
     target: Object
     targetName: string
     event: IBindFunction
 }
+
 namespace Order {
     interface VNodeVMData {
         /**命令 */
@@ -39,8 +41,9 @@ namespace Order {
             subOrderNames.push(name);
         }
     }
+
     /**从注释中读取命令 */
-    export function getCommentStringInfo(s: string): IOrderInfo | null {
+    export function getOrderInfoByString(s: string): IOrderInfo | null {
         let order = s.match(orderRE);
         if (order) {
             return { order: trim(order[0]), condition: s.substring(order[0].length, s.length) }
@@ -52,37 +55,36 @@ namespace Order {
         }
         return null;
     }
+
     /**从VOrder中读取命令 */
     export function getOrderInfo(vOrder: VMDOM.VOrder): IOrderInfo | null {
-        debugger;
-        let statements=vOrder.block.children;
+        let block=vOrder.block.clone();
+        let statements=block.children;
         if(statements.length===0){
             return null;
         }
+        //无论是否有多个statement，order name 都只会出现在第一个statement里
         let statement=statements[0];
         let keyWords=statement.children;
-        for(let i=0;i<keyWords.length;){
-            let keyWord=keyWords[i];
-            if(keyWord===' '){
-                keyWords.shift();
-                continue;
-            }
-            if(isString(keyWord)){
-                let order = keyWord.match(orderRE);
-                debugger;
-                if (order) {
-                    return { order: trim(order[0]), condition: keyWord.substring(order[0].length, keyWord.length) }
-                } else {
-                    let subOrder = keyWord.match(subOrderRE);
-                    if (subOrder) {
-                        return { subOrder: trim(subOrder[0]), condition: keyWord.substring(subOrder[0].length, keyWord.length) }
-                    }
-                }
-                break;
-            }else{
-                throw new Error('order第一个单词必须是指令名，不能为：'+keyWord.toString());
-            }
+        
+        let keyWord=keyWords[0];
+        if(keyWords[0]===' '){
+            keyWords.shift();
+            keyWord=keyWords[0];
+        }
+        if(isString(keyWord)){
+            let order = keyWord.match(orderRE);
             
+            if (order) {
+                keyWords.shift();
+                return { order: order[0], condition:block.innerText  }
+            } else {
+                let subOrder = keyWord.match(subOrderRE);
+                if (subOrder) {
+                    keyWords.shift();
+                    return { subOrder: subOrder[0], condition: block.innerText }
+                }
+            }
         }
         return null;
     }
@@ -92,16 +94,19 @@ namespace Order {
         subOrder?: string;
         condition: string;
     }
+    
     export interface IOrderConstructor {
         new (node: IComment, condition: string,...args:any[]): VOrder;
         orderName: string;
         subOrder?:string[];
         run(data:IOrderData):void;
     }
+
     export let orders: { [index: string]: IOrderConstructor } = {};
     function makeOrderRegExp(names:string[]):RegExp{
         return new RegExp("^\\s*("+names.join("|")+")(?:\\s*|$)");
     }
+
     export function register(order: IOrderConstructor) {
         let name:string=order.orderName.toLowerCase();
         orders[name] = order;
@@ -129,15 +134,11 @@ namespace Order {
             return;
         }
         let order: VOrder = new orders[orderName](node, info.condition);
-        
         return order;
     }
     export function parseComment(this:void,node: VMDOM.VComment): VOrder | undefined {
 
-        // if (node.__order__) {
-        //     return node.__order__;
-        // }
-        let info = getCommentStringInfo(node.data);
+        let info = getOrderInfoByString(node.data);
         if (!info) {
             return;
         }

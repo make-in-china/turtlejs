@@ -102,7 +102,7 @@ namespace JS{
                     case "\t":
                         if(hasSpace){
                             //删掉一个；
-                            chds.pop();
+                            chds.splice(i,1);
                             i--;
                         }else{
                             //换成空格
@@ -143,7 +143,7 @@ namespace JS{
                     case "\r":
                     case "\n":
                     case "\t":
-                        chds.pop();
+                        chds.shift();
                         i--;
                         break;
                 }

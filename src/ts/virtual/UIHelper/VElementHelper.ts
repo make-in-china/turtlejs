@@ -7,7 +7,7 @@ class VElementHelper{
         let className=`V${name[0]+name.substr(1).toLowerCase()}Element`;
         let propertys=decorates.join(`:string
         `)+':string';
-        return `/// <reference path="../node/Attribute_Property.ts"/>
+        return `
 interface IVNodeMethod{
     (nodeName: "${name.toLowerCase()}", nodeType?: 1): VMDOM.${className}&IVNodeMethod;
 }

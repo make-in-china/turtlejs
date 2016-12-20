@@ -83,6 +83,7 @@ namespace JS{
                 return this.parseStep(paramStatements);
             }else if(paramStatements.length===1){
                 //可能是 for in
+                debugger;
                 return this.parseForIn(paramStatements[0].children);
             }
             return null;
@@ -110,11 +111,10 @@ namespace JS{
             if(keyWords[0]==='var'){
                 //var开头;
                 hasVar=true;
-                index++;
                 if(keyWords[index]!==' '){
                     return null;
                 }
-                index++;
+                index+=2;
                 count+=2;
             }else{
                 hasVar=false;

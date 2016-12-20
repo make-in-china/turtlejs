@@ -7,15 +7,17 @@ interface IVNodeMethod{
     (nodeName: string, nodeType: ENodeType.Member): VMDOM.VMember&IVNodeMethod;
 }
 namespace VMDOM{
+    @register('#member', ENodeType.Member)
     export class VMember extends VPlaceHolder{
         nodeName="#member"
+        nodeType=ENodeType.Member
         isVar:boolean=false
         toJS(space:number=0):string{
             return (new Array(space+1)).join(" ")+`.$$$(${this.isVar?"":"this."}${this.data})`;
         }
     }
-    bindClassToFunctionHelper[ENodeType.Member]=function(node:IVNodeMethod & VNode,nodeName: string){
-        node.__proto__=VMember.prototype;
-        VMember.call(node,nodeName);
-    }
+    // bindClassToFunction2Helper['#member']=bindClassToFunctionHelper[ENodeType.Member]=function(node:IVNodeMethod & VNode,nodeName: string){
+    //     node.__proto__=VMember.prototype;
+    //     VMember.call(node,nodeName);
+    // }
 }

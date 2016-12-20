@@ -88,18 +88,16 @@ namespace Order {
         }, beginIndex);
     }
     
-    function runOrder(this:void,info: IOrderInfo, node: VMDOM.VComment): VOrder|null {
+    function runOrder(this:void,info: IOrderInfo, node: VMDOM.VComment){
         let orderName: string = <string>info.order;
-
+        debugger;
         if (orderName in orders) {
             let order=new orders[orderName](node,info.condition);
             
             if(order.run&&OrderEx.canRunAtService(order)){
                 order.run();
             }
-            return order;
         }
-        return null;
     }
     function parseBlock(this:void,info: IOrderInfo, node: VMDOM.VComment): BlockOrder|null {
         let orderName: string = <string>info.order;

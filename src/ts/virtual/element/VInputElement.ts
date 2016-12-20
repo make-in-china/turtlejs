@@ -1,4 +1,4 @@
-/// <reference path="../node/Attribute_Property.ts"/>
+
 interface IVNodeMethod{
     (nodeName: "input", nodeType?: 1): VMDOM.VInputElement&IVNodeMethod
 }

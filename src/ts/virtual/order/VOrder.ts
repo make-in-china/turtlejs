@@ -22,7 +22,12 @@ namespace Order {
                 if (!(node instanceof VMDOM.VComment)) {
                     return;
                 }
-                let info = getCommentStringInfo(node.data);
+                let info:IOrderInfo|null;
+                if(node instanceof VMDOM.VOrder){
+                    info = getOrderInfo(node);
+                }else{
+                    info = getOrderInfoByString(node.data);
+                }
                 if (!info) {
                     return;
                 }
