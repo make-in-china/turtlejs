@@ -32,7 +32,7 @@ namespace UIHelper {
                             //order达成运行所需条件，运行
                             order.run();
                         } else {
-                            //order达成运行所需未条件，转换为VScript节点
+                            //order未达成运行所需条件，转换为VScript节点
                             OrderEx.toScriptNode(order);
                         }
                     }
@@ -90,44 +90,8 @@ namespace UIHelper {
         }
         return scriptFunctions;
     }
-    let nameMatch=/[\s\S]*[\/\\](.*?)[\/\\].*?$/;
-    export function makeClass(this: void, path: string, className?: string) {
-        if (!className) {
-            className = path.match(nameMatch)[1];
-        }
-        className = className[0].toUpperCase() + className.substr(1).toLowerCase();
-        let html = fs.readFileSync(path);
-        if (!isString(html)) {
-            html = html.toString();
-        }
-        let dom = VDOM2.parseStructor(html);
-        let tops: VMDOM.VNode[];
-        let chds: VMDOM.VNode[] | IArray;
-        if (isArray(dom)) {
-            chds = dom;
-            tops = dom
-        } else {
-            chds = dom.childNodes;
-            tops = [dom];
-        }
-
-        initOrder(chds,path);
-
-        let refInfo = new RefInfo;
-        let scripts: VMDOM.VScript[] = [];
-        let paramInfos:PartParam[]=[];
-        let props:string[]=[];
-        let defaultValues:string[]=[];
+    function replaceToMember(refInfo:RefInfo,propertys: string[],names: string[],vars: string[],propertyInitScript: { [index: string]: string }){
         
-        initRefInfo(chds,props,defaultValues,refInfo,scripts);
-
-        let scriptFunctions: string = scriptsToString(scripts);
-        
-        let propertys: string[] = [];
-        let names: string[] = [];
-        let vars: string[] = [];
-        let propertyInitScript: { [index: string]: string } = {};
-        //替换节点为mem
         for (const info of refInfo.data) {
             if (info.refs.length > 1) {
                 //缓存parent;
@@ -190,6 +154,48 @@ namespace UIHelper {
                 setPropertyInitScript(refInfo.name,refInfo.node);
             }
         }
+    }
+    let nameMatch=/[\s\S]*[\/\\](.*?)[\/\\].*?$/;
+    export function makeClass(this: void, path: string, className?: string) {
+        if (!className) {
+            className = path.match(nameMatch)[1];
+        }
+        className = className[0].toUpperCase() + className.substr(1).toLowerCase();
+        let html = fs.readFileSync(path);
+        if (!isString(html)) {
+            html = html.toString();
+        }
+        let dom = VDOM2.parseStructor(html);
+        let tops: VMDOM.VNode[];
+        let chds: VMDOM.VNode[] | IArray;
+        if (isArray(dom)) {
+            chds = dom;
+            tops = dom
+        } else {
+            chds = dom.childNodes;
+            tops = [dom];
+        }
+
+        initOrder(chds,path);
+
+        let refInfo = new RefInfo;
+        let scripts: VMDOM.VScript[] = [];
+        let paramInfos:PartParam[]=[];
+        let props:string[]=[];
+        let defaultValues:string[]=[];
+        
+        initRefInfo(chds,props,defaultValues,refInfo,scripts);
+
+        let scriptFunctions: string = scriptsToString(scripts);
+        
+        let propertys: string[] = [];
+        let names: string[] = [];
+        let vars: string[] = [];
+        let propertyInitScript: { [index: string]: string } = {};
+        //替换节点为mem
+        replaceToMember(refInfo,propertys,names,vars,propertyInitScript);
+
+        
         let topsJS: string[] = [];
         let topsType: string[] = [];
         for (const top of tops) {
@@ -205,9 +211,9 @@ namespace UIHelper {
         if (topsJS.length > 0) {
             propertys.push('tops:[' + topsType.join('\n,') + '];');
             domInitScript += `
-            push.call(this.tops,<any>[
-                    ${topsJS.join(',\n                    ')}
-            ]);`;
+            push.call(this.tops,<(VMDOM.VNode&IVNodeMethod)>
+                    ${topsJS.join(',\n                    <(VMDOM.VNode&IVNodeMethod)>')}
+            );`;
         }
         let propertyInfo: string = propertys.join(';\n        ');
         let varInfo: string = vars.join(';\n            ');

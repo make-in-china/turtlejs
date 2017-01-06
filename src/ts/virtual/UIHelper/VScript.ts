@@ -12,7 +12,7 @@ namespace VMDOM {
         nodeName = "#script"
         nodeType = ENodeType.Script
         toJS(): string {
-            return `('',ENodeType.PlaceHolder).__(${this.propertyName})`;
+            return `.$$__(${this.propertyName})`;
         }
         propertyName: string
         toFunction(): string {

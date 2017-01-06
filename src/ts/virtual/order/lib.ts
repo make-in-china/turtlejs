@@ -170,6 +170,9 @@ namespace Order {
     }
     
     export function exec(this:void,node: INode, script: string): any {
+        
+        //标记操作过程
+        insertNode(node,$$$(`Order.exec(this,'${script}');`,ENodeType.Script));
         let that:Scope=DOMScope.get(node);
         return _exec.call(that, script,node);
     }

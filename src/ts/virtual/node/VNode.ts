@@ -51,16 +51,17 @@ namespace VMDOM{
         /**
          * 用自身做环境调用函数,并返回父
          */
-        __(fn:(node:VNode)=>void): VElement&IVNodeMethod{
+        __(fn:(node:VNode)=>void): VNode&IVNodeMethod{
             fn.call(this)
-            return <VElement&IVNodeMethod>this.parentNode;
+            return <VNode&IVNodeMethod>this.parentNode;
         }
         
+        
         /**
-         * 用自身做环境调用函数,并返回自身
+         * 添加ENodeType.PlaceHolder子节点，用子节点做环境调用函数,并返回自身
          */
-        ___(this:VNode&IVNodeMethod,fn:(node:VNode)=>void): VNode&IVNodeMethod{
-            fn.call(this)
+        $$__(this: VNode&IVNodeMethod, fn:(node:VNode)=>void): VNode&IVNodeMethod{
+            this('',ENodeType.PlaceHolder).__(fn);
             return this;
         }
         /**

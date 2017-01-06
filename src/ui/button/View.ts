@@ -10,28 +10,40 @@ namespace ComponentView{
         tops:[VMDOM.VDivElement&IVNodeMethod];
         initDOM(props:IButtonProps){
             
-            push.call(this.tops,<any>[
+            push.call(this.tops,<(VMDOM.VNode&IVNodeMethod)>
                     $$$("div")
-('',ENodeType.PlaceHolder).__(order1)
-('',ENodeType.PlaceHolder).__(order0)
-('',ENodeType.PlaceHolder).__(order1)
-('',ENodeType.PlaceHolder).__(order0)
-('',ENodeType.PlaceHolder).__(order1)
-('',ENodeType.PlaceHolder).__(order0)
-            ]);
+.$$__(order4)
+.$$__(order0)
+.$$__(order3)
+.$$__(order2)
+.$$__(order1)
+.$$__(order0)
+.$$__(order3)
+.$$__(order2)
+.$$__(order1)
+.$$__(order0)
+.$$__(order3)
+.$$__(order2)
+.$$__(order1)
+.$$__(order0)
+            );
         }
     }
 
     //因为无法推测运行结果，所以生成中间数据算法在此
     
-    function order0(this:VMDOM.VPlaceHolder){
+    function order0(this:VMDOM.VPlaceHolder){Order.exec(this,'i<3');
+    }
+    function order1(this:VMDOM.VPlaceHolder){Order.exec(this,'i++,data.arr.push(i)');
+    }
+    function order2(this:VMDOM.VPlaceHolder){
         Order.BindExpressions.run({
             object:['','i'],
             function:null,
             placeholder:this
         });
     }
-    function order1(this:VMDOM.VPlaceHolder){
+    function order3(this:VMDOM.VPlaceHolder){
         Order.BindExpressions.run({
             object:['((data).arr)','(i+1-1)*2/2'],
             function:{
@@ -40,5 +52,7 @@ namespace ComponentView{
             },
             placeholder:this
         });
+    }
+    function order4(this:VMDOM.VPlaceHolder){Order.exec(this,'{arr:[0]}');
     }
 }

@@ -79,7 +79,16 @@ namespace Order {
             }
         }
     }
-
+    /**
+     * 返回是否可以重复
+     */
+    function canRepeat(this:void,data:IOrderDataFor):boolean{
+        if (data.forMode === JS.EForMode.In) {
+            return checkForIn(<any>data);
+        } else {
+            return checkForStep(<any>data);
+        }
+    }
 
 
     function checkForStep(this:void,data:IOrderDataForStepRun): boolean {
@@ -116,18 +125,12 @@ namespace Order {
         let forInInfo=data.forInInfo
         
         if (data.index < forInInfo.names.length) {
+            //预编译时运行操作
             exec(data.placeholder, forInInfo.var + '=\'' + forInInfo.names[data.index] + '\';');
             data.index++;
             return true
         } else {
             return false
-        }
-    }
-    function canRepeat(this:void,data:IOrderDataFor):boolean{
-        if (data.forMode === JS.EForMode.In) {
-            return checkForIn(<any>data);
-        } else {
-            return checkForStep(<any>data);
         }
     }
 }
