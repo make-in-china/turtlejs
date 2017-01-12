@@ -172,7 +172,8 @@ namespace Order {
     export function exec(this:void,node: INode, script: string): any {
         
         //标记操作过程
-        insertNode(node,$$$(`Order.exec(this,'${script}');`,ENodeType.Script));
+        insertNode(node,$$$(`
+        Order.exec(this,'${script}');`,ENodeType.Script));
         let that:Scope=DOMScope.get(node);
         return _exec.call(that, script,node);
     }
@@ -189,6 +190,11 @@ namespace Order {
         for(let i=replaceScopes.oldScopes.length-1;i>=0;i--){
             let oldScope=replaceScopes.oldScopes.pop();
             let scope=<Scope>replaceScopes.scopes.pop();
+            // debugger;
+            // Object.defineProperty(scope.__actionNode__,'__scope__',{
+            //     value:oldScope
+            // });
+            delete scope.__actionNode__.__scope__;
             scope.__actionNode__.__scope__=oldScope;
         }
     }
@@ -238,10 +244,11 @@ namespace Order {
         }
         return obj;
     }
-    function emptyFunction(){}
+    // function emptyFunction(){}
     function defineCloneProperty(that:Object,name:string,source:any){
         let created:any=null;
         Object.defineProperty(that,name,{
+            configurable: true,
             get(){
                 let ret = source[name];
                 if(isObject(ret)){
@@ -253,7 +260,11 @@ namespace Order {
                     return ret;
                 }
             },
-            set:emptyFunction
+            set(v:any){
+                debugger;
+                // delete that[name];
+                // that[name]=v;
+            }
         })
     }
     function onPropertyChange(obj:Object, name:string, fnOnSet:Function) {

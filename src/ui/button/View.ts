@@ -32,9 +32,11 @@ namespace ComponentView{
 
     //因为无法推测运行结果，所以生成中间数据算法在此
     
-    function order0(this:VMDOM.VPlaceHolder){Order.exec(this,'i<3');
+    function order0(this:VMDOM.VPlaceHolder){
+        Order.exec(this,'i<3');
     }
-    function order1(this:VMDOM.VPlaceHolder){Order.exec(this,'i++,data.arr.push(i)');
+    function order1(this:VMDOM.VPlaceHolder){
+        Order.exec(this,'i++,data.arr.push(i)');
     }
     function order2(this:VMDOM.VPlaceHolder){
         Order.BindExpressions.run({
@@ -53,6 +55,7 @@ namespace ComponentView{
             placeholder:this
         });
     }
-    function order4(this:VMDOM.VPlaceHolder){Order.exec(this,'{arr:[0]}');
+    function order4(this:VMDOM.VPlaceHolder){
+        Order.exec(this,'{arr:[0]}');
     }
 }

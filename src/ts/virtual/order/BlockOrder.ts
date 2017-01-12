@@ -90,10 +90,8 @@ namespace Order {
     
     function runOrder(this:void,info: IOrderInfo, node: VMDOM.VComment){
         let orderName: string = <string>info.order;
-        debugger;
         if (orderName in orders) {
             let order=new orders[orderName](node,info.condition);
-            
             if(order.run&&OrderEx.canRunAtService(order)){
                 order.run();
             }
