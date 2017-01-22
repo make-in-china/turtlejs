@@ -15,7 +15,7 @@ function tsc(event){
             target: 'es5',//把typescript转换成es5标准的js文件,也可以是es6,但这个node版本不支持
             outFile:'virtual/UIHelper.0.1.js',
             experimentalDecorators:true,
-            "declaration": true
+            declaration: true
             })
         );
      merge([
@@ -30,7 +30,7 @@ function tsc2(event){
             target: 'es5',//把typescript转换成es5标准的js文件,也可以是es6,但这个node版本不支持
             outFile:'js/turtle.0.1.js',
             experimentalDecorators:true,
-            "declaration": true
+            declaration: true
             })
         );
         // tsResult.pipe(sourcemaps.init()).pipe(sourcemaps.write('../maps', {addComment: false}))
