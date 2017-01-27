@@ -1,0 +1,21 @@
+<xmp><div class="{hide!ub!uhide} click2">
+    <div style="{%0!={width!0}?'width:{width!}em;':''%}">{text}：</div>
+    <div id='{id}' ref="{id}" class="ub-f1 fgray10 mdipl1 mdipt1 mdipb1 h100 {align!ct} fz17">
+        请输入{%'{placeholder!}'?'{placeholder!}':'{text}'%}
+    </div>
+    <ui:inputbox type="{inputtype!1}" text='{text}'></ui:inputbox>
+    <! if {input!true}>
+        <input ref="{id}2" type="{type!email}" class="w100 full bdw0 bblack0"></input>
+        <script var='{id},{id}2'>
+            var placeholder="{placeholder!}";
+            if(!placeholder){
+                placeholder="{text}";
+            }
+            inputbox.setInput({id}2,{id},"{type!}",{id}.innerHTML,0,'{text}','{next!}');
+        </script>
+    <! else>
+        <script var='{id}'>
+            inputbox.setInputPlaceHolder({id},"","");
+        </script>
+    <! end if>
+</div></xmp>

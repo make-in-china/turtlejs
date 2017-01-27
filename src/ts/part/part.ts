@@ -4,8 +4,9 @@
 /// <reference path='../lib/TreeEach.ts'/>
 /// <reference path='../lib/lib.ts'/>
 /// <reference path='../lib/is.ts'/>
-/// <reference path="Server.ts"/>
+// / <reference path="Server.ts"/>
 /// <reference path="View.ts"/>
+/// <reference path="partCore.ts"/>
 
 interface VNodeVMData{
     sign:number
@@ -16,13 +17,11 @@ interface IPartRefs {
     [index: string]: INode | undefined
     resize?: IHTMLElement
     main?: IHTMLElement
-    begin: VComment&IVNodeMethod
-    end: VComment&IVNodeMethod
+    begin: VMDOM.VComment&IVNodeMethod
+    end: VMDOM.VComment&IVNodeMethod
 }
 abstract class Part extends EventEmitterEx {
-    abstract dom:ComponentView.IView
-    /**组件名*/
-    abstract partName: string;
+    dom:ComponentView.IView
     /**
      * 是否已插入DOM
      */
@@ -30,10 +29,10 @@ abstract class Part extends EventEmitterEx {
     /**
      * 组件的方法属性
      */
-    $: Service;
+    // $: Service;
 
     /** DOM节点存储数组 */
-    protected nodeStore: (VNode&IVNodeMethod)[] = [];
+    protected nodeStore: (VMDOM.VNode&IVNodeMethod)[] = [];
 
     /**节点命名空间 */
     refs: IPartRefs
@@ -57,8 +56,8 @@ abstract class Part extends EventEmitterEx {
 
     /**insert事件管理器 */
     $online = this.getEventHelper<
-        (this: void, part: Part, node: IHTMLElement) => void,
-        (this: void, part: Part, node: IHTMLElement) => boolean>("online");
+        (this: void, part: Part, node: HTMLElement) => void,
+        (this: void, part: Part, node: HTMLElement) => boolean>("online");
 
     /**remove事件管理器 */
     $offline = this.getEventHelper<
@@ -66,11 +65,13 @@ abstract class Part extends EventEmitterEx {
         (this: void, part: Part) => boolean>("offline");
 
     /**初始化对象 */
-    constructor(public props: Object, outerChildNodes: INode[], outerElement: IHTMLCollection) {
+    constructor(public partName:string/*组件名*/,dom:ComponentView.IView,public props: Object, outerChildNodes?: INode[]) {
+        
         // constructor(public template: PartTemplate, extPart: Part | undefined, public props: Object, html: string, outerChildNodes: INodeArray, outerElement: IHTMLCollection) {
         super();
+        this.dom=dom;
+        this.dom.initDOM(props);
         // this.$ = new Service(template.service);
-        this.partName = this.partName;
         // if(extPart){
         //     /**继承 */
         //     this.__proto__=extPart;   
@@ -80,10 +81,23 @@ abstract class Part extends EventEmitterEx {
         // }
         
         let nodes = this.dom.tops;
-
-        initHTML(nodes, outerChildNodes, outerElement, props, this);
-        for (let i = nodes.length; i > 0; i--) {
-            this.nodeStore.push(nodes[0]);
+        
+        let outerElement: INode[]=<any>[];
+        if(outerChildNodes){
+            
+            for(let node of outerChildNodes){
+                if(node.nodeType===1){
+                    outerElement.push(<IHTMLElement>node);
+                }
+            }
+        }else{
+            outerChildNodes=[];
+        }
+        if(nodes){
+            initHTML(nodes, outerChildNodes, outerElement, props, this);
+            for (let i = nodes.length; i > 0; i--) {
+                this.nodeStore.push(nodes[0]);
+            }    
         }
         let name = this.partName;
         let begin = $$$(name, ENodeType.Comment);// document.createComment('<'+name+'>');
@@ -112,7 +126,7 @@ abstract class Part extends EventEmitterEx {
         //     (<ExtendsPart>extPart).to(this);
         // }
         let store = this.nodeStore;
-        push.apply(store, nodes);
+        push.apply(store, <any>nodes);
         // for (let i = nodes.length; i > 0; i--) {
         //     dom.removeChild(nodes[0]);
         // }
@@ -133,13 +147,13 @@ abstract class Part extends EventEmitterEx {
         }
     }
     /**即时读取子节点 */
-    get elements(): (VNode&IVNodeMethod)[] {
+    get elements(): (VMDOM.VNode&IVNodeMethod)[] {
         // if(this.isExtends){
         //     return new ArrayEx<INode>();
         // }
         if (this.isInDOM) {
             try {
-                let elements: (VNode&IVNodeMethod)[]=[];
+                let elements: (VMDOM.VNode&IVNodeMethod)[]=[];
                 let node = this.refs.begin.nextSibling;
                 let end = this.refs.end;
                 while (node&&node !== end) {
@@ -310,7 +324,7 @@ abstract class Part extends EventEmitterEx {
         return s;
     }
 
-    insertTo(elem) {
+    insertTo(elem:HTMLElement) {
         if (this.isInDOM) {
             let elems = this.elements;
             elems.unshift(this.refs.begin);

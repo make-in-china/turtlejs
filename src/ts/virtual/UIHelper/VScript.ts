@@ -7,12 +7,15 @@ interface IVNodeMethod {
     (data: string, nodeType: ENodeType.Script): VMDOM.VScript & IVNodeMethod;
 }
 namespace VMDOM {
+    
     @register('#script', ENodeType.Script)
+    /** 预编译脚本 */
     export class VScript extends VPlaceHolder {
         nodeName = "#script"
         nodeType = ENodeType.Script
         toJS(): string {
             return `.$$__(${this.propertyName})`;
+            //需要UIHelper配合
         }
         propertyName: string
         toFunction(): string {
@@ -20,8 +23,4 @@ namespace VMDOM {
     }`;
         }
     }
-    // bindClassToFunction2Helper['#script'] = bindClassToFunctionHelper[ENodeType.Script] = function (node: IVNodeMethod & VNode, nodeName: string) {
-    //     node.__proto__ = VScript.prototype;
-    //     VScript.call(node, nodeName);
-    // }
 }

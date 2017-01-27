@@ -1,0 +1,34 @@
+<xmp>
+    <div ref="elemBox">
+        <ui:move noout=1>
+            <div ref="elemSlider" class="shadow-5 bgreen15 rem5" style="width:5em;"></div>
+        </ui:move>
+    </div>
+    <script>
+        var maxValue={maxvalue!100};
+        var minvalue={minvalue!0};
+        var elemBox=$t.refNode["elemBox"].pop();
+        var elemSlider=$t.refNode["elemSlider"].pop();
+        var bind="{bind!}";
+        var width="{width!100%}";
+        var height="{height!1em}";
+        var css=elemBox.style;
+        css.width=width;
+        css.height=height;
+        elemSlider.style.height=height;
+        var position=elemBox.children[0].movePosition;
+        elemBox.__onSlide=function(v){
+            v=minvalue+v*(maxValue-minvalue)/(elemBox.scrollWidth-elemSlider.scrollWidth);
+            if(v!=elemBox.value)elemBox.value=v;
+
+            if(isFunction(elemBox.onSlide)){
+                elemBox.onSlide(v);
+            }
+        }
+        bindProperty(position,'left',elemBox,'__onSlide');
+        if(bind){
+            bindElementPropertyByName(elemBox,'value',bind);
+        }
+        elemBox.value=minvalue;
+    </script>
+</xmp>

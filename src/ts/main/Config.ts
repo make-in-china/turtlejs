@@ -1,4 +1,4 @@
-
+/// <reference path="../part/templateConfig.ts"/>
 interface ITurtle{
     config: Config;
 }

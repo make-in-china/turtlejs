@@ -36,7 +36,7 @@ namespace Order {
             if(statements.length>1){
                 throw new Error("不支持多句！");
             }
-            let logic:JS.Var=<JS.Var>JS.getLogic(statements[0],["var"]);
+            let logic:JS.Var=<JS.Var>JS.getLogic(statements[0],"var");
             if(logic){
                 data.varInfos=logic.varInfos;
             }
@@ -51,9 +51,9 @@ namespace Order {
     export function tryRunVarInfos(this:void,node:INode,varInfos:[string,string|undefined,boolean][]){
         for(const varInfo of varInfos){
             if(varInfo[2]){
-                testSet(node,varInfo[0],<string>varInfo[1]);
+                testVar(node,varInfo[0],<string>varInfo[1]);
             }else{
-                testSetValue(node,varInfo[0],varInfo[1]);
+                testSetVar(node,varInfo[0],varInfo[1]);
             }
         }
     }

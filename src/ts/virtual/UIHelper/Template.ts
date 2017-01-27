@@ -6,7 +6,6 @@ namespace UIHelper{
         return `namespace ComponentScript{
     export class ${className}{
         constructor(part:Component.${className}){
-            part.dom.initDOM(part.props);
         }
     }
 }`
@@ -14,15 +13,16 @@ namespace UIHelper{
 
     
     export function getViewString(className:string,propertyInfo:string,varInfo:string,domInitScript:string,scripts:string,props:string,defaultValuesInfo:string){
-        return `/// <reference path="../../../dest/virtual/UIHelper.0.1.d.ts"/>
+        return `/// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
 
 //本模块由引擎生成，请勿手动修改此文件
+//生成时间:${(new Date()).toString()}
 
 namespace ComponentView{
-    export interface I${className}Props{
+    export interface I${className}Props extends IProps{
         ${props}
     }
-    export class ${className}{${defaultValuesInfo!==''?`
+    export class ${className} implements IView{${defaultValuesInfo!==''?`
         static defaultValuesInfo=[${defaultValuesInfo}];`:``}
         ${propertyInfo}
         initDOM(props:I${className}Props){
@@ -38,17 +38,20 @@ ${scripts!==''?`
     export function getClassString(className:string){
         return `/// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
 /// <reference path="./Script.ts"/>
+
+//本模块由引擎生成，请勿手动修改此文件
+//生成时间:${(new Date()).toString()}
+
 namespace Component{
     export class ${className} extends Part{
+        partName="${className.toLowerCase()}"
         constructor(
             public props:ComponentView.I${className}Props,
-            public outerChildNodes:INode[],
-            public outerElement:IHTMLCollection
+            public outerChildNodes:INode[]
         ) {
-            super(template,props,html,outerChildNodes,outerElement);
+            super(new ComponentView.${className},props,outerChildNodes);
             new ComponentScript.${className}(this);
         }
-        dom=new ComponentView.${className}
     }
 }`
     }

@@ -9,7 +9,11 @@
 /// <reference path='lib.ts'/>
 /// <reference path='../lib/HashObject.ts'/>
 /// <reference path='../lib/Encode.ts'/>
-
+/// <reference path='../lib/DebugHelper.ts'/>
+/// <reference path='../core/xhr.ts'/>
+/// <reference path='../part/store.ts'/>
+/// <reference path='../virtual/Include.ts'/>
+/// <reference path='../part/uiList.ts'/>
 
 interface IRenderDocument{
     ():void;
@@ -25,9 +29,9 @@ class Turtle extends EventEmitterEx implements ITurtle{
     // domScope                                =new DOMScope;
     // rootScope                               =new Scope;
     config                                  =new Config;
-    T:TemplateList                          =new TemplateList;
+    T:UIList                                =new UIList;
     xhr                                     =new XHR;
-    service                                 =new Service;
+    // service                                 =new Service;
     store                                   =new Store;
     readyByRenderDocument:Ready             =new Ready;
     
@@ -59,9 +63,8 @@ class Turtle extends EventEmitterEx implements ITurtle{
             // isExtend                                                =getAttr(scriptNode,'extend',null),
             compileName                                             =getAttr(scriptNode,'compilename',""),
             compileuilist                                           =getAttr(scriptNode,'compileuilist',""),
-            script                                                  =<string>scriptNode.innerHTML,
             compileInfo:{isOn?:boolean,url?:string}|undefined;
-
+        let script                                                  =<string>scriptNode.innerHTML;
         this.turtleScriptElement=scriptNode;
         //初始化组件配置
         if(baseuipath){
@@ -113,7 +116,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
         }
         
         if(script.length>0){
-            execScript(scriptNode);
+            exec(script);
         }
         
     }
@@ -142,8 +145,8 @@ class Turtle extends EventEmitterEx implements ITurtle{
     }
     renderTemplate(tp:IHTMLElement){
         let sHTML=getTemplate(tp);
-        let vDOM=VDOM(sHTML);
-        let vDOMs:(VNode&IVNodeMethod)[];
+        let vDOM=VDOM.parseStructor(sHTML);
+        let vDOMs:(VMDOM.VNode&IVNodeMethod)[];
         if(isArray(vDOM)){
             vDOMs=vDOM;
         }else{
@@ -173,11 +176,11 @@ class Turtle extends EventEmitterEx implements ITurtle{
             templateXMP:IHTMLElement[]=[];
         /*优先处理定义相关的模板*/
         for(i=0;i<xmps.length;i++){
-            if(isDefine(xmps[i])){
-                parseDefine(xmps[i]);
-            }else{
+            // if(isDefine(xmps[i])){
+            //     parseDefine(xmps[i]);
+            // }else{
                 templateXMP.push(xmps[i]);
-            }
+            // }
         }
         /*处理逻辑模板*/
         for(i=0;i<templateXMP.length;i++){

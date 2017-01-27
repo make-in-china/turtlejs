@@ -1,0 +1,27 @@
+<xmp>
+    <div ref="panel" class="shadowless pdip5 mdip5 rdip5" style="display:inline-block;">
+        <div class="ub ct">
+            <div class="ub-f1 fb ct pdip5">{title!}</div>
+            <set lazy append class="fz24">
+                <ui:button skin="close"><script var="panel">
+                    panel.style.display="none";
+                </script></ui:button>
+            </set>
+        </div>
+        <div ref="content" class="ub-f1 uof"><!content></div>
+    </div>
+    <script>
+        var panel=$t.refNode.panel.pop();
+        var content=$t.refNode.content.pop();
+        component.show=function(){
+            panel.style.display="inline-block";
+        }
+        component.hide=function(){
+            panel.style.display="none";
+        }
+        component.setContent=function(elems){
+            content.innerHTML="";
+            $t.appendNodes(elems,content);
+        }
+    </script>
+</xmp>

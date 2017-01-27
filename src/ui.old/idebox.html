@@ -1,0 +1,33 @@
+<xmp ui="resize.script">
+<script>
+    window.freeSize=function(elemSize){
+          
+    }
+</script>
+</xmp>
+<xmp>
+    <div ref="elemSize" class="abs ub iub ub-ver">
+        <div class="ict">
+            <div><div ref="lt" cls="block"></div></div>
+            <div class="ub-f1"><div ref="t"  cls="block"></div></div>
+            <div><div ref="rt" cls="block"></div></div>
+        </div>
+        <div class="ub-f1 ict">
+            <div><div ref="l"  cls="block"></div></div>
+            <div class="ub-f1"><div ref="ct" class="ub-f1"><!content></div></div>
+            <div><div ref="r" cls="block"></div></div>
+        </div>
+        <div class="ict">
+            <div><div ref="lb"  cls="block"></div></div>
+            <div class="ub-f1"><div ref="b" cls="block"></div></div>
+            <div><div ref="rb" cls="block"></div></div>
+       </div>
+    </div>
+    <script var="elemSize">
+        if(!window.freeSize){
+            $t.getUI("resize.script");
+            $t.classes.push("block","fz10 wem1 hem1 shadowless mdip2 bgray15");
+        }
+        freeSize(elemSize);
+    </script>
+</xmp>

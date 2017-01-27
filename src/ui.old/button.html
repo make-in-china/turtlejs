@@ -1,0 +1,45 @@
+<xmp ui="skin.btn.fround">
+  <div ref="{ref!}" style="cursor: pointer;" class="animated fadeIn ct click2 pdipt5 pdipb5 rdip30 bfrdip30 " style="background-image:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#29c3e9), to(#09a3c9));-webkit-box-shadow: inset 0 0 0.25em #000,0 0 .25em #eee;box-shadow:inset 0 0 0.25em #000,0 0 .25em #eee;">
+    <!content>
+  </div>
+</xmp>
+<xmp ui="skin.btn.close"><div ref="{ref!}" style="cursor:pointer;" class="rem1 bfrem1 click2 fa ct wem1 hem1 bred15 fgray15">&#xf00d;</div></xmp>
+<xmp ui="skin.btn.sub"><div ref="{ref!}" style="cursor:pointer;" class="fa ct wem1 hem1">&#xf068;</div></xmp>
+<xmp ui="skin.btn.add"><div ref="{ref!}" style="cursor:pointer;" class="fa ct wem1 hem1">&#xf067;</div></xmp>
+<xmp><! if {skin!false!true}>
+<ui:skin.btn.{skin!} ref="{ref!}">{text!}</ui:skin.btn.{skin!}>
+<! else>
+<a ref="{ref!}" href="javascript:;">{text!}</a>
+<! end>
+<script>
+    var node;
+    if(outerElement.length!==0){
+      node=outerElement[0];
+      if(node.nodeName==="SCRIPT"){
+          var script=node.innerHTML;
+          if(script.length>0){
+              var fn;
+              var keyVar=getAttr(node,'var','');
+              fn=Function('event'+(keyVar?',':'')+keyVar,'try{'+script+'}catch(e){console.log(e);debugger;}');
+              var args=[];
+              if(keyVar.length>0){
+                  keyVar=keyVar.split(',');
+                  for(var i=0;i<keyVar.length;i++){
+                      var ui=$t.refNode[keyVar[i]];
+                      if(ui){
+                          args.push(ui[ui.length-1]);
+                      }else{
+                          args.push(null);
+                      }
+                      
+                  }
+              }
+              this.children[0].addEventListener('click',function(e){
+                  var _args=Array.prototype.slice.call(args);
+                  _args.unshift(e);
+                  fn.apply(this,_args);
+              },false);
+          }
+      }
+    }
+</script></xmp>

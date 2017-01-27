@@ -1,3 +1,5 @@
+
+/// <reference path='../javascript/JavaScriptStatement.ts'/>
 namespace JS{
     export class JavaScriptBlock{
         parent:JavaScriptStatement

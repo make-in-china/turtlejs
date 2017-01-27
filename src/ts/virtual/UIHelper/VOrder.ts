@@ -1,4 +1,5 @@
 /// <reference path='../node/VPlaceHolder.ts'/>
+/// <reference path='../javascript/JavaScriptBlock.ts'/>
 
 const enum ENodeType{
     Order=102

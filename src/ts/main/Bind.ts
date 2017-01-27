@@ -60,6 +60,22 @@ function removeBind(obj:Object, name:string, targetName:string): boolean {
 }
 
 
+function setQuestionAtrr(node: IHTMLElement, outerChildNodes, outerElement, props, part) {
+    let attrs = slice.call(node.attributes);
+    for (let i = 0; i < attrs.length; i++) {
+        let name = attrs[i].name;
+        if (name.length > 1) {
+            if (name[name.length - 1] === ':') {
+                setNodeProperty(node, name, takeAttr(node, name), outerChildNodes, outerElement, props, part);
+            } else if (name[0] === ':') {
+                let v = takeAttr(node, name, "");
+                if (v) {
+                    bindNodeProperty(node, name.substring(1, name.length), v);
+                }
+            }
+        }
+    }
+}
 
 
 /*绑定属性与描述*/

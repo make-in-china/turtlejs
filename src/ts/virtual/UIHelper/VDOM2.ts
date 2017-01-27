@@ -16,8 +16,8 @@ interface IMember2 extends IMember {
 
 interface IDirective{
     attrName:string
-    name:string
     defaultValue:string|undefined
+    name:string
     filters:{
         name:string
         params:string[]
@@ -215,14 +215,15 @@ abstract class VDOM2 extends VDOM {
         let data;
         switch (html[m.index]) {
             case '@':
-                if(m.index<m.length-2&&html[m.index+1]==='{'){
-                    let data:string;
-                    if (m.textNodeStart !== m.index) {
-                        data = html.substring(m.textNodeStart, m.index);
-                        if (!VMDOM.emptyTextNodeRE.test(data)) {
-                            m.node(data, 3);
-                        }
+                let data:string;
+                if (m.textNodeStart !== m.index) {
+                    data = html.substring(m.textNodeStart, m.index);
+                    if (!VMDOM.emptyTextNodeRE.test(data)) {
+                        m.node(data, 3);
                     }
+                }
+                //代码块
+                if(m.index<m.length-2&&html[m.index+1]==='{'){
 
                     m.index++;
                     let {length,block}=JS.Parser.parseBlock(html,m.index);
@@ -233,6 +234,23 @@ abstract class VDOM2 extends VDOM {
 
                     m.textNodeStart = m.index;
                     break;
+                }else{
+                    //寻找执行体
+                    m.index++;
+                    let {length,statement}=JS.Parser.parseStatement(html,m.index);
+                    m.index+=length;
+                    //@js语句
+                    //@order
+                    //@scope
+
+                    
+                    let script=`Order.exec(this,'${statement.toString()}')`;
+                    
+                    let scriptNode=$$$(script,ENodeType.Script);
+                    m.node.appendChild(scriptNode);
+
+                    m.textNodeStart = m.index;
+
                 }
             default:
                 super.textNode(html,m);

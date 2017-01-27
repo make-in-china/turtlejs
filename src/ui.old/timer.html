@@ -1,0 +1,10 @@
+<xmp><script>
+    var repeat=parseInt('{repeat!-1}');
+    var delay=parseInt('{delay!1000}');
+    if(delay>=0&&repeat>=-1){
+      var fn=Function('outer,outerElement','try{'+nodesToString(outer)+'}catch(e){console.log(e);debugger;}');
+      if(i<repeat||repeat==-1){
+          $t.repeatCall(delay,repeat,$t.getClosure(fn,outer,outerElement));
+      }
+    }
+</script></xmp>

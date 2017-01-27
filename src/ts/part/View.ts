@@ -1,7 +1,8 @@
 
 namespace ComponentView{
+    export interface IProps{}
     export interface IView{
-        tops:(VNode&IVNodeMethod)[]
-        initDom():void;
+        tops?:(VMDOM.VNode&IVNodeMethod)[]
+        initDOM(props:IProps):void;
     }
 }

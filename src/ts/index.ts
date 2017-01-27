@@ -1,3 +1,4 @@
+
 /// <reference path='./main/Turtle.ts'/>
 
 // if(!$DOM){
@@ -25,6 +26,6 @@
 //     };
 // }
 
-
-let turtle=$t=new Turtle();
+var $t=new Turtle();
+let turtle=$t;
 

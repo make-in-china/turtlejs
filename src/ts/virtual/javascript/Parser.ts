@@ -480,6 +480,7 @@ namespace JS{
                     m.index++;
             }
         }
+        /**解析结构 */
         static parseStructor(condition:string,start:number=0,checkCallback?:(m:IJavaScriptParseState)=>boolean):JavaScriptBlock{
             let m=this.getInitData(condition,start);
             let length=condition.length;
@@ -498,6 +499,7 @@ namespace JS{
             }
             return m.root;
         }
+        /**仅从文本流里解析出一个代码块 */
         static parseBlock(condition:string,start:number):{
             length:number,
             block:JavaScriptBlock
@@ -518,7 +520,21 @@ namespace JS{
             }
             return {length:m.index-start,block:<any>block};
         }
-        
+        static parseStatement(condition:string,start:number):{
+            length:number,
+            statement:JavaScriptStatement
+        }{
+            let m=this.getInitData(condition,start);
+            let length=condition.length;
+            let chds=m.root.children;
+            while (m.index < length) {
+                this[m.action](m,condition);
+                if(chds.length>0&&chds[0].isEnd){
+                    break;
+                }
+            }
+            return {length:m.index-start,statement:chds[0]};
+        }
     }
 }
 

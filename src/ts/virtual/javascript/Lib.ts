@@ -37,13 +37,18 @@ namespace JS{
         }
         return value;
     }
-    export function getLogic(statement:JavaScriptStatement,firstTryNames:string[]):JavaScriptLogic|null{
-
+    export function getLogic(statement:JavaScriptStatement,name:'for'|'function'|'var'):JavaScriptLogic|null{
+        let Logic=logics[name];
+        return Logic.new(statement);
+    }
+    
+    /**从代码块读取js逻辑 */
+    export function findLogic(statement:JavaScriptStatement,firstTryNames:('for'|'function'|'var')[]):JavaScriptLogic|null{
         if(firstTryNames){
             for(const name of firstTryNames){
                 if(name in logics){
                     let Logic=logics[name];
-                    let logic=Logic.new(statement)
+                    let logic=Logic.new(statement);
                     if(logic){
                         return logic;
                     }

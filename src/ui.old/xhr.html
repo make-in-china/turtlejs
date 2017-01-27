@@ -1,0 +1,53 @@
+<xmp><div style='display:none !important'></div>
+<script>
+    var url='{url}';//getAttr(this,'url','');
+    var action='{action!GET}'.toUpperCase();//getAttr(this,'action','get').toLowerCase();
+    var autoRun=parseBool('{autoRun!}');//parseBool(getAttr(this,'autoRun',true));
+    var name='{name!''}'//getAttr(this,'name','');
+    var xhr=new XMLHttpRequest;
+    var postData;
+    var async=parseBool('{async!}');
+    var onData;
+    var t8=this.children[0];
+    if(outer.length==0){
+        onData=function(d){
+            t8.insertAdjacentText('beforeBegin',d);
+        }
+    }else{
+        var html=nodesToString(outer);
+        onData=function(d){
+            var ret=turtle.parseHTML(turtle.replaceByObjectAttr(html,JSON.parse(d)));
+            turtle.initCls();
+            turtle.initLink();
+            turtle.insertNodesBefore(t8,ret);
+        }
+    }
+    if(action=='POST'){
+        postData=getAttr(this,'postdata','');
+        xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    }else if(action=='GET'){
+    }else if(action=='UNDEFINED'){
+        action='GET';
+    }else{
+        throw new Error('aciton参数只支持get/post');
+    }
+    xhr.onreadystatechange=function(){
+      if (xhr.readyState==4){ 
+        if (xhr.status == 200||xhr.status == 0){
+            onData(xhr.responseText);
+        }
+      }
+    }
+    var fn=function(){
+        xhr.open(action,url,async);
+        xhr.send(postData);
+    };
+    if(name){
+        debugger;
+        $t.uiXHR.push(name,fn);
+    }
+    if(autoRun){
+        fn();
+    }
+</script>
+</xmp>

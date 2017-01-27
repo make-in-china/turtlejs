@@ -1,0 +1,32 @@
+<xmp>
+    <div class="shadowless pdip5 mdip5 rdip5" style="display:inline-block;">
+        <div class="ub ct">
+            <div class="ub-f1 fb {%switch({align!0}){case 2:'ct';break;case 1:'right';}%} pdip5">{title!}</div>
+            <set lazy append class="fz24" ref="sub">
+                <ui:button skin="sub"></ui:button>
+            </set>
+            <set lazy append class="fz24 uhide" ref="add">
+                <ui:button skin="add"></ui:button>
+            </set>
+        </div>
+        <div class="ub-f1 zidx2" ref="content"><!content></div>
+        <script>
+            var add=$t.refNode["add"].pop();
+            var sub=$t.refNode["sub"].pop();
+            var content=$t.refNode["content"].pop();
+            component.max=add.onclick=function(){
+                removeClass(sub,"uhide");
+                addClass(add,"uhide");
+                removeClass(content,"uhide");
+            }
+            component.min=sub.onclick=function(){
+                removeClass(add,"uhide");
+                addClass(sub,"uhide");
+                addClass(content,"uhide");
+            }
+            if(!parseBool({extend!0})){
+               sub.onclick();
+            }
+        </script>
+    </div>
+</xmp>

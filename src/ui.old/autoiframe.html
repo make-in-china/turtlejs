@@ -1,0 +1,18 @@
+<xmp>
+  <iframe ref="iframe" class="bdw0 uhide"></iframe>
+  <script var="iframe">
+      var src="{src!}";
+      $t.ui.autoiframe.service.autoiframe(iframe,src);    
+  </script>
+</xmp>
+<xmp service="autoiframe" ui="autoiframe">
+    function(iframe,src){
+        iframe.onload=function(){
+            iframe.style.height=iframe.contentDocument.body.scrollHeight+"px";
+            iframe.style.width=iframe.contentDocument.body.scrollWidth+"px";
+            $t.removeClass(iframe,"uhide");
+            delete iframe.onload;
+        }
+        iframe.src=src;
+    }
+</xmp>

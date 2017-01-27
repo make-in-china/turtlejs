@@ -1,0 +1,18 @@
+<xmp ui="resize.script">
+<script>
+    window.freeSize=function(elemSize){
+        
+    }
+</script>
+</xmp>
+<xmp>
+    <div ref="elemSize" class="abs wem1 hem1 right-16 bottom-16 bgray15 shadowless"></div>
+    <ui:move lazy><!content></ui:move>
+    
+    <script var="elemSize">
+        if(!window.freeSize){
+            $t.getUI("resize.script");
+        }
+        freeSize(elemSize);
+    </script>
+</xmp>

@@ -1,0 +1,9 @@
+<div>
+
+    @{for var data={arr:[0]},i=0;i<3;i++,data.arr.push(i)}
+        @{- 
+            ((data).arr)[(i+1-1)*2/2]:v=>'v+i='+(v+i)+';'
+        }
+        @{- i}
+    @{end}
+</div>

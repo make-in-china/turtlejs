@@ -1,5 +1,7 @@
 
 /// <reference path='../../scope/DOMScope.ts'/>
+/// <reference path='../UIHelper/VOrder.ts'/>
+/// <reference path='../UIHelper/VScript.ts'/>
 // interface VComment {
 //     __order__?: Order.VOrder
 // }
@@ -221,9 +223,21 @@ namespace Order {
         that=replaceScope(that);
         return _exec.call(that,script, node);
     }
+    // export const enum ETestSetCode{
+    //     normal=0,
+    //     var=1
+    // }
+    // export function testSet(this:void,node: INode,name:string, script: string,code:ETestSetCode=ETestSetCode.normal): void {
     export function testSet(this:void,node: INode,name:string, script: string): void {
         let that:Scope=DOMScope.get(node);
         that=replaceScope(that);
+        that[name]=_exec.call(that,script, node);
+    }
+    export function testVar(this:void,node: INode,name:string, script: string): void {
+        let that:Scope=DOMScope.get(node);
+        that=replaceScope(that);
+        //删除旧的
+        delete that[name];
         that[name]=_exec.call(that,script, node);
     }
     export function testSetValue(this:void,node: INode,name:string, value: any): void {
@@ -231,7 +245,13 @@ namespace Order {
         that=replaceScope(that);
         that[name]=value;
     }
-    
+    export function testSetVar(this:void,node: INode,name:string, value: any): void {
+        let that:Scope=DOMScope.get(node);
+        that=replaceScope(that);
+        delete that[name];
+        that[name]=value;
+    }
+
     function createFakeObject(that:Object):Object{
         let obj={};
         for(let name in that){
@@ -260,11 +280,7 @@ namespace Order {
                     return ret;
                 }
             },
-            set(v:any){
-                debugger;
-                // delete that[name];
-                // that[name]=v;
-            }
+            set(v:any){}
         })
     }
     function onPropertyChange(obj:Object, name:string, fnOnSet:Function) {

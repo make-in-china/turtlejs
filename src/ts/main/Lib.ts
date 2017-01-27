@@ -1,4 +1,4 @@
-
+/// <reference path="../lib/IAttr.ts" />
 // function _catch(e, fn?: Function) {
 //     if (fn) {
 //         fn(e);

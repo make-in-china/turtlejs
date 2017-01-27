@@ -1,0 +1,47 @@
+<script type="xmp" service="parseloop">
+    function(node) {
+        function parseLoopFromTo(node) {
+            var c = node.innerHTML;
+            var from = Number($t.execTemplateScript(getAttr(node, 'from', '0'), node, null));
+            var to = Number($t.execTemplateScript(getAttr(node, 'to', '-1'), node, null));
+            var step = Number($t.execTemplateScript(getAttr(node, 'step', '1'), node, null));
+            var step = from <= to ? step : -1;
+            var s = '';
+            for (var i = from; i <= to; i += step) {
+                s += c.replace(/\[\?\]/g, i);
+            }
+            return s;
+        }
+        function parseLoopEach(node, eachData) {
+            var c = node.innerHTML,
+                from = 0,
+                scope = $t.uiScope.get(node),
+                data = $t.execByScope(node, eachData, scope),
+                to = data.length,
+                s = '';
+            for (var i = from; i < to; i++) {
+                s += c.replace(/\[\?(.*?)\]/g, function(s) {
+                    s = s.substring(2, s.length - 1);
+                    if (s.length > 0) {
+                        return data[i][s];
+                    } else {
+                        return i;
+                    }
+                });
+            }
+            return s;
+        }
+        var each = getAttr(node, 'each', '');
+        if (each) {
+            return parseLoopEach(node, each);
+        } else {
+            return parseLoopFromTo(node);
+        }
+    }
+</script>
+<xmp>
+  <script>
+    debugger;
+    this.innerHTML=$t.service.require("parseloop")(this.__uiNode);
+  </script>
+</xmp>

@@ -1,0 +1,453 @@
+
+<xmp ui="inputbox.script">
+  <script>
+    
+    var isiPhone=(appcan.detect.browser.name=='safari'),
+        closeinput,
+        cancelInput,
+        tID,
+        t = window.inputbox = {},
+        body = document.body,
+        Text = $t.refNode['Text'].pop(),
+        input = $t.refNode['input'].pop(),
+        buttonPanel = Text.children[1],
+        elemOK = $t.refNode['elemOK'].pop();
+    Text.box = t;
+    removeNode(Text);
+    function pressKey(input, key) {
+        var start = input.selectionState.start;
+        var end = input.selectionState.end;
+        start > end && ( start = start ^ end,
+        end = start ^ end,
+        start = start ^ end);
+        input.value = input.value.substring(0, start) + key + input.value.substring(end, input.value.length);
+        input.focus();
+    }
+
+    function deleteData(input) {
+        var start = input.selectionState.start;
+        var end = input.selectionState.end;
+        start > end && ( start = start ^ end,
+        end = start ^ end,
+        start = start ^ end);
+        if (start == end) {
+            start = end - 1;
+        }
+        input.value = input.value.substring(0, start) + input.value.substring(end, input.value.length);
+        input.focus();
+    }
+
+    function copyData(input) {
+        var start = input.selectionState.start;
+        var end = input.selectionState.end;
+        start > end && ( start = start ^ end,
+        end = start ^ end,
+        start = start ^ end);
+        uexClipboard.copy(input.value.substring(start, end));
+    }
+
+    function pasteData(input) {
+        uexClipboard.cbGetContent = function(opCode, dataType, data) {
+            pressKey(input, data);
+            uexClipboard.cbGetContent = null;
+        }
+        uexClipboard.getContent();
+    }
+
+    function onOK(input) {
+        var nextText = document.getElementById(t.next);
+        if (nextText && nextText.box) {
+            closeinput(1);
+            if(!isiPhone){
+                nextText.box.textBox.focus();
+            }else{
+                nextText.box.textBox.parentNode.onclick();
+            }
+            return;
+        }
+        closeinput();
+    }
+
+    function press(e) {
+        var elem = e.target;
+        if (elem.hasAttribute("data-key")) {
+            var key = elem.getAttribute("data-key");
+            switch(key) {
+            case"selectAll":
+                input.select();
+                input.focus();
+                break;
+            case"cancel":
+                cancelInput();
+                break;
+            case"OK":
+                onOK(input);
+                break;
+            case"copy":
+                copyData(input);
+                break;
+            case"paste":
+                pasteData(input);
+                break;
+            case"delete":
+                deleteData(input);
+                break;
+            default:
+                if (/^([a-z0-9]| )$/.test(key)) {
+                    pressKey(input, key);
+                } else {
+                    input.focus();
+                }
+            }
+        }
+        e.stopPropagation();
+        e.preventDefault();
+    }
+
+    var closeInputPanel = function(v) {
+        if (body.contains(Text)) {
+            removeClasses(buttonPanel, ["fast", "flipInX"]);
+            addClasses(buttonPanel, ["duration2", "flipOutX"]);
+            
+            if(!isiPhone){
+              clearInterval(tID);
+            }
+            if (v) {
+                body.removeChild(Text);
+                removeClasses(buttonPanel, ["duration2", "flipOutX"]);
+                addClasses(buttonPanel, ["fast", "flipInX"]);
+            } else {
+                setTimeout(function() {
+                    body.removeChild(Text);
+                    removeClasses(buttonPanel, ["duration2", "flipOutX"]);
+                    addClasses(buttonPanel, ["fast", "flipInX"]);
+                }, 200);
+            }
+        }
+    }
+    Text.onclick = press;
+    function _openInput(cbok, cbcancel, e) {
+        cancelInput = function() {
+            if (isFunction(cbcancel))
+                cbcancel();
+            closeInputPanel();
+        }
+        input.onkeypress = function(e) {
+            if (e.which == 13) {
+                closeinput();
+            }
+        }
+        body.appendChild(Text);
+        input.selectionState = {
+            start : 0,
+            end : 0
+        };
+        if(!isiPhone){
+          Text.style.display = "none";
+          setTimeout(function() {
+              Text.style.display = "";
+              tID = setInterval(function() {
+                  input.focus();
+              }, 500);
+              input.focus();
+          }, 500);
+        }else{
+          input.focus();
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        return true;
+    }
+
+
+    input.onblur = function() {
+        var type = input.type;
+        input.type = "text";
+        input.selectionState.start = input.selectionStart
+        input.selectionState.end = input.selectionEnd;
+        input.type = type;
+    }
+    t.openInput = function(source, cbok, cbcancel, e) {
+        input.value = source.value;
+        input.type = source.type;
+        closeinput = function(e) {
+            source.value = input.value;
+            if (isFunction(cbok))
+                cbok();
+            closeInputPanel();
+        }
+        _openInput(cbok, cbcancel, e);
+    }
+    t.openInput2 = function(value, type, cbok, cbcancel, e) {
+        input.type = type;
+        input.value = value;
+        closeinput = function(v) {
+            if (isFunction(cbok))
+                cbok(input);
+            closeInputPanel(v);
+        }
+        _openInput(cbok, cbcancel, e);
+    }
+    function setInnerHTML(elem, type, placeholder, value) {
+        if (value.length > 0) {
+            if (type === "password") {
+                elem.innerHTML = (new Array(value.length + 1)).join('●');
+            } else {
+                elem.innerHTML = value;
+            }
+            $t.replaceClass(elem, "fgray10", "fcoffee3");
+        } else {
+            elem.innerHTML = placeholder;
+            $t.replaceClass(elem, "fcoffee3", "fgray10");
+        }
+    }
+
+
+    t.setInputPlaceHolder = function(elem, type, placeholder) {
+        var _value = '';
+        Object.defineProperty(elem, "value", {
+            get : function() {
+                return _value;
+            },
+            set : function(v) {
+                _value = v;
+                setInnerHTML(elem, type, placeholder, _value);
+            }
+        });
+        setInnerHTML(elem, type, placeholder, _value);
+    }
+    t.setInput = function(elemEvent, elem, type, placeholder, virtualKeyboard, text, next) {
+        t.next = next;
+        if (next == "") {
+            elemOK.innerHTML = '&#xf00c;';
+            addClass(elemOK, "fa");
+        }
+        t.source = elem;
+        t.text = text;
+        t.textBox = elemEvent;
+        elem.box = t;
+        if (elemEvent) {
+            elemEvent.onkeydown = function(e) {
+                return false;
+            }
+            if(!isiPhone){
+              elemEvent.onfocus = function(e) {
+                  t.openInput2(elem.value, type, function(elemInput) {
+                      elem.value = elemInput.value;
+                  }, null, e);
+              }
+            }else{
+              elemEvent.parentNode.onclick = function(e) {
+                  t.openInput2(elem.value, type, function(elemInput) {
+                      elem.value = elemInput.value;
+                  }, null, e);
+              }
+              elemEvent.style.display="none";
+            }
+        }
+        t.setInputPlaceHolder(elem, type, placeholder);
+    }
+  </script>
+</xmp>
+<xmp ui="inputbox.typepanel2">
+  <set class="imdip2 ict ishadowless2 ibgray15 iclick2 irdip5 ibfrdip5 iwdip28 ihdip28">
+    <div>
+      <div data-key="1">
+        1
+      </div>
+      <div data-key="2">
+        2
+      </div>
+      <div data-key="3">
+        3
+      </div>
+      <div data-key="0">
+        0
+      </div>
+    </div>
+    <div>
+      <div data-key="4">
+        4
+      </div>
+      <div data-key="5">
+        5
+      </div>
+      <div data-key="6">
+        6
+      </div>
+      <div data-key=" " style="width:4.5em;">
+        &nbsp;
+      </div>
+    </div>
+    <div>
+      <div data-key="7">
+        7
+      </div>
+      <div data-key="8">
+        8
+      </div>
+      <div data-key="9">
+        9
+      </div>
+      <div key="elemOK" class="fa fb" data-key="OK" style="width:4.5em;">
+        &#xf178;
+      </div>
+    </div>
+  </set>
+</xmp>
+<xmp ui="inputbox.typepanel1">
+  <set class="imdip2 ict ishadowless2 ibgray15 iclick2 irdip5 ibfrdip5 iwdip28 ihdip28">
+    <div>
+      <div data-key="a">
+        a
+      </div>
+      <div data-key="b">
+        b
+      </div>
+      <div data-key="c">
+        c
+      </div>
+      <div data-key="d">
+        d
+      </div>
+      <div data-key="e">
+        e
+      </div>
+      <div data-key="f">
+        f
+      </div>
+      <div data-key="g">
+        g
+      </div>
+    </div>
+    <div>
+      <div data-key="h">
+        h
+      </div>
+      <div data-key="i">
+        i
+      </div>
+      <div data-key="j">
+        j
+      </div>
+      <div data-key="k">
+        k
+      </div>
+      <div data-key="l">
+        l
+      </div>
+      <div data-key="m">
+        m
+      </div>
+      <div data-key="n">
+        n
+      </div>
+    </div>
+    <div>
+      <div data-key="o">
+        o
+      </div>
+      <div data-key="p">
+        p
+      </div>
+      <div data-key="q">
+        q
+      </div>
+      <div data-key="r">
+        r
+      </div>
+      <div data-key="s">
+        s
+      </div>
+      <div data-key="t">
+        t
+      </div>
+      <div data-key=" " style="width:3em;">
+        &nbsp;
+      </div>
+    </div>
+    <div>
+      <div data-key="u">
+        u
+      </div>
+      <div data-key="v">
+        v
+      </div>
+      <div data-key="w">
+        w
+      </div>
+      <div data-key="x">
+        x
+      </div>
+      <div data-key="y">
+        y
+      </div>
+      <div data-key="z">
+        z
+      </div>
+      <div key="elemOK" class="fa fb" data-key="OK" style="width:3em;">
+        &#xf178;
+      </div>
+    </div>
+  </set>
+</xmp>
+<xmp>
+  <div key='Text' class="full bblack4 pdip5 fz18" style="z-index: 147483640;">
+    <div data-key="input" key="elemInputTop" class="ifz20 ihdip20 ipdip3 mdipb8 pdip8 bgray15 ub rdip10 shadowless">
+      <div>
+        {text}:
+      </div>
+      <div data-key="input" class="ub ub-f1 bdw1 ub lb2 bgray15">
+        <input key="input" data-key="input" type="email" style="outline:none;" class="fz16 ub ub-f1 rdip10 bdw0">
+      </div>
+      
+      <! if appcan.detect.browser.name!=='safari'>
+      <div data-key="delete" class="click2 ct bfrem1 shadowless2 rdip10 wem1 hem1">
+        <span class="fz14 fa noevent">&#xf12d;</span>
+      </div>
+      <! end>
+    </div>
+    <div class="animated fast ct flipInX rdip10 pdip4 shadowless fz23 fcoffee3" style="background-image:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#f8f8f8),color-stop(0.2, #fff),color-stop(0.8, #fff), to(rgba(245,245,245,.95)));">
+      <div data-key="cancel" class="fred15 zidx2 fa bfrdip10 bfrdiplt0 bfrdiprb0 ct top0 click2 fz14 wem2 hem2 abs right0">
+        &#xf00d;
+      </div>
+      <div class="ileft">
+        <! if appcan.detect.browser.name!=='safari'>
+        <div class="fz10 imdip3 ict fb ibgray15 ishadowless2 iclick2 rdipb10 irdip5 ibfrdip5 ub ihdip28 ipdip5 ipdipr10">
+          
+            <div data-key="copy">
+              <span class="fa wem2 ct">&#xf0c5</span>复制
+            </div>
+            <div data-key="paste">
+              <span class="fa wem2 ct">&#xf0ea</span>粘贴
+            </div>
+            <div data-key="selectAll">
+              <span class="fa wem2 ct">&#xf07e</span>全选
+            </div>
+        </div>
+        <! else>
+        <div class="fz10 wem16 hdip1">
+          
+        </div>
+        <! end>
+        <! switch {type!1}><! case break 2><ui:inputbox.typepanel2></ui:inputbox.typepanel2>
+        <! case break 3><ui:inputbox.typepanel1></ui:inputbox.typepanel1>
+        <! default>
+        <div class="imdip3 ub ict ibgray15 ishadowless2 iclick2 irdip5 ibfrdip5 ihem2">
+          <div class="ub-f1" data-key=" "></div>
+          <div key="elemOK" class="fa wem3 fb" data-key="OK">
+            &#xf178;
+          </div>
+        </div>
+        <! end>
+      </div>
+    </div>
+  </div>
+  <ui:inputbox.script></ui:inputbox.script>
+  <script var="elemInputTop">
+    
+    if(appcan.detect.browser.name==='safari'){
+        elemInputTop.style.marginTop="1.5em";
+    };
+  </script>
+</xmp>

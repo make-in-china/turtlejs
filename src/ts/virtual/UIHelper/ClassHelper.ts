@@ -211,7 +211,7 @@ namespace UIHelper {
         if (topsJS.length > 0) {
             propertys.push('tops:[' + topsType.join('\n,') + '];');
             domInitScript += `
-            push.call(this.tops,<(VMDOM.VNode&IVNodeMethod)>
+            push.call(this.tops=<any>[],<(VMDOM.VNode&IVNodeMethod)>
                     ${topsJS.join(',\n                    <(VMDOM.VNode&IVNodeMethod)>')}
             );`;
         }

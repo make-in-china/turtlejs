@@ -6,7 +6,6 @@
 /// <reference path='../../lib/TreeEach.ts'/>
 /// <reference path='../../lib/is.ts'/>
 /// <reference path='./VElementHelper.ts'/>
-/// <reference path='VMember.ts'/>
 /// <reference path='../order/VOrder.ts'/>
 /// <reference path='../order/If.ts'/>
 /// <reference path='../order/For.ts'/>
