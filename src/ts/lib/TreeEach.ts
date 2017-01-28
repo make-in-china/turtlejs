@@ -36,7 +36,7 @@ interface ITreeEachReturn {
  * @param {(node:T,step?:ITreeEachStep)=>eTreeEach|undefined} fn 回调函数
  * @param {number} beginIndex 遍历起始位置
  */
-function treeEach<T>(array:T[]|IArray,propertyName:string,fn:(node:T,state:ITreeEachState<T>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
+function treeEach<T>(array:T[]|IArray|NodeList,propertyName:string,fn:(node:T,state:ITreeEachState<T>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
     if(!isArrayLike(array)){
         return;
     }

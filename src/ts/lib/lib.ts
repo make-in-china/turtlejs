@@ -36,6 +36,8 @@ interface INode extends EventTarget {
     appendChild(newChild: INode): INode;
     removeChild(oldChild: INode): INode;
     cloneNode(deep?: boolean): INode;
+    toDOM():Node
+    insertBefore2(newChild: INode, refChild: INode): INode;
 }
 interface IElementTraversal {
     childElementCount: number;
@@ -369,6 +371,10 @@ interface IText extends ICharacterData {
 }
 interface IComment extends ICharacterData {
     textContent: string;
+    vmData?:{
+        part?:Part;
+        sign?:0|1;
+    }
 }
 interface IHTMLCollection {
     /**

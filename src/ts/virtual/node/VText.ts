@@ -77,6 +77,7 @@ namespace VMDOM{
             } else {
                 elem = document.createTextNode('');
             }
+            this.vmData.domNode = elem;
             return elem;
         }
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */

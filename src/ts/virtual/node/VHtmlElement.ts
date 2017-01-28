@@ -131,6 +131,8 @@ namespace VMDOM{
                     elem[j] = obj[j];
                 }
             }
+            
+            this.vmData.domNode = elem;
             return elem;
         }
         protected doToDOM(): Node {
@@ -199,8 +201,6 @@ namespace VMDOM{
             this.createHomologyFunction("removeChild");
             
             debugger;
-            this.createHomologyFunction("appendChild");
-            this.createHomologyFunction("removeChild");
 
 
 

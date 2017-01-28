@@ -29,10 +29,15 @@ var ArrayEx = (function (_super) {
 }(Array));
 /// <reference path="../lib/ArrayEx.ts"/>
 /// <reference path="../lib/lib.ts" />
-typeof Node !== "undefined" && (Node.prototype.beDOM = Node.prototype.valueOf =
-    function () {
-        return this;
-    });
+(function () {
+    var appendChild = Node.prototype.appendChild;
+    Node.prototype.appendChild = function (newChild) {
+        return appendChild.call(this, newChild.toDOM());
+    };
+}());
+Node.prototype.toDOM = Node.prototype.valueOf = function () {
+    return this;
+};
 var vNodesToDOM = function (nodes) {
     return nodes;
 };
@@ -1591,11 +1596,12 @@ var VMDOM;
             if (space === void 0) { space = 0; }
             return "$$$" + this.toJS(space).replace(/^\s*/, '');
         };
-        VNode.prototype.beDOM = function () {
+        VNode.prototype.toDOM = function () {
             if (this.vmData.domNode) {
                 return this.vmData.domNode;
             }
-            var elem = this.doBeDOM();
+            debugger;
+            var elem = this.doToDOM();
             this.copyPropertyToNode(elem);
             this.vmData.domNode = elem;
             this.connectParent(elem);
@@ -1603,21 +1609,18 @@ var VMDOM;
             elem.__vdomNode__ = this;
             return elem;
         };
-        VNode.prototype.doBeDOM = function () {
+        VNode.prototype.doToDOM = function () {
             var toHelp = document.createElement('__Turtle__'); //用于创建
             toHelp.innerHTML = this.vmData.data;
             var elem = toHelp.removeChild(toHelp.childNodes[0]);
             return elem;
         };
         VNode.prototype.copyPropertyToNode = function (elem) {
-            debugger;
             for (var i in this) {
                 switch (i) {
                     case '__':
-                    case '__events__':
-                    case '__isClose__':
-                    case 'vmData.domNode':
-                    // case "__closeSelf__":
+                    case '__value__':
+                    case 'length': /**函数带有length */
                     case '__proto__':
                     case 'children':
                     case 'childNodes':
@@ -1628,11 +1631,14 @@ var VMDOM;
                     case "classList":
                     case "className":
                     case 'attributes':
+                    case 'vmData':
                         break;
                     default:
                         if (!this.hasOwnProperty(i)) {
                             continue;
                         }
+                        console.log(i);
+                        debugger;
                         var desc = Object.getOwnPropertyDescriptor(this, i);
                         if (desc) {
                             if (!(i in elem)) {
@@ -1710,7 +1716,7 @@ var VMDOM;
                     if (o === arguments[i] && o instanceof VNode) {
                         toDOMs.push(o);
                         //转换为真实Node
-                        objects.push(o.beDOM());
+                        objects.push(o.toDOM());
                     }
                     else {
                         objects.push(o);
@@ -2129,11 +2135,11 @@ var VMDOM;
             }
             return elem;
         };
-        VHtmlElement.prototype.doBeDOM = function () {
+        VHtmlElement.prototype.doToDOM = function () {
             var elem = this.doBaseToDOM();
             var chds = this.childNodes;
             for (var j = 0; j < chds.length; j++) {
-                chds[j].beDOM();
+                chds[j].toDOM();
             }
             return elem;
         };
@@ -2195,8 +2201,6 @@ var VMDOM;
             this.createHomologyFunction("appendChild");
             this.createHomologyFunction("removeChild");
             debugger;
-            this.createHomologyFunction("appendChild");
-            this.createHomologyFunction("removeChild");
             this.setBridgeGet("style");
             this.setBridgeGet("classList");
             this.setBridgeGet("attributes");
@@ -2411,7 +2415,7 @@ var VMDOM;
         VText.prototype.toHTMLString = function () {
             return [this.__value__];
         };
-        VText.prototype.doBeDOM = function () {
+        VText.prototype.doToDOM = function () {
             var elem;
             if (this.data !== "") {
                 var toHelp = document.createElement('__Turtle__'); //用于创建
@@ -2500,12 +2504,16 @@ var VMDOM;
             }
             return ret;
         };
-        VComment.prototype.doBeDOM = function () {
+        VComment.prototype.doToDOM = function () {
             var elem = document.createComment(this.data);
             return elem;
         };
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         VComment.prototype.emulation = function () { };
+        VComment.prototype.copyPropertyToNode = function (elem) {
+            elem.vmData = this.vmData;
+            _super.prototype.copyPropertyToNode.call(this, elem);
+        };
         return VComment;
     }(VMDOM.VCharacterData));
     VComment = __decorate([
@@ -5616,7 +5624,6 @@ function setNodeProperty(node, proName, condition, outerChildNodes, outerElement
 function getTemplate(node) {
     var nodeName = node.nodeName;
     if (templateConfig.hasOwnProperty(nodeName)) {
-        debugger;
         if (templateConfig[nodeName].hasOwnProperty('getData')) {
             return templateConfig[nodeName].getData(node);
         }
@@ -6129,7 +6136,7 @@ function getParts(childNodes) {
     var child = [];
     var cpn;
     treeEach(childNodes, "childNodes", function (node) {
-        if (node.nodeType === 8 && node.vmData.part) {
+        if (isCommentNode(node) && node.vmData && node.vmData.part) {
             var part = node.vmData.part;
             if (cpn) {
                 if (part === cpn && node.vmData.sign === 0) {
@@ -6855,7 +6862,7 @@ var Turtle = (function (_super) {
         }
         else {
             vDOMs = [vDOM];
-            vDOM.beDOM;
+            vDOM.toDOM;
         }
         initHTML(vDOMs);
         // if(isFunction(vDOM)){
@@ -6863,13 +6870,13 @@ var Turtle = (function (_super) {
         var doms = [];
         for (var _i = 0, vDOMs_1 = vDOMs; _i < vDOMs_1.length; _i++) {
             var node = vDOMs_1[_i];
-            doms.push(node.beDOM());
+            doms.push(node.toDOM());
         }
         replaceNodeByNodes(tp, doms);
         // vDOM.__domNode__=p;debugger;
         // return;   
         // }
-        // replaceNodeByNodes(tp,takeChildNodes(vDOM.beDOM()));
+        // replaceNodeByNodes(tp,takeChildNodes(vDOM.toDOM()));
         //vDOM.innerHTML='';
     };
     Turtle.prototype.r1 = function (scriptNode, compileuilist, compileName, compileInfo, compile) {

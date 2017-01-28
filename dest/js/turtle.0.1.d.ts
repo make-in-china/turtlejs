@@ -1,4 +1,4 @@
-/// <reference path="../../src/ts/virtual/node/.d.ts" />
+/// <reference path="../src/ts/virtual/node/.d.ts" />
 declare class ArrayEx<T> extends Array<T> {
     last(): T | undefined;
     clear(): void;
@@ -32,6 +32,8 @@ interface INode extends EventTarget {
     appendChild(newChild: INode): INode;
     removeChild(oldChild: INode): INode;
     cloneNode(deep?: boolean): INode;
+    toDOM(): Node;
+    insertBefore2(newChild: INode, refChild: INode): INode;
 }
 interface IElementTraversal {
     childElementCount: number;
@@ -361,6 +363,10 @@ interface IText extends ICharacterData {
 }
 interface IComment extends ICharacterData {
     textContent: string;
+    vmData?: {
+        part?: Part;
+        sign?: 0 | 1;
+    };
 }
 interface IHTMLCollection {
     /**
@@ -720,12 +726,16 @@ interface IHTMLScriptElement extends IHTMLElement {
 interface Object {
     __proto__: Object;
 }
-interface INode {
-    insertBefore2(newChild: INode, refChild: INode): INode;
-}
 interface Node {
-    beDOM(): Node;
+    toDOM(): Node;
     valueOf(): Node;
+    appendChild(newChild: INode): Node;
+}
+interface Comment {
+    vmData?: {
+        part?: Part;
+        sign?: 0 | 1;
+    };
 }
 declare let vNodesToDOM: (nodes: INode[]) => INode[];
 declare function insertNodesBefore(node: INode, nodes: INode[]): void;
@@ -894,7 +904,7 @@ interface ITreeEachReturn {
  * @param {(node:T,step?:ITreeEachStep)=>eTreeEach|undefined} fn 回调函数
  * @param {number} beginIndex 遍历起始位置
  */
-declare function treeEach<T>(array: T[] | IArray, propertyName: string, fn: (node: T, state: ITreeEachState<T>) => (eTreeEach | void), beginIndex?: number): ITreeEachReturn | undefined;
+declare function treeEach<T>(array: T[] | IArray | NodeList, propertyName: string, fn: (node: T, state: ITreeEachState<T>) => (eTreeEach | void), beginIndex?: number): ITreeEachReturn | undefined;
 declare namespace ComponentView {
     interface IProps {
     }
@@ -1138,9 +1148,9 @@ declare namespace VMDOM {
         abstract cloneNode(deep: boolean): VNode & IVNodeMethod;
         abstract toHTMLString(): string[];
         toJSString(space?: number): string;
-        beDOM(): Node;
-        protected doBeDOM(): Node;
-        private copyPropertyToNode(elem);
+        toDOM(): Node;
+        protected doToDOM(): Node;
+        protected copyPropertyToNode(elem: Node): void;
         /**与真实DOM交互 */
         protected connectParent<T extends IVNodeMethod>(this: VNode, elem: Node): void;
         protected createHomologyFunction(name: string): (this: VNode & IVNodeMethod) => any;
@@ -1240,7 +1250,7 @@ declare namespace VMDOM {
         insertBefore(newNode: VNode & IVNodeMethod, refChild: VNode & IVNodeMethod): VNode & IVNodeMethod;
         protected doAppendChild(vNode: VNode & IVNodeMethod): VNode & IVNodeMethod;
         protected doBaseToDOM(): HTMLElement;
-        protected doBeDOM(): Node;
+        protected doToDOM(): Node;
         toCreateJS(space?: number): string;
         childNodesToJS(space?: number): string;
         attributesToJS(): string;
@@ -1280,7 +1290,7 @@ declare namespace VMDOM {
         toCreateJS(space?: number): string;
         toJS(space?: number): string;
         toHTMLString(): string[];
-        protected doBeDOM(): Text;
+        protected doToDOM(): Text;
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation(): void;
     }
@@ -1305,9 +1315,10 @@ declare namespace VMDOM {
         toCreateJS(space?: number): string;
         toJS(space?: number): string;
         toHTMLString(): string[];
-        protected doBeDOM(): Comment;
+        protected doToDOM(): Comment;
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation(): void;
+        protected copyPropertyToNode(elem: Comment): void;
     }
 }
 interface IVNodeMethod {
@@ -2748,9 +2759,9 @@ declare function render(this: void, uiNode: IHTMLElement | null, outerChildNodes
 }): void;
 declare let elementParser: ElementParser;
 declare function initHTML(arr: INode[] | INodeList, outerChildNodes?: any, outerElement?: any, props?: any, part?: any): void;
-declare function getParts(childNodes: VMDOM.VNode[]): Part[];
+declare function getParts(childNodes: INode[] | NodeList): Part[];
 interface VNodeVMData {
-    sign: number;
+    sign?: 0 | 1;
     part: Part;
 }
 interface IPartRefs {

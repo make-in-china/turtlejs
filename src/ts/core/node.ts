@@ -1,16 +1,26 @@
 
 /// <reference path="../lib/lib.ts" />
-interface INode {
-    insertBefore2(newChild: INode, refChild: INode): INode;
-}
+
 interface Node {
     toDOM(): Node
     valueOf(): Node
+    appendChild(newChild:INode):Node;
 }
-typeof Node!=="undefined"&&(Node.prototype.toDOM =Node.prototype.valueOf = 
-    function () {
-        return this
-    });
+interface Comment{
+    vmData?:{
+        part?:Part;
+        sign?:0|1;
+    }
+}
+(function(){
+    let appendChild=Node.prototype.appendChild;
+    Node.prototype.appendChild =function(newChild:INode):Node {
+        return appendChild.call(this,newChild.toDOM());
+    }
+}());
+Node.prototype.toDOM =Node.prototype.valueOf = function () {
+    return this
+}
 let vNodesToDOM = function (nodes: INode[]) {
     return nodes
 }

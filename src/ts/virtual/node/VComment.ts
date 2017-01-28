@@ -63,10 +63,15 @@ namespace VMDOM{
         }
         protected doToDOM():Comment{
             let elem = document.createComment(this.data);
+            this.vmData.domNode = elem;
             return elem;
         }
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation():void{}
         
+        protected copyPropertyToNode(elem:Comment){
+            elem.vmData=this.vmData;
+            super.copyPropertyToNode(elem);
+        }
     }
 }

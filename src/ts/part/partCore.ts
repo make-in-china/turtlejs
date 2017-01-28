@@ -81,7 +81,6 @@ function setNodeProperty(node, proName, condition, outerChildNodes, outerElement
 function getTemplate(node: IHTMLElement): string {
     let nodeName = node.nodeName;
     if (templateConfig.hasOwnProperty(nodeName)) {
-        debugger;
         if (templateConfig[nodeName].hasOwnProperty('getData')) {
             return (<{getData(node:INode):string}>templateConfig[nodeName]).getData(node);
         } else {
@@ -617,11 +616,11 @@ function initHTML(arr: INode[]|INodeList, outerChildNodes?, outerElement?, props
         // }
     });
 }
-function getParts(childNodes: VMDOM.VNode[]): Part[] {
+function getParts(childNodes: INode[]|NodeList): Part[] {
     let child: Part[] = [];
     let cpn:Part|undefined;
     treeEach(childNodes, "childNodes", function (node) {
-        if (node.nodeType === 8 && node.vmData.part) {
+        if(isCommentNode(node)&&node.vmData&&node.vmData.part){
             let part=node.vmData.part;
             if (cpn) {
                 if ( part === cpn && node.vmData.sign === 0) {

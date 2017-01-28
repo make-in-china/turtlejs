@@ -124,7 +124,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
         return <any>document.scripts[document.scripts.length-1];
     }
     get rootParts(){
-        var t=getParts(<any>document.body.childNodes);
+        var t=getParts(document.body.childNodes);
         Object.defineProperty(t,"treeDiagram",{
             get :function(){
                 var tabSpace=0;

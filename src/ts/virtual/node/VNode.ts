@@ -197,9 +197,9 @@ namespace VMDOM{
             if (this.vmData.domNode) {
                 return this.vmData.domNode;
             }
+            debugger;
             let elem=this.doToDOM();
             this.copyPropertyToNode(elem);
-            this.vmData.domNode = elem;
             this.connectParent(elem);
             this.emulation();
             elem.__vdomNode__ = <any>this;
@@ -209,17 +209,16 @@ namespace VMDOM{
             let toHelp = document.createElement('__Turtle__');//用于创建
             toHelp.innerHTML = this.vmData.data;
             let elem = toHelp.removeChild(toHelp.childNodes[0]);
+            this.vmData.domNode = elem;
             return elem;
         }
-        private copyPropertyToNode(elem:Node){
-            debugger;
+        protected copyPropertyToNode(elem:Node){
+            
             for (let i in this) {
                 switch (i) {
                     case '__':
-                    case '__events__':
-                    case '__isClose__':
-                    case 'vmData.domNode':
-                    // case "__closeSelf__":
+                    case '__value__':
+                    case 'length':/**函数带有length */
                     case '__proto__':
                     case 'children':
                     case 'childNodes':
@@ -230,11 +229,14 @@ namespace VMDOM{
                     case "classList":
                     case "className":
                     case 'attributes':
+                    case 'vmData':
                         break;
                     default:
                         if (!this.hasOwnProperty(i)) {
                             continue;
                         }
+                        console.log(i);
+                        debugger;
                         let desc = Object.getOwnPropertyDescriptor(this, i);
                         if (desc) {
                             if (!(i in elem)) {

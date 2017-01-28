@@ -9,7 +9,7 @@
 /// <reference path="partCore.ts"/>
 
 interface VNodeVMData{
-    sign:number
+    sign?:0|1
     part:Part
 }
 
