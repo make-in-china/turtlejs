@@ -4,10 +4,10 @@ interface INode{
 }
 
 class Scope {
-    public __actionNode__:INode
-    public __parent__:Scope|null
-    public __children__:Scope[]=[]
-    public __proto__:Scope|null
+    __actionNode__:INode
+    __parent__:Scope|null
+    __children__:Scope[]=[]
+    __proto__:Scope|null
     constructor(commentNode:IComment,parent:Scope|null,public __name__?:string){
         let p=commentNode.parentNode;
         if(!p){
@@ -26,10 +26,11 @@ class Scope {
     }
 }
 class RootScope implements Scope{
-    public __actionNode__:INode
-    public __parent__:null=null
-    public __children__:Scope[]=[]
-    public __proto__:Scope|null
+    __actionNode__:INode
+    __parent__:null=null
+    __children__:Scope[]=[]
+    __proto__:Scope|null
+    __name__:undefined
     constructor(public document:INode){
         this.__actionNode__=document;
         document.__scope__=this;

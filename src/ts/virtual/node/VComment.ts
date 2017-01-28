@@ -61,7 +61,7 @@ namespace VMDOM{
             }
             return ret;
         }
-        protected doBeDOM():Comment{
+        protected doToDOM():Comment{
             let elem = document.createComment(this.data);
             return elem;
         }

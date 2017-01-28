@@ -193,11 +193,11 @@ namespace VMDOM{
         toJSString(space:number=0):string{
             return "$$$"+this.toJS(space).replace(/^\s*/,'');
         }
-        beDOM():Node{
+        toDOM():Node{
             if (this.vmData.domNode) {
                 return this.vmData.domNode;
             }
-            let elem=this.doBeDOM();
+            let elem=this.doToDOM();
             this.copyPropertyToNode(elem);
             this.vmData.domNode = elem;
             this.connectParent(elem);
@@ -205,7 +205,7 @@ namespace VMDOM{
             elem.__vdomNode__ = <any>this;
             return elem;
         }
-        protected doBeDOM(): Node{
+        protected doToDOM(): Node{
             let toHelp = document.createElement('__Turtle__');//用于创建
             toHelp.innerHTML = this.vmData.data;
             let elem = toHelp.removeChild(toHelp.childNodes[0]);
@@ -313,7 +313,7 @@ namespace VMDOM{
                     if (o === arguments[i]&&o instanceof VNode) {
                         toDOMs.push(o);
                         //转换为真实Node
-                        objects.push(o.beDOM());
+                        objects.push(o.toDOM());
                     }else{
                         objects.push(<any>o);
                     }

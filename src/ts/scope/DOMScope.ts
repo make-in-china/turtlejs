@@ -38,6 +38,7 @@ class DOMScope{
             if(nd.__scope__){
                 return nd.__scope__;
             }
+            
             nd=nd.parentNode;
         }
         return $rootScope;

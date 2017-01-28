@@ -133,11 +133,11 @@ namespace VMDOM{
             }
             return elem;
         }
-        protected doBeDOM(): Node {
+        protected doToDOM(): Node {
             let elem=this.doBaseToDOM();
             let chds = this.childNodes;
             for (let j = 0; j < chds.length; j++) {
-                (<VNode>chds[j]).beDOM();
+                (<VNode>chds[j]).toDOM();
             }
             return elem;
         }

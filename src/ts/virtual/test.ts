@@ -81,7 +81,7 @@ let VNodeXXX: IVNode =(function () {
         this.addEventListener = addEventListener
         this.removeEventListener = removeEventListener
         this.toJS = toJS
-        this.beDOM = beDOM
+        this.toDOM = toDOM
         // Object.defineProperty(this, 'outerHTML', {
         //     get: function (this:IVNode) {
         //         let
@@ -695,7 +695,7 @@ let VNodeXXX: IVNode =(function () {
         }
         return sBegin + sAttr + sInner + sEnd;
     }
-    function beDOM(this: IVNode): Node {
+    function toDOM(this: IVNode): Node {
         let elem: Node;
         let toHelp = document.createElement('__Turtle__');//用于创建VStyle和toDom支持
         let me = this;
@@ -795,7 +795,7 @@ let VNodeXXX: IVNode =(function () {
             } else {
                 let chds = this.childNodes;
                 for (let j = 0; j < chds.length; j++) {
-                    (<IVNode>chds[j]).beDOM();
+                    (<IVNode>chds[j]).toDOM();
                 }
             }
         }
@@ -834,7 +834,7 @@ let VNodeXXX: IVNode =(function () {
                 let o = arguments[i].valueOf();
                 if (o === arguments[i]) {
                     toDOMs.push(o);
-                    o = o.beDOM();
+                    o = o.toDOM();
                 }
                 objects.push(o);
 

@@ -4,10 +4,10 @@ interface INode {
     insertBefore2(newChild: INode, refChild: INode): INode;
 }
 interface Node {
-    beDOM(): Node
+    toDOM(): Node
     valueOf(): Node
 }
-typeof Node!=="undefined"&&(Node.prototype.beDOM =Node.prototype.valueOf = 
+typeof Node!=="undefined"&&(Node.prototype.toDOM =Node.prototype.valueOf = 
     function () {
         return this
     });

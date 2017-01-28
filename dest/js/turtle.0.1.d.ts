@@ -1,4 +1,4 @@
-/// <reference path="../src/ts/virtual/node/.d.ts" />
+/// <reference path="../../src/ts/virtual/node/.d.ts" />
 declare class ArrayEx<T> extends Array<T> {
     last(): T | undefined;
     clear(): void;
@@ -955,6 +955,7 @@ declare class RootScope implements Scope {
     __parent__: null;
     __children__: Scope[];
     __proto__: Scope | null;
+    __name__: undefined;
     constructor(document: INode);
 }
 declare class IAttr {

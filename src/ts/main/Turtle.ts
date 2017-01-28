@@ -151,7 +151,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
             vDOMs=vDOM;
         }else{
             vDOMs=[vDOM];
-            vDOM.beDOM
+            vDOM.toDOM
         }
         
         initHTML(vDOMs);    
@@ -159,13 +159,13 @@ class Turtle extends EventEmitterEx implements ITurtle{
         let p=tp.parentNode;
         let doms:INode[]=[]
         for(const node of vDOMs){
-            doms.push(node.beDOM());
+            doms.push(node.toDOM());
         }
         replaceNodeByNodes(tp,doms);
         // vDOM.__domNode__=p;debugger;
             // return;   
         // }
-        // replaceNodeByNodes(tp,takeChildNodes(vDOM.beDOM()));
+        // replaceNodeByNodes(tp,takeChildNodes(vDOM.toDOM()));
         //vDOM.innerHTML='';
     }
     renderDocument:IRenderDocument=()=>{

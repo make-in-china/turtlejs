@@ -67,7 +67,7 @@ namespace VMDOM{
         toHTMLString(): string[] {
             return [this.__value__];
         }
-        protected doBeDOM():Text{
+        protected doToDOM():Text{
             let elem:Text;
             if (this.data !== "") {
                 let toHelp = document.createElement('__Turtle__');//用于创建
