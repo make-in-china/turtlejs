@@ -6,12 +6,6 @@ interface Node {
     valueOf(): Node
     appendChild(newChild:INode):Node;
 }
-interface Comment{
-    vmData?:{
-        part?:Part;
-        sign?:0|1;
-    }
-}
 (function(){
     let appendChild=Node.prototype.appendChild;
     Node.prototype.appendChild =function(newChild:INode):Node {

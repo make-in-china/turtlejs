@@ -363,10 +363,6 @@ interface IText extends ICharacterData {
 }
 interface IComment extends ICharacterData {
     textContent: string;
-    vmData?: {
-        part?: Part;
-        sign?: 0 | 1;
-    };
 }
 interface IHTMLCollection {
     /**
@@ -730,12 +726,6 @@ interface Node {
     toDOM(): Node;
     valueOf(): Node;
     appendChild(newChild: INode): Node;
-}
-interface Comment {
-    vmData?: {
-        part?: Part;
-        sign?: 0 | 1;
-    };
 }
 declare let vNodesToDOM: (nodes: INode[]) => INode[];
 declare function insertNodesBefore(node: INode, nodes: INode[]): void;
@@ -1302,6 +1292,9 @@ declare function isVComment(node: VMDOM.VNode): node is VMDOM.VComment;
 interface VNodeVMData {
     /**是否有两个- */
     doubleMinus?: boolean;
+}
+interface Comment {
+    vmData?: VNodeVMData;
 }
 declare namespace VMDOM {
     class VComment extends VCharacterData {
@@ -2705,7 +2698,7 @@ declare class Config {
     debugMode: number;
 }
 interface ITurtle {
-    parts: IKeyArrayHashObject<Part>;
+    parts: IKeyArrayHashObject<Component.Part>;
 }
 declare var $t: Turtle;
 declare let operatorRE: RegExp;
@@ -2725,11 +2718,11 @@ declare function findTemplates(nodes: IHTMLElement[] | IArray): IElement[] | IAr
 /**
  * 加载UI
  */
-declare function importUI(uiName: string, uiSortPath: string): Part;
+declare function importUI(uiName: string, uiSortPath: string): Component.Part;
 /**从DOM树获取父组件
  * @param {}
  */
-declare function getParentPart(node: VMDOM.VNode): Part | null;
+declare function getParentPart(node: VMDOM.VNode): Component.Part | null;
 declare function parseAsync(node: IHTMLElement, outerChildNodes: any, outerElement: any, props: any, part: any): void;
 declare function parseLazy(node: IHTMLElement, outerChildNodes: any, outerElement: any, props: any, part: any): void;
 declare function getUIInfo(node: IHTMLElement): string | {
@@ -2759,68 +2752,79 @@ declare function render(this: void, uiNode: IHTMLElement | null, outerChildNodes
 }): void;
 declare let elementParser: ElementParser;
 declare function initHTML(arr: INode[] | INodeList, outerChildNodes?: any, outerElement?: any, props?: any, part?: any): void;
-declare function getParts(childNodes: INode[] | NodeList): Part[];
+declare function getParts(childNodes: INode[] | NodeList): Component.Part[];
 interface VNodeVMData {
     sign?: 0 | 1;
-    part: Part;
+    part: Component.Part;
 }
-interface IPartRefs {
-    [index: string]: INode | undefined;
-    resize?: IHTMLElement;
-    main?: IHTMLElement;
-    begin: VMDOM.VComment & IVNodeMethod;
-    end: VMDOM.VComment & IVNodeMethod;
+interface IComment {
+    vmData?: VNodeVMData;
 }
-declare abstract class Part extends EventEmitterEx {
-    partName: string;
-    props: Object;
-    dom: ComponentView.IView;
-    /**
-     * 是否已插入DOM
-     */
-    isInDOM: boolean;
-    /**
-     * 组件的方法属性
-     */
-    /** DOM节点存储数组 */
-    protected nodeStore: (VMDOM.VNode & IVNodeMethod)[];
-    /**节点命名空间 */
-    refs: IPartRefs;
-    /**资源路径 */
-    resPath: string;
-    /**resize事件管理器*/
-    $resize: EventHelper<(this: void, part: Part) => void, (this: void, part: Part) => boolean>;
-    /**init事件管理器 */
-    $init: EventHelper<(this: void, part: Part) => void, (this: void, part: Part) => boolean>;
-    /**insert事件管理器 */
-    $online: EventHelper<(this: void, part: Part, node: HTMLElement) => void, (this: void, part: Part, node: HTMLElement) => boolean>;
-    /**remove事件管理器 */
-    $offline: EventHelper<(this: void, part: Part) => void, (this: void, part: Part) => boolean>;
-    /**初始化对象 */
-    constructor(partName: string, dom: ComponentView.IView, props: Object, outerChildNodes?: INode[]);
-    /**即时子Part数组 */
-    readonly child: Part[];
-    /**子节点数目 */
-    readonly elementLength: number;
-    /**即时读取子节点 */
-    readonly elements: (VMDOM.VNode & IVNodeMethod)[];
-    /**读取父组件 */
-    readonly parent: Part;
-    /**读取组件下所有DOM节点 */
-    readonly innerHTML: string;
-    /**读取父节点 */
-    readonly elemParent: VMDOM.VNode & IVNodeMethod;
-    readonly scopeNodes: INode[];
-    /**获取组件区块（试验） */
-    /**设置组件宽高
-     * @param {ClientRect} rect 区块
-    */
-    size: ClientRect;
-    toString(): string;
-    treeDiagram(tabSpace: any): string;
-    insertTo(elem: HTMLElement): void;
-    insertBefore(elem: any): void;
-    remove(): void;
+interface Comment {
+    vmData?: VNodeVMData;
+}
+declare namespace Component {
+    interface IPartRefs {
+        [index: string]: INode | undefined;
+        resize?: IHTMLElement;
+        main?: IHTMLElement;
+        begin: VMDOM.VComment & IVNodeMethod;
+        end: VMDOM.VComment & IVNodeMethod;
+    }
+    abstract class Part extends EventEmitterEx {
+        partName: string;
+        props: Object;
+        dom: ComponentView.IView;
+        /**
+         * 是否已插入DOM
+         */
+        isInDOM: boolean;
+        /**
+         * 组件的方法属性
+         */
+        /** DOM节点存储数组 */
+        protected nodeStore: (VMDOM.VNode & IVNodeMethod)[];
+        /**节点命名空间 */
+        refs: IPartRefs;
+        /**资源路径 */
+        resPath: string;
+        /**resize事件管理器*/
+        $resize: EventHelper<(this: void, part: Part) => void, (this: void, part: Part) => boolean>;
+        /**init事件管理器 */
+        $init: EventHelper<(this: void, part: Part) => void, (this: void, part: Part) => boolean>;
+        /**insert事件管理器 */
+        $online: EventHelper<(this: void, part: Part, node: HTMLElement) => void, (this: void, part: Part, node: HTMLElement) => boolean>;
+        /**remove事件管理器 */
+        $offline: EventHelper<(this: void, part: Part) => void, (this: void, part: Part) => boolean>;
+        /**初始化对象 */
+        constructor(partName: string, dom: ComponentView.IView, props: Object, outerChildNodes?: INode[]);
+        /**即时子Part数组 */
+        readonly child: Part[];
+        /**子节点数目 */
+        readonly elementLength: number;
+        /**即时读取子节点 */
+        readonly elements: (VMDOM.VNode & IVNodeMethod)[];
+        /**读取父组件 */
+        readonly parent: Part;
+        /**读取组件下所有DOM节点 */
+        readonly innerHTML: string;
+        /**读取父节点 */
+        readonly elemParent: VMDOM.VNode & IVNodeMethod;
+        readonly scopeNodes: INode[];
+        /**获取组件区块（试验） */
+        /**设置组件宽高
+         * @param {ClientRect} rect 区块
+        */
+        size: ClientRect;
+        toString(): string;
+        treeDiagram(tabSpace: any): string;
+        insertTo(elem: HTMLElement): void;
+        insertBefore(elem: any): void;
+        remove(): void;
+    }
+    function register(part: {
+        new (...arg: any[]): Part;
+    }): void;
 }
 declare class ClientHelper {
     private data;
@@ -2854,7 +2858,7 @@ declare let log: Function;
  */
 declare let bp: Function;
 declare class UIList {
-    [index: string]: Part;
+    [index: string]: Component.Part;
 }
 interface IRenderDocument {
     (): void;
@@ -2870,7 +2874,7 @@ declare class Turtle extends EventEmitterEx implements ITurtle {
     readyByRenderDocument: Ready;
     /**error事件管理器*/
     $error: EventHelper<(this: void, event: any) => void, (this: void, event: any) => boolean>;
-    parts: IKeyArrayHashObject<Part>;
+    parts: IKeyArrayHashObject<Component.Part>;
     refs: IKeyArrayHashObject<IHTMLElement>;
     replaceClassStore: IHTMLElement[];
     defineClassNames: string[];
@@ -2880,7 +2884,7 @@ declare class Turtle extends EventEmitterEx implements ITurtle {
     getBind: typeof getBind;
     constructor();
     private getScriptNode();
-    readonly rootParts: Part[];
+    readonly rootParts: Component.Part[];
     emitResize(): void;
     renderTemplate(tp: IHTMLElement): void;
     renderDocument: IRenderDocument;

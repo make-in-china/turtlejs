@@ -371,10 +371,6 @@ interface IText extends ICharacterData {
 }
 interface IComment extends ICharacterData {
     textContent: string;
-    vmData?:{
-        part?:Part;
-        sign?:0|1;
-    }
 }
 interface IHTMLCollection {
     /**

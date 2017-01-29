@@ -39,7 +39,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
     $error                                  =this.getEventHelper<
                                                 (this:void,event:any)=>void,
                                                 (this:void,event:any)=>boolean>("error");
-    parts:IKeyArrayHashObject<Part>         ={}
+    parts:IKeyArrayHashObject<Component.Part>         ={}
     refs:IKeyArrayHashObject<IHTMLElement>  ={}
     // private fn                              ={}
     replaceClassStore:IHTMLElement[]        =[]

@@ -1,6 +1,7 @@
 
 /// <reference path="View.ts"/>
 namespace Component{
+    @register
     export class Button extends Part{
         constructor(
             public props:ComponentView.IButtonProps,

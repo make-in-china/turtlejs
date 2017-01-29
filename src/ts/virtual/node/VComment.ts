@@ -11,6 +11,9 @@ interface VNodeVMData{
     doubleMinus?:boolean;
 }
 
+interface Comment{
+    vmData?:VNodeVMData
+}
 namespace VMDOM{
     @register('#comment',ENodeType.Comment)
     export class VComment extends VCharacterData{

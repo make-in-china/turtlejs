@@ -10,7 +10,7 @@
 /// <reference path='../main/Config.ts'/>
 
 interface ITurtle{
-    parts:IKeyArrayHashObject<Part>;
+    parts:IKeyArrayHashObject<Component.Part>;
     // service:Service;
     // T:IHashObject<{
     //     prototype:Part
@@ -245,7 +245,7 @@ function importUI(uiName: string, uiSortPath: string){
 /**从DOM树获取父组件
  * @param {}
  */
-function getParentPart(node:VMDOM.VNode):Part|null{
+function getParentPart(node:VMDOM.VNode):Component.Part|null{
     while(1){
         if(node.previousSibling!==null){
             node=node.previousSibling;
@@ -616,9 +616,9 @@ function initHTML(arr: INode[]|INodeList, outerChildNodes?, outerElement?, props
         // }
     });
 }
-function getParts(childNodes: INode[]|NodeList): Part[] {
-    let child: Part[] = [];
-    let cpn:Part|undefined;
+function getParts(childNodes: INode[]|NodeList): Component.Part[] {
+    let child: Component.Part[] = [];
+    let cpn:Component.Part|undefined;
     treeEach(childNodes, "childNodes", function (node) {
         if(isCommentNode(node)&&node.vmData&&node.vmData.part){
             let part=node.vmData.part;
