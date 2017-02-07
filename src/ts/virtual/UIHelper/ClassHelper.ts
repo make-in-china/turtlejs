@@ -18,7 +18,7 @@ namespace UIHelper {
         return sAttr + s;
     }
     function initOrder(chds:VMDOM.VNode[] | IArray,path:string):boolean{
-        let isAllRun:b  oolean=true;
+        let isAllRun:boolean=true;
         treeEach(<VMDOM.VNode[]>chds, "childNodes", (node, state) => {
             if (node instanceof VMDOM.VComment) {
                 //解析注释里的命令
