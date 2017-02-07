@@ -143,19 +143,26 @@ namespace JS{
                     deleteSpace(keyWord,true);
                 }
             }else{
-                switch(keyWord){
-                    case " ":
-                    case "\r":
-                    case "\n":
-                    case "\t":
-                        chds.shift();
-                        i--;
-                        break;
+                if(isString(keyWord)&&isSpace(keyWord)){
+                    chds.shift();
+                    i--;
                 }
             }
         }
     }
-
+    export function isSpace(keyWord:string):boolean{
+        switch(keyWord){
+            case " ":
+                return true
+            case "\r":
+                return true
+            case "\n":
+                return true
+            case "\t":
+                return true
+        }
+        return false
+    }
 
 
 }

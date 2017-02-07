@@ -34,10 +34,9 @@ namespace Order {
 
     let
         subOrderNames:string[]=[],
-        subOrderRE:RegExp,//=/^\s*()(?:\s|$)/,// = /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
+        subOrderRE:RegExp,
         orderNames:string[]=[],
         orderRE:RegExp;
-        //if|while|for|switch|async|break|-|scope|content|elements|bind|!|let|=
     export function addSubOrderName(name:string){
         if(subOrderNames.indexOf(name)===-1){
             subOrderNames.push(name);
@@ -60,41 +59,34 @@ namespace Order {
 
     /**从VOrder中读取命令 */
     export function getOrderInfo(vOrder: VMDOM.VOrder): IOrderInfo | null {
-        let block=vOrder.block.clone();
-        let statements=block.children;
-        if(statements.length===0){
-            return null;
-        }
-        //无论是否有多个statement，order name 都只会出现在第一个statement里
-        let statement=statements[0];
-        let keyWords=statement.children;
-        
-        let keyWord=keyWords[0];
-        if(keyWords[0]===' '){
-            keyWords.shift();
-            keyWord=keyWords[0];
-        }
-        if(isString(keyWord)){
-            let order = keyWord.match(orderRE);
-            
-            if (order) {
-                keyWords.shift();
-                return { order: order[0], condition:block.innerText  }
-            } else {
-                let subOrder = keyWord.match(subOrderRE);
-                if (subOrder) {
-                    keyWords.shift();
-                    return { subOrder: subOrder[0], condition: block.innerText }
-                }
+
+        let name=vOrder.orderData.name;
+        let order = name.match(orderRE);
+
+        if (order) {
+            if(vOrder.orderData.condition){
+                return { order: order[0], condition: vOrder.orderData.condition.innerText }
+            }else{
+                return { order: order[0], condition: '' }
             }
         }
+
+        let subOrder = name.match(subOrderRE);
+        if (subOrder) {
+            if(vOrder.orderData.condition){
+                return { subOrder: subOrder[0], condition: vOrder.orderData.condition.innerText }
+            }else{
+                return { subOrder: subOrder[0], condition: '' }
+            }
+        }
+    
         return null;
     }
 
     export interface IOrderInfo {
         order?: string;
         subOrder?: string;
-        condition: string;
+        /*no name*/condition: string;
     }
     
     export interface IOrderConstructor {
@@ -109,6 +101,9 @@ namespace Order {
         return new RegExp("^\\s*("+names.join("|")+")(?:\\s*|$)");
     }
 
+    /**
+     * 注册Order到系统
+    */      
     export function register(order: IOrderConstructor) {
         let name:string=order.orderName.toLowerCase();
         orders[name] = order;
@@ -118,11 +113,12 @@ namespace Order {
             for(const subOrder of order.subOrder){
                 addSubOrderName(subOrder);
             }
-            // subOrderNames.push(order.subOrder.join("|"));
             subOrderRE=makeOrderRegExp(subOrderNames);
         }
     }
-    
+    /**
+     * 解析并渲染order
+     */
     export function parseOrder(this:void,node: VMDOM.VOrder): VOrder | undefined {
         let info = getOrderInfo(node);
         if (!info) {
@@ -135,6 +131,7 @@ namespace Order {
         if (!(orderName in orders)) {
             return;
         }
+        debugger;
         let order: VOrder = new orders[orderName](node, info.condition);
         return order;
     }

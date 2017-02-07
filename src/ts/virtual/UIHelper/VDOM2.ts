@@ -222,34 +222,85 @@ abstract class VDOM2 extends VDOM {
                         m.node(data, 3);
                     }
                 }
+                
                 //代码块
-                if(m.index<m.length-2&&html[m.index+1]==='{'){
+                switch(true){
+                    case m.index<m.length-2&&html[m.index+1]==='{':
+                        //@{js语句块}    
+                        m.index++;
+                        var {length,block}=JS.Parser.parseBlock(html,m.index);
+                        m.index+=length;
+                        
+                        var script=`Order.exec(this,'${block.toString()}')`;
+                        
+                        var scriptNode=$$$(script,ENodeType.Script);
+                        m.node.appendChild(scriptNode);
 
-                    m.index++;
-                    let {length,block}=JS.Parser.parseBlock(html,m.index);
-                    m.index+=length;
-                    
-                    let order=$$$(block,ENodeType.Order);
-                    m.node.appendChild(order);
+                        m.textNodeStart = m.index;
+                        return;
+                    case m.index<m.length-2&&html[m.index+1]==='@':
+                        //@@order;
+                        //@@order();
+                        //@@order   ();
+                        m.index+=2;
+                        var {length,statement}=JS.Parser.parseStatement(html,m.index);
+                        m.index+=length;
+                        
+                        let count:number=2;
+                        let chds=statement.children;
+                        if(chds.length<count){
+                            throw new Error("错误的Order语句：语句不完整，缺少';'");
+                        }
+                        let itm=chds[0];
+                        if(!isString(itm)){
+                            throw new Error("错误的Order语句：'"+itm+"'应该为Order Name");
+                        }
+                        let name=itm;
+                        let idx=1;
+                        itm=chds[idx];
+                        if(isString(itm)&&JS.isSpace(itm)){
+                            idx++;
+                            count++;
+                            if(chds.length<count){
+                                throw new Error("错误的Order语句：语句不完整，缺少';'");
+                            }
+                            itm=chds[idx];
+                        }
+                        let condition:JS.JavaScriptBlock|undefined;
+                        if(itm instanceof JS.JavaScriptBlock){
+                            idx++;
+                            count++;
+                            if(chds.length<count){
+                                throw new Error("错误的Order语句：语句不完整，缺少';'");
+                            }
+                            condition=itm;
+                        }
 
-                    m.textNodeStart = m.index;
-                    break;
-                }else{
-                    //寻找执行体
-                    m.index++;
-                    let {length,statement}=JS.Parser.parseStatement(html,m.index);
-                    m.index+=length;
-                    //@js语句
-                    //@order
-                    //@scope
+                        if(!isString(itm)||itm!==';'){
+                            //order;
+                            throw new Error("错误的Order语句：语句不完整，缺少';'");
+                        }
 
-                    
-                    let script=`Order.exec(this,'${statement.toString()}')`;
-                    
-                    let scriptNode=$$$(script,ENodeType.Script);
-                    m.node.appendChild(scriptNode);
+                        m.node.appendChild($$$(new VMDOM.VOrderData(name,condition),ENodeType.Order));
 
-                    m.textNodeStart = m.index;
+                        m.textNodeStart = m.index;
+                        return;
+                    default:
+                        //寻找执行体
+                        m.index++;
+                        var {length,statement}=JS.Parser.parseStatement(html,m.index);
+                        m.index+=length;
+                        //@js语句
+                                                
+
+                        
+                        var script=`Order.exec(this,'${statement.toString()}')`;
+                        
+                        var scriptNode=$$$(script,ENodeType.Script);
+                        m.node.appendChild(scriptNode);
+
+                        m.textNodeStart = m.index;
+
 
                 }
             default:

@@ -1,13 +1,14 @@
 ﻿
 var gulp = require('gulp');
-gulp.task('default', function () {
+gulp.task('ui:w', function () {
     var fork=require('child_process').fork;
     var task=fork('gulp.uiWatch.ts');
     task.on("message",function(e){
         console.log(e);
     });
 });
-gulp.task('tsc',function(){
+//virtual
+gulp.task('vm',function(){
     var fs=require('fs');
     var moment=require('moment');
     var sourcemaps = require('gulp-sourcemaps');
@@ -32,7 +33,8 @@ gulp.task('tsc',function(){
 
 });
 
-gulp.task('tsc2',function(){
+//turtle
+gulp.task('turtle',function(){
     var fs=require('fs');
     var moment=require('moment');
     var sourcemaps = require('gulp-sourcemaps');
@@ -54,4 +56,21 @@ gulp.task('tsc2',function(){
          tsResult.dts.pipe(gulp.dest('dest'))])   ;
          
 
+});
+gulp.task('default',function(){
+    console.log(`任务列表：
+    project   创建工程
+        name  工程名
+    ui:w      监视ui工程
+    tsc       构建turtle.js
+    tsc2      构建 uihealper.js`);
+});
+gulp.task('project',function(){
+    var args=process.argv.slice(3);
+    var UIHelper=require('./dest/virtual/UIHelper.0.1.js').UIHelper;
+    for(const arg of args){
+        let name=arg.replace(/^\-/,'');
+        let path='src/ui/'+name;
+        UIHelper.buildProject(name,path);
+    }
 });

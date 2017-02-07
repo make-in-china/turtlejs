@@ -789,6 +789,9 @@ interface Constructor {
 }
 declare function extend<T>(elem: T, elemEx: any): T;
 declare function merge<T>(elem: T, elemEx: any): T;
+interface Function {
+    name: string;
+}
 declare function removeItem<T>(arr: {
     [index: number]: T;
     length: number;
@@ -2718,7 +2721,7 @@ declare function findTemplates(nodes: IHTMLElement[] | IArray): IElement[] | IAr
 /**
  * 加载UI
  */
-declare function importUI(uiName: string, uiSortPath: string): Component.Part;
+declare function importUI(uiName: string, uiSortPath: string): UIPathSpace;
 /**从DOM树获取父组件
  * @param {}
  */
@@ -2824,6 +2827,7 @@ declare namespace Component {
     }
     function register(part: {
         new (...arg: any[]): Part;
+        name: string;
     }): void;
 }
 declare class ClientHelper {
@@ -2857,8 +2861,21 @@ declare let log: Function;
  * 可躲过一些js压缩库debugger;
  */
 declare let bp: Function;
+declare class UIPathSpace {
+    path: string;
+    constructor(path: string);
+    list: {
+        resPath: string;
+        name: string;
+        part: typeof Component.Part;
+    }[];
+}
 declare class UIList {
-    [index: string]: Component.Part;
+    [index: string]: UIPathSpace;
+    static push(uiList: UIList, sortPath: string, path: string, part: {
+        new (...arg: any[]): Component.Part;
+        name: string;
+    }): void;
 }
 interface IRenderDocument {
     (): void;

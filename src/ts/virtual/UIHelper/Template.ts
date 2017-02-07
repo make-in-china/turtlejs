@@ -3,15 +3,37 @@ namespace UIHelper{
     
 
     export function getScriptString(className:string){
-        return `namespace ComponentScript{
+        return `/// <reference path="Class.ts"/>
+namespace ComponentScript{
     export class ${className}{
         constructor(part:Component.${className}){
+            //todo:这里填写组件代码
         }
     }
 }`
     }
 
     
+
+    export function getClassString(className:string){
+        return `/// <reference path="View.ts"/>
+
+//本模块由引擎生成，请勿手动修改此文件
+//生成时间:${(new Date()).toString()}
+
+namespace Component{
+    @register
+    export class ${className} extends Part{
+        constructor(
+            public props:ComponentView.I${className}Props,
+            public outerChildNodes?:INode[]
+        ) {
+            super("${className.toLowerCase()}",new ComponentView.${className},props,outerChildNodes);
+            new ComponentScript.${className}(this);
+        }
+    }
+}`
+    }
     export function getViewString(className:string,propertyInfo:string,varInfo:string,domInitScript:string,scripts:string,props:string,defaultValuesInfo:string){
         return `/// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
 
@@ -34,25 +56,13 @@ ${scripts!==''?`
     ${scripts}`:''}
 }`
     }
-
-    export function getClassString(className:string){
-        return `/// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
-/// <reference path="./Script.ts"/>
-
-//本模块由引擎生成，请勿手动修改此文件
-//生成时间:${(new Date()).toString()}
-
-namespace Component{
-    export class ${className} extends Part{
-        partName="${className.toLowerCase()}"
-        constructor(
-            public props:ComponentView.I${className}Props,
-            public outerChildNodes:INode[]
-        ) {
-            super(new ComponentView.${className},props,outerChildNodes);
-            new ComponentScript.${className}(this);
-        }
+    export function getViewPropertyInfoString(topsType:string[]){
+        return `tops:[${topsType.join('\n,')}]=<any>[];`
     }
-}`
+    export function getViewInitDOMString(topsJS:string[]){
+        return `
+            push.call(this.tops=<any>[],<(VMDOM.VNode&IVNodeMethod)>
+                    ${topsJS.join(',\n                    <(VMDOM.VNode&IVNodeMethod)>')}
+            );`
     }
 }

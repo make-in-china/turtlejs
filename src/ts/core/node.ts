@@ -6,19 +6,18 @@ interface Node {
     valueOf(): Node
     appendChild(newChild:INode):Node;
 }
-(function(){
+typeof Node!=='undefined'&&(function(){
     let appendChild=Node.prototype.appendChild;
     Node.prototype.appendChild =function(newChild:INode):Node {
         return appendChild.call(this,newChild.toDOM());
     }
+    Node.prototype.toDOM =Node.prototype.valueOf = function () {
+        return this
+    }
 }());
-Node.prototype.toDOM =Node.prototype.valueOf = function () {
-    return this
-}
 let vNodesToDOM = function (nodes: INode[]) {
     return nodes
 }
-
 function insertNodesBefore(node: INode, nodes:INode[]) {
     let parent = node.parentNode;
     if (parent == null) {

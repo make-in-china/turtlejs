@@ -213,13 +213,13 @@ function findTemplates(nodes: IHTMLElement[] | IArray): IElement[] | IArray {
  * 加载UI
  */
 function importUI(uiName: string, uiSortPath: string){
-
+    
     if (!$t.T.hasOwnProperty(uiName)) {
         let uiPath = baseUIPath.getPathBySortPath(uiSortPath);
-        let path=uiPath + '/' + (uiName + '.html').toLowerCase();
+        let path=uiPath + '/' + (uiName + '/index.js').toLowerCase();
         //加载js
-        $t.T[uiName]=require(path);
-        debugger;
+        return ($t.T[uiName]=require(path));
+        
         // $t.xhr.get(path, false, function (text: string) {
         //     parseUITemplate(uiName, uiSortPath, uiPath, text);
         // });
@@ -282,7 +282,7 @@ function parseLazy(node: IHTMLElement, outerChildNodes, outerElement, props, par
     node.removeAttribute('lazy');
     initHTML(node.childNodes, outerChildNodes, outerElement, props, part);
 }
-function getUIInfo(node: IHTMLElement) {
+function getUIInfo(node: IHTMLElement|VMDOM.VHtmlElement) {
     let nodeName = node.nodeName;
     if (nodeName === 'SCRIPT' && getAttr(node, 'type') === 'ui') {
         return node.getAttribute('name').toLowerCase();

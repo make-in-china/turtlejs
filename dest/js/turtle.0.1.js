@@ -29,15 +29,15 @@ var ArrayEx = (function (_super) {
 }(Array));
 /// <reference path="../lib/ArrayEx.ts"/>
 /// <reference path="../lib/lib.ts" />
-(function () {
+typeof Node !== 'undefined' && (function () {
     var appendChild = Node.prototype.appendChild;
     Node.prototype.appendChild = function (newChild) {
         return appendChild.call(this, newChild.toDOM());
     };
+    Node.prototype.toDOM = Node.prototype.valueOf = function () {
+        return this;
+    };
 }());
-Node.prototype.toDOM = Node.prototype.valueOf = function () {
-    return this;
-};
 var vNodesToDOM = function (nodes) {
     return nodes;
 };
@@ -6564,7 +6564,7 @@ var Component;
     }(EventEmitterEx));
     Component.Part = Part;
     function register(part) {
-        debugger;
+        UIList.push($t.T, "", "", part);
     }
     Component.register = register;
 })(Component || (Component = {}));
@@ -6712,9 +6712,31 @@ var log = Function('s', 'console.log(s)');
  * 可躲过一些js压缩库debugger;
  */
 var bp = Function('debugger');
+var UIPathSpace = (function () {
+    function UIPathSpace(path) {
+        this.path = path;
+    }
+    return UIPathSpace;
+}());
 var UIList = (function () {
     function UIList() {
     }
+    UIList.push = function (uiList, sortPath, path, part) {
+        if (sortPath === void 0) { sortPath = 'ui'; }
+        var uiPathSpace;
+        if (sortPath in uiList) {
+            uiPathSpace = uiList[sortPath];
+        }
+        else {
+            uiList[sortPath] = uiPathSpace = new UIPathSpace(path);
+        }
+        var name = part.name.toLowerCase();
+        uiPathSpace.list.push({
+            resPath: path + '/' + name + '.res',
+            name: name,
+            part: part
+        });
+    };
     return UIList;
 }());
 /// <reference path="../core/Node.ts"/>

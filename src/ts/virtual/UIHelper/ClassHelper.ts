@@ -1,5 +1,6 @@
 
 /// <reference path='../../part/PartParam.ts'/>
+/// <reference path='PartCore.ts'/>
 namespace UIHelper {
 
     
@@ -16,7 +17,8 @@ namespace UIHelper {
         }
         return sAttr + s;
     }
-    function initOrder(chds:VMDOM.VNode[] | IArray,path:string){
+    function initOrder(chds:VMDOM.VNode[] | IArray,path:string):boolean{
+        let isAllRun:b  oolean=true;
         treeEach(<VMDOM.VNode[]>chds, "childNodes", (node, state) => {
             if (node instanceof VMDOM.VComment) {
                 //解析注释里的命令
@@ -32,6 +34,7 @@ namespace UIHelper {
                             //order达成运行所需条件，运行
                             order.run();
                         } else {
+                            isAllRun=false;
                             //order未达成运行所需条件，转换为VScript节点
                             OrderEx.toScriptNode(order);
                         }
@@ -42,11 +45,29 @@ namespace UIHelper {
                 return eTreeEach.c_noIn;
             }
         });
+        return isAllRun;
     }
-    function initRefInfo(chds:VMDOM.VNode[] | IArray,props:string[],defaultValues:string[],refInfo:RefInfo,scripts: VMDOM.VScript[]){
+    function getVMUIInfo(node: VMDOM.VHtmlElement) {
+        let nodeName = node.nodeName;
+        // if (nodeName === 'SCRIPT' && getAttr(node, 'type') === 'ui') {
+        //     return node.getAttribute('name').toLowerCase();
+        // } else 
+        if (nodeName.indexOf(':')!==-1) {
+            let uiInfo = nodeName.split(':');
+            let sortPath = uiInfo[0].toLowerCase();
+            if (baseUIPath.hasSortPath(sortPath)) {
+                return { sortPath: sortPath, name: uiInfo[1].toLowerCase() };
+            }
+        }
+    }
+    
+    function init_Ref_Part_Info(chds:VMDOM.VNode[] | IArray,props:string[],defaultValues:string[],refInfo:RefInfo,scripts: VMDOM.VScript[]){
         treeEach(<VMDOM.VNode[]>chds, "childNodes", (node, state) => {
 
             if (node instanceof VMDOM.VHtmlElement) {
+                
+
+                //预执行指令
                 let directives=node.vmData.directives;
                 if(directives){
                     for(const directive of directives){
@@ -58,6 +79,36 @@ namespace UIHelper {
                         }
                     }
                 }
+
+                //pre 解析组件
+
+                //解析组件
+                let uiInfo = getVMUIInfo(node);
+                if (uiInfo) {
+                    renderVMComponent(node,null,uiInfo);
+                    
+                    // partName = takeAttr(node, 'p-name');
+
+
+                    // reExtends = takeAttr(node, 're-extends');
+
+                    // outerChildNodes = slice.call(node.childNodes);
+                    // outerElement = slice.call(node.children);
+                    // let chds = node.childNodes;
+                    // for (let i = chds.length; i > 0; i--) {
+                    //     node.removeChild(<INode>chds[0]);
+                    // }
+                    
+                    // cpn = ui.render(node, node.parentNode, outerChildNodes, outerElement, null, part, partName, reExtends);
+                    // if (cpn) {
+                    //     step.next = cpn.elementLength;
+                    // }
+                    return eTreeEach.c_noIn | eTreeEach.c_noRepeat;
+                }
+
+
+                //after 解析组件
+
                 //解析ref
                 let v = node.getAttribute("ref");
                 if (v) {
@@ -156,6 +207,8 @@ namespace UIHelper {
         }
     }
     let nameMatch=/[\s\S]*[\/\\](.*?)[\/\\].*?$/;
+
+    /**生成Class.ts代码文件 */
     export function makeClass(this: void, path: string, className?: string) {
         if (!className) {
             className = path.match(nameMatch)[1];
@@ -175,16 +228,17 @@ namespace UIHelper {
             chds = dom.childNodes;
             tops = [dom];
         }
-
-        initOrder(chds,path);
-
+    //1.初始化 Order
+        let isAllRun=initOrder(chds,path);
+        
         let refInfo = new RefInfo;
         let scripts: VMDOM.VScript[] = [];
         let paramInfos:PartParam[]=[];
         let props:string[]=[];
         let defaultValues:string[]=[];
         
-        initRefInfo(chds,props,defaultValues,refInfo,scripts);
+    //2.初始化  ref
+        init_Ref_Part_Info(chds,props,defaultValues,refInfo,scripts);
 
         let scriptFunctions: string = scriptsToString(scripts);
         
@@ -195,7 +249,6 @@ namespace UIHelper {
         //替换节点为mem
         replaceToMember(refInfo,propertys,names,vars,propertyInitScript);
 
-        
         let topsJS: string[] = [];
         let topsType: string[] = [];
         for (const top of tops) {
@@ -209,17 +262,17 @@ namespace UIHelper {
         }
 
         if (topsJS.length > 0) {
-            propertys.push('tops:[' + topsType.join('\n,') + '];');
-            domInitScript += `
-            push.call(this.tops=<any>[],<(VMDOM.VNode&IVNodeMethod)>
-                    ${topsJS.join(',\n                    <(VMDOM.VNode&IVNodeMethod)>')}
-            );`;
+            propertys.push(getViewPropertyInfoString(topsType));
+            domInitScript += getViewInitDOMString(topsJS);
         }
         let propertyInfo: string = propertys.join(';\n        ');
         let varInfo: string = vars.join(';\n            ');
         let propsInfo:string=props.join('\n        ');
         let defaultValuesInfo:string=defaultValues.join(',');
-        fs.writeFileSync(path.replace(/View\.html$/, 'View.ts'), getViewString(className, propertyInfo, varInfo, domInitScript, scriptFunctions,propsInfo,defaultValuesInfo));
+        fs.writeFileSync(
+            path.replace(/View\.html$/, 'View.ts'), 
+            getViewString(className, propertyInfo, varInfo, domInitScript, scriptFunctions,propsInfo,defaultValuesInfo)
+        );
 
         //mixin .css  to  变量
     }

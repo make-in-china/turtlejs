@@ -43,15 +43,6 @@ function uibuildTs(path){
 
     UIHelper.makeClass(path);
 }
-function buildProjects(event){
-    var args=process.argv.slice(3);
-    var UIHelper=require('./dest/virtual/UIHelper.0.1.js').UIHelper;
-    for(const arg of args){
-        let name=arg.replace(/^\-/,'');
-        let path='src/ui/'+name;
-        UIHelper.buildProject(name,path);
-    }
-}
 
 // gulp.task('tsc2', tsc2);
 // gulp.task('tscui',tscui);    

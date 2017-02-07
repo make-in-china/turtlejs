@@ -58,7 +58,9 @@ function merge<T>(elem:T,elemEx:any):T{
     }
     return elem;
 }
-
+interface Function{
+    name:string
+}
 function removeItem<T>(arr:{
     [index:number]:T
     length:number
