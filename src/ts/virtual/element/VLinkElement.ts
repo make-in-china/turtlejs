@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({disabled:'',href:'',crossOrigin:'',rel:'',media:'',hreflang:'',type:'',charset:'',rev:'',target:'',integrity:''})
     export class  VLinkElement extends VHtmlElement{
-        nodeName="LINK";
+        nodeName:"LINK"="LINK";
         disabled:string
         href:string
         crossOrigin:string

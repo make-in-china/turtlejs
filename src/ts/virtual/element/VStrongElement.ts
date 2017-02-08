@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VStrongElement extends VHtmlElement{
-        nodeName="STRONG"
+        nodeName:"STRONG"="STRONG"
         title:string
         lang:string
         accessKey:string

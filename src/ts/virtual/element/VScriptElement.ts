@@ -7,7 +7,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({src:'',type:'',charset:'',async:'',defer:'',crossOrigin:'',event:'',integrity:''})
     export class  VScriptElement extends VHtmlElement{
-        nodeName="SCRIPT";
+        nodeName:"SCRIPT"="SCRIPT";
         src:string
         type:string
         charset:string

@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({width:'',height:''})
     export class  VCanvasElement extends VHtmlElement{
-        nodeName="CANVAS";
+        nodeName:"CANVAS"="CANVAS";
         width:string
         height:string
         

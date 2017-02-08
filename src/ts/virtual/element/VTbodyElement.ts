@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({align:'',vAlign:''})
     export class  VTbodyElement extends VHtmlElement{
-        nodeName="TBODY";
+        nodeName:"TBODY"="TBODY";
         align:string
         vAlign:string
         

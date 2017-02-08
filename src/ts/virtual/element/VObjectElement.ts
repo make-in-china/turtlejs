@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({type:'',name:'',useMap:'',width:'',height:'',align:'',archive:'',code:'',standby:'',codeType:'',border:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VObjectElement extends VHtmlElement{
-        nodeName="OBJECT"
+        nodeName:"OBJECT"="OBJECT"
         type:string
         name:string
         useMap:string

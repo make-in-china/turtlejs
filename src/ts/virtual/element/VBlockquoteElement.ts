@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({cite:''})
     export class  VBlockquoteElement extends VHtmlElement{
-        nodeName="BLOCKQUOTE";
+        nodeName:"BLOCKQUOTE"="BLOCKQUOTE";
         cite:string
         
     }

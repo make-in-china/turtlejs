@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({align:''})
     export class  VLegendElement extends VHtmlElement{
-        nodeName="LEGEND";
+        nodeName:"LEGEND"="LEGEND";
         align:string
         
     }

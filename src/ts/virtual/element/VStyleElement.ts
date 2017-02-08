@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({media:'',type:''})
     export class  VStyleElement extends VHtmlElement{
-        nodeName="STYLE";
+        nodeName:"STYLE"="STYLE";
         media:string
         type:string
         

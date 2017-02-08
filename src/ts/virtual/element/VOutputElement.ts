@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({name:''})
     export class  VOutputElement extends VHtmlElement{
-        nodeName="OUTPUT";
+        nodeName:"OUTPUT"="OUTPUT";
         name:string
         
     }

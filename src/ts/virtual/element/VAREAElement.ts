@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({alt:'',coords:'',shape:'',target:'',ping:'',noHref:'',href:''})
     export class  VAreaElement extends VHtmlElement{
-        nodeName="AREA";
+        nodeName:"AREA"="AREA";
         alt:string
         coords:string
         shape:string

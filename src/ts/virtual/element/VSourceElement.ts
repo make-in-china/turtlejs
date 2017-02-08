@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({src:'',type:'',srcset:'',sizes:'',media:''})
     export class  VSourceElement extends VHtmlElement{
-        nodeName="SOURCE";
+        nodeName:"SOURCE"="SOURCE";
         src:string
         type:string
         srcset:string

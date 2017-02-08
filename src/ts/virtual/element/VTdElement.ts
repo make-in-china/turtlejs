@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({colSpan:'',rowSpan:'',headers:'',align:'',axis:'',height:'',width:'',noWrap:'',vAlign:'',bgColor:'',abbr:'',scope:''})
     export class  VTdElement extends VHtmlElement{
-        nodeName="TD";
+        nodeName:"TD"="TD";
         colSpan:string
         rowSpan:string
         headers:string

@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({align:'',color:'',noShade:'',size:'',width:''})
     export class VHrElement extends VHtmlElement{
-        nodeName="HR";
+        nodeName:"HR"="HR";
         align:string
         color:string
         noShade:string

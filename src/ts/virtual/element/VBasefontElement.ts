@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VBasefontElement extends VHtmlElement{
-        nodeName="BASEFONT"
+        nodeName:"BASEFONT"="BASEFONT"
         title:string
         lang:string
         accessKey:string

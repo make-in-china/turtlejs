@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({alt:'',src:'',srcset:'',sizes:'',crossOrigin:'',useMap:'',isMap:'',width:'',height:'',name:'',lowsrc:'',align:'',hspace:'',vspace:'',longDesc:'',border:''})
     export class  VImgElement extends VHtmlElement{
-        nodeName="IMG";
+        nodeName:"IMG"="IMG";
         alt:string
         src:string
         srcset:string

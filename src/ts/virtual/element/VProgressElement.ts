@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({value:'',max:''})
     export class  VProgressElement extends VHtmlElement{
-        nodeName="PROGRESS";
+        nodeName:"PROGRESS"="PROGRESS";
         value:string
         max:string
         

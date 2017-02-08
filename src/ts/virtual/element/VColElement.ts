@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({span:'',align:'',vAlign:'',width:''})
     export class  VColElement extends VHtmlElement{
-        nodeName="COL";
+        nodeName:"COL"="COL";
         span:string
         align:string
         vAlign:string

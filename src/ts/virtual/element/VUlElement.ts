@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({compact:'',type:''})
     export class  VUlElement extends VHtmlElement{
-        nodeName="UL";
+        nodeName:"UL"="UL";
         compact:string
         type:string
     }

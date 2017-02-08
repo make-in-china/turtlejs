@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({target:'',download:'',ping:'',rel:'',hreflang:'',type:'',coords:'',charset:'',name:'',rev:'',shape:'',href:''})
     export class VAElement extends VHtmlElement{
-        nodeName="A"
+        nodeName:"A"="A"
         target:string
         download:string
         ping:string

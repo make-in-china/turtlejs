@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({clear:''})
     export class  VBrElement extends VHtmlElement{
-        nodeName="BR";
+        nodeName:"BR"="BR";
         clear:string;
         constructor(){
             super();

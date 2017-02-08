@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({width:'',height:'',poster:''})
     export class  VVideoElement extends VHtmlElement{
-        nodeName="VIDEO";
+        nodeName:"VIDEO"="VIDEO";
         width:string
         height:string
         poster:string

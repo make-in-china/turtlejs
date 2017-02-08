@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({formTarget:'',name:'',value:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VButtonElement extends VHtmlElement{
-        nodeName="BUTTON"
+        nodeName:"BUTTON"="BUTTON"
         formTarget:string
         name:string
         value:string

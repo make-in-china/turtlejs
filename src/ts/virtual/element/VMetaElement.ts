@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({name:'',content:'',scheme:''})
     export class  VMetaElement extends VHtmlElement{
-        nodeName="META";
+        nodeName:"META"="META";
         name:string
         content:string
         scheme:string

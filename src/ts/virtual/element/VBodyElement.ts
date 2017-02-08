@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({text:'',link:'',vLink:'',aLink:'',bgColor:'',background:''})
     export class  VBodyElement extends VHtmlElement{
-        nodeName="BODY";
+        nodeName:"BODY"="BODY";
         text:string
         link:string
         vLink:string

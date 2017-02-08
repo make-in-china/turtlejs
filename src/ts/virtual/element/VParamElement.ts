@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({name:'',value:'',type:'',valueType:''})
     export class  VParamElement extends VHtmlElement{
-        nodeName="PARAM";
+        nodeName:"PARAM"="PARAM";
         name:string
         value:string
         type:string

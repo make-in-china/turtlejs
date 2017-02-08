@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({href:'',target:''})
     export class  VBaseElement extends VHtmlElement{
-        nodeName="BASE";
+        nodeName:"BASE"="BASE";
         href:string
         target:string
         constructor(){

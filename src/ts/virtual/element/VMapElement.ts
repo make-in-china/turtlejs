@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({name:''})
     export class  VMapElement extends VHtmlElement{
-        nodeName="MAP";
+        nodeName:"MAP"="MAP";
         name:string
         
         constructor(){

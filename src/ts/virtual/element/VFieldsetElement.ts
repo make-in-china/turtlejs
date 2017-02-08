@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({disabled:'',name:''})
     export class  VFieldsetElement extends VHtmlElement{
-        nodeName="FIELDSET"
+        nodeName:"FIELDSET"="FIELDSET"
         disabled:string
         name:string
         

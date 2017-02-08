@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({align:''})
     export class  VH4Element extends VHtmlElement{
-        nodeName="H4";
+        nodeName:"H4"="H4";
         align:string
         
     }

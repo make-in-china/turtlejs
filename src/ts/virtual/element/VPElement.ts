@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({align:''})
     export class  VPElement extends VHtmlElement{
-        nodeName="P";
+        nodeName:"P"="P";
         align:string
         
     }

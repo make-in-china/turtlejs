@@ -5,7 +5,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({name:'',scrolling:'',frameBorder:'',marginHeight:'',marginWidth:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
     export class VFrameElement extends VHtmlElement{
-        nodeName="FRAME"
+        nodeName:"FRAME"="FRAME"
         name:string
         scrolling:string
         frameBorder:string

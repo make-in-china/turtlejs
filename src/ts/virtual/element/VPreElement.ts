@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({width:''})
     export class  VPreElement extends VHtmlElement{
-        nodeName="PRE";
+        nodeName:"PRE"="PRE";
         width:string
         
     }

@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({autofocus:'',challenge:'',disabled:'',keytype:'',name:''})
     export class  VKeygenElement extends VHtmlElement{
-        nodeName="KEYGEN";
+        nodeName:"KEYGEN"="KEYGEN";
         autofocus:string
         challenge:string
         disabled:string

@@ -6,7 +6,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @mergeClass({width:''})
     export class  VXmpElement extends VHtmlElement{
-        nodeName="XMP";
+        nodeName:"XMP"="XMP";
         width:string
     }
     
