@@ -642,20 +642,25 @@ declare namespace ComponentView {
     }
     interface IView {
         tops?: (VMDOM.VNode & IVNodeMethod)[];
-        initDOM(props: IProps): void;
+        initDOM(props: IProps, nodes?: (VMDOM.VNode & IVNodeMethod)[]): void;
     }
 }
+declare class BasePath {
+    paths: {
+        [index: string]: string;
+    };
+    /**
+     * 解析UIPath字符串
+     * @param {string} s 格式为: {name:'path'}[,{name:'path'}]
+     */
+    push(s: string): boolean;
+    hasSortPath(sortPath: string): boolean;
+    toString(): string;
+}
+declare let baseUIPath: BasePath;
 declare class NameItem {
     constructor(name: string);
     name: string;
-}
-declare class BasePath {
-    private paths;
-    push(v: string | Array<string>): void;
-    parseUIPath(s: string): void;
-    getPathBySortPath(sortPath: any): any;
-    hasSortPath(sortPath: any): boolean;
-    toString(): string;
 }
 declare class TemplateConfig {
     [index: string]: Object;
@@ -679,7 +684,6 @@ declare class TemplateConfig {
     findByString(str: string): RegExpMatchArray | undefined;
 }
 declare let templateConfig: TemplateConfig;
-declare let baseUIPath: BasePath;
 interface INode {
     __scope__?: Scope;
 }
@@ -1072,6 +1076,12 @@ declare namespace VMDOM {
         toJS(): string;
         protected emulation(): void;
         toHTMLString(): string[];
+    }
+}
+declare function isVHTMLUnknownElement(node: VMDOM.VNode): node is VMDOM.VHTMLUnknownElement;
+declare namespace VMDOM {
+    class VHTMLUnknownElement extends VHtmlElement {
+        constructor(nodeName: string);
     }
 }
 interface IVNodeMethod {
@@ -2403,27 +2413,6 @@ declare class XHR {
     post(url: string, data: string, async: boolean, fn: (s: string) => void, fnerror?: (this: XMLHttpRequest, ev?: ErrorEvent) => any): void;
 }
 declare let includeJSFiles: (files: string | string[], callback?: () => void) => void;
-declare namespace _util {
-    const DI_TARGET = "$di$target";
-    const DI_DEPENDENCIES = "$di$dependencies";
-    function getServiceDependencies(ctor: any): {
-        id: ServiceIdentifier<any>;
-        index: number;
-        optional: boolean;
-    }[];
-}
-declare function storeServiceDependency(id: Function, target: Function, index: number, optional: boolean): void;
-/**
- * A *only* valid way to create a {{ServiceIdentifier}}.
- */
-declare function createDecorator<T>(serviceId: string): {
-    (...args: any[]): void;
-    type: T;
-};
-interface ServiceIdentifier<T> {
-    (...args: any[]): void;
-    type: T;
-}
 interface ITurtle {
     store: Store;
 }
@@ -2442,17 +2431,42 @@ declare class Config {
     baseServicePath: string;
     debugMode: number;
 }
-interface ITurtle {
-    parts: IKeyArrayHashObject<Component.Part>;
+declare class UIPathSpace {
+    [index: string]: {
+        path: string;
+        resPath: string;
+        part: {
+            new (props: ComponentView.IProps | null, outerChildNodes?: INode[]): Component.Part;
+        };
+    };
 }
-declare var $t: Turtle;
-declare let operatorRE: RegExp;
+declare class UIList {
+    [index: string]: UIPathSpace;
+    static push(uiList: UIList, sortPath: string, path: string, part: {
+        new (props: ComponentView.IProps | null, outerChildNodes?: INode[]): Component.Part;
+        name: string;
+    }): void;
+}
 interface ITurtle {
+    loadJS(path: string | string[], variable?: string): any;
+}
+declare let loadJS: (path: string | string[], variable?: string) => any;
+interface Window {
+    ActiveXObject?: Object;
+}
+interface Node {
+    insertBefore2<T extends INode | Node>(newNode: T, node?: T): T;
+}
+declare let isIE: boolean;
+interface ITurtle {
+    T: UIList;
     xhr: XHR;
     refs: IKeyArrayHashObject<IHTMLElement>;
     replaceClassStore: IHTMLElement[];
     defineClassNames: string[];
 }
+declare var $t: ITurtle;
+declare let operatorRE: RegExp;
 declare function replaceCls(): void;
 declare function getScopeBy(scope: any, node: INode): any;
 declare function setNodeProperty(node: any, proName: any, condition: any, outerChildNodes: any, outerElement: any, props: any, part: any): void;
@@ -2463,7 +2477,11 @@ declare function findTemplates(nodes: IHTMLElement[] | IArray): IElement[] | IAr
 /**
  * 加载UI
  */
-declare function importUI(uiName: string, uiSortPath: string): UIPathSpace;
+declare function importUI(uiName: string, uiSortPath: string): {
+    path: string;
+    resPath: string;
+    part: new (props: ComponentView.IProps, outerChildNodes?: INode[]) => Component.Part;
+};
 /**从DOM树获取父组件
  * @param {}
  */
@@ -2515,7 +2533,7 @@ declare namespace Component {
     }
     abstract class Part extends EventEmitterEx {
         partName: string;
-        props: Object;
+        props: ComponentView.IProps;
         dom: ComponentView.IView;
         /**
          * 是否已插入DOM
@@ -2539,7 +2557,7 @@ declare namespace Component {
         /**remove事件管理器 */
         $offline: EventHelper<(this: void, part: Part) => void, (this: void, part: Part) => boolean>;
         /**初始化对象 */
-        constructor(partName: string, dom: ComponentView.IView, props: Object, outerChildNodes?: INode[]);
+        constructor(partName: string, dom: ComponentView.IView, props: ComponentView.IProps, nodes?: (VMDOM.VNode & IVNodeMethod)[]);
         /**即时子Part数组 */
         readonly child: Part[];
         /**子节点数目 */
@@ -2564,10 +2582,6 @@ declare namespace Component {
         insertBefore(elem: any): void;
         remove(): void;
     }
-    function register(part: {
-        new (...arg: any[]): Part;
-        name: string;
-    }): void;
 }
 declare class ClientHelper {
     private data;
@@ -2600,22 +2614,6 @@ declare let log: Function;
  * 可躲过一些js压缩库debugger;
  */
 declare let bp: Function;
-declare class UIPathSpace {
-    path: string;
-    constructor(path: string);
-    list: {
-        resPath: string;
-        name: string;
-        part: typeof Component.Part;
-    }[];
-}
-declare class UIList {
-    [index: string]: UIPathSpace;
-    static push(uiList: UIList, sortPath: string, path: string, part: {
-        new (...arg: any[]): Component.Part;
-        name: string;
-    }): void;
-}
 interface IRenderDocument {
     (): void;
     beginTime?: Date;
@@ -2638,6 +2636,7 @@ declare class Turtle extends EventEmitterEx implements ITurtle {
     url: string;
     isCompile: boolean;
     getBind: typeof getBind;
+    loadJS: (path: string | string[], variable?: string) => any;
     constructor();
     private getScriptNode();
     readonly rootParts: Component.Part[];
@@ -2648,5 +2647,5 @@ declare class Turtle extends EventEmitterEx implements ITurtle {
     private r2();
     ready(fn: () => void): this;
 }
-declare var $t: Turtle;
-declare let turtle: Turtle;
+declare var $t: ITurtle;
+declare let turtle: ITurtle;

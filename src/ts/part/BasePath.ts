@@ -4,39 +4,43 @@
 class BasePath{
     paths:{
         [index:string]:string
-    }={ui:'ui'};
-    push(v:string|Array<string>):boolean{
-        if(isString(v)){
-            return this.parseUIPath(v);    
-        }else if(isArray(v)){
-            for(var i=0;i<v.length;i++){
-                if(isString(v[i])){
-                    if(!this.parseUIPath(v[i])){
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }else{
-            return false;
-        }
-    }
+    }={};
+    
+    // push(path:string):boolean{
+    //     if(isString(path)){
+    //         return this.parseUIPath(path);    
+    //     }else if(isArray(path)){
+    //         for(var i=0;i<path.length;i++){
+    //             if(isString(path[i])){
+    //                 if(!this.parseUIPath(path[i])){
+    //                     return false;
+    //                 }
+    //             }
+    //         }
+    //         return true;
+    //     }else{
+    //         return false;
+    //     }
+    // }
     /**
      * 解析UIPath字符串
-     * @param {string} s 格式为:{name:'',path:''}
+     * @param {string} s 格式为: {name:'path'}[,{name:'path'}]
      */
-    parseUIPath(s:string):boolean{
+    push(s:string):boolean{
         try{
             var o=exec('('+s+')');
-            if(isObject(o)&&o.hasOwnProperty('name')&&o.hasOwnProperty('path')){
-                this.paths[o.name]=o;
-                // this.push(o);
-                return true;
+            for(var name in o){
+                this.paths[name]=o[name];
             }
+            // if(isObject(o)&&o.hasOwnProperty('name')&&o.hasOwnProperty('path')){
+            //     this.paths[o.name]=o.path;
+            //     // this.push(o);
+            //     return true;
+            // }
         }catch(e){
-            
+            return false
         }
-        return false;
+        return true;
     }
     hasSortPath(sortPath:string){
         return this.paths.hasOwnProperty(sortPath);

@@ -1,6 +1,6 @@
 
 /// <reference path='../../part/PartParam.ts'/>
-/// <reference path='PartCore.ts'/>
+/// <reference path='PartHelper.ts'/>
 namespace UIHelper {
 
     
@@ -55,9 +55,10 @@ namespace UIHelper {
         if (nodeName.indexOf(':')!==-1) {
             let uiInfo = nodeName.split(':');
             let sortPath = uiInfo[0].toLowerCase();
-            
             if (baseUIPath.hasSortPath(sortPath)) {
                 return { sortPath: sortPath, name: uiInfo[1].toLowerCase() };
+            }else{
+                throw new Error('无法识别组件：'+sortPath+':'+uiInfo[1]);
             }
         }
     }
@@ -86,7 +87,7 @@ namespace UIHelper {
                     //解析组件
                     let uiInfo = getVMUIInfo(node);
                     if (uiInfo) {
-                        renderVMComponent(node,null,uiInfo,scripts);
+                        renderVMComponent(node,uiInfo,scripts);
                         
                         // partName = takeAttr(node, 'p-name');
 
@@ -125,7 +126,6 @@ namespace UIHelper {
 
     //获取vscript.toFunction
     function scriptsToString(scripts: VMDOM.VScript[]){
-        debugger;
         let scriptFunctions:string='';
         let functionHash:{[index:string]:VMDOM.VScript}={}
         let index=0;
@@ -214,6 +214,7 @@ namespace UIHelper {
 
     /**生成Class.ts代码文件 */
     export function makeClass(this: void, path: string, className?: string) {
+        baseUIPath.push('{ui:"ui"}');
         if (!className) {
             className = path.match(nameMatch)[1];
         }

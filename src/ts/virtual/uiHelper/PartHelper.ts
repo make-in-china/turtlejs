@@ -21,9 +21,6 @@
 function renderVMComponent(
         this:void,
         node:VMDOM.VHTMLUnknownElement,
-        // outerChildNodes: INode[], 
-        // outerElement: IHTMLCollection,
-        props:ComponentView.IProps|null,
         uiInfo: string | {
             sortPath: string;
             name: string;
@@ -39,11 +36,36 @@ function renderVMComponent(
             name=uiInfo.name;
             sortPath=uiInfo.sortPath;
         }
+        let attrs=node.attributes;
+        let len=attrs.length;
+        let props:string;
+        if(len>0){
 
+            let propsArr:string[]=[];
+            for(let i=0;i<len;i++){
+                propsArr.push(`'${attrs[i].name}':'${attrs[i].value}'`);
+            }
+            props=`{${propsArr.join(',')}}`;
+        }else{
+            props='null';
+        }
+
+        let childNodes:string[]=[];
+
+        let nodes:(VMDOM.VNode&IVNodeMethod[])[]=<any>takeChildNodes(node);
+
+        for(let i=0;i<nodes.length;i++){
+            childNodes.push('$$$'+nodes[i].toJS());
+        }
+        let strChildNodes:string;
+        if(childNodes.length===0){
+            strChildNodes='undefined';
+        }else{
+            strChildNodes=`[${childNodes.join(',')}]`;
+        }
         //加载js,并创建组件
         let js=`
-        let view=new Component['${sortPath}:${name}'](${JSON.stringify(props)});
-        view.insertBefore(this);
+        new (importUI('${name}','${sortPath}').part)(${props},${strChildNodes}).insertBefore(this);
         this.remove();`
         let script=$$$(js,ENodeType.Script);
         replaceNodeByNode(node,script);
@@ -52,15 +74,6 @@ function renderVMComponent(
 
         //检验ui是否可以预渲染
         
-
-        // if (!UI) {
-        //     if(uiNode){
-        //         removeNode(uiNode);
-        //     }
-        //     throw new Error(name + '组件不存在！');
-        // }
-        // let ui=new UI({},outerChildNodes,outerElement);  
-
         // if(props===null){
         //     props={};
         // }

@@ -14,6 +14,8 @@
 /// <reference path='../part/store.ts'/>
 /// <reference path='../virtual/Include.ts'/>
 /// <reference path='../part/uiList.ts'/>
+/// <reference path='LoadJS.ts'/>
+/// <reference path="../core/BrowserHelper.ts"/>
 
 interface IRenderDocument{
     ():void;
@@ -48,6 +50,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
     url:string
     isCompile:boolean;/**未使用 */
     getBind                                 =getBind
+    loadJS                                  =loadJS
     constructor(){
         super();
         this.$error.on((e)=>{
@@ -68,9 +71,9 @@ class Turtle extends EventEmitterEx implements ITurtle{
         this.turtleScriptElement=scriptNode;
         //初始化组件配置
         if(baseuipath){
-            baseUIPath.push(baseuipath.split(";"));
+            baseUIPath.push(baseuipath);
         }else{
-            baseUIPath.push('{path:"ui",name:"ui"}');
+            baseUIPath.push('{ui:"ui"}');
         }
         // if(isExtend){
         //     extend(window,this.fn);
@@ -275,4 +278,5 @@ class Turtle extends EventEmitterEx implements ITurtle{
         }
         return this;
     }
+    
 }

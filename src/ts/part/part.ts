@@ -20,7 +20,7 @@ interface Comment{
     vmData?:VNodeVMData
 }
 namespace Component{
-
+    
     export interface IPartRefs {
         [index: string]: INode | undefined
         resize?: IHTMLElement
@@ -33,7 +33,7 @@ namespace Component{
         /**
          * 是否已插入DOM
          */
-        isInDOM: boolean;
+        isInDOM: boolean=false;
         /**
          * 组件的方法属性
          */
@@ -73,12 +73,11 @@ namespace Component{
             (this: void, part: Part) => boolean>("offline");
 
         /**初始化对象 */
-        constructor(public partName:string/*组件名*/,dom:ComponentView.IView,public props: Object, outerChildNodes?: INode[]) {
-            
-            // constructor(public template: PartTemplate, extPart: Part | undefined, public props: Object, html: string, outerChildNodes: INodeArray, outerElement: IHTMLCollection) {
+        constructor(public partName:string/*组件名*/,dom:ComponentView.IView,public props: ComponentView.IProps,nodes?: (VMDOM.VNode&IVNodeMethod)[]) {
             super();
+            
             this.dom=dom;
-            this.dom.initDOM(props);
+            this.dom.initDOM(props,nodes);
             // this.$ = new Service(template.service);
             // if(extPart){
             //     /**继承 */
@@ -88,23 +87,22 @@ namespace Component{
             //     this.super=extPart;
             // }
             
-            let nodes = this.dom.tops;
+            let topNodes = this.dom.tops;
             
-            let outerElement: INode[]=<any>[];
-            if(outerChildNodes){
-                
-                for(let node of outerChildNodes){
-                    if(node.nodeType===1){
-                        outerElement.push(<IHTMLElement>node);
+            let outerElement: (VMDOM.VHtmlElement&IVNodeMethod)[]=<any>[];
+            if(nodes){
+                for(let node of nodes){
+                    if(isVHTMLElement(node)){
+                        outerElement.push(node);
                     }
                 }
             }else{
-                outerChildNodes=[];
+                nodes=[];
             }
-            if(nodes){
-                initHTML(nodes, outerChildNodes, outerElement, props, this);
-                for (let i = nodes.length; i > 0; i--) {
-                    this.nodeStore.push(nodes[0]);
+            if(topNodes){
+                initHTML(topNodes, nodes, outerElement, props, this);
+                for (let i = topNodes.length; i > 0; i--) {
+                    this.nodeStore.push(topNodes[0]);
                 }    
             }
             let name = this.partName;
@@ -113,7 +111,6 @@ namespace Component{
             end.vmData.part=begin.vmData.part=this;
             begin.vmData.sign=1;
             end.vmData.sign=0;
-            // end.__part__ = begin.__part__ = this;
 
             this.refs = {
                 begin: begin,
@@ -129,12 +126,12 @@ namespace Component{
             // this.basePart.isInDOM=false;
 
 
-            // initHTML(nodes, outerChildNodes, outerElement, props, this);
+            // initHTML(nodes, nodes, outerElement, props, this);
             // if(extPart){
             //     (<ExtendsPart>extPart).to(this);
             // }
             let store = this.nodeStore;
-            push.apply(store, <any>nodes);
+            // push.apply(store, <any>nodes);  ?这里是bug
             // for (let i = nodes.length; i > 0; i--) {
             //     dom.removeChild(nodes[0]);
             // }

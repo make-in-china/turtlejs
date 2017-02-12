@@ -6,9 +6,9 @@
 class Label extends Component.Part{
     constructor(
         public props:ILabelProps,
-        public outerChildNodes?:INode[]
+        public outerChildNodes?:(VMDOM.VNode&IVNodeMethod)[]
     ) {
         super("label",new LabelView,props,outerChildNodes);
-        new LabelScript(this);
+        initLabel(this);
     }
 }

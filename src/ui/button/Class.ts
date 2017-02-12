@@ -6,7 +6,7 @@
 class Button extends Component.Part{
     constructor(
         public props:IButtonProps,
-        public outerChildNodes?:INode[]
+        public outerChildNodes?:(VMDOM.VNode&IVNodeMethod)[]
     ) {
         super("button",new ButtonView,props,outerChildNodes);
         initButton(this);

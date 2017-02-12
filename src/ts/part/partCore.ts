@@ -3,17 +3,21 @@
 /// <reference path='../virtual/order/VOrder.ts'/>
 /// <reference path='../core/XHR.ts'/>
 /// <reference path='../virtual/Include.ts'/>
-/// <reference path='../lib/instantiation.ts'/>
 /// <reference path='../lib/treeEach.ts'/>
 /// <reference path='Part.ts'/>
 /// <reference path='Store.ts'/>
 /// <reference path='../main/Config.ts'/>
 /// <reference path="UIList.ts"/>
+/// <reference path="../main/LoadJS.ts"/>
 
 interface ITurtle{
-    parts:IKeyArrayHashObject<Component.Part>;
+    // parts:IKeyArrayHashObject<Component.Part>;
     // service:Service;
     T:UIList
+    xhr: XHR;
+    refs: IKeyArrayHashObject<IHTMLElement>;
+    replaceClassStore:IHTMLElement[];
+    defineClassNames:string[];
 }
 declare var $t:ITurtle;
 let
@@ -27,12 +31,6 @@ let
 //     (name: string, nodeType?: 8): IComment
 //     (name: string, nodeType?: number): INode | null
 // }
-interface ITurtle {
-    xhr: XHR;
-    refs: IKeyArrayHashObject<IHTMLElement>;
-    replaceClassStore:IHTMLElement[];
-    defineClassNames:string[];
-}
 function replaceCls(){
     // let arr=$t.replaceClassStore;
     // for(let i=0;i<arr.length;i++){
@@ -210,19 +208,14 @@ function findTemplates(nodes: IHTMLElement[] | IArray): IElement[] | IArray {
 /**
  * 加载UI
  */
-function importUI(uiName: string, uiSortPath: string):UIPathSpace{
-    
+function importUI(uiName: string, uiSortPath: string){
     if (!$t.T.hasOwnProperty(uiName)) {
         let uiPath = baseUIPath.paths[uiSortPath];
         let path=uiPath + '/' + (uiName + '/index.js').toLowerCase();
-
         //加载js
-        require(path);
-        // $t.xhr.get(path, false, function (text: string) {
-        //     parseUITemplate(uiName, uiSortPath, uiPath, text);
-        // });
+        UIList.push($t.T,uiSortPath,'',$t.loadJS(path,uiName[0].toUpperCase()+uiName.substr(1)));
     }
-    return $t.T[uiName];
+    return $t.T[uiSortPath][uiName];
 }
 
 // function getExtends(extName, sortPath) {
@@ -561,7 +554,7 @@ let elementParser = new ElementParser;
 // let attributeParser = new AttributeParser;
 function initHTML(arr: INode[]|INodeList, outerChildNodes?, outerElement?, props?, part?) {
     treeEach(arr, 'childNodes', function (node: IHTMLElement, step) {
-        if (node instanceof VMDOM.VComment) {
+        if (node instanceof VMDOM.VComment&&node.vmData.sign===undefined) {
             let order = Order.parseComment(node);
             if (order && order.run) {
                 order.run();

@@ -1,13 +1,4 @@
-class UIPathSpace{
-    constructor(
-        public path:string){
-    }
-    list:{
-        resPath:string
-        name:string,
-        part:typeof Component.Part
-    }[]
-}
+/// <reference path="UIPathSpace.ts"/>
 class UIList{
     [index:string]:UIPathSpace
     static push(
@@ -15,7 +6,7 @@ class UIList{
         sortPath:string='ui',
         path:string,
         part:{
-            new (...arg:any[]): Component.Part
+            new (props:ComponentView.IProps|null,outerChildNodes?:INode[]): Component.Part
             name:string
         }
     ){
@@ -23,13 +14,13 @@ class UIList{
         if(sortPath in uiList){
             uiPathSpace=uiList[sortPath];
         }else{
-            uiList[sortPath]=uiPathSpace=new UIPathSpace(path);
+            uiList[sortPath]=uiPathSpace=new UIPathSpace();
         }
         let name=part.name.toLowerCase();
-        uiPathSpace.list.push({
+        uiPathSpace[name]={
+            path:path,
             resPath:path+'/' + name + '.res',
-            name:name,
             part:part
-        });
+        };
     }
 }

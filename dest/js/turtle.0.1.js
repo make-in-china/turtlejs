@@ -758,39 +758,47 @@ function treeEach(array, propertyName, fn, beginIndex) {
     }
     return { stack: stack, return: ret, array: arr, index: i };
 }
-var NameItem = (function () {
-    function NameItem(name) {
-        this.name = name;
-    }
-    return NameItem;
-}());
+/// <reference path='../lib/Is.ts'/>
 var BasePath = (function () {
     function BasePath() {
         this.paths = {};
     }
-    BasePath.prototype.push = function (v) {
-        if (isString(v)) {
-            this.parseUIPath(v);
-        }
-        else if (isArray(v)) {
-            for (var i = 0; i < v.length; i++) {
-                if (isString(v[i])) {
-                    this.parseUIPath(v[i]);
-                }
+    // push(path:string):boolean{
+    //     if(isString(path)){
+    //         return this.parseUIPath(path);    
+    //     }else if(isArray(path)){
+    //         for(var i=0;i<path.length;i++){
+    //             if(isString(path[i])){
+    //                 if(!this.parseUIPath(path[i])){
+    //                     return false;
+    //                 }
+    //             }
+    //         }
+    //         return true;
+    //     }else{
+    //         return false;
+    //     }
+    // }
+    /**
+     * 解析UIPath字符串
+     * @param {string} s 格式为: {name:'path'}[,{name:'path'}]
+     */
+    BasePath.prototype.push = function (s) {
+        try {
+            var o = exec('(' + s + ')');
+            for (var name in o) {
+                this.paths[name] = o[name];
             }
+            // if(isObject(o)&&o.hasOwnProperty('name')&&o.hasOwnProperty('path')){
+            //     this.paths[o.name]=o.path;
+            //     // this.push(o);
+            //     return true;
+            // }
         }
-    };
-    BasePath.prototype.parseUIPath = function (s) {
-        // try{
-        var o = exec('(' + s + ')');
-        if (isObject(o) && o.hasOwnProperty('name') && o.hasOwnProperty('path')) {
-            this.paths[o.name] = o;
-            this.push(o);
+        catch (e) {
+            return false;
         }
-        // }catch(e){_catch(e);}
-    };
-    BasePath.prototype.getPathBySortPath = function (sortPath) {
-        return this.paths[sortPath].path;
+        return true;
     };
     BasePath.prototype.hasSortPath = function (sortPath) {
         return this.paths.hasOwnProperty(sortPath);
@@ -798,11 +806,19 @@ var BasePath = (function () {
     BasePath.prototype.toString = function () {
         var arr = [];
         for (var i in this.paths) {
-            arr.push("{name:'" + this.paths[i].name + "',path:'" + this.paths[i].path + "'}");
+            arr.push("{name:'" + i + "',path:'" + this.paths[i] + "'}");
         }
         return arr.join(';');
     };
     return BasePath;
+}());
+var baseUIPath = new BasePath;
+/// <reference path='BasePath.ts'/>
+var NameItem = (function () {
+    function NameItem(name) {
+        this.name = name;
+    }
+    return NameItem;
 }());
 var TemplateConfig = (function () {
     function TemplateConfig() {
@@ -866,7 +882,6 @@ var TemplateConfig = (function () {
     return TemplateConfig;
 }());
 var templateConfig = new TemplateConfig;
-var baseUIPath = new BasePath;
 var Scope = (function () {
     function Scope(commentNode, parent, __name__) {
         this.__name__ = __name__;
@@ -1507,7 +1522,7 @@ var VMDOM;
                     return p;
                 }
                 else {
-                    throw new Error("parentNode is Null");
+                    return this;
                 }
             },
             enumerable: true,
@@ -1829,22 +1844,6 @@ var VMDOM;
     }
     VMDOM.getFunctionComment = getFunctionComment;
 })(VMDOM || (VMDOM = {}));
-// bindClassToFunction2Helper["#documenttype"]=bindClassToFunctionHelper[ENodeType.DocumentType]=function(node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-//     node.__proto__=VMDOM.VDocumentType.prototype;
-//     VMDOM.VDocumentType.call(node);
-// }
-// bindClassToFunction2Helper["#comment"]=bindClassToFunctionHelper[ENodeType.Comment]=function(node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-//     node.__proto__=VMDOM.VComment.prototype;
-//     VMDOM.VComment.call(node,nodeName);
-// }
-// bindClassToFunction2Helper["#text"]=bindClassToFunctionHelper[ENodeType.Text]=function(node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-//     node.__proto__=VMDOM.VText.prototype;
-//     VMDOM.VText.call(node,nodeName);
-// }
-// bindClassToFunction2Helper["#document"]=bindClassToFunctionHelper[ENodeType.Document]=function(node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-//     node.__proto__=VMDOM.VDocument.prototype;
-//     VMDOM.VDocument.call(node);
-// }
 function bindClassToFunction(node, nodeName, nodeType) {
     if (nodeType !== undefined) {
         var fn = VMDOM.bindClassToFunctionHelper[nodeType];
@@ -1869,12 +1868,19 @@ function bindClassToFunction(node, nodeName, nodeType) {
                 VMDOM[name_3].call(node);
             }
             else {
-                throw new Error("unknown nodeName:" + nodeName);
+                var fn = VMDOM.bindClassToFunctionHelper["-1"];
+                if (fn) {
+                    fn(node, nodeName);
+                    return '';
+                }
+                else {
+                    throw new Error("unknown:\n        nodeName:" + nodeName + "  ,nodeType:" + nodeType);
+                }
             }
         }
     }
     else {
-        throw new Error("unknown nodeType:" + nodeType);
+        throw new Error("unknown:\n        nodeName:" + nodeName + "  ,nodeType:" + nodeType);
     }
 }
 function getVNodeMethod() {
@@ -2618,6 +2624,26 @@ var VMDOM;
         VMDOM.register('#document', 9 /* Document */)
     ], VDocument);
     VMDOM.VDocument = VDocument;
+})(VMDOM || (VMDOM = {}));
+/// <reference path='VHtmlElement.ts'/>
+function isVHTMLUnknownElement(node) {
+    return node instanceof VMDOM.VHTMLUnknownElement;
+}
+var VMDOM;
+(function (VMDOM) {
+    var VHTMLUnknownElement = (function (_super) {
+        __extends(VHTMLUnknownElement, _super);
+        function VHTMLUnknownElement(nodeName) {
+            var _this = _super.call(this) || this;
+            _this.nodeName = nodeName.toUpperCase();
+            return _this;
+        }
+        return VHTMLUnknownElement;
+    }(VMDOM.VHtmlElement));
+    VHTMLUnknownElement = __decorate([
+        VMDOM.register('#htmlunknownelement', -1)
+    ], VHTMLUnknownElement);
+    VMDOM.VHTMLUnknownElement = VHTMLUnknownElement;
 })(VMDOM || (VMDOM = {}));
 var VMDOM;
 (function (VMDOM) {
@@ -3957,6 +3983,7 @@ var VMDOM;
 /// <reference path='../node/VComment.ts'/>
 /// <reference path='../node/VDocumentType.ts'/>
 /// <reference path='../node/VDocument.ts'/>
+/// <reference path='../node/VHTMLUnknownElement.ts'/>
 /// <reference path='../element/VAElement.ts'/>
 /// <reference path='../element/VAreaElement.ts'/>
 /// <reference path='../element/VBaseElement.ts'/>
@@ -5552,37 +5579,6 @@ var includeJSFiles = (function () {
         includeJSFile(includeTask);
     };
 }());
-var _util;
-(function (_util) {
-    _util.DI_TARGET = '$di$target';
-    _util.DI_DEPENDENCIES = '$di$dependencies';
-    function getServiceDependencies(ctor) {
-        return ctor[_util.DI_DEPENDENCIES] || [];
-    }
-    _util.getServiceDependencies = getServiceDependencies;
-})(_util || (_util = {}));
-function storeServiceDependency(id, target, index, optional) {
-    if (target[_util.DI_TARGET] === target) {
-        target[_util.DI_DEPENDENCIES].push({ id: id, index: index, optional: optional });
-    }
-    else {
-        target[_util.DI_DEPENDENCIES] = [{ id: id, index: index, optional: optional }];
-        target[_util.DI_TARGET] = target;
-    }
-}
-/**
- * A *only* valid way to create a {{ServiceIdentifier}}.
- */
-function createDecorator(serviceId) {
-    var id = function (target, key, index) {
-        if (arguments.length !== 3) {
-            throw new Error('@IServiceName-decorator can only be used to decorate a parameter');
-        }
-        storeServiceDependency(id, target, index, false);
-    };
-    id.toString = function () { return serviceId; };
-    return id;
-}
 /// <reference path='../lib/lib.ts'/>
 var Store = (function () {
     function Store() {
@@ -5628,29 +5624,156 @@ var Config = (function () {
     }
     return Config;
 }());
+var UIPathSpace = (function () {
+    function UIPathSpace() {
+    }
+    return UIPathSpace;
+}());
+/// <reference path="UIPathSpace.ts"/>
+var UIList = (function () {
+    function UIList() {
+    }
+    UIList.push = function (uiList, sortPath, path, part) {
+        if (sortPath === void 0) { sortPath = 'ui'; }
+        var uiPathSpace;
+        if (sortPath in uiList) {
+            uiPathSpace = uiList[sortPath];
+        }
+        else {
+            uiList[sortPath] = uiPathSpace = new UIPathSpace();
+        }
+        var name = part.name.toLowerCase();
+        uiPathSpace[name] = {
+            path: path,
+            resPath: path + '/' + name + '.res',
+            part: part
+        };
+    };
+    return UIList;
+}());
+var loadJS = (function () {
+    var requireHash = {};
+    var RequireFile = (function () {
+        function RequireFile(file) {
+            this.file = file;
+            this.injectInvoke = Function(file + ";\n    return function(s){\n        return eval('('+s+')');\n    };\n    ")();
+        }
+        return RequireFile;
+    }());
+    return function (path, variable) {
+        if (isArray(path)) {
+            var key = path.join(",");
+            if (requireHash.hasOwnProperty(key)) {
+                return requireHash[key].injectInvoke(variable);
+            }
+            else {
+                var codes_1 = "";
+                for (var i = 0; i < path.length; i++) {
+                    $t.xhr.get(path[i], false, function (s) {
+                        codes_1 += "\r\n" + s;
+                    });
+                }
+                var requireFile = requireHash[key] = new RequireFile(codes_1);
+                return requireFile.injectInvoke(variable);
+                ;
+            }
+        }
+        else {
+            if (requireHash.hasOwnProperty(path)) {
+                return requireHash[path].injectInvoke(variable);
+            }
+            else {
+                var something_1;
+                $t.xhr.get(path, false, function (s) {
+                    var requireFile = requireHash[path] = new RequireFile(s);
+                    something_1 = requireFile.injectInvoke(variable);
+                });
+                return something_1;
+            }
+        }
+    };
+})();
+var isIE;
+try {
+    isIE = !!(typeof window !== "undefined" && window.ActiveXObject || "ActiveXObject" in window);
+}
+catch (e) {
+    isIE = false;
+}
+(function () {
+    var insertBefore = Node.prototype.insertBefore;
+    if (isIE) {
+        var reAppend_1 = [];
+        Node.prototype.insertBefore2 = function (newNode, refChild) {
+            var n;
+            if (isTextNode(newNode)) {
+                if (newNode.data === "") {
+                    return newNode;
+                }
+            }
+            else if (isCommentNode(newNode)) {
+                var node = refChild ? refChild : this.childNodes[0];
+                if (!node) {
+                    return newNode;
+                }
+                n = node.nextSibling;
+                while (n !== null) {
+                    reAppend_1.push(this.removeChild(n));
+                    n = node.nextSibling;
+                }
+                reAppend_1.unshift(this.removeChild(node));
+                this.appendChild(newNode);
+                for (var i = 0; i < reAppend_1.length; i++) {
+                    this.appendChild(reAppend_1[i]);
+                }
+                return newNode;
+            }
+            else {
+                var node = refChild ? refChild : this.childNodes[0];
+                if (!node) {
+                    return newNode;
+                }
+                return insertBefore.call(this, newNode, node);
+            }
+            return newNode;
+        };
+    }
+    else {
+        Node.prototype.insertBefore2 = insertBefore;
+    }
+})();
 /// <reference path='TemplateConfig.ts'/>
 /// <reference path='../virtual/order/VOrder.ts'/>
 /// <reference path='../core/XHR.ts'/>
 /// <reference path='../virtual/Include.ts'/>
-/// <reference path='../lib/instantiation.ts'/>
 /// <reference path='../lib/treeEach.ts'/>
 /// <reference path='Part.ts'/>
 /// <reference path='Store.ts'/>
 /// <reference path='../main/Config.ts'/>
+/// <reference path="UIList.ts"/>
+/// <reference path="../main/LoadJS.ts"/>
+/// <reference path="../core/BrowserHelper.ts"/>
 var 
 // $DOM,
 // $node: I$Node,
 operatorRE = /\!=|==|=|<|>|\|/;
+// interface I$Node {
+//     (name:'__break__', nodeType?:number):IHTMLBreakElement
+//     (name: string, nodeType?: 1): INode
+//     (name: string, nodeType?: 3): IText
+//     (name: string, nodeType?: 8): IComment
+//     (name: string, nodeType?: number): INode | null
+// }
 function replaceCls() {
-    var arr = $t.replaceClassStore;
-    for (var i = 0; i < arr.length; i++) {
-        var cls = arr[i].getAttribute('cls');
-        arr[i].removeAttribute('cls');
-        if ($t.defineClassNames[cls]) {
-            arr[i].className += ' ' + $t.defineClassNames[cls].join(" ");
-        }
-    }
-    arr.length = 0;
+    // let arr=$t.replaceClassStore;
+    // for(let i=0;i<arr.length;i++){
+    //     let cls=arr[i].getAttribute('cls');
+    //     arr[i].removeAttribute('cls');
+    //     if($t.defineClassNames[cls]){
+    //         arr[i].className+=' '+$t.defineClassNames[cls].join(" ");
+    //     }
+    // }
+    // arr.length=0;
 }
 function getScopeBy(scope, node) {
     if (!scope)
@@ -5819,16 +5942,12 @@ function findTemplates(nodes) {
  */
 function importUI(uiName, uiSortPath) {
     if (!$t.T.hasOwnProperty(uiName)) {
-        var uiPath = baseUIPath.getPathBySortPath(uiSortPath);
+        var uiPath = baseUIPath.paths[uiSortPath];
         var path = uiPath + '/' + (uiName + '/index.js').toLowerCase();
         //加载js
-        require(path);
-        debugger;
-        // $t.xhr.get(path, false, function (text: string) {
-        //     parseUITemplate(uiName, uiSortPath, uiPath, text);
-        // });
+        UIList.push($t.T, uiSortPath, '', $t.loadJS(path, uiName[0].toUpperCase() + uiName.substr(1)));
     }
-    return $t.T[uiName];
+    return $t.T[uiSortPath][uiName];
 }
 // function getExtends(extName, sortPath) {
 //     let ext;
@@ -5889,7 +6008,13 @@ function parseLazy(node, outerChildNodes, outerElement, props, part) {
 function getUIInfo(node) {
     var nodeName = node.nodeName;
     if (nodeName === 'SCRIPT' && getAttr(node, 'type') === 'ui') {
-        return node.getAttribute('name').toLowerCase();
+        var name_9 = node.getAttribute('name');
+        if (name_9) {
+            return name_9.toLowerCase();
+        }
+        else {
+            return '';
+        }
     }
     else if (nodeName.indexOf(':')) {
         var c = nodeName.split(':');
@@ -6138,7 +6263,7 @@ var elementParser = new ElementParser;
 // let attributeParser = new AttributeParser;
 function initHTML(arr, outerChildNodes, outerElement, props, part) {
     treeEach(arr, 'childNodes', function (node, step) {
-        if (node instanceof VMDOM.VComment) {
+        if (node instanceof VMDOM.VComment && node.vmData.sign === undefined) {
             var order = Order.parseComment(node);
             if (order && order.run) {
                 order.run();
@@ -6236,12 +6361,14 @@ var Component;
     var Part = (function (_super) {
         __extends(Part, _super);
         /**初始化对象 */
-        function Part(partName /*组件名*/, dom, props, outerChildNodes) {
-            var _this = 
-            // constructor(public template: PartTemplate, extPart: Part | undefined, public props: Object, html: string, outerChildNodes: INodeArray, outerElement: IHTMLCollection) {
-            _super.call(this) || this;
+        function Part(partName /*组件名*/, dom, props, nodes) {
+            var _this = _super.call(this) || this;
             _this.partName = partName; /*组件名*/
             _this.props = props;
+            /**
+             * 是否已插入DOM
+             */
+            _this.isInDOM = false;
             /**
              * 组件的方法属性
              */
@@ -6258,7 +6385,7 @@ var Component;
             /**remove事件管理器 */
             _this.$offline = _this.getEventHelper("offline");
             _this.dom = dom;
-            _this.dom.initDOM(props);
+            _this.dom.initDOM(props, nodes);
             // this.$ = new Service(template.service);
             // if(extPart){
             //     /**继承 */
@@ -6267,23 +6394,23 @@ var Component;
             // if(!isUndefined(extPart)){
             //     this.super=extPart;
             // }
-            var nodes = _this.dom.tops;
+            var topNodes = _this.dom.tops;
             var outerElement = [];
-            if (outerChildNodes) {
-                for (var _i = 0, outerChildNodes_1 = outerChildNodes; _i < outerChildNodes_1.length; _i++) {
-                    var node = outerChildNodes_1[_i];
-                    if (node.nodeType === 1) {
+            if (nodes) {
+                for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
+                    var node = nodes_1[_i];
+                    if (isVHTMLElement(node)) {
                         outerElement.push(node);
                     }
                 }
             }
             else {
-                outerChildNodes = [];
+                nodes = [];
             }
-            if (nodes) {
-                initHTML(nodes, outerChildNodes, outerElement, props, _this);
-                for (var i = nodes.length; i > 0; i--) {
-                    _this.nodeStore.push(nodes[0]);
+            if (topNodes) {
+                initHTML(topNodes, nodes, outerElement, props, _this);
+                for (var i = topNodes.length; i > 0; i--) {
+                    _this.nodeStore.push(topNodes[0]);
                 }
             }
             var name = _this.partName;
@@ -6292,7 +6419,6 @@ var Component;
             end.vmData.part = begin.vmData.part = _this;
             begin.vmData.sign = 1;
             end.vmData.sign = 0;
-            // end.__part__ = begin.__part__ = this;
             _this.refs = {
                 begin: begin,
                 end: end
@@ -6305,12 +6431,12 @@ var Component;
             // }
             // this.basePart=sp?sp:this;
             // this.basePart.isInDOM=false;
-            // initHTML(nodes, outerChildNodes, outerElement, props, this);
+            // initHTML(nodes, nodes, outerElement, props, this);
             // if(extPart){
             //     (<ExtendsPart>extPart).to(this);
             // }
             var store = _this.nodeStore;
-            push.apply(store, nodes);
+            // push.apply(store, <any>nodes);  ?这里是bug
             // for (let i = nodes.length; i > 0; i--) {
             //     dom.removeChild(nodes[0]);
             // }
@@ -6627,10 +6753,6 @@ var Component;
         return Part;
     }(EventEmitterEx));
     Component.Part = Part;
-    function register(part) {
-        UIList.push($t.T, "", "", part);
-    }
-    Component.register = register;
 })(Component || (Component = {}));
 var ClientHelper = (function () {
     function ClientHelper() {
@@ -6776,33 +6898,6 @@ var log = Function('s', 'console.log(s)');
  * 可躲过一些js压缩库debugger;
  */
 var bp = Function('debugger');
-var UIPathSpace = (function () {
-    function UIPathSpace(path) {
-        this.path = path;
-    }
-    return UIPathSpace;
-}());
-var UIList = (function () {
-    function UIList() {
-    }
-    UIList.push = function (uiList, sortPath, path, part) {
-        if (sortPath === void 0) { sortPath = 'ui'; }
-        var uiPathSpace;
-        if (sortPath in uiList) {
-            uiPathSpace = uiList[sortPath];
-        }
-        else {
-            uiList[sortPath] = uiPathSpace = new UIPathSpace(path);
-        }
-        var name = part.name.toLowerCase();
-        uiPathSpace.list.push({
-            resPath: path + '/' + name + '.res',
-            name: name,
-            part: part
-        });
-    };
-    return UIList;
-}());
 /// <reference path="../core/Node.ts"/>
 /// <reference path='../part/Part.ts'/>
 /// <reference path='../scope/Scope.ts'/>
@@ -6818,6 +6913,7 @@ var UIList = (function () {
 /// <reference path='../part/store.ts'/>
 /// <reference path='../virtual/Include.ts'/>
 /// <reference path='../part/uiList.ts'/>
+/// <reference path='LoadJS.ts'/>
 var readyRE = /complete|loaded|interactive/;
 var Turtle = (function (_super) {
     __extends(Turtle, _super);
@@ -6838,6 +6934,7 @@ var Turtle = (function (_super) {
         // private fn                              ={}
         _this.replaceClassStore = [];
         _this.getBind = getBind;
+        _this.loadJS = loadJS;
         _this.renderDocument = function () {
             _this.renderDocument.beginTime = new Date();
             var xmps = findTemplates(document.body.children), i, templateXMP = [];
@@ -6869,10 +6966,10 @@ var Turtle = (function (_super) {
         _this.turtleScriptElement = scriptNode;
         //初始化组件配置
         if (baseuipath) {
-            baseUIPath.push(baseuipath.split(";"));
+            baseUIPath.push(baseuipath);
         }
         else {
-            baseUIPath.push('{path:"ui",name:"ui"}');
+            baseUIPath.push('{ui:"ui"}');
         }
         // if(isExtend){
         //     extend(window,this.fn);

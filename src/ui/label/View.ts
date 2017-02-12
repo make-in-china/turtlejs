@@ -1,41 +1,21 @@
 /// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
 
 //本模块由引擎生成，请勿手动修改此文件
-//生成时间:Sun Feb 05 2017 22:16:29 GMT+0800 (中国标准时间)
+//生成时间:Mon Feb 13 2017 00:31:25 GMT+0800 (中国标准时间)
 
 interface ILabelProps extends ComponentView.IProps{
     
 }
 class LabelView implements ComponentView.IView{
     tops:[VMDOM.VDivElement&IVNodeMethod]=<any>[];
-    initDOM(props:ILabelProps){
+    initDOM(props:ILabelProps,nodes?:(VMDOM.VNode&IVNodeMethod)[]){
+        let S0="div";
         
         push.call(this.tops=<any>[],<(VMDOM.VNode&IVNodeMethod)>
-                $$$("div")
+            $$$(S0)
 
-                (`@@while();
-@@end;
-
-@@do();
-@@end();
-
-@@for( ; ; );
-@@end;
-
-@@if();
-@@elseif();
-@@else();
-@@end;
-
-@@switch();
-@@case();
-@@case();
-@@case();
-@@default;
-@@end;
-
-@@break;
-@@{}`,ENodeType.Comment).$
         );
+        
     }
 }
+

@@ -87,13 +87,13 @@ namespace VMDOM{
         /**
          * 返回父节点，如果无，返回自己
          */
-        get $(): VElement&IVNodeMethod{
+        get $(this:VElement&IVNodeMethod): VElement&IVNodeMethod{
             let p=this.parentNode;
             this.vmData.isClose=true;
             if(p){
                 return <VElement&IVNodeMethod>p;
             }else{
-                throw new Error("parentNode is Null");
+                return this;
             }
         }
         addEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void

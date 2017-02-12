@@ -21,7 +21,7 @@ function ${className}(part:${className}){
 class ${className} extends Component.Part{
     constructor(
         public props:I${className}Props,
-        public outerChildNodes?:INode[]
+        public outerChildNodes?:(VMDOM.VNode&IVNodeMethod)[]
     ) {
         super("${className.toLowerCase()}",new ${className}View,props,outerChildNodes);
         init${className}(this);
@@ -40,13 +40,14 @@ interface I${className}Props extends ComponentView.IProps{
 class ${className}View implements ComponentView.IView{${defaultValuesInfo!==''?`
     static defaultValuesInfo=[${defaultValuesInfo}];`:``}
     ${propertyInfo}
-    initDOM(props:I${className}Props){
+    initDOM(props:I${className}Props,nodes?:(VMDOM.VNode&IVNodeMethod)[]){
         ${varInfo}${domInitScript}
+        ${scripts!==''?`
+        //因为无法推测运行结果，所以生成中间数据算法在此
+        ${scripts}`:''}
     }
 }
-${scripts!==''?`
-//因为无法推测运行结果，所以生成中间数据算法在此
-${scripts}`:''}
+
 `
     }
     export function getViewPropertyInfoString(topsType:string[]){
@@ -54,8 +55,8 @@ ${scripts}`:''}
     }
     export function getViewInitDOMString(topsJS:string[]){
         return `
-            push.call(this.tops=<any>[],<(VMDOM.VNode&IVNodeMethod)>
-                    ${topsJS.join(',\n                    <(VMDOM.VNode&IVNodeMethod)>')}
-            );`
+        push.call(this.tops=<any>[],<(VMDOM.VNode&IVNodeMethod)>
+            ${topsJS.join(',\n                    <(VMDOM.VNode&IVNodeMethod)>')}
+        );`
     }
 }

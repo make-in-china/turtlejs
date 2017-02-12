@@ -106,6 +106,8 @@ function appendNodes(nodes: INode[]|INodeList|IHTMLCollection, parent: INode) {
         parent.appendChild(c);
     }
 }
+
+
 function takeChildNodes(node: INode): INode[] {
     let cds = node.childNodes;
     let length = cds.length;
@@ -187,7 +189,7 @@ function takeAttr<T extends string | null>(node: IElement, attrName: string, def
     if (!node.hasAttribute(attrName)) {
         return defaultValue;
     } else {
-        let s = node.getAttribute(attrName);
+        let s:string = <string>node.getAttribute(attrName);
         node.removeAttribute(attrName);
         return s;
     }
@@ -196,7 +198,7 @@ function getAttr<T extends string | null>(node: IElement, attrName: string, defa
     if (!node.hasAttribute(attrName)) {
         return defaultValue;
     } else {
-        return node.getAttribute(attrName);
+        return <string>node.getAttribute(attrName);
     }
 }
 
