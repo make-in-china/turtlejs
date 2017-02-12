@@ -4,12 +4,9 @@ namespace UIHelper{
 
     export function getScriptString(className:string){
         return `/// <reference path="Class.ts"/>
-namespace ComponentScript{
-    export class ${className}{
-        constructor(part:Component.${className}){
-            //todo:这里填写组件代码
-        }
-    }
+
+function ${className}(part:${className}){
+    //todo:这里填写组件代码
 }`
     }
 
@@ -21,16 +18,13 @@ namespace ComponentScript{
 //本模块由引擎生成，请勿手动修改此文件
 //生成时间:${(new Date()).toString()}
 
-namespace Component{
-    @register
-    export class ${className} extends Part{
-        constructor(
-            public props:ComponentView.I${className}Props,
-            public outerChildNodes?:INode[]
-        ) {
-            super("${className.toLowerCase()}",new ComponentView.${className},props,outerChildNodes);
-            new ComponentScript.${className}(this);
-        }
+class ${className} extends Component.Part{
+    constructor(
+        public props:I${className}Props,
+        public outerChildNodes?:INode[]
+    ) {
+        super("${className.toLowerCase()}",new ${className}View,props,outerChildNodes);
+        init${className}(this);
     }
 }`
     }
@@ -40,21 +34,20 @@ namespace Component{
 //本模块由引擎生成，请勿手动修改此文件
 //生成时间:${(new Date()).toString()}
 
-namespace ComponentView{
-    export interface I${className}Props extends IProps{
-        ${props}
+interface I${className}Props extends ComponentView.IProps{
+    ${props}
+}
+class ${className}View implements ComponentView.IView{${defaultValuesInfo!==''?`
+    static defaultValuesInfo=[${defaultValuesInfo}];`:``}
+    ${propertyInfo}
+    initDOM(props:I${className}Props){
+        ${varInfo}${domInitScript}
     }
-    export class ${className} implements IView{${defaultValuesInfo!==''?`
-        static defaultValuesInfo=[${defaultValuesInfo}];`:``}
-        ${propertyInfo}
-        initDOM(props:I${className}Props){
-            ${varInfo}${domInitScript}
-        }
-    }
+}
 ${scripts!==''?`
-    //因为无法推测运行结果，所以生成中间数据算法在此
-    ${scripts}`:''}
-}`
+//因为无法推测运行结果，所以生成中间数据算法在此
+${scripts}`:''}
+`
     }
     export function getViewPropertyInfoString(topsType:string[]){
         return `tops:[${topsType.join('\n,')}]=<any>[];`

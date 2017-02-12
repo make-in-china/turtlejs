@@ -47,7 +47,7 @@ namespace UIHelper {
         });
         return isAllRun;
     }
-    function getVMUIInfo(node: VMDOM.VHtmlElement) {
+    function getVMUIInfo(node: VMDOM.VHTMLUnknownElement) {
         let nodeName = node.nodeName;
         // if (nodeName === 'SCRIPT' && getAttr(node, 'type') === 'ui') {
         //     return node.getAttribute('name').toLowerCase();
@@ -55,6 +55,7 @@ namespace UIHelper {
         if (nodeName.indexOf(':')!==-1) {
             let uiInfo = nodeName.split(':');
             let sortPath = uiInfo[0].toLowerCase();
+            
             if (baseUIPath.hasSortPath(sortPath)) {
                 return { sortPath: sortPath, name: uiInfo[1].toLowerCase() };
             }
@@ -81,33 +82,33 @@ namespace UIHelper {
                 }
 
                 //pre 解析组件
+                if(isVHTMLUnknownElement(node)){
+                    //解析组件
+                    let uiInfo = getVMUIInfo(node);
+                    if (uiInfo) {
+                        renderVMComponent(node,null,uiInfo,scripts);
+                        
+                        // partName = takeAttr(node, 'p-name');
 
-                //解析组件
-                let uiInfo = getVMUIInfo(node);
-                if (uiInfo) {
-                    renderVMComponent(node,null,uiInfo);
-                    
-                    // partName = takeAttr(node, 'p-name');
 
+                        // reExtends = takeAttr(node, 're-extends');
 
-                    // reExtends = takeAttr(node, 're-extends');
-
-                    // outerChildNodes = slice.call(node.childNodes);
-                    // outerElement = slice.call(node.children);
-                    // let chds = node.childNodes;
-                    // for (let i = chds.length; i > 0; i--) {
-                    //     node.removeChild(<INode>chds[0]);
-                    // }
-                    
-                    // cpn = ui.render(node, node.parentNode, outerChildNodes, outerElement, null, part, partName, reExtends);
-                    // if (cpn) {
-                    //     step.next = cpn.elementLength;
-                    // }
-                    return eTreeEach.c_noIn | eTreeEach.c_noRepeat;
+                        // outerChildNodes = slice.call(node.childNodes);
+                        // outerElement = slice.call(node.children);
+                        // let chds = node.childNodes;
+                        // for (let i = chds.length; i > 0; i--) {
+                        //     node.removeChild(<INode>chds[0]);
+                        // }
+                        
+                        // cpn = ui.render(node, node.parentNode, outerChildNodes, outerElement, null, part, partName, reExtends);
+                        // if (cpn) {
+                        //     step.next = cpn.elementLength;
+                        // }
+                        return eTreeEach.c_noIn | eTreeEach.c_noRepeat;
+                    }
+                    //after 解析组件
                 }
-
-
-                //after 解析组件
+                
 
                 //解析ref
                 let v = node.getAttribute("ref");
@@ -121,7 +122,10 @@ namespace UIHelper {
             }
         });
     }
+
+    //获取vscript.toFunction
     function scriptsToString(scripts: VMDOM.VScript[]){
+        debugger;
         let scriptFunctions:string='';
         let functionHash:{[index:string]:VMDOM.VScript}={}
         let index=0;
@@ -255,6 +259,9 @@ namespace UIHelper {
             topsJS.push(top.toJSString(16));
             topsType.push(toClassName(top));
         }
+
+
+        //初始化dom
         let domInitScript: string = '';
         for (let i = names.length - 1; i >= 0; i--) {
             let name = names[i];
@@ -265,6 +272,26 @@ namespace UIHelper {
             propertys.push(getViewPropertyInfoString(topsType));
             domInitScript += getViewInitDOMString(topsJS);
         }
+        //字符串替换为const
+        let allString:string[]=[];
+        domInitScript=domInitScript.replace(/".*?"|'.*?'|`.*?`/g,function(s:string){
+            let idx=allString.indexOf(s);
+            if(idx===-1){
+                allString.push(s);
+                return 'S'+(allString.length-1);
+            }else{
+                return 'S'+idx;
+            }
+        });
+        if(allString.length>0){
+            for(let i=0;i<allString.length;i++){
+                allString[i]='S'+i+'='+ allString[i]
+            }
+            domInitScript='let '+allString.join(',')+';\n        '+domInitScript;
+        }
+
+        //回调函数合并
+
         let propertyInfo: string = propertys.join(';\n        ');
         let varInfo: string = vars.join(';\n            ');
         let propsInfo:string=props.join('\n        ');

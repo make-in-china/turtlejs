@@ -8,16 +8,14 @@
 /// <reference path='Part.ts'/>
 /// <reference path='Store.ts'/>
 /// <reference path='../main/Config.ts'/>
+/// <reference path="UIList.ts"/>
 
 interface ITurtle{
     parts:IKeyArrayHashObject<Component.Part>;
     // service:Service;
-    // T:IHashObject<{
-    //     prototype:Part
-    //     new(props: Object, outerChildNodes: INode[], outerElement: IHTMLCollection):Part
-    // }>;
+    T:UIList
 }
-declare var $t:Turtle;
+declare var $t:ITurtle;
 let
     // $DOM,
     // $node: I$Node,
@@ -36,15 +34,15 @@ interface ITurtle {
     defineClassNames:string[];
 }
 function replaceCls(){
-    let arr=$t.replaceClassStore;
-    for(let i=0;i<arr.length;i++){
-        let cls=arr[i].getAttribute('cls');
-        arr[i].removeAttribute('cls');
-        if($t.defineClassNames[cls]){
-            arr[i].className+=' '+$t.defineClassNames[cls].join(" ");
-        }
-    }
-    arr.length=0;
+    // let arr=$t.replaceClassStore;
+    // for(let i=0;i<arr.length;i++){
+    //     let cls=arr[i].getAttribute('cls');
+    //     arr[i].removeAttribute('cls');
+    //     if($t.defineClassNames[cls]){
+    //         arr[i].className+=' '+$t.defineClassNames[cls].join(" ");
+    //     }
+    // }
+    // arr.length=0;
 }
 function getScopeBy(scope, node: INode) {
     if (!scope)
@@ -212,14 +210,14 @@ function findTemplates(nodes: IHTMLElement[] | IArray): IElement[] | IArray {
 /**
  * 加载UI
  */
-function importUI(uiName: string, uiSortPath: string){
+function importUI(uiName: string, uiSortPath: string):UIPathSpace{
     
     if (!$t.T.hasOwnProperty(uiName)) {
-        let uiPath = baseUIPath.getPathBySortPath(uiSortPath);
+        let uiPath = baseUIPath.paths[uiSortPath];
         let path=uiPath + '/' + (uiName + '/index.js').toLowerCase();
+
         //加载js
-        return ($t.T[uiName]=require(path));
-        
+        require(path);
         // $t.xhr.get(path, false, function (text: string) {
         //     parseUITemplate(uiName, uiSortPath, uiPath, text);
         // });
@@ -265,7 +263,7 @@ function getParentPart(node:VMDOM.VNode):Component.Part|null{
     return null;
 }
 function parseAsync(node: IHTMLElement, outerChildNodes, outerElement, props, part) {
-    let delay = parseInt(Order.exec(node, node.getAttribute('async')));//, null, outerChildNodes, outerElement, props, part));
+    let delay = parseInt(Order.exec(node, <string>node.getAttribute('async')));//, null, outerChildNodes, outerElement, props, part));
     node.removeAttribute('async');
     let mark = $$$('async', ENodeType.Comment);
     replaceNodeByNode(node, mark);
@@ -282,10 +280,15 @@ function parseLazy(node: IHTMLElement, outerChildNodes, outerElement, props, par
     node.removeAttribute('lazy');
     initHTML(node.childNodes, outerChildNodes, outerElement, props, part);
 }
-function getUIInfo(node: IHTMLElement|VMDOM.VHtmlElement) {
+function getUIInfo(node: IHTMLElement) {
     let nodeName = node.nodeName;
     if (nodeName === 'SCRIPT' && getAttr(node, 'type') === 'ui') {
-        return node.getAttribute('name').toLowerCase();
+        let name=node.getAttribute('name');
+        if(name){
+            return name.toLowerCase();
+        }else{
+            return '';
+        }
     } else if (nodeName.indexOf(':')) {
         let c = nodeName.split(':');
         let sortPath = c[0].toLowerCase();
@@ -315,76 +318,76 @@ function parseGet(node: IHTMLElement, outerChildNodes, outerElement, props, part
     }
 }
 
-function isHTMLElement(p: IHTMLElement | IHTMLCollection): p is IHTMLElement {
-    return typeof p === "IHTMLElement";
-}
-function parseSet(node: IHTMLElement, outerChildNodes: INode[], outerElement: IElement[], props, part) {
+// function isHTMLElement(p: IHTMLElement | IHTMLCollection): p is IHTMLElement {
+//     return typeof p === "IHTMLElement";
+// }
+// function parseSet(node: IHTMLElement, outerChildNodes: INode[], outerElement: IElement[], props, part) {
 
-    let link = takeAttr(node, 'link', "");
-    if (link) {
-        /*设置关联子对象*/
-        let chds = StoreManage.takeElem($t.store, link);
+//     let link = takeAttr(node, 'link', "");
+//     if (link) {
+//         /*设置关联子对象*/
+//         let chds = StoreManage.takeElem($t.store, link);
 
-        if (chds) {
-            if (isHTMLElement(chds)) {
-                node.appendChild(chds);
-            } else {
-                let n=node.children[0];
-                if(n)appendNodes(<IHTMLCollection>chds, n);
-            }
+//         if (chds) {
+//             if (isHTMLElement(chds)) {
+//                 node.appendChild(chds);
+//             } else {
+//                 let n=node.children[0];
+//                 if(n)appendNodes(<IHTMLCollection>chds, n);
+//             }
 
-            takeOutChildNodes(node);
-        } else {
-            removeNode(node);
-        }
-    } else {
-        let ns: IHTMLElement[] | IHTMLCollection;
-        /*设置属性*/
-        if (node.children.length > 0) {
-            /*设置子对象*/
-            ns = node.children;
-        } else if (node.parentNode) {
-            /*设置父对象*/
-            ns = [<IHTMLElement>node.parentNode];
-        } else {
-            return;
-        }
-        let isAppend = !node.hasAttribute('append');
-        node.removeAttribute('append');
-        let attr = node.attributes;
-        for (let j = 0; j < ns.length; j++) {
-            let nd=<IHTMLElement>ns[j];
-            if (isAppend) {
-                for (let i = 0; i < attr.length; i++) {
-                    nd.setAttribute(attr[i].name, attr[i].value);
-                }
-            } else {
-                for (let i = 0; i < attr.length; i++) {
-                    let value = attr[i].value;
-                    let value2: string;
-                    switch (attr[i].name) {
-                        case 'class':
-                            value2 = nd.getAttribute(attr[i].name);
-                            if (value2) {
-                                value += (/ $/.test(value) ? '' : ' ') + value2;
-                            }
-                            break;
-                        case 'style':
-                            value2 = nd.getAttribute(attr[i].name);
-                            if (value2) {
-                                value += (/; *$/.test(value) ? '' : ';') + value2;
-                            }
+//             takeOutChildNodes(node);
+//         } else {
+//             removeNode(node);
+//         }
+//     } else {
+//         let ns: IHTMLElement[] | IHTMLCollection;
+//         /*设置属性*/
+//         if (node.children.length > 0) {
+//             /*设置子对象*/
+//             ns = node.children;
+//         } else if (node.parentNode) {
+//             /*设置父对象*/
+//             ns = [<IHTMLElement>node.parentNode];
+//         } else {
+//             return;
+//         }
+//         let isAppend = !node.hasAttribute('append');
+//         node.removeAttribute('append');
+//         let attr = node.attributes;
+//         for (let j = 0; j < ns.length; j++) {
+//             let nd=<IHTMLElement>ns[j];
+//             if (isAppend) {
+//                 for (let i = 0; i < attr.length; i++) {
+//                     nd.setAttribute(attr[i].name, attr[i].value);
+//                 }
+//             } else {
+//                 for (let i = 0; i < attr.length; i++) {
+//                     let value = attr[i].value;
+//                     let value2: string;
+//                     switch (attr[i].name) {
+//                         case 'class':
+//                             value2 = nd.getAttribute(attr[i].name);
+//                             if (value2) {
+//                                 value += (/ $/.test(value) ? '' : ' ') + value2;
+//                             }
+//                             break;
+//                         case 'style':
+//                             value2 = nd.getAttribute(attr[i].name);
+//                             if (value2) {
+//                                 value += (/; *$/.test(value) ? '' : ';') + value2;
+//                             }
 
-                            break;
-                    }
-                    nd.setAttribute(attr[i].name, value);
-                }
-            }
-        }
-        takeOutChildNodes(node);
-    }
-    return eTreeEach.c_noIn;
-}
+//                             break;
+//                     }
+//                     nd.setAttribute(attr[i].name, value);
+//                 }
+//             }
+//         }
+//         takeOutChildNodes(node);
+//     }
+//     return eTreeEach.c_noIn;
+// }
 
 let exec = eval;
 function execOnScript(node: IHTMLElement, outerChildNodes, outerElement, props, part) {
@@ -460,7 +463,7 @@ function execNodeQuestion(node: IHTMLElement, outerChildNodes, outerElement, pro
 }
 class ElementParser {
     GET = parseGet
-    SET = parseSet
+    // SET = parseSet
     // __BREAK__ = parseBreakOrder
     SCRIPT = parseScript
 }

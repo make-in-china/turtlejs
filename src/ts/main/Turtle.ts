@@ -76,7 +76,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
         //     extend(window,this.fn);
         // }
         //初始化预编译输出路径
-        this.url=scriptNode.getAttribute("src");
+        this.url=<string>scriptNode.getAttribute("src");
         if (compile !== ""){
             if(getQueryString("turtle_nocompile")!="1"){
                 this.xhr.get(scriptNode.src+'.setup',false,function(text){

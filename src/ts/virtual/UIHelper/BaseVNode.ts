@@ -4,6 +4,7 @@
 /// <reference path='../node/VComment.ts'/>
 /// <reference path='../node/VDocumentType.ts'/>
 /// <reference path='../node/VDocument.ts'/>
+/// <reference path='../node/VHTMLUnknownElement.ts'/>
 
 /// <reference path='../element/VAElement.ts'/>
 /// <reference path='../element/VAreaElement.ts'/>

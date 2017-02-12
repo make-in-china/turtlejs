@@ -34,10 +34,10 @@ namespace UIHelper {
 </html>`);
 
         fs.writeFileSync(testPath,
-            `/// <reference path="Script.ts"/>
+            `/// <reference path="Script.ts" no-default-lib="true"/>
 
-let view=new Component.${className}({});
-view.insertTo(document.body);`);
+let part=new ${className}({});
+part.insertTo(document.body);`);
 
 
         fs.writeFileSync(classPath, getClassString(className));

@@ -1,4 +1,4 @@
 /// <reference path="Script.ts"/>
 
-let view=new Component.Label({});
-view.insertTo(document.body);
+let part=new Label({});
+part.insertTo(document.body);

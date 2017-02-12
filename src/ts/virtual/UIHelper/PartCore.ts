@@ -1,14 +1,34 @@
+
 /// <reference path='../../part/partCore.ts'/>
+/**
+ * 加载UI
+ */
+// function importVMUI(uiName: string, uiSortPath: string):UIPathSpace{
+    
+    // if (!$t.T.hasOwnProperty(uiName)) {
+    //     let uiPath = baseUIPath.paths[uiSortPath];
+    //     let path=uiPath + '/' + (uiName + '/index.js').toLowerCase();
+
+    //     //加载js
+    //     require(path);
+    //     debugger;
+    //     // $t.xhr.get(path, false, function (text: string) {
+    //     //     parseUITemplate(uiName, uiSortPath, uiPath, text);
+    //     // });
+    // }
+    // return $t.T[uiName];
+// }
 function renderVMComponent(
         this:void,
-        uiNode:VMDOM.VHtmlElement|null,
+        node:VMDOM.VHTMLUnknownElement,
         // outerChildNodes: INode[], 
         // outerElement: IHTMLCollection,
         props:ComponentView.IProps|null,
         uiInfo: string | {
             sortPath: string;
             name: string;
-        }
+        },
+        scripts: VMDOM.VScript[]
     ){
         let name:string
         let sortPath:string
@@ -20,9 +40,15 @@ function renderVMComponent(
             sortPath=uiInfo.sortPath;
         }
 
-
-
-        let UI= importUI(name, sortPath);
+        //加载js,并创建组件
+        let js=`
+        let view=new Component['${sortPath}:${name}'](${JSON.stringify(props)});
+        view.insertBefore(this);
+        this.remove();`
+        let script=$$$(js,ENodeType.Script);
+        replaceNodeByNode(node,script);
+        scripts.push(script);
+        // let UI= importVMUI(name, sortPath);
 
         //检验ui是否可以预渲染
         

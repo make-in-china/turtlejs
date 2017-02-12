@@ -18,7 +18,7 @@ class StoreManage{
             }
         }
     }
-    static takeElem(data:Store,name:string):IHTMLElement|IHTMLCollection|undefined{
+    static takeElem(data:Store,name:string):IElement|IHTMLCollection|undefined{
         if(data.hasOwnProperty(name)){
             let ret:IHTMLElement=data[name];
             delete data[name];

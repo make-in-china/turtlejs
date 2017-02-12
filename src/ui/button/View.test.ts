@@ -1,5 +1,5 @@
 
-/// <reference path="Script.ts"/>
+/// <reference path="Script.ts" no-default-lib="true"/>
 
-let view=new Component.Button({});
-view.insertTo(document.body);
+let part=new Button({});
+part.insertTo(document.body);

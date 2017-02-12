@@ -16,8 +16,4 @@ namespace VMDOM{
             return (new Array(space+1)).join(" ")+`.$$$(${this.isVar?"":"this."}${this.data})`;
         }
     }
-    // bindClassToFunction2Helper['#member']=bindClassToFunctionHelper[ENodeType.Member]=function(node:IVNodeMethod & VNode,nodeName: string){
-    //     node.__proto__=VMember.prototype;
-    //     VMember.call(node,nodeName);
-    // }
 }

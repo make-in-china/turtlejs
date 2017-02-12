@@ -62,8 +62,8 @@ gulp.task('default',function(){
     project   创建工程
         name  工程名
     ui:w      监视ui工程
-    tsc       构建turtle.js
-    tsc2      构建 uihealper.js`);
+    turtle    构建turtle.js
+    vm        构建 uihealper.js`);
 });
 gulp.task('project',function(){
     var args=process.argv.slice(3);

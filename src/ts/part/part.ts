@@ -240,17 +240,17 @@ namespace Component{
                 // removeNode(recalNode);
                 // rects.push(rt);
                 let cs = this.elements;
-                let elem: IElement;
-                let dom: IElement = <any>document.documentElement;
+                let elem: IHTMLElement;
+                let dom: IHTMLElement = <any>document.documentElement;
                 for (let i = 0; i < cs.length; i++) {
-                    elem = <IElement>cs[i].valueOf();
+                    elem = <IHTMLElement>cs[i].valueOf();
                     if (elem.nodeType === 1) {
                         let l = 0, t = 0;
                         let elem2 = elem;
                         while (elem2 !== dom) {
                             t += elem2.offsetTop;
                             l += elem2.offsetLeft;
-                            elem2 = <IElement>elem2.parentNode;
+                            elem2 = <IHTMLElement>elem2.parentNode;
                         }
                         rects.push([l, t, elem.offsetWidth, elem.offsetHeight]);
                     }
@@ -418,11 +418,5 @@ namespace Component{
                 }
             }
         }
-    }
-    export function register(part:{
-        new (...arg:any[]): Part
-        name:string
-    }) {
-        UIList.push($t.T,"","",part);
     }
 }

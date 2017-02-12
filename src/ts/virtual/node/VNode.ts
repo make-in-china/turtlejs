@@ -28,7 +28,6 @@ interface IVNodeMethod{
     // (): VNode&IVNodeMethod;
     (nodeName: string, nodeType: ENodeType): VMDOM.VNode&IVNodeMethod;
 }
-
 namespace VMDOM{
     export let emptyTextNodeRE = /^\s*$/;
     export let stringNode = {
@@ -46,8 +45,15 @@ namespace VMDOM{
         abstract toJS(space?:number):string;
         abstract toCreateJS(space?:number):string;
         readonly childNodes: VNodeList=new VNodeList;
-        parentNode: VNode&IVNodeMethod | null;
-        
+        parentNode: (VNode&IVNodeMethod) | null;
+        // get parentElement():(VHtmlElement&IVNodeMethod) | null{
+        //     let node=this.parentNode;
+        //     if(node&&isVHTMLElement(node)){
+        //         return node;
+        //     }else{
+        //         return null;
+        //     }
+        // }
         /**
          * 用自身做环境调用函数,并返回父
          */
@@ -147,23 +153,23 @@ namespace VMDOM{
             vNode.parentNode = <VNode&IVNodeMethod>this;
             return vNode;
         }
-        insertBefore(this:  VNode&IVNodeMethod, newNode:  VNode&IVNodeMethod, refChild:  VNode&IVNodeMethod):  VNode&IVNodeMethod {
+        insertBefore(this:  VNode&IVNodeMethod, newChild:  VNode&IVNodeMethod, refChild:  VNode&IVNodeMethod):  VNode&IVNodeMethod {
             //添加到childNodes里
             let chds = this.childNodes;
             let idx:number = indexOf.call(chds,refChild);
             if (idx === -1) {
-                return newNode;
+                return newChild;
             }
-            let p2 = newNode.parentNode;
+            let p2 = newChild.parentNode;
             if (p2) {
-                p2.removeChild(newNode);
+                p2.removeChild(newChild);
             }
-            splice.call(chds,idx, 0, newNode);
-            newNode.parentNode = this;
-            return newNode;
+            splice.call(chds,idx, 0, newChild);
+            newChild.parentNode = this;
+            return newChild;
         }
-        insertBefore2(this:  VNode&IVNodeMethod, newNode:  VNode&IVNodeMethod, node:  VNode&IVNodeMethod):  VNode&IVNodeMethod{
-            return this.insertBefore(newNode,node);
+        insertBefore2(this:  VNode&IVNodeMethod, newChild:  VNode&IVNodeMethod, refChild:  VNode&IVNodeMethod):  VNode&IVNodeMethod{
+            return this.insertBefore(newChild,refChild);
         }
         remove(){
             let p=this.parentNode;
@@ -212,6 +218,13 @@ namespace VMDOM{
             this.vmData.domNode = elem;
             return elem;
         }
+        //合并自己的textNode
+        normalize(): void{
+            throw new Error('未实现');
+        }
+        replaceChild(newChild: VNode&IVNodeMethod, oldChild: VNode&IVNodeMethod): VNode&IVNodeMethod{
+            return oldChild;
+        }
         protected copyPropertyToNode(elem:Node){
             
             for (let i in this) {
@@ -242,10 +255,10 @@ namespace VMDOM{
                             if (!(i in elem)) {
                                 Object.defineProperty(elem, i, desc);
                             } else {
-                                elem[i] = this[i];
+                                elem[<any>i] = this[i];
                             }
                         } else {
-                            elem[i] = this[i];
+                            elem[<any>i] = this[i];
                         }
                 }
             }
@@ -398,22 +411,6 @@ namespace VMDOM{
 interface IBindClassToFunction{
     [index:number]:(node:IVNodeMethod & VMDOM.VNode,nodeName: any)=>void
 }
-// bindClassToFunction2Helper["#documenttype"]=bindClassToFunctionHelper[ENodeType.DocumentType]=function(node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-//     node.__proto__=VMDOM.VDocumentType.prototype;
-//     VMDOM.VDocumentType.call(node);
-// }
-// bindClassToFunction2Helper["#comment"]=bindClassToFunctionHelper[ENodeType.Comment]=function(node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-//     node.__proto__=VMDOM.VComment.prototype;
-//     VMDOM.VComment.call(node,nodeName);
-// }
-// bindClassToFunction2Helper["#text"]=bindClassToFunctionHelper[ENodeType.Text]=function(node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-//     node.__proto__=VMDOM.VText.prototype;
-//     VMDOM.VText.call(node,nodeName);
-// }
-// bindClassToFunction2Helper["#document"]=bindClassToFunctionHelper[ENodeType.Document]=function(node:IVNodeMethod & VMDOM.VNode,nodeName: string){
-//     node.__proto__=VMDOM.VDocument.prototype;
-//     VMDOM.VDocument.call(node);
-// }
 
 function bindClassToFunction(node:IVNodeMethod & VMDOM.VNode,nodeName: string, nodeType?: ENodeType|undefined){
     if(nodeType!==undefined){
@@ -437,12 +434,20 @@ function bindClassToFunction(node:IVNodeMethod & VMDOM.VNode,nodeName: string, n
                 node.__proto__=VMDOM[name].prototype;
                 VMDOM[name].call(node);
             }else{
-                throw new Error(`unknown nodeName:${nodeName}`);
+                let fn=VMDOM.bindClassToFunctionHelper["-1"];
+                if(fn){
+                    fn(node,nodeName);
+                    return '';
+                }else{
+                    throw new Error(`unknown:
+        nodeName:${nodeName}  ,nodeType:${nodeType}`);
+                }
             }
         }
         
     }else{
-        throw new Error(`unknown nodeType:${nodeType}`);
+        throw new Error(`unknown:
+        nodeName:${nodeName}  ,nodeType:${nodeType}`);
     }
 }
 function getVNodeMethod():VMDOM.VNode&IVNodeMethod{

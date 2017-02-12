@@ -3,42 +3,39 @@
 //本模块由引擎生成，请勿手动修改此文件
 //生成时间:Sun Feb 05 2017 22:16:29 GMT+0800 (中国标准时间)
 
-namespace ComponentView{
-    export interface ILabelProps extends IProps{
+interface ILabelProps extends ComponentView.IProps{
+    
+}
+class LabelView implements ComponentView.IView{
+    tops:[VMDOM.VDivElement&IVNodeMethod]=<any>[];
+    initDOM(props:ILabelProps){
         
+        push.call(this.tops=<any>[],<(VMDOM.VNode&IVNodeMethod)>
+                $$$("div")
+
+                (`@@while();
+@@end;
+
+@@do();
+@@end();
+
+@@for( ; ; );
+@@end;
+
+@@if();
+@@elseif();
+@@else();
+@@end;
+
+@@switch();
+@@case();
+@@case();
+@@case();
+@@default;
+@@end;
+
+@@break;
+@@{}`,ENodeType.Comment).$
+        );
     }
-    export class Label implements IView{
-        tops:[VMDOM.VDivElement&IVNodeMethod]=<any>[];
-        initDOM(props:ILabelProps){
-            
-            push.call(this.tops=<any>[],<(VMDOM.VNode&IVNodeMethod)>
-                    $$$("div")
-
-                    (`@@while();
-    @@end;
-
-    @@do();
-    @@end();
-
-    @@for( ; ; );
-    @@end;
-
-    @@if();
-    @@elseif();
-    @@else();
-    @@end;
-
-    @@switch();
-    @@case();
-    @@case();
-    @@case();
-    @@default;
-    @@end;
-
-    @@break;
-    @@{}`,ENodeType.Comment).$
-            );
-        }
-    }
-
 }

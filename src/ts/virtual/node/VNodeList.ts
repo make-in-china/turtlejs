@@ -2,7 +2,7 @@
 /// <reference path='.d.ts'/>
 /// <reference path='VNode.ts'/>
 namespace VMDOM{
-    export class VNodeList{
+    export class VNodeList implements INodeList{
         length: number=0;
         item(index: number): VNode&IVNodeMethod|undefined{
             return this[index];

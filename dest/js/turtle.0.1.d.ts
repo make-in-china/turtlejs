@@ -3,6 +3,11 @@ declare class ArrayEx<T> extends Array<T> {
     last(): T | undefined;
     clear(): void;
 }
+declare class IAttr {
+    readonly name: string;
+    value: string;
+    constructor(name: string, value: string);
+}
 interface INamedNodeMap {
     [index: number]: IAttr;
     indexOfName(name: string): any;
@@ -22,18 +27,25 @@ interface INodeList {
     item(index: number): INode | undefined;
     [index: number]: INode | undefined;
 }
+interface IHTMLCollectionOf<T extends IElement> extends IHTMLCollection {
+    item(index: number): T;
+    namedItem(name: string): T;
+}
 interface INode extends EventTarget {
-    readonly childNodes: INodeList;
-    previousSibling: INode | null;
-    nextSibling: INode | null;
-    parentNode: INode | null;
-    nodeName: string;
-    nodeType: number;
-    appendChild(newChild: INode): INode;
-    removeChild(oldChild: INode): INode;
-    cloneNode(deep?: boolean): INode;
     toDOM(): Node;
     insertBefore2(newChild: INode, refChild: INode): INode;
+    readonly childNodes: INodeList;
+    readonly nextSibling: INode | null;
+    readonly nodeName: string;
+    readonly nodeType: number;
+    readonly parentNode: INode | null;
+    readonly previousSibling: INode | null;
+    appendChild<T extends INode>(newChild: T): T;
+    cloneNode(deep?: boolean): INode;
+    insertBefore(newChild: INode, refChild: INode | null): INode;
+    normalize(): void;
+    removeChild(oldChild: INode): INode;
+    replaceChild(newChild: INode, oldChild: INode): INode;
 }
 interface IElementTraversal {
     childElementCount: number;
@@ -56,233 +68,64 @@ interface IChildNode {
 }
 interface IElement extends INode, GlobalEventHandlers, IElementTraversal, INodeSelector, IChildNode {
     valueOf(): IElement;
-    classList: DOMTokenList;
-    clientHeight: number;
-    clientLeft: number;
-    clientTop: number;
-    clientWidth: number;
-    offsetHeight: number;
-    offsetLeft: number;
-    offsetTop: number;
-    offsetWidth: number;
+    readonly classList: DOMTokenList;
+    className: string;
+    readonly clientHeight: number;
+    readonly clientLeft: number;
+    readonly clientTop: number;
+    readonly clientWidth: number;
+    id: string;
+    innerHTML: string;
     msContentZoomFactor: number;
-    msRegionOverflow: string;
-    onariarequest: (ev: AriaRequestEvent) => any;
-    oncommand: (ev: CommandEvent) => any;
-    ongotpointercapture: (ev: PointerEvent) => any;
-    onlostpointercapture: (ev: PointerEvent) => any;
-    onmsgesturechange: (ev: MSGestureEvent) => any;
-    onmsgesturedoubletap: (ev: MSGestureEvent) => any;
-    onmsgestureend: (ev: MSGestureEvent) => any;
-    onmsgesturehold: (ev: MSGestureEvent) => any;
-    onmsgesturestart: (ev: MSGestureEvent) => any;
-    onmsgesturetap: (ev: MSGestureEvent) => any;
-    onmsgotpointercapture: (ev: MSPointerEvent) => any;
-    onmsinertiastart: (ev: MSGestureEvent) => any;
-    onmslostpointercapture: (ev: MSPointerEvent) => any;
-    onmspointercancel: (ev: MSPointerEvent) => any;
-    onmspointerdown: (ev: MSPointerEvent) => any;
-    onmspointerenter: (ev: MSPointerEvent) => any;
-    onmspointerleave: (ev: MSPointerEvent) => any;
-    onmspointermove: (ev: MSPointerEvent) => any;
-    onmspointerout: (ev: MSPointerEvent) => any;
-    onmspointerover: (ev: MSPointerEvent) => any;
-    onmspointerup: (ev: MSPointerEvent) => any;
+    readonly msRegionOverflow: string;
+    onariarequest: (this: IElement, ev: Event) => any;
+    oncommand: (this: IElement, ev: Event) => any;
+    ongotpointercapture: (this: IElement, ev: PointerEvent) => any;
+    onlostpointercapture: (this: IElement, ev: PointerEvent) => any;
+    onmsgesturechange: (this: IElement, ev: MSGestureEvent) => any;
+    onmsgesturedoubletap: (this: IElement, ev: MSGestureEvent) => any;
+    onmsgestureend: (this: IElement, ev: MSGestureEvent) => any;
+    onmsgesturehold: (this: IElement, ev: MSGestureEvent) => any;
+    onmsgesturestart: (this: IElement, ev: MSGestureEvent) => any;
+    onmsgesturetap: (this: IElement, ev: MSGestureEvent) => any;
+    onmsgotpointercapture: (this: IElement, ev: MSPointerEvent) => any;
+    onmsinertiastart: (this: IElement, ev: MSGestureEvent) => any;
+    onmslostpointercapture: (this: IElement, ev: MSPointerEvent) => any;
+    onmspointercancel: (this: IElement, ev: MSPointerEvent) => any;
+    onmspointerdown: (this: IElement, ev: MSPointerEvent) => any;
+    onmspointerenter: (this: IElement, ev: MSPointerEvent) => any;
+    onmspointerleave: (this: IElement, ev: MSPointerEvent) => any;
+    onmspointermove: (this: IElement, ev: MSPointerEvent) => any;
+    onmspointerout: (this: IElement, ev: MSPointerEvent) => any;
+    onmspointerover: (this: IElement, ev: MSPointerEvent) => any;
+    onmspointerup: (this: IElement, ev: MSPointerEvent) => any;
     ontouchcancel: (ev: TouchEvent) => any;
     ontouchend: (ev: TouchEvent) => any;
     ontouchmove: (ev: TouchEvent) => any;
     ontouchstart: (ev: TouchEvent) => any;
-    onwebkitfullscreenchange: (ev: Event) => any;
-    onwebkitfullscreenerror: (ev: Event) => any;
-    scrollHeight: number;
+    onwebkitfullscreenchange: (this: IElement, ev: Event) => any;
+    onwebkitfullscreenerror: (this: IElement, ev: Event) => any;
+    outerHTML: string;
+    readonly prefix: string | null;
+    readonly scrollHeight: number;
     scrollLeft: number;
     scrollTop: number;
-    scrollWidth: number;
-    tagName: string;
-    id: string;
-    className: string;
-    innerHTML: string;
-    getAttribute(name?: string): string;
+    readonly scrollWidth: number;
+    readonly tagName: string;
+    readonly assignedSlot: HTMLSlotElement | null;
+    slot: string;
+    readonly shadowRoot: ShadowRoot | null;
+    getAttribute(name: string): string | null;
     getAttributeNS(namespaceURI: string, localName: string): string;
-    getAttributeNode(name: string): IAttr;
-    getAttributeNodeNS(namespaceURI: string, localName: string): IAttr;
+    getAttributeNode(name: string): Attr;
+    getAttributeNodeNS(namespaceURI: string, localName: string): Attr;
     getBoundingClientRect(): ClientRect;
     getClientRects(): ClientRectList;
-    getElementsByTagName(name: "a"): NodeListOf<HTMLAnchorElement>;
-    getElementsByTagName(name: "abbr"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "acronym"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "address"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "applet"): NodeListOf<HTMLAppletElement>;
-    getElementsByTagName(name: "area"): NodeListOf<HTMLAreaElement>;
-    getElementsByTagName(name: "article"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "aside"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "audio"): NodeListOf<HTMLAudioElement>;
-    getElementsByTagName(name: "b"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "base"): NodeListOf<HTMLBaseElement>;
-    getElementsByTagName(name: "basefont"): NodeListOf<HTMLBaseFontElement>;
-    getElementsByTagName(name: "bdo"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "big"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "blockquote"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "body"): NodeListOf<HTMLBodyElement>;
-    getElementsByTagName(name: "br"): NodeListOf<HTMLBRElement>;
-    getElementsByTagName(name: "button"): NodeListOf<HTMLButtonElement>;
-    getElementsByTagName(name: "canvas"): NodeListOf<HTMLCanvasElement>;
-    getElementsByTagName(name: "caption"): NodeListOf<HTMLTableCaptionElement>;
-    getElementsByTagName(name: "center"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "circle"): NodeListOf<SVGCircleElement>;
-    getElementsByTagName(name: "cite"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "clippath"): NodeListOf<SVGClipPathElement>;
-    getElementsByTagName(name: "code"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "col"): NodeListOf<HTMLTableColElement>;
-    getElementsByTagName(name: "colgroup"): NodeListOf<HTMLTableColElement>;
-    getElementsByTagName(name: "datalist"): NodeListOf<HTMLDataListElement>;
-    getElementsByTagName(name: "dd"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "defs"): NodeListOf<SVGDefsElement>;
-    getElementsByTagName(name: "del"): NodeListOf<HTMLModElement>;
-    getElementsByTagName(name: "desc"): NodeListOf<SVGDescElement>;
-    getElementsByTagName(name: "dfn"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "dir"): NodeListOf<HTMLDirectoryElement>;
-    getElementsByTagName(name: "div"): NodeListOf<HTMLDivElement>;
-    getElementsByTagName(name: "dl"): NodeListOf<HTMLDListElement>;
-    getElementsByTagName(name: "dt"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "ellipse"): NodeListOf<SVGEllipseElement>;
-    getElementsByTagName(name: "em"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "embed"): NodeListOf<HTMLEmbedElement>;
-    getElementsByTagName(name: "feblend"): NodeListOf<SVGFEBlendElement>;
-    getElementsByTagName(name: "fecolormatrix"): NodeListOf<SVGFEColorMatrixElement>;
-    getElementsByTagName(name: "fecomponenttransfer"): NodeListOf<SVGFEComponentTransferElement>;
-    getElementsByTagName(name: "fecomposite"): NodeListOf<SVGFECompositeElement>;
-    getElementsByTagName(name: "feconvolvematrix"): NodeListOf<SVGFEConvolveMatrixElement>;
-    getElementsByTagName(name: "fediffuselighting"): NodeListOf<SVGFEDiffuseLightingElement>;
-    getElementsByTagName(name: "fedisplacementmap"): NodeListOf<SVGFEDisplacementMapElement>;
-    getElementsByTagName(name: "fedistantlight"): NodeListOf<SVGFEDistantLightElement>;
-    getElementsByTagName(name: "feflood"): NodeListOf<SVGFEFloodElement>;
-    getElementsByTagName(name: "fefunca"): NodeListOf<SVGFEFuncAElement>;
-    getElementsByTagName(name: "fefuncb"): NodeListOf<SVGFEFuncBElement>;
-    getElementsByTagName(name: "fefuncg"): NodeListOf<SVGFEFuncGElement>;
-    getElementsByTagName(name: "fefuncr"): NodeListOf<SVGFEFuncRElement>;
-    getElementsByTagName(name: "fegaussianblur"): NodeListOf<SVGFEGaussianBlurElement>;
-    getElementsByTagName(name: "feimage"): NodeListOf<SVGFEImageElement>;
-    getElementsByTagName(name: "femerge"): NodeListOf<SVGFEMergeElement>;
-    getElementsByTagName(name: "femergenode"): NodeListOf<SVGFEMergeNodeElement>;
-    getElementsByTagName(name: "femorphology"): NodeListOf<SVGFEMorphologyElement>;
-    getElementsByTagName(name: "feoffset"): NodeListOf<SVGFEOffsetElement>;
-    getElementsByTagName(name: "fepointlight"): NodeListOf<SVGFEPointLightElement>;
-    getElementsByTagName(name: "fespecularlighting"): NodeListOf<SVGFESpecularLightingElement>;
-    getElementsByTagName(name: "fespotlight"): NodeListOf<SVGFESpotLightElement>;
-    getElementsByTagName(name: "fetile"): NodeListOf<SVGFETileElement>;
-    getElementsByTagName(name: "feturbulence"): NodeListOf<SVGFETurbulenceElement>;
-    getElementsByTagName(name: "fieldset"): NodeListOf<HTMLFieldSetElement>;
-    getElementsByTagName(name: "figcaption"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "figure"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "filter"): NodeListOf<SVGFilterElement>;
-    getElementsByTagName(name: "font"): NodeListOf<HTMLFontElement>;
-    getElementsByTagName(name: "footer"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "foreignobject"): NodeListOf<SVGForeignObjectElement>;
-    getElementsByTagName(name: "form"): NodeListOf<HTMLFormElement>;
-    getElementsByTagName(name: "frame"): NodeListOf<HTMLFrameElement>;
-    getElementsByTagName(name: "frameset"): NodeListOf<HTMLFrameSetElement>;
-    getElementsByTagName(name: "g"): NodeListOf<SVGGElement>;
-    getElementsByTagName(name: "h1"): NodeListOf<HTMLHeadingElement>;
-    getElementsByTagName(name: "h2"): NodeListOf<HTMLHeadingElement>;
-    getElementsByTagName(name: "h3"): NodeListOf<HTMLHeadingElement>;
-    getElementsByTagName(name: "h4"): NodeListOf<HTMLHeadingElement>;
-    getElementsByTagName(name: "h5"): NodeListOf<HTMLHeadingElement>;
-    getElementsByTagName(name: "h6"): NodeListOf<HTMLHeadingElement>;
-    getElementsByTagName(name: "head"): NodeListOf<HTMLHeadElement>;
-    getElementsByTagName(name: "header"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "hgroup"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "hr"): NodeListOf<HTMLHRElement>;
-    getElementsByTagName(name: "html"): NodeListOf<HTMLHtmlElement>;
-    getElementsByTagName(name: "i"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "iframe"): NodeListOf<HTMLIFrameElement>;
-    getElementsByTagName(name: "image"): NodeListOf<SVGImageElement>;
-    getElementsByTagName(name: "img"): NodeListOf<HTMLImageElement>;
-    getElementsByTagName(name: "input"): NodeListOf<HTMLInputElement>;
-    getElementsByTagName(name: "ins"): NodeListOf<HTMLModElement>;
-    getElementsByTagName(name: "isindex"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "kbd"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "keygen"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "label"): NodeListOf<HTMLLabelElement>;
-    getElementsByTagName(name: "legend"): NodeListOf<HTMLLegendElement>;
-    getElementsByTagName(name: "li"): NodeListOf<HTMLLIElement>;
-    getElementsByTagName(name: "line"): NodeListOf<SVGLineElement>;
-    getElementsByTagName(name: "lineargradient"): NodeListOf<SVGLinearGradientElement>;
-    getElementsByTagName(name: "link"): NodeListOf<HTMLLinkElement>;
-    getElementsByTagName(name: "listing"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "map"): NodeListOf<HTMLMapElement>;
-    getElementsByTagName(name: "mark"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "marker"): NodeListOf<SVGMarkerElement>;
-    getElementsByTagName(name: "marquee"): NodeListOf<HTMLMarqueeElement>;
-    getElementsByTagName(name: "mask"): NodeListOf<SVGMaskElement>;
-    getElementsByTagName(name: "menu"): NodeListOf<HTMLMenuElement>;
-    getElementsByTagName(name: "meta"): NodeListOf<HTMLMetaElement>;
-    getElementsByTagName(name: "metadata"): NodeListOf<SVGMetadataElement>;
-    getElementsByTagName(name: "nav"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "nextid"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "nobr"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "noframes"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "noscript"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "object"): NodeListOf<HTMLObjectElement>;
-    getElementsByTagName(name: "ol"): NodeListOf<HTMLOListElement>;
-    getElementsByTagName(name: "optgroup"): NodeListOf<HTMLOptGroupElement>;
-    getElementsByTagName(name: "option"): NodeListOf<HTMLOptionElement>;
-    getElementsByTagName(name: "p"): NodeListOf<HTMLParagraphElement>;
-    getElementsByTagName(name: "param"): NodeListOf<HTMLParamElement>;
-    getElementsByTagName(name: "path"): NodeListOf<SVGPathElement>;
-    getElementsByTagName(name: "pattern"): NodeListOf<SVGPatternElement>;
-    getElementsByTagName(name: "plaintext"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "polygon"): NodeListOf<SVGPolygonElement>;
-    getElementsByTagName(name: "polyline"): NodeListOf<SVGPolylineElement>;
-    getElementsByTagName(name: "pre"): NodeListOf<HTMLPreElement>;
-    getElementsByTagName(name: "progress"): NodeListOf<HTMLProgressElement>;
-    getElementsByTagName(name: "q"): NodeListOf<HTMLQuoteElement>;
-    getElementsByTagName(name: "radialgradient"): NodeListOf<SVGRadialGradientElement>;
-    getElementsByTagName(name: "rect"): NodeListOf<SVGRectElement>;
-    getElementsByTagName(name: "rt"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "ruby"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "s"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "samp"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "script"): NodeListOf<HTMLScriptElement>;
-    getElementsByTagName(name: "section"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "select"): NodeListOf<HTMLSelectElement>;
-    getElementsByTagName(name: "small"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "source"): NodeListOf<HTMLSourceElement>;
-    getElementsByTagName(name: "span"): NodeListOf<HTMLSpanElement>;
-    getElementsByTagName(name: "stop"): NodeListOf<SVGStopElement>;
-    getElementsByTagName(name: "strike"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "strong"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "style"): NodeListOf<HTMLStyleElement>;
-    getElementsByTagName(name: "sub"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "sup"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "svg"): NodeListOf<SVGSVGElement>;
-    getElementsByTagName(name: "switch"): NodeListOf<SVGSwitchElement>;
-    getElementsByTagName(name: "symbol"): NodeListOf<SVGSymbolElement>;
-    getElementsByTagName(name: "table"): NodeListOf<HTMLTableElement>;
-    getElementsByTagName(name: "tbody"): NodeListOf<HTMLTableSectionElement>;
-    getElementsByTagName(name: "td"): NodeListOf<HTMLTableDataCellElement>;
-    getElementsByTagName(name: "text"): NodeListOf<SVGTextElement>;
-    getElementsByTagName(name: "textpath"): NodeListOf<SVGTextPathElement>;
-    getElementsByTagName(name: "textarea"): NodeListOf<HTMLTextAreaElement>;
-    getElementsByTagName(name: "tfoot"): NodeListOf<HTMLTableSectionElement>;
-    getElementsByTagName(name: "th"): NodeListOf<HTMLTableHeaderCellElement>;
-    getElementsByTagName(name: "thead"): NodeListOf<HTMLTableSectionElement>;
-    getElementsByTagName(name: "title"): NodeListOf<HTMLTitleElement>;
-    getElementsByTagName(name: "tr"): NodeListOf<HTMLTableRowElement>;
-    getElementsByTagName(name: "track"): NodeListOf<HTMLTrackElement>;
-    getElementsByTagName(name: "tspan"): NodeListOf<SVGTSpanElement>;
-    getElementsByTagName(name: "tt"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "u"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "ul"): NodeListOf<HTMLUListElement>;
-    getElementsByTagName(name: "use"): NodeListOf<SVGUseElement>;
-    getElementsByTagName(name: "var"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "video"): NodeListOf<HTMLVideoElement>;
-    getElementsByTagName(name: "view"): NodeListOf<SVGViewElement>;
-    getElementsByTagName(name: "wbr"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: "x-ms-webview"): NodeListOf<MSHTMLWebViewElement>;
-    getElementsByTagName(name: "xmp"): NodeListOf<HTMLElement>;
-    getElementsByTagName(name: string): NodeListOf<Element>;
-    getElementsByTagNameNS(namespaceURI: string, localName: string): NodeListOf<Element>;
+    getElementsByTagName<K extends keyof ElementListTagNameMap>(name: K): ElementListTagNameMap[K];
+    getElementsByTagName(name: string): INodeListOf<IElement>;
+    getElementsByTagNameNS(namespaceURI: "http://www.w3.org/1999/xhtml", localName: string): IHTMLCollectionOf<IHTMLElement>;
+    getElementsByTagNameNS(namespaceURI: "http://www.w3.org/2000/svg", localName: string): IHTMLCollectionOf<ISVGElement>;
+    getElementsByTagNameNS(namespaceURI: string, localName: string): IHTMLCollectionOf<IElement>;
     hasAttribute(name: string): boolean;
     hasAttributeNS(namespaceURI: string, localName: string): boolean;
     msGetRegionContent(): MSRangeCollection;
@@ -292,58 +135,34 @@ interface IElement extends INode, GlobalEventHandlers, IElementTraversal, INodeS
     msSetPointerCapture(pointerId: number): void;
     msZoomTo(args: MsZoomToOptions): void;
     releasePointerCapture(pointerId: number): void;
-    removeAttribute(name?: string): void;
+    removeAttribute(qualifiedName: string): void;
     removeAttributeNS(namespaceURI: string, localName: string): void;
-    removeAttributeNode(oldAttr: IAttr): IAttr;
+    removeAttributeNode(oldAttr: Attr): Attr;
     requestFullscreen(): void;
     requestPointerLock(): void;
     setAttribute(name: string, value: string): void;
     setAttributeNS(namespaceURI: string, qualifiedName: string, value: string): void;
-    setAttributeNode(newAttr: IAttr): IAttr;
-    setAttributeNodeNS(newAttr: IAttr): IAttr;
+    setAttributeNode(newAttr: Attr): Attr;
+    setAttributeNodeNS(newAttr: Attr): Attr;
     setPointerCapture(pointerId: number): void;
     webkitMatchesSelector(selectors: string): boolean;
     webkitRequestFullScreen(): void;
     webkitRequestFullscreen(): void;
-    getElementsByClassName(classNames: string): NodeListOf<Element>;
+    getElementsByClassName(classNames: string): INodeListOf<IElement>;
     matches(selector: string): boolean;
-    getElementsByTagName(tagname: "picture"): NodeListOf<HTMLPictureElement>;
-    addEventListener(type: "MSGestureChange", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSGestureDoubleTap", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSGestureEnd", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSGestureHold", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSGestureStart", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSGestureTap", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSGotPointerCapture", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSInertiaStart", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSLostPointerCapture", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerCancel", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerDown", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerEnter", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerLeave", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerMove", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerOut", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerOver", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerUp", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "ariarequest", listener: (ev: AriaRequestEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "command", listener: (ev: CommandEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "gotpointercapture", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "lostpointercapture", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointercancel", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointerdown", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointerenter", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointerleave", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointermove", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointerout", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointerover", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointerup", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "touchcancel", listener: (ev: TouchEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "touchend", listener: (ev: TouchEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "touchmove", listener: (ev: TouchEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "touchstart", listener: (ev: TouchEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "webkitfullscreenchange", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "webkitfullscreenerror", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "wheel", listener: (ev: WheelEvent) => any, useCapture?: boolean): void;
+    closest(selector: string): IElement | null;
+    scrollIntoView(arg?: boolean | ScrollIntoViewOptions): void;
+    scroll(options?: ScrollToOptions): void;
+    scroll(x: number, y: number): void;
+    scrollTo(options?: ScrollToOptions): void;
+    scrollTo(x: number, y: number): void;
+    scrollBy(options?: ScrollToOptions): void;
+    scrollBy(x: number, y: number): void;
+    insertAdjacentElement(position: string, insertedElement: IElement): IElement | null;
+    insertAdjacentHTML(where: string, html: string): void;
+    insertAdjacentText(where: string, text: string): void;
+    attachShadow(shadowRootInitDict: ShadowRootInit): ShadowRoot;
+    addEventListener<K extends keyof ElementEventMap>(type: K, listener: (this: IElement, ev: ElementEventMap[K]) => any, useCapture?: boolean): void;
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
 }
 interface ICharacterData extends INode, IChildNode {
@@ -364,20 +183,22 @@ interface IText extends ICharacterData {
 interface IComment extends ICharacterData {
     textContent: string;
 }
-interface IHTMLCollection {
+interface IHTMLCollectionBase {
     /**
       * Sets or retrieves the number of objects in a collection.
       */
-    length: number;
+    readonly length: number;
     /**
       * Retrieves an object from various collections.
       */
-    item(nameOrIndex?: any, optionalIndex?: any): IHTMLElement | undefined;
+    item(index: number): IElement;
+    [index: number]: IElement;
+}
+interface IHTMLCollection extends IHTMLCollectionBase {
     /**
       * Retrieves a select object or an object from an options collection.
       */
-    namedItem(name: string): IHTMLElement;
-    [index: number]: IHTMLElement | undefined;
+    namedItem(name: string): IElement | null;
 }
 interface IHTMLElement extends IElement {
     attributes: INamedNodeMap;
@@ -474,114 +295,32 @@ interface IHTMLElement extends IElement {
     click(): void;
     dragDrop(): boolean;
     focus(): void;
-    insertAdjacentElement(position: string, insertedElement: Element): Element;
+    insertAdjacentElement(position: string, insertedElement: IElement): IElement;
     insertAdjacentHTML(where: string, html: string): void;
     insertAdjacentText(where: string, text: string): void;
     msGetInputContext(): MSInputMethodContext;
     scrollIntoView(top?: boolean): void;
     setActive(): void;
-    addEventListener(type: "MSContentZoom", listener: (ev: UIEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSGestureChange", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSGestureDoubleTap", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSGestureEnd", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSGestureHold", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSGestureStart", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSGestureTap", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSGotPointerCapture", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSInertiaStart", listener: (ev: MSGestureEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSLostPointerCapture", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSManipulationStateChanged", listener: (ev: MSManipulationEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerCancel", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerDown", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerEnter", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerLeave", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerMove", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerOut", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerOver", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "MSPointerUp", listener: (ev: MSPointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "abort", listener: (ev: UIEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "activate", listener: (ev: UIEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "ariarequest", listener: (ev: AriaRequestEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "beforeactivate", listener: (ev: UIEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "beforecopy", listener: (ev: DragEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "beforecut", listener: (ev: DragEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "beforedeactivate", listener: (ev: UIEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "beforepaste", listener: (ev: DragEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "blur", listener: (ev: FocusEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "canplay", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "canplaythrough", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "change", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "click", listener: (ev: MouseEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "command", listener: (ev: CommandEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "contextmenu", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "copy", listener: (ev: DragEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "cuechange", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "cut", listener: (ev: DragEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "dblclick", listener: (ev: MouseEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "deactivate", listener: (ev: UIEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "drag", listener: (ev: DragEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "dragend", listener: (ev: DragEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "dragenter", listener: (ev: DragEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "dragleave", listener: (ev: DragEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "dragover", listener: (ev: DragEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "dragstart", listener: (ev: DragEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "drop", listener: (ev: DragEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "durationchange", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "emptied", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "ended", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "error", listener: (ev: ErrorEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "focus", listener: (ev: FocusEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "gotpointercapture", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "input", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "keydown", listener: (ev: KeyboardEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "keypress", listener: (ev: KeyboardEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "keyup", listener: (ev: KeyboardEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "load", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "loadeddata", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "loadedmetadata", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "loadstart", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "lostpointercapture", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "mousedown", listener: (ev: MouseEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "mouseenter", listener: (ev: MouseEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "mouseleave", listener: (ev: MouseEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "mousemove", listener: (ev: MouseEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "mouseout", listener: (ev: MouseEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "mouseover", listener: (ev: MouseEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "mouseup", listener: (ev: MouseEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "mousewheel", listener: (ev: MouseWheelEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "paste", listener: (ev: DragEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pause", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "play", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "playing", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointercancel", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointerdown", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointerenter", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointerleave", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointermove", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointerout", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointerover", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "pointerup", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "progress", listener: (ev: ProgressEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "ratechange", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "reset", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "scroll", listener: (ev: UIEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "seeked", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "seeking", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "select", listener: (ev: UIEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "selectstart", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "stalled", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "submit", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "suspend", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "timeupdate", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "touchcancel", listener: (ev: TouchEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "touchend", listener: (ev: TouchEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "touchmove", listener: (ev: TouchEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "touchstart", listener: (ev: TouchEvent) => any, useCapture?: boolean): void;
-    addEventListener(type: "volumechange", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "waiting", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "webkitfullscreenchange", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "webkitfullscreenerror", listener: (ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "wheel", listener: (ev: WheelEvent) => any, useCapture?: boolean): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: IHTMLElement, ev: HTMLElementEventMap[K]) => any, useCapture?: boolean): void;
+    addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
+}
+interface ISVGElement extends IElement {
+    className: any;
+    onclick: (this: ISVGElement, ev: MouseEvent) => any;
+    ondblclick: (this: ISVGElement, ev: MouseEvent) => any;
+    onfocusin: (this: ISVGElement, ev: FocusEvent) => any;
+    onfocusout: (this: ISVGElement, ev: FocusEvent) => any;
+    onload: (this: ISVGElement, ev: Event) => any;
+    onmousedown: (this: ISVGElement, ev: MouseEvent) => any;
+    onmousemove: (this: ISVGElement, ev: MouseEvent) => any;
+    onmouseout: (this: ISVGElement, ev: MouseEvent) => any;
+    onmouseover: (this: ISVGElement, ev: MouseEvent) => any;
+    onmouseup: (this: ISVGElement, ev: MouseEvent) => any;
+    readonly ownerSVGElement: SVGSVGElement;
+    readonly style: CSSStyleDeclaration;
+    readonly viewportElement: ISVGElement;
+    xmlbase: string;
+    addEventListener<K extends keyof SVGElementEventMap>(type: K, listener: (this: ISVGElement, ev: SVGElementEventMap[K]) => any, useCapture?: boolean): void;
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
 }
 interface IHTMLTextAreaElement extends IHTMLElement {
@@ -961,11 +700,6 @@ declare class RootScope implements Scope {
     __name__: undefined;
     constructor(document: INode);
 }
-declare class IAttr {
-    readonly name: string;
-    value: string;
-    constructor(name: string, value: string);
-}
 declare class VNamedNodeMap {
     [index: number]: IAttr;
     private _length;
@@ -1019,7 +753,7 @@ declare class ClassList {
     item(i: number): string;
 }
 declare namespace VMDOM {
-    class VNodeList {
+    class VNodeList implements INodeList {
         length: number;
         item(index: number): VNode & IVNodeMethod | undefined;
         [index: number]: VNode & IVNodeMethod | undefined;
@@ -1095,7 +829,7 @@ declare namespace VMDOM {
         abstract toJS(space?: number): string;
         abstract toCreateJS(space?: number): string;
         readonly childNodes: VNodeList;
-        parentNode: VNode & IVNodeMethod | null;
+        parentNode: (VNode & IVNodeMethod) | null;
         /**
          * 用自身做环境调用函数,并返回父
          */
@@ -1133,8 +867,8 @@ declare namespace VMDOM {
          * 添加子节点，并返回子节点
          */
         protected doAppendChild(this: VNode, vNode: VNode & IVNodeMethod): VNode & IVNodeMethod;
-        insertBefore(this: VNode & IVNodeMethod, newNode: VNode & IVNodeMethod, refChild: VNode & IVNodeMethod): VNode & IVNodeMethod;
-        insertBefore2(this: VNode & IVNodeMethod, newNode: VNode & IVNodeMethod, node: VNode & IVNodeMethod): VNode & IVNodeMethod;
+        insertBefore(this: VNode & IVNodeMethod, newChild: VNode & IVNodeMethod, refChild: VNode & IVNodeMethod): VNode & IVNodeMethod;
+        insertBefore2(this: VNode & IVNodeMethod, newChild: VNode & IVNodeMethod, refChild: VNode & IVNodeMethod): VNode & IVNodeMethod;
         remove(): void;
         removeChild(this: VNode & IVNodeMethod, vNode: VNode & IVNodeMethod): VNode & IVNodeMethod;
         getData(this: VNode): string;
@@ -1143,6 +877,8 @@ declare namespace VMDOM {
         toJSString(space?: number): string;
         toDOM(): Node;
         protected doToDOM(): Node;
+        normalize(): void;
+        replaceChild(newChild: VNode & IVNodeMethod, oldChild: VNode & IVNodeMethod): VNode & IVNodeMethod;
         protected copyPropertyToNode(elem: Node): void;
         /**与真实DOM交互 */
         protected connectParent<T extends IVNodeMethod>(this: VNode, elem: Node): void;
@@ -1183,42 +919,33 @@ declare namespace VMDOM {
         innerHTML: VElement & IVNodeMethod;
         removeChild(this: VElement & IVNodeMethod, vNode: VNode & IVNodeMethod): VNode & IVNodeMethod;
         toHTMLString(): string[];
-        onpointercancel: (this: this, ev: PointerEvent) => any;
-        onpointerdown: (this: this, ev: PointerEvent) => any;
-        onpointerenter: (this: this, ev: PointerEvent) => any;
-        onpointerleave: (this: this, ev: PointerEvent) => any;
-        onpointermove: (this: this, ev: PointerEvent) => any;
-        onpointerout: (this: this, ev: PointerEvent) => any;
-        onpointerover: (this: this, ev: PointerEvent) => any;
-        onpointerup: (this: this, ev: PointerEvent) => any;
-        onwheel: (this: this, ev: WheelEvent) => any;
-        onariarequest: (this: this, ev: AriaRequestEvent) => any;
-        oncommand: (this: this, ev: CommandEvent) => any;
-        ongotpointercapture: (this: this, ev: PointerEvent) => any;
-        onlostpointercapture: (this: this, ev: PointerEvent) => any;
-        onmsgesturechange: (this: this, ev: MSGestureEvent) => any;
-        onmsgesturedoubletap: (this: this, ev: MSGestureEvent) => any;
-        onmsgestureend: (this: this, ev: MSGestureEvent) => any;
-        onmsgesturehold: (this: this, ev: MSGestureEvent) => any;
-        onmsgesturestart: (this: this, ev: MSGestureEvent) => any;
-        onmsgesturetap: (this: this, ev: MSGestureEvent) => any;
-        onmsgotpointercapture: (this: this, ev: MSPointerEvent) => any;
-        onmsinertiastart: (this: this, ev: MSGestureEvent) => any;
-        onmslostpointercapture: (this: this, ev: MSPointerEvent) => any;
-        onmspointercancel: (this: this, ev: MSPointerEvent) => any;
-        onmspointerdown: (this: this, ev: MSPointerEvent) => any;
-        onmspointerenter: (this: this, ev: MSPointerEvent) => any;
-        onmspointerleave: (this: this, ev: MSPointerEvent) => any;
-        onmspointermove: (this: this, ev: MSPointerEvent) => any;
-        onmspointerout: (this: this, ev: MSPointerEvent) => any;
-        onmspointerover: (this: this, ev: MSPointerEvent) => any;
-        onmspointerup: (this: this, ev: MSPointerEvent) => any;
+        onariarequest: (this: IElement, ev: Event) => any;
+        oncommand: (this: IElement, ev: Event) => any;
+        ongotpointercapture: (this: IElement, ev: PointerEvent) => any;
+        onlostpointercapture: (this: IElement, ev: PointerEvent) => any;
+        onmsgesturechange: (this: IElement, ev: MSGestureEvent) => any;
+        onmsgesturedoubletap: (this: IElement, ev: MSGestureEvent) => any;
+        onmsgestureend: (this: IElement, ev: MSGestureEvent) => any;
+        onmsgesturehold: (this: IElement, ev: MSGestureEvent) => any;
+        onmsgesturestart: (this: IElement, ev: MSGestureEvent) => any;
+        onmsgesturetap: (this: IElement, ev: MSGestureEvent) => any;
+        onmsgotpointercapture: (this: IElement, ev: MSPointerEvent) => any;
+        onmsinertiastart: (this: IElement, ev: MSGestureEvent) => any;
+        onmslostpointercapture: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointercancel: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointerdown: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointerenter: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointerleave: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointermove: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointerout: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointerover: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointerup: (this: IElement, ev: MSPointerEvent) => any;
         ontouchcancel: (ev: TouchEvent) => any;
         ontouchend: (ev: TouchEvent) => any;
         ontouchmove: (ev: TouchEvent) => any;
         ontouchstart: (ev: TouchEvent) => any;
-        onwebkitfullscreenchange: (this: this, ev: Event) => any;
-        onwebkitfullscreenerror: (this: this, ev: Event) => any;
+        onwebkitfullscreenchange: (this: IElement, ev: Event) => any;
+        onwebkitfullscreenerror: (this: IElement, ev: Event) => any;
     }
 }
 declare let encodeHTML: (value: string) => string;
@@ -1352,7 +1079,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VAElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "A";
         target: string;
         download: string;
         ping: string;
@@ -1372,7 +1099,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VAreaElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "AREA";
         alt: string;
         coords: string;
         shape: string;
@@ -1388,7 +1115,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VBaseElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "BASE";
         href: string;
         target: string;
         constructor();
@@ -1399,7 +1126,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VBasefontElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "BASEFONT";
         title: string;
         lang: string;
         accessKey: string;
@@ -1413,7 +1140,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VBlockquoteElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "BLOCKQUOTE";
         cite: string;
     }
 }
@@ -1422,7 +1149,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VBodyElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "BODY";
         text: string;
         link: string;
         vLink: string;
@@ -1436,7 +1163,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VBrElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "BR";
         clear: string;
         constructor();
     }
@@ -1446,7 +1173,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VCanvasElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "CANVAS";
         width: string;
         height: string;
     }
@@ -1456,7 +1183,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VCaptionElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "CAPTION";
         align: string;
     }
 }
@@ -1465,7 +1192,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VColElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "COL";
         span: string;
         align: string;
         vAlign: string;
@@ -1478,7 +1205,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VColgroupElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "COLGROUP";
         span: string;
         align: string;
         vAlign: string;
@@ -1490,7 +1217,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VDialogElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "DIALOG";
         open: string;
     }
 }
@@ -1499,7 +1226,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VDirElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "DIR";
         compact: string;
     }
 }
@@ -1508,7 +1235,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VDivElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "DIV";
         align: string;
     }
 }
@@ -1517,7 +1244,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VDlElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "DL";
         compact: string;
     }
 }
@@ -1526,7 +1253,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VFieldsetElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "FIELDSET";
         disabled: string;
         name: string;
     }
@@ -1536,7 +1263,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VFrameElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "FRAME";
         name: string;
         scrolling: string;
         frameBorder: string;
@@ -1555,7 +1282,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VH1Element extends VHtmlElement {
-        nodeName: string;
+        nodeName: "H1";
         align: string;
     }
 }
@@ -1564,7 +1291,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VH2Element extends VHtmlElement {
-        nodeName: string;
+        nodeName: "H2";
         align: string;
     }
 }
@@ -1573,7 +1300,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VH3Element extends VHtmlElement {
-        nodeName: string;
+        nodeName: "H3";
         align: string;
     }
 }
@@ -1582,7 +1309,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VH4Element extends VHtmlElement {
-        nodeName: string;
+        nodeName: "H4";
         align: string;
     }
 }
@@ -1591,7 +1318,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VH5Element extends VHtmlElement {
-        nodeName: string;
+        nodeName: "H5";
         align: string;
     }
 }
@@ -1600,7 +1327,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VH6Element extends VHtmlElement {
-        nodeName: string;
+        nodeName: "H6";
         align: string;
     }
 }
@@ -1609,7 +1336,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VHeadElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "HEAD";
         title: string;
         lang: string;
         accessKey: string;
@@ -1622,7 +1349,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VHrElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "HR";
         align: string;
         color: string;
         noShade: string;
@@ -1636,7 +1363,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VIframeElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "IFRAME";
         src: string;
         srcdoc: string;
         name: string;
@@ -1657,7 +1384,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VImgElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "IMG";
         alt: string;
         src: string;
         srcset: string;
@@ -1682,7 +1409,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VInputElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "INPUT";
         accept: string;
         alt: string;
         autocomplete: string;
@@ -1727,7 +1454,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VInsElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "INS";
         cite: string;
         dateTime: string;
     }
@@ -1737,7 +1464,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VKeygenElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "KEYGEN";
         autofocus: string;
         challenge: string;
         disabled: string;
@@ -1750,7 +1477,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VLegendElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "LEGEND";
         align: string;
     }
 }
@@ -1759,7 +1486,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VLiElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "LI";
         value: string;
         type: string;
     }
@@ -1769,7 +1496,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VLinkElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "LINK";
         disabled: string;
         href: string;
         crossOrigin: string;
@@ -1789,7 +1516,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VMapElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "MAP";
         name: string;
         constructor();
     }
@@ -1799,7 +1526,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VMenuElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "MENU";
         compact: string;
     }
 }
@@ -1808,7 +1535,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VMetaElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "META";
         name: string;
         content: string;
         scheme: string;
@@ -1820,7 +1547,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VMeterElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "METER";
         value: string;
         min: string;
         max: string;
@@ -1834,7 +1561,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VOlElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "OL";
         reversed: string;
         start: string;
         type: string;
@@ -1846,7 +1573,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VOptgroupElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "OPTGROUP";
         disabled: string;
         label: string;
     }
@@ -1856,7 +1583,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VOptionElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "OPTION";
         disabled: string;
         label: string;
         selected: string;
@@ -1868,7 +1595,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VOutputElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "OUTPUT";
         name: string;
     }
 }
@@ -1877,7 +1604,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VParamElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "PARAM";
         name: string;
         value: string;
         type: string;
@@ -1890,7 +1617,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VPElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "P";
         align: string;
     }
 }
@@ -1899,7 +1626,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VPreElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "PRE";
         width: string;
     }
 }
@@ -1908,7 +1635,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VProgressElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "PROGRESS";
         value: string;
         max: string;
     }
@@ -1918,7 +1645,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VQElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "Q";
         cite: string;
     }
 }
@@ -1927,7 +1654,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VScriptElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "SCRIPT";
         src: string;
         type: string;
         charset: string;
@@ -1946,7 +1673,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VSelectElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "SELECT";
         autofocus: string;
         disabled: string;
         multiple: string;
@@ -1962,7 +1689,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VSourceElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "SOURCE";
         src: string;
         type: string;
         srcset: string;
@@ -1975,7 +1702,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VStyleElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "STYLE";
         media: string;
         type: string;
     }
@@ -1985,7 +1712,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VTableElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "TABLE";
         align: string;
         border: string;
         frame: string;
@@ -2002,7 +1729,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VTbodyElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "TBODY";
         align: string;
         vAlign: string;
     }
@@ -2012,7 +1739,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VTdElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "TD";
         colSpan: string;
         rowSpan: string;
         headers: string;
@@ -2032,7 +1759,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VTextareaElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "TEXTAREA";
         autofocus: string;
         cols: string;
         dirName: string;
@@ -2056,7 +1783,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VTfootElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "TFOOT";
         align: string;
         vAlign: string;
     }
@@ -2066,7 +1793,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VTheadElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "THREAD";
         align: string;
         vAlign: string;
     }
@@ -2076,7 +1803,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VThElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "TH";
         colSpan: string;
         rowSpan: string;
         headers: string;
@@ -2096,7 +1823,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VTrackElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "TRACK";
         kind: string;
         src: string;
         srclang: string;
@@ -2109,7 +1836,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VTrElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "TR";
         align: string;
         vAlign: string;
         bgColor: string;
@@ -2120,7 +1847,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VUlElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "UL";
         compact: string;
         type: string;
     }
@@ -2130,7 +1857,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VVideoElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "VIDEO";
         width: string;
         height: string;
         poster: string;
@@ -2141,7 +1868,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VXmpElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "XMP";
         width: string;
     }
 }
@@ -2150,7 +1877,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VTitleElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "TITLE";
         title: string;
         lang: string;
         accessKey: string;
@@ -2163,7 +1890,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VSpanElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "SPAN";
         title: string;
         lang: string;
         accessKey: string;
@@ -2176,7 +1903,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VEmElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "EM";
         title: string;
         lang: string;
         accessKey: string;
@@ -2189,7 +1916,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VIElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "I";
         title: string;
         lang: string;
         accessKey: string;
@@ -2202,7 +1929,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VBElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "B";
         title: string;
         lang: string;
         accessKey: string;
@@ -2215,7 +1942,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VFormElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "FORM";
         name: string;
         target: string;
         title: string;
@@ -2230,7 +1957,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VLabelElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "LABEL";
         title: string;
         lang: string;
         accessKey: string;
@@ -2243,7 +1970,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VDtElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "DT";
         title: string;
         lang: string;
         accessKey: string;
@@ -2256,7 +1983,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VDdElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "DD";
         title: string;
         lang: string;
         accessKey: string;
@@ -2269,7 +1996,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VEmbedElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "EMBED";
         type: string;
         width: string;
         height: string;
@@ -2287,7 +2014,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VStrongElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "STRONG";
         title: string;
         lang: string;
         accessKey: string;
@@ -2300,7 +2027,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VButtonElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "BUTTON";
         formTarget: string;
         name: string;
         value: string;
@@ -2316,7 +2043,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VObjectElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "OBJECT";
         type: string;
         name: string;
         useMap: string;
@@ -2340,7 +2067,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VSvgElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "SVG";
         title: string;
         lang: string;
         accessKey: string;
@@ -2353,7 +2080,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VCircleElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "CIRCLE";
         title: string;
         lang: string;
         accessKey: string;
@@ -2366,7 +2093,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VHeaderElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "HEADER";
         title: string;
         lang: string;
         accessKey: string;
@@ -2379,7 +2106,7 @@ interface IVNodeMethod {
 }
 declare namespace VMDOM {
     class VFooterElement extends VHtmlElement {
-        nodeName: string;
+        nodeName: "FOOTER";
         title: string;
         lang: string;
         accessKey: string;
@@ -2526,6 +2253,7 @@ declare namespace JS {
      * @param {boolean=false} deep 递归
      */
     function deleteStatementSpace(statement: JavaScriptStatement, deep?: boolean): void;
+    function isSpace(keyWord: string): boolean;
 }
 declare namespace JS {
     abstract class JavaScriptLogic {
@@ -2557,18 +2285,26 @@ declare namespace JS {
         clone(): JavaScriptBlock;
     }
 }
+declare namespace VMDOM {
+    class VOrderData {
+        name: string;
+        condition: JS.JavaScriptBlock | null | undefined;
+        constructor(name: string, condition: JS.JavaScriptBlock | null | undefined);
+        clone(): VOrderData;
+    }
+}
 declare const enum ENodeType {
     Order = 102,
 }
 interface IVNodeMethod {
-    (block: JS.JavaScriptBlock, nodeType: ENodeType.Order): VMDOM.VOrder & IVNodeMethod;
+    (data: VMDOM.VOrderData, nodeType: ENodeType.Order): VMDOM.VOrder & IVNodeMethod;
 }
 declare namespace VMDOM {
     class VOrder extends VPlaceHolder {
-        block: JS.JavaScriptBlock;
+        orderData: VOrderData;
         nodeName: string;
         nodeType: ENodeType;
-        constructor(block: JS.JavaScriptBlock);
+        constructor(orderData: VOrderData);
         cloneNode(deep: boolean): VOrder & IVNodeMethod;
         toJS(space?: number): string;
     }
@@ -2626,7 +2362,13 @@ declare namespace Order {
     let orders: {
         [index: string]: IOrderConstructor;
     };
+    /**
+     * 注册Order到系统
+    */
     function register(order: IOrderConstructor): void;
+    /**
+     * 解析并渲染order
+     */
     function parseOrder(this: void, node: VMDOM.VOrder): VOrder | undefined;
     function parseComment(this: void, node: VMDOM.VComment): VOrder | undefined;
     function newScopeFunction(this: void, params: string[]): Function;
@@ -2690,7 +2432,7 @@ declare class Store {
 }
 declare class StoreManage {
     static take(data: Store, name: string): INode | INodeList | undefined;
-    static takeElem(data: Store, name: string): IHTMLElement | IHTMLCollection | undefined;
+    static takeElem(data: Store, name: string): IElement | IHTMLCollection | undefined;
 }
 interface ITurtle {
     config: Config;
@@ -2733,8 +2475,6 @@ declare function getUIInfo(node: IHTMLElement): string | {
     name: string;
 };
 declare function parseGet(node: IHTMLElement, outerChildNodes: any, outerElement: any, props: any, part: any): eTreeEach;
-declare function isHTMLElement(p: IHTMLElement | IHTMLCollection): p is IHTMLElement;
-declare function parseSet(node: IHTMLElement, outerChildNodes: INode[], outerElement: IElement[], props: any, part: any): eTreeEach;
 declare let exec: typeof eval;
 declare function execOnScript(node: IHTMLElement, outerChildNodes: any, outerElement: any, props: any, part: any): void;
 declare function execScript(node: IHTMLElement, outerChildNodes?: any, outerElement?: any, props?: any, part?: any): void;
@@ -2746,7 +2486,6 @@ declare function parseScript(node: IHTMLElement, outerChildNodes: any, outerElem
 declare function execNodeQuestion(node: IHTMLElement, outerChildNodes: any, outerElement: any, props: any, part: any): void;
 declare class ElementParser {
     GET: typeof parseGet;
-    SET: typeof parseSet;
     SCRIPT: typeof parseScript;
 }
 declare function render(this: void, uiNode: IHTMLElement | null, outerChildNodes: INode[], outerElement: IHTMLCollection, props: Object | null, uiInfo: string | {

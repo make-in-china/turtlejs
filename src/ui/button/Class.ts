@@ -3,16 +3,13 @@
 //本模块由引擎生成，请勿手动修改此文件
 //生成时间:Mon Jan 30 2017 06:54:45 GMT+0800 (中国标准时间)
 
-namespace Component{
-    @register
-    export class Button extends Part{
-        constructor(
-            public props:ComponentView.IButtonProps,
-            public outerChildNodes?:INode[]
-        ) {
-            super("button",new ComponentView.Button,props,outerChildNodes);
-            new ComponentScript.Button(this);
-        }
+class Button extends Component.Part{
+    constructor(
+        public props:IButtonProps,
+        public outerChildNodes?:INode[]
+    ) {
+        super("button",new ButtonView,props,outerChildNodes);
+        initButton(this);
     }
 }
 

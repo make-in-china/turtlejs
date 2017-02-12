@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -12,7 +17,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var ArrayEx = (function (_super) {
     __extends(ArrayEx, _super);
     function ArrayEx() {
-        return _super.apply(this, arguments) || this;
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     ArrayEx.prototype.last = function () {
         if (this.length > 0) {
@@ -27,7 +32,15 @@ var ArrayEx = (function (_super) {
     };
     return ArrayEx;
 }(Array));
+var IAttr = (function () {
+    function IAttr(name, value) {
+        this.name = name;
+        this.value = value;
+    }
+    return IAttr;
+}());
 /// <reference path="../lib/ArrayEx.ts"/>
+/// <reference path="IAttr.ts"/>
 /// <reference path="../lib/lib.ts" />
 typeof Node !== 'undefined' && (function () {
     var appendChild = Node.prototype.appendChild;
@@ -673,7 +686,7 @@ var EventHelper = (function () {
 var EventEmitterEx = (function (_super) {
     __extends(EventEmitterEx, _super);
     function EventEmitterEx() {
-        var _this = _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
         /**
          * 缓存事件管理器
          */
@@ -885,13 +898,6 @@ var RootScope = (function () {
         document.__scope__ = this;
     }
     return RootScope;
-}());
-var IAttr = (function () {
-    function IAttr(name, value) {
-        this.name = name;
-        this.value = value;
-    }
-    return IAttr;
 }());
 /// <reference path="../../lib/is.ts"/>
 /// <reference path="../../lib/IAttr.ts"/>
@@ -1454,6 +1460,14 @@ var VMDOM;
             this.vmData = new VNodeVMData();
             this.childNodes = new VMDOM.VNodeList;
         }
+        // get parentElement():(VHtmlElement&IVNodeMethod) | null{
+        //     let node=this.parentNode;
+        //     if(node&&isVHTMLElement(node)){
+        //         return node;
+        //     }else{
+        //         return null;
+        //     }
+        // }
         /**
          * 用自身做环境调用函数,并返回父
          */
@@ -1552,23 +1566,23 @@ var VMDOM;
             vNode.parentNode = this;
             return vNode;
         };
-        VNode.prototype.insertBefore = function (newNode, refChild) {
+        VNode.prototype.insertBefore = function (newChild, refChild) {
             //添加到childNodes里
             var chds = this.childNodes;
             var idx = indexOf.call(chds, refChild);
             if (idx === -1) {
-                return newNode;
+                return newChild;
             }
-            var p2 = newNode.parentNode;
+            var p2 = newChild.parentNode;
             if (p2) {
-                p2.removeChild(newNode);
+                p2.removeChild(newChild);
             }
-            splice.call(chds, idx, 0, newNode);
-            newNode.parentNode = this;
-            return newNode;
+            splice.call(chds, idx, 0, newChild);
+            newChild.parentNode = this;
+            return newChild;
         };
-        VNode.prototype.insertBefore2 = function (newNode, node) {
-            return this.insertBefore(newNode, node);
+        VNode.prototype.insertBefore2 = function (newChild, refChild) {
+            return this.insertBefore(newChild, refChild);
         };
         VNode.prototype.remove = function () {
             var p = this.parentNode;
@@ -1614,6 +1628,13 @@ var VMDOM;
             var elem = toHelp.removeChild(toHelp.childNodes[0]);
             this.vmData.domNode = elem;
             return elem;
+        };
+        //合并自己的textNode
+        VNode.prototype.normalize = function () {
+            throw new Error('未实现');
+        };
+        VNode.prototype.replaceChild = function (newChild, oldChild) {
+            return oldChild;
         };
         VNode.prototype.copyPropertyToNode = function (elem) {
             for (var i in this) {
@@ -1692,6 +1713,10 @@ var VMDOM;
                                         if (elem2.parentNode) {
                                             pE.insertBefore2(elem, elem2);
                                             break;
+                                            // } else {
+                                            // console.log(elem2.innerHTML);
+                                            // debugger;
+                                            /*这里怎么处理好呢*/
                                         }
                                     }
                                 }
@@ -2019,7 +2044,7 @@ var VMDOM;
     var VHtmlElement = VHtmlElement_1 = (function (_super) {
         __extends(VHtmlElement, _super);
         function VHtmlElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeType = 1 /* Element */;
             _this.nodeName = "HTML";
             return _this;
@@ -2101,6 +2126,9 @@ var VMDOM;
                 // if ((<VElem<IVNodeMethod>>chds[i]).nodeType === 1) {
                 splice.call(chds_1, idx, 0, newNode);
                 return newNode;
+                // }
+                // }
+                // push.call(chds,newNode);
             }
             return newNode;
         };
@@ -2310,7 +2338,7 @@ var VMDOM;
     var VCharacterData = (function (_super) {
         __extends(VCharacterData, _super);
         function VCharacterData() {
-            return _super.apply(this, arguments) || this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         VCharacterData.prototype.getData = function () {
             return this.data;
@@ -2422,6 +2450,7 @@ var VMDOM;
                 var toHelp = document.createElement('__Turtle__'); //用于创建
                 toHelp.innerHTML = this.data;
                 elem = toHelp.removeChild(toHelp.childNodes[0]);
+                //elem=document.createTextNode(this.data);不用这句的原因是为了转码
             }
             else {
                 elem = document.createTextNode('');
@@ -2534,7 +2563,7 @@ var VMDOM;
     var VDocumentType = (function (_super) {
         __extends(VDocumentType, _super);
         function VDocumentType() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeType = 10 /* DocumentType */;
             _this.nodeName = "html";
             return _this;
@@ -2564,7 +2593,7 @@ var VMDOM;
     var VDocument = (function (_super) {
         __extends(VDocument, _super);
         function VDocument() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeType = 9 /* Document */;
             _this.nodeName = "#document";
             return _this;
@@ -2595,7 +2624,7 @@ var VMDOM;
     var VAElement = (function (_super) {
         __extends(VAElement, _super);
         function VAElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "A";
             return _this;
         }
@@ -2662,7 +2691,7 @@ var VMDOM;
     var VBlockquoteElement = (function (_super) {
         __extends(VBlockquoteElement, _super);
         function VBlockquoteElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "BLOCKQUOTE";
             return _this;
         }
@@ -2678,7 +2707,7 @@ var VMDOM;
     var VBodyElement = (function (_super) {
         __extends(VBodyElement, _super);
         function VBodyElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "BODY";
             return _this;
         }
@@ -2711,7 +2740,7 @@ var VMDOM;
     var VCanvasElement = (function (_super) {
         __extends(VCanvasElement, _super);
         function VCanvasElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "CANVAS";
             return _this;
         }
@@ -2727,7 +2756,7 @@ var VMDOM;
     var VCaptionElement = (function (_super) {
         __extends(VCaptionElement, _super);
         function VCaptionElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "CAPTION";
             return _this;
         }
@@ -2760,7 +2789,7 @@ var VMDOM;
     var VColgroupElement = (function (_super) {
         __extends(VColgroupElement, _super);
         function VColgroupElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "COLGROUP";
             return _this;
         }
@@ -2776,7 +2805,7 @@ var VMDOM;
     var VDialogElement = (function (_super) {
         __extends(VDialogElement, _super);
         function VDialogElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "DIALOG";
             return _this;
         }
@@ -2792,7 +2821,7 @@ var VMDOM;
     var VDirElement = (function (_super) {
         __extends(VDirElement, _super);
         function VDirElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "DIR";
             return _this;
         }
@@ -2808,7 +2837,7 @@ var VMDOM;
     var VDivElement = (function (_super) {
         __extends(VDivElement, _super);
         function VDivElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "DIV";
             return _this;
         }
@@ -2824,7 +2853,7 @@ var VMDOM;
     var VDlElement = (function (_super) {
         __extends(VDlElement, _super);
         function VDlElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "DL";
             return _this;
         }
@@ -2840,7 +2869,7 @@ var VMDOM;
     var VFieldsetElement = (function (_super) {
         __extends(VFieldsetElement, _super);
         function VFieldsetElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "FIELDSET";
             return _this;
         }
@@ -2873,7 +2902,7 @@ var VMDOM;
     var VH1Element = (function (_super) {
         __extends(VH1Element, _super);
         function VH1Element() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "H1";
             return _this;
         }
@@ -2889,7 +2918,7 @@ var VMDOM;
     var VH2Element = (function (_super) {
         __extends(VH2Element, _super);
         function VH2Element() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "H2";
             return _this;
         }
@@ -2905,7 +2934,7 @@ var VMDOM;
     var VH3Element = (function (_super) {
         __extends(VH3Element, _super);
         function VH3Element() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "H3";
             return _this;
         }
@@ -2921,7 +2950,7 @@ var VMDOM;
     var VH4Element = (function (_super) {
         __extends(VH4Element, _super);
         function VH4Element() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "H4";
             return _this;
         }
@@ -2937,7 +2966,7 @@ var VMDOM;
     var VH5Element = (function (_super) {
         __extends(VH5Element, _super);
         function VH5Element() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "H5";
             return _this;
         }
@@ -2953,7 +2982,7 @@ var VMDOM;
     var VH6Element = (function (_super) {
         __extends(VH6Element, _super);
         function VH6Element() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "H6";
             return _this;
         }
@@ -2969,7 +2998,7 @@ var VMDOM;
     var VHeadElement = (function (_super) {
         __extends(VHeadElement, _super);
         function VHeadElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "HEAD";
             return _this;
         }
@@ -3002,7 +3031,7 @@ var VMDOM;
     var VIframeElement = (function (_super) {
         __extends(VIframeElement, _super);
         function VIframeElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "IFRAME";
             return _this;
         }
@@ -3057,7 +3086,7 @@ var VMDOM;
     var VInsElement = (function (_super) {
         __extends(VInsElement, _super);
         function VInsElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "INS";
             return _this;
         }
@@ -3073,7 +3102,7 @@ var VMDOM;
     var VKeygenElement = (function (_super) {
         __extends(VKeygenElement, _super);
         function VKeygenElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "KEYGEN";
             return _this;
         }
@@ -3089,7 +3118,7 @@ var VMDOM;
     var VLegendElement = (function (_super) {
         __extends(VLegendElement, _super);
         function VLegendElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "LEGEND";
             return _this;
         }
@@ -3105,7 +3134,7 @@ var VMDOM;
     var VLiElement = (function (_super) {
         __extends(VLiElement, _super);
         function VLiElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "LI";
             return _this;
         }
@@ -3155,7 +3184,7 @@ var VMDOM;
     var VMenuElement = (function (_super) {
         __extends(VMenuElement, _super);
         function VMenuElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "MENU";
             return _this;
         }
@@ -3188,7 +3217,7 @@ var VMDOM;
     var VMeterElement = (function (_super) {
         __extends(VMeterElement, _super);
         function VMeterElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "METER";
             return _this;
         }
@@ -3204,7 +3233,7 @@ var VMDOM;
     var VOlElement = (function (_super) {
         __extends(VOlElement, _super);
         function VOlElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "OL";
             return _this;
         }
@@ -3220,7 +3249,7 @@ var VMDOM;
     var VOptgroupElement = (function (_super) {
         __extends(VOptgroupElement, _super);
         function VOptgroupElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "OPTGROUP";
             return _this;
         }
@@ -3236,7 +3265,7 @@ var VMDOM;
     var VOptionElement = (function (_super) {
         __extends(VOptionElement, _super);
         function VOptionElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "OPTION";
             return _this;
         }
@@ -3252,7 +3281,7 @@ var VMDOM;
     var VOutputElement = (function (_super) {
         __extends(VOutputElement, _super);
         function VOutputElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "OUTPUT";
             return _this;
         }
@@ -3285,7 +3314,7 @@ var VMDOM;
     var VPElement = (function (_super) {
         __extends(VPElement, _super);
         function VPElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "P";
             return _this;
         }
@@ -3301,7 +3330,7 @@ var VMDOM;
     var VPreElement = (function (_super) {
         __extends(VPreElement, _super);
         function VPreElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "PRE";
             return _this;
         }
@@ -3317,7 +3346,7 @@ var VMDOM;
     var VProgressElement = (function (_super) {
         __extends(VProgressElement, _super);
         function VProgressElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "PROGRESS";
             return _this;
         }
@@ -3333,7 +3362,7 @@ var VMDOM;
     var VQElement = (function (_super) {
         __extends(VQElement, _super);
         function VQElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "Q";
             return _this;
         }
@@ -3350,7 +3379,7 @@ var VMDOM;
     var VScriptElement = (function (_super) {
         __extends(VScriptElement, _super);
         function VScriptElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "SCRIPT";
             return _this;
         }
@@ -3400,7 +3429,7 @@ var VMDOM;
     var VSelectElement = (function (_super) {
         __extends(VSelectElement, _super);
         function VSelectElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "SELECT";
             return _this;
         }
@@ -3420,7 +3449,7 @@ var VMDOM;
     var VSourceElement = (function (_super) {
         __extends(VSourceElement, _super);
         function VSourceElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "SOURCE";
             return _this;
         }
@@ -3436,7 +3465,7 @@ var VMDOM;
     var VStyleElement = (function (_super) {
         __extends(VStyleElement, _super);
         function VStyleElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "STYLE";
             return _this;
         }
@@ -3452,7 +3481,7 @@ var VMDOM;
     var VTableElement = (function (_super) {
         __extends(VTableElement, _super);
         function VTableElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "TABLE";
             return _this;
         }
@@ -3468,7 +3497,7 @@ var VMDOM;
     var VTbodyElement = (function (_super) {
         __extends(VTbodyElement, _super);
         function VTbodyElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "TBODY";
             return _this;
         }
@@ -3484,7 +3513,7 @@ var VMDOM;
     var VTdElement = (function (_super) {
         __extends(VTdElement, _super);
         function VTdElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "TD";
             return _this;
         }
@@ -3500,7 +3529,7 @@ var VMDOM;
     var VTextareaElement = (function (_super) {
         __extends(VTextareaElement, _super);
         function VTextareaElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "TEXTAREA";
             return _this;
         }
@@ -3528,7 +3557,7 @@ var VMDOM;
     var VTfootElement = (function (_super) {
         __extends(VTfootElement, _super);
         function VTfootElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "TFOOT";
             return _this;
         }
@@ -3544,7 +3573,7 @@ var VMDOM;
     var VTheadElement = (function (_super) {
         __extends(VTheadElement, _super);
         function VTheadElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "THREAD";
             return _this;
         }
@@ -3560,7 +3589,7 @@ var VMDOM;
     var VThElement = (function (_super) {
         __extends(VThElement, _super);
         function VThElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "TH";
             return _this;
         }
@@ -3576,7 +3605,7 @@ var VMDOM;
     var VTrackElement = (function (_super) {
         __extends(VTrackElement, _super);
         function VTrackElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "TRACK";
             return _this;
         }
@@ -3592,7 +3621,7 @@ var VMDOM;
     var VTrElement = (function (_super) {
         __extends(VTrElement, _super);
         function VTrElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "TR";
             return _this;
         }
@@ -3608,7 +3637,7 @@ var VMDOM;
     var VUlElement = (function (_super) {
         __extends(VUlElement, _super);
         function VUlElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "UL";
             return _this;
         }
@@ -3624,7 +3653,7 @@ var VMDOM;
     var VVideoElement = (function (_super) {
         __extends(VVideoElement, _super);
         function VVideoElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "VIDEO";
             return _this;
         }
@@ -3640,7 +3669,7 @@ var VMDOM;
     var VXmpElement = (function (_super) {
         __extends(VXmpElement, _super);
         function VXmpElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "XMP";
             return _this;
         }
@@ -3656,7 +3685,7 @@ var VMDOM;
     var VTitleElement = (function (_super) {
         __extends(VTitleElement, _super);
         function VTitleElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "TITLE";
             return _this;
         }
@@ -3672,7 +3701,7 @@ var VMDOM;
     var VSpanElement = (function (_super) {
         __extends(VSpanElement, _super);
         function VSpanElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "SPAN";
             return _this;
         }
@@ -3688,7 +3717,7 @@ var VMDOM;
     var VEmElement = (function (_super) {
         __extends(VEmElement, _super);
         function VEmElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "EM";
             return _this;
         }
@@ -3704,7 +3733,7 @@ var VMDOM;
     var VIElement = (function (_super) {
         __extends(VIElement, _super);
         function VIElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "I";
             return _this;
         }
@@ -3720,7 +3749,7 @@ var VMDOM;
     var VBElement = (function (_super) {
         __extends(VBElement, _super);
         function VBElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "B";
             return _this;
         }
@@ -3736,7 +3765,7 @@ var VMDOM;
     var VFormElement = (function (_super) {
         __extends(VFormElement, _super);
         function VFormElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "FORM";
             return _this;
         }
@@ -3752,7 +3781,7 @@ var VMDOM;
     var VLabelElement = (function (_super) {
         __extends(VLabelElement, _super);
         function VLabelElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "LABEL";
             return _this;
         }
@@ -3768,7 +3797,7 @@ var VMDOM;
     var VDtElement = (function (_super) {
         __extends(VDtElement, _super);
         function VDtElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "DT";
             return _this;
         }
@@ -3784,7 +3813,7 @@ var VMDOM;
     var VDdElement = (function (_super) {
         __extends(VDdElement, _super);
         function VDdElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "DD";
             return _this;
         }
@@ -3800,7 +3829,7 @@ var VMDOM;
     var VEmbedElement = (function (_super) {
         __extends(VEmbedElement, _super);
         function VEmbedElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "EMBED";
             return _this;
         }
@@ -3816,7 +3845,7 @@ var VMDOM;
     var VStrongElement = (function (_super) {
         __extends(VStrongElement, _super);
         function VStrongElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "STRONG";
             return _this;
         }
@@ -3832,7 +3861,7 @@ var VMDOM;
     var VButtonElement = (function (_super) {
         __extends(VButtonElement, _super);
         function VButtonElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "BUTTON";
             return _this;
         }
@@ -3848,7 +3877,7 @@ var VMDOM;
     var VObjectElement = (function (_super) {
         __extends(VObjectElement, _super);
         function VObjectElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "OBJECT";
             return _this;
         }
@@ -3864,7 +3893,7 @@ var VMDOM;
     var VSvgElement = (function (_super) {
         __extends(VSvgElement, _super);
         function VSvgElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "SVG";
             return _this;
         }
@@ -3880,7 +3909,7 @@ var VMDOM;
     var VCircleElement = (function (_super) {
         __extends(VCircleElement, _super);
         function VCircleElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "CIRCLE";
             return _this;
         }
@@ -3896,7 +3925,7 @@ var VMDOM;
     var VHeaderElement = (function (_super) {
         __extends(VHeaderElement, _super);
         function VHeaderElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "HEADER";
             return _this;
         }
@@ -3912,7 +3941,7 @@ var VMDOM;
     var VFooterElement = (function (_super) {
         __extends(VFooterElement, _super);
         function VFooterElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "FOOTER";
             return _this;
         }
@@ -4012,7 +4041,7 @@ var VMDOM;
     var VDomhelperElement = (function (_super) {
         __extends(VDomhelperElement, _super);
         function VDomhelperElement() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "DOMHELPER";
             return _this;
         }
@@ -4535,7 +4564,7 @@ var VMDOM;
     var VPlaceHolder = (function (_super) {
         __extends(VPlaceHolder, _super);
         function VPlaceHolder() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "#placeholder";
             _this.nodeType = 100 /* PlaceHolder */;
             return _this;
@@ -4748,19 +4777,28 @@ var JS;
                 }
             }
             else {
-                switch (keyWord) {
-                    case " ":
-                    case "\r":
-                    case "\n":
-                    case "\t":
-                        chds.shift();
-                        i--;
-                        break;
+                if (isString(keyWord) && isSpace(keyWord)) {
+                    chds.shift();
+                    i--;
                 }
             }
         }
     }
     JS.deleteStatementSpace = deleteStatementSpace;
+    function isSpace(keyWord) {
+        switch (keyWord) {
+            case " ":
+                return true;
+            case "\r":
+                return true;
+            case "\n":
+                return true;
+            case "\t":
+                return true;
+        }
+        return false;
+    }
+    JS.isSpace = isSpace;
 })(JS || (JS = {}));
 /// <reference path='Lib.ts'/>
 var JS;
@@ -4899,21 +4937,42 @@ var JS;
     }());
     JS.JavaScriptBlock = JavaScriptBlock;
 })(JS || (JS = {}));
+/// <reference path='../javascript/JavaScriptBlock.ts'/>
+var VMDOM;
+(function (VMDOM) {
+    var VOrderData = (function () {
+        function VOrderData(name, condition) {
+            this.name = name;
+            this.condition = condition;
+        }
+        VOrderData.prototype.clone = function () {
+            if (this.condition) {
+                return new VOrderData(this.name, this.condition.clone());
+            }
+            else {
+                return new VOrderData(this.name, null);
+            }
+        };
+        return VOrderData;
+    }());
+    VMDOM.VOrderData = VOrderData;
+})(VMDOM || (VMDOM = {}));
 /// <reference path='../node/VPlaceHolder.ts'/>
 /// <reference path='../javascript/JavaScriptBlock.ts'/>
+/// <reference path='VOrderData.ts'/>
 var VMDOM;
 (function (VMDOM) {
     var VOrder = (function (_super) {
         __extends(VOrder, _super);
-        function VOrder(block) {
+        function VOrder(orderData) {
             var _this = _super.call(this, '') || this;
-            _this.block = block;
+            _this.orderData = orderData;
             _this.nodeName = "#order";
             _this.nodeType = 102 /* Order */;
             return _this;
         }
         VOrder.prototype.cloneNode = function (deep) {
-            return $$$(this.block.clone(), 102 /* Order */);
+            return $$$(this.orderData.clone(), 102 /* Order */);
         };
         VOrder.prototype.toJS = function (space) {
             if (space === void 0) { space = 0; }
@@ -4936,7 +4995,7 @@ var VMDOM;
     var VScript = (function (_super) {
         __extends(VScript, _super);
         function VScript() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.nodeName = "#script";
             _this.nodeType = 103 /* Script */;
             return _this;
@@ -4952,6 +5011,7 @@ var VMDOM;
     }(VMDOM.VPlaceHolder));
     VScript = __decorate([
         VMDOM.register('#script', 103 /* Script */)
+        /** 预编译脚本 */
     ], VScript);
     VMDOM.VScript = VScript;
 })(VMDOM || (VMDOM = {}));
@@ -4960,9 +5020,7 @@ var VMDOM;
 /// <reference path='../UIHelper/VScript.ts'/>
 var Order;
 (function (Order) {
-    var subOrderNames = [], subOrderRE, //=/^\s*()(?:\s|$)/,// = /^\s?(else if|else|case break|case|default|end)(\s|$)/g,
-    orderNames = [], orderRE;
-    //if|while|for|switch|async|break|-|scope|content|elements|bind|!|let|=
+    var subOrderNames = [], subOrderRE, orderNames = [], orderRE;
     function addSubOrderName(name) {
         if (subOrderNames.indexOf(name) === -1) {
             subOrderNames.push(name);
@@ -4986,31 +5044,23 @@ var Order;
     Order.getOrderInfoByString = getOrderInfoByString;
     /**从VOrder中读取命令 */
     function getOrderInfo(vOrder) {
-        var block = vOrder.block.clone();
-        var statements = block.children;
-        if (statements.length === 0) {
-            return null;
-        }
-        //无论是否有多个statement，order name 都只会出现在第一个statement里
-        var statement = statements[0];
-        var keyWords = statement.children;
-        var keyWord = keyWords[0];
-        if (keyWords[0] === ' ') {
-            keyWords.shift();
-            keyWord = keyWords[0];
-        }
-        if (isString(keyWord)) {
-            var order = keyWord.match(orderRE);
-            if (order) {
-                keyWords.shift();
-                return { order: order[0], condition: block.innerText };
+        var name = vOrder.orderData.name;
+        var order = name.match(orderRE);
+        if (order) {
+            if (vOrder.orderData.condition) {
+                return { order: order[0], condition: vOrder.orderData.condition.innerText };
             }
             else {
-                var subOrder = keyWord.match(subOrderRE);
-                if (subOrder) {
-                    keyWords.shift();
-                    return { subOrder: subOrder[0], condition: block.innerText };
-                }
+                return { order: order[0], condition: '' };
+            }
+        }
+        var subOrder = name.match(subOrderRE);
+        if (subOrder) {
+            if (vOrder.orderData.condition) {
+                return { subOrder: subOrder[0], condition: vOrder.orderData.condition.innerText };
+            }
+            else {
+                return { subOrder: subOrder[0], condition: '' };
             }
         }
         return null;
@@ -5020,6 +5070,9 @@ var Order;
     function makeOrderRegExp(names) {
         return new RegExp("^\\s*(" + names.join("|") + ")(?:\\s*|$)");
     }
+    /**
+     * 注册Order到系统
+    */
     function register(order) {
         var name = order.orderName.toLowerCase();
         Order.orders[name] = order;
@@ -5030,11 +5083,13 @@ var Order;
                 var subOrder = _a[_i];
                 addSubOrderName(subOrder);
             }
-            // subOrderNames.push(order.subOrder.join("|"));
             subOrderRE = makeOrderRegExp(subOrderNames);
         }
     }
     Order.register = register;
+    /**
+     * 解析并渲染order
+     */
     function parseOrder(node) {
         var info = getOrderInfo(node);
         if (!info) {
@@ -5047,6 +5102,7 @@ var Order;
         if (!(orderName in Order.orders)) {
             return;
         }
+        debugger;
         var order = new Order.orders[orderName](node, info.condition);
         return order;
     }
@@ -5302,6 +5358,7 @@ var Order;
             e.isBinding = true;
             obj[name] = obj2[name2];
             e.isBinding = false;
+            //}
         }
         else {
             var fn = bindPropertyByName(obj, name, obj2, name2);
@@ -5346,6 +5403,7 @@ var Order;
     }
 })(Order || (Order = {}));
 /// <reference path='Lib.ts'/>
+/// <reference path='../javascript/JavaScriptStatement.ts'/>
 var Order;
 (function (Order) {
     var VOrder = (function () {
@@ -5762,10 +5820,13 @@ function findTemplates(nodes) {
 function importUI(uiName, uiSortPath) {
     if (!$t.T.hasOwnProperty(uiName)) {
         var uiPath = baseUIPath.getPathBySortPath(uiSortPath);
-        var path = uiPath + '/' + (uiName + '.html').toLowerCase();
+        var path = uiPath + '/' + (uiName + '/index.js').toLowerCase();
         //加载js
-        $t.T[uiName] = require(path);
+        require(path);
         debugger;
+        // $t.xhr.get(path, false, function (text: string) {
+        //     parseUITemplate(uiName, uiSortPath, uiPath, text);
+        // });
     }
     return $t.T[uiName];
 }
@@ -5856,79 +5917,72 @@ function parseGet(node, outerChildNodes, outerElement, props, part) {
         }
     }
 }
-function isHTMLElement(p) {
-    return typeof p === "IHTMLElement";
-}
-function parseSet(node, outerChildNodes, outerElement, props, part) {
-    var link = takeAttr(node, 'link', "");
-    if (link) {
-        /*设置关联子对象*/
-        var chds = StoreManage.takeElem($t.store, link);
-        if (chds) {
-            if (isHTMLElement(chds)) {
-                node.appendChild(chds);
-            }
-            else {
-                var n = node.children[0];
-                if (n)
-                    appendNodes(chds, n);
-            }
-            takeOutChildNodes(node);
-        }
-        else {
-            removeNode(node);
-        }
-    }
-    else {
-        var ns = void 0;
-        /*设置属性*/
-        if (node.children.length > 0) {
-            /*设置子对象*/
-            ns = node.children;
-        }
-        else if (node.parentNode) {
-            /*设置父对象*/
-            ns = [node.parentNode];
-        }
-        else {
-            return;
-        }
-        var isAppend = !node.hasAttribute('append');
-        node.removeAttribute('append');
-        var attr = node.attributes;
-        for (var j = 0; j < ns.length; j++) {
-            var nd = ns[j];
-            if (isAppend) {
-                for (var i = 0; i < attr.length; i++) {
-                    nd.setAttribute(attr[i].name, attr[i].value);
-                }
-            }
-            else {
-                for (var i = 0; i < attr.length; i++) {
-                    var value = attr[i].value;
-                    var value2 = void 0;
-                    switch (attr[i].name) {
-                        case 'class':
-                            value2 = nd.getAttribute(attr[i].name);
-                            if (value2) {
-                                value += (/ $/.test(value) ? '' : ' ') + value2;
-                            }
-                            break;
-                        case 'style':
-                            value2 = nd.getAttribute(attr[i].name);
-                            if (value2) {
-                                value += (/; *$/.test(value) ? '' : ';') + value2;
-                            }
-                            break;
-                    }
-                    nd.setAttribute(attr[i].name, value);
-                }
-            }
-        }
-        takeOutChildNodes(node);
-    }
-    return 4 /* c_noIn */;
-}
+// function isHTMLElement(p: IHTMLElement | IHTMLCollection): p is IHTMLElement {
+//     return typeof p === "IHTMLElement";
+// }
+// function parseSet(node: IHTMLElement, outerChildNodes: INode[], outerElement: IElement[], props, part) {
+//     let link = takeAttr(node, 'link', "");
+//     if (link) {
+//         /*设置关联子对象*/
+//         let chds = StoreManage.takeElem($t.store, link);
+//         if (chds) {
+//             if (isHTMLElement(chds)) {
+//                 node.appendChild(chds);
+//             } else {
+//                 let n=node.children[0];
+//                 if(n)appendNodes(<IHTMLCollection>chds, n);
+//             }
+//             takeOutChildNodes(node);
+//         } else {
+//             removeNode(node);
+//         }
+//     } else {
+//         let ns: IHTMLElement[] | IHTMLCollection;
+//         /*设置属性*/
+//         if (node.children.length > 0) {
+//             /*设置子对象*/
+//             ns = node.children;
+//         } else if (node.parentNode) {
+//             /*设置父对象*/
+//             ns = [<IHTMLElement>node.parentNode];
+//         } else {
+//             return;
+//         }
+//         let isAppend = !node.hasAttribute('append');
+//         node.removeAttribute('append');
+//         let attr = node.attributes;
+//         for (let j = 0; j < ns.length; j++) {
+//             let nd=<IHTMLElement>ns[j];
+//             if (isAppend) {
+//                 for (let i = 0; i < attr.length; i++) {
+//                     nd.setAttribute(attr[i].name, attr[i].value);
+//                 }
+//             } else {
+//                 for (let i = 0; i < attr.length; i++) {
+//                     let value = attr[i].value;
+//                     let value2: string;
+//                     switch (attr[i].name) {
+//                         case 'class':
+//                             value2 = nd.getAttribute(attr[i].name);
+//                             if (value2) {
+//                                 value += (/ $/.test(value) ? '' : ' ') + value2;
+//                             }
+//                             break;
+//                         case 'style':
+//                             value2 = nd.getAttribute(attr[i].name);
+//                             if (value2) {
+//                                 value += (/; *$/.test(value) ? '' : ';') + value2;
+//                             }
+//                             break;
+//                     }
+//                     nd.setAttribute(attr[i].name, value);
+//                 }
+//             }
+//         }
+//         takeOutChildNodes(node);
+//     }
+//     return eTreeEach.c_noIn;
+// }
 var exec = eval;
 function execOnScript(node, outerChildNodes, outerElement, props, part) {
     var p = node.parentNode;
@@ -6003,7 +6057,7 @@ function execNodeQuestion(node, outerChildNodes, outerElement, props, part) {
 var ElementParser = (function () {
     function ElementParser() {
         this.GET = parseGet;
-        this.SET = parseSet;
+        // SET = parseSet
         // __BREAK__ = parseBreakOrder
         this.SCRIPT = parseScript;
     }
@@ -6126,6 +6180,9 @@ function initHTML(arr, outerChildNodes, outerElement, props, part) {
         }*/
         if (elementParser.hasOwnProperty(node.nodeName)) {
             /* let ret=*/ return elementParser[node.nodeName](node, outerChildNodes, outerElement, props, part);
+            /* if(ret){
+                return ret;
+                };*/
         }
         // let attrs = slice.call(node.attributes);
         // for (let i = 0; i < attrs.length; i++) {
@@ -6507,6 +6564,9 @@ var Component;
                 }
                 this.$online.emit(this, elem);
                 this.isInDOM = true;
+                // if(isFunction(this.oninsert)){
+                //     this.oninsert();
+                // }
             }
         };
         Part.prototype.insertBefore = function (elem) {
@@ -6534,6 +6594,10 @@ var Component;
                     DOMScope.link(scopeNodes[i].__scope__, elem);
                 }
                 this.$online.emit(this, elem);
+                // this.basePart.isInsert=true;
+                // if(isFunction(this.oninsert)){
+                //     this.oninsert();
+                // }
             }
         };
         Part.prototype.remove = function () {
@@ -6783,6 +6847,7 @@ var Turtle = (function (_super) {
                 //     parseDefine(xmps[i]);
                 // }else{
                 templateXMP.push(xmps[i]);
+                // }
             }
             /*处理逻辑模板*/
             for (i = 0; i < templateXMP.length; i++) {

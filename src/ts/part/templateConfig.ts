@@ -1,4 +1,5 @@
 
+/// <reference path='BasePath.ts'/>
 class NameItem{
     constructor(name:string){
         this.name=name;
@@ -6,44 +7,6 @@ class NameItem{
     name:string
 }
 
-
-class BasePath{
-    private paths={};
-    push(v:string|Array<string>){
-        if(isString(v)){
-            this.parseUIPath(<string>v);    
-        }else if(isArray(v)){
-            
-            for(var i=0;i<v.length;i++){
-                if(isString(v[i])){
-                    this.parseUIPath(v[i])
-                }
-            }
-        }
-    }
-    parseUIPath(s:string){
-        // try{
-            var o=exec('('+s+')');
-            if(isObject(o)&&o.hasOwnProperty('name')&&o.hasOwnProperty('path')){
-                this.paths[o.name]=o;
-                this.push(o);
-            }
-        // }catch(e){_catch(e);}
-    }
-    getPathBySortPath(sortPath){
-        return this.paths[sortPath].path;
-    }
-    hasSortPath(sortPath){
-        return this.paths.hasOwnProperty(sortPath);
-    }
-    toString(){
-        var arr:string[]=[];
-        for(var i in this.paths){
-            arr.push("{name:'"+this.paths[i].name+"',path:'"+this.paths[i].path+"'}")
-        }
-        return arr.join(';');
-    }
-}
 class TemplateConfig{
     [index:string]:Object
     XMP         ={};
@@ -100,4 +63,3 @@ class TemplateConfig{
     }
 }
 let templateConfig=new TemplateConfig;
-let baseUIPath=new BasePath;

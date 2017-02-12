@@ -42,7 +42,7 @@ interface IKeyArrayHashObject<T>{
 }
 class KeyArrayHashObjectManage{
     private static isArray<T>(p: T | T[]): p is T[] {
-        return typeof p==="array";
+        return typeof p===<any>"array";
     }
     static clean<T>(data:IKeyArrayHashObject<T>){
         for(var i in data){

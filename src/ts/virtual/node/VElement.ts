@@ -106,42 +106,32 @@ namespace VMDOM{
             }
             return ret;
         }
-        onpointercancel: (this: this, ev: PointerEvent) => any;
-        onpointerdown: (this: this, ev: PointerEvent) => any;
-        onpointerenter: (this: this, ev: PointerEvent) => any;
-        onpointerleave: (this: this, ev: PointerEvent) => any;
-        onpointermove: (this: this, ev: PointerEvent) => any;
-        onpointerout: (this: this, ev: PointerEvent) => any;
-        onpointerover: (this: this, ev: PointerEvent) => any;
-        onpointerup: (this: this, ev: PointerEvent) => any;
-        onwheel: (this: this, ev: WheelEvent) => any;
-
-        onariarequest: (this: this, ev: AriaRequestEvent) => any;
-        oncommand: (this: this, ev: CommandEvent) => any;
-        ongotpointercapture: (this: this, ev: PointerEvent) => any;
-        onlostpointercapture: (this: this, ev: PointerEvent) => any;
-        onmsgesturechange: (this: this, ev: MSGestureEvent) => any;
-        onmsgesturedoubletap: (this: this, ev: MSGestureEvent) => any;
-        onmsgestureend: (this: this, ev: MSGestureEvent) => any;
-        onmsgesturehold: (this: this, ev: MSGestureEvent) => any;
-        onmsgesturestart: (this: this, ev: MSGestureEvent) => any;
-        onmsgesturetap: (this: this, ev: MSGestureEvent) => any;
-        onmsgotpointercapture: (this: this, ev: MSPointerEvent) => any;
-        onmsinertiastart: (this: this, ev: MSGestureEvent) => any;
-        onmslostpointercapture: (this: this, ev: MSPointerEvent) => any;
-        onmspointercancel: (this: this, ev: MSPointerEvent) => any;
-        onmspointerdown: (this: this, ev: MSPointerEvent) => any;
-        onmspointerenter: (this: this, ev: MSPointerEvent) => any;
-        onmspointerleave: (this: this, ev: MSPointerEvent) => any;
-        onmspointermove: (this: this, ev: MSPointerEvent) => any;
-        onmspointerout: (this: this, ev: MSPointerEvent) => any;
-        onmspointerover: (this: this, ev: MSPointerEvent) => any;
-        onmspointerup: (this: this, ev: MSPointerEvent) => any;
+        onariarequest: (this: IElement, ev: Event) => any;
+        oncommand: (this: IElement, ev: Event) => any;
+        ongotpointercapture: (this: IElement, ev: PointerEvent) => any;
+        onlostpointercapture: (this: IElement, ev: PointerEvent) => any;
+        onmsgesturechange: (this: IElement, ev: MSGestureEvent) => any;
+        onmsgesturedoubletap: (this: IElement, ev: MSGestureEvent) => any;
+        onmsgestureend: (this: IElement, ev: MSGestureEvent) => any;
+        onmsgesturehold: (this: IElement, ev: MSGestureEvent) => any;
+        onmsgesturestart: (this: IElement, ev: MSGestureEvent) => any;
+        onmsgesturetap: (this: IElement, ev: MSGestureEvent) => any;
+        onmsgotpointercapture: (this: IElement, ev: MSPointerEvent) => any;
+        onmsinertiastart: (this: IElement, ev: MSGestureEvent) => any;
+        onmslostpointercapture: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointercancel: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointerdown: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointerenter: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointerleave: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointermove: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointerout: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointerover: (this: IElement, ev: MSPointerEvent) => any;
+        onmspointerup: (this: IElement, ev: MSPointerEvent) => any;
         ontouchcancel: (ev: TouchEvent) => any;
         ontouchend: (ev: TouchEvent) => any;
         ontouchmove: (ev: TouchEvent) => any;
         ontouchstart: (ev: TouchEvent) => any;
-        onwebkitfullscreenchange: (this: this, ev: Event) => any;
-        onwebkitfullscreenerror: (this: this, ev: Event) => any;
+        onwebkitfullscreenchange: (this: IElement, ev: Event) => any;
+        onwebkitfullscreenerror: (this: IElement, ev: Event) => any;
     }
 }
