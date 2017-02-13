@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "param", nodeType?: 1): VMDOM.VParamElement&IVNodeMethod
+interface VNodeNames{
+    "param":VMDOM.VParamElement
 }
 
 namespace VMDOM{

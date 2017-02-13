@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "pre", nodeType?: 1): VMDOM.VPreElement&IVNodeMethod;
+interface VNodeNames{
+    "pre":VMDOM.VPreElement;
 }
 
 namespace VMDOM{

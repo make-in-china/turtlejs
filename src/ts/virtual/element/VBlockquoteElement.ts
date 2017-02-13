@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "blockquote", nodeType?: 1): VMDOM.VBlockquoteElement&IVNodeMethod
+interface VNodeNames{
+    "blockquote":VMDOM.VBlockquoteElement
 }
 namespace VMDOM{
     @mergeClass({cite:''})

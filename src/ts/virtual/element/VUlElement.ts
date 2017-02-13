@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "ul", nodeType?: 1): VMDOM.VUlElement&IVNodeMethod
+interface VNodeNames{
+    "ul":VMDOM.VUlElement
 }
 
 namespace VMDOM{

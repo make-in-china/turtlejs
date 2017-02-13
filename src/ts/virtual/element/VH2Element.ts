@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "h2", nodeType?: 1): VMDOM.VH2Element&IVNodeMethod
+interface VNodeNames{
+    "h2":VMDOM.VH2Element
 }
 namespace VMDOM{
     @mergeClass({align:''})

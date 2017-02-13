@@ -3,7 +3,7 @@
 const enum ENodeType {
     Script = 103
 }
-interface IVNodeMethod {
+interface VNodeNames {
     (data: string, nodeType: ENodeType.Script): VMDOM.VScript & IVNodeMethod;
 }
 namespace VMDOM {

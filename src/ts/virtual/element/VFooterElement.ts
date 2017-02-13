@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "footer", nodeType?: 1): VMDOM.VFooterElement&IVNodeMethod
+interface VNodeNames{
+    "footer":VMDOM.VFooterElement
 }
 namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})

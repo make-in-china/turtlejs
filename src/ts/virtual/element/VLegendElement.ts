@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "legend", nodeType?: 1): VMDOM.VLegendElement&IVNodeMethod
+interface VNodeNames{
+    "legend":VMDOM.VLegendElement
 }
 
 namespace VMDOM{

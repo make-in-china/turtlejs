@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "select", nodeType?: 1): VMDOM.VSelectElement&IVNodeMethod
+interface VNodeNames{
+    "select":VMDOM.VSelectElement
 }
 
 namespace VMDOM{

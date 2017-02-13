@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "optgroup", nodeType?: 1): VMDOM.VOptgroupElement&IVNodeMethod
+interface VNodeNames{
+    "optgroup":VMDOM.VOptgroupElement
 }
 
 namespace VMDOM{

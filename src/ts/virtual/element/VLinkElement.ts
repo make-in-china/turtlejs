@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "link", nodeType?: 1): VMDOM.VLinkElement &IVNodeMethod
+interface VNodeNames{
+    "link":VMDOM.VLinkElement 
 }
 
 namespace VMDOM{

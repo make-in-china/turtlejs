@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "input", nodeType?: 1): VMDOM.VInputElement&IVNodeMethod
+interface VNodeNames{
+    "input":VMDOM.VInputElement
 }
 
 namespace VMDOM{

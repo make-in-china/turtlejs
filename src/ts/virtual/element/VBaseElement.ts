@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "base", nodeType?: 1): VMDOM.VBaseElement&IVNodeMethod
+interface VNodeNames{
+    "base": VMDOM.VBaseElement
 }
 namespace VMDOM{
     @mergeClass({href:'',target:''})

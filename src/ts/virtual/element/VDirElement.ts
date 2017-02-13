@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "dir", nodeType?: 1): VMDOM.VDirElement&IVNodeMethod
+interface VNodeNames{
+    "dir": VMDOM.VDirElement
 }
 namespace VMDOM{
     @mergeClass({compact:''})

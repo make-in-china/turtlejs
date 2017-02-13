@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "iframe", nodeType?: 1): VMDOM.VIframeElement&IVNodeMethod
+interface VNodeNames{
+    "iframe":VMDOM.VIframeElement
 }
 
 namespace VMDOM{

@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "caption", nodeType?: 1): VMDOM.VCaptionElement&IVNodeMethod
+interface VNodeNames{
+    "caption":VMDOM.VCaptionElement
 }
 namespace VMDOM{
     @mergeClass({align:''})

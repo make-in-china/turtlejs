@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "circle", nodeType?: 1): VMDOM.VCircleElement&IVNodeMethod
+interface VNodeNames{
+    "circle":VMDOM.VCircleElement
 }
 namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})

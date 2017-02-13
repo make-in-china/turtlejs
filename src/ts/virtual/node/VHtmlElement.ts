@@ -4,10 +4,11 @@
 /// <reference path='../../lib/Encode.ts'/>
 /// <reference path='../../core/Node.ts'/>
 /// <reference path='Lib.ts'/>
-
+interface VNodeNames{
+    'html': VMDOM.VHtmlElement
+}
 interface IVNodeMethod{
     (nodeName: string, nodeType?: ENodeType.Element): VMDOM.VHtmlElement&IVNodeMethod;
-    (nodeName: 'html', nodeType?: ENodeType.Element): VMDOM.VHtmlElement&IVNodeMethod;
 }
 function isVHTMLElement(node: VMDOM.VNode): node is VMDOM.VHtmlElement {
     return node.nodeType === ENodeType.Element

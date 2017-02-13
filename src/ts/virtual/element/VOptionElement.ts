@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "option", nodeType?: 1): VMDOM.VOptionElement&IVNodeMethod
+interface VNodeNames{
+    "option":VMDOM.VOptionElement
 }
 
 namespace VMDOM{

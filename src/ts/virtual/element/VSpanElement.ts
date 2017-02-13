@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "span", nodeType?: 1): VMDOM.VSpanElement&IVNodeMethod
+interface VNodeNames{
+    "span":VMDOM.VSpanElement
 }
 namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})

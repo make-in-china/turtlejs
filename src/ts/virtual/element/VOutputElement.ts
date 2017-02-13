@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "output", nodeType?: 1): VMDOM.VOutputElement&IVNodeMethod
+interface VNodeNames{
+    "output":VMDOM.VOutputElement
 }
 
 namespace VMDOM{

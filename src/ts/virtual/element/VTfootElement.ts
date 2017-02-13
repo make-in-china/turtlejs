@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "tfoot", nodeType?: 1): VMDOM.VTfootElement&IVNodeMethod
+interface VNodeNames{
+    "tfoot":VMDOM.VTfootElement
 }
 
 namespace VMDOM{

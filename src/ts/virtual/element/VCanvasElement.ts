@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "canvas", nodeType?: 1): VMDOM.VCanvasElement&IVNodeMethod
+interface VNodeNames{
+    "canvas":VMDOM.VCanvasElement
 }
 namespace VMDOM{
     @mergeClass({width:'',height:''})

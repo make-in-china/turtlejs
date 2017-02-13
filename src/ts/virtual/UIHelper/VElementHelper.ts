@@ -9,7 +9,7 @@ class VElementHelper{
         `)+':string';
         return `
 interface IVNodeMethod{
-    (nodeName: "${name.toLowerCase()}", nodeType?: 1): VMDOM.${className}&IVNodeMethod;
+    (nodeName: "${name.toLowerCase()}", nodeType?: ENodeType.Element): VMDOM.${className}&IVNodeMethod;
 }
 namespace VMDOM{
     export class ${className} extends VHtmlElement{

@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "li", nodeType?: 1): VMDOM.VLiElement&IVNodeMethod
+interface VNodeNames{
+    "li":VMDOM.VLiElement
 }
 
 namespace VMDOM{

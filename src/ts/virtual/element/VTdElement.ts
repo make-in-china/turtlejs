@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "td", nodeType?: 1): VMDOM.VTdElement&IVNodeMethod
+interface VNodeNames{
+    "td":VMDOM.VTdElement
 }
 
 namespace VMDOM{

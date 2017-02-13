@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "video", nodeType?: 1): VMDOM.VVideoElement&IVNodeMethod
+interface VNodeNames{
+    "video":VMDOM.VVideoElement
 }
 
 namespace VMDOM{

@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "table", nodeType?: 1): VMDOM.VTableElement&IVNodeMethod
+interface VNodeNames{
+    "table":VMDOM.VTableElement
 }
 
 namespace VMDOM{

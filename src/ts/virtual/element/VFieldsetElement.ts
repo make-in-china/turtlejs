@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "fieldset", nodeType?: 1): VMDOM.VFieldsetElement&IVNodeMethod
+interface VNodeNames{
+    "fieldset":VMDOM.VFieldsetElement
 }
 namespace VMDOM{
     @mergeClass({disabled:'',name:''})

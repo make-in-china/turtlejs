@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "frame", nodeType?: 1): VMDOM.VFrameElement&IVNodeMethod
+interface VNodeNames{
+    "frame":VMDOM.VFrameElement
 }
 namespace VMDOM{
     @mergeClass({name:'',scrolling:'',frameBorder:'',marginHeight:'',marginWidth:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})

@@ -13,7 +13,6 @@ interface IMember2 extends IMember {
     attrValueStart:number
     attrValueEnd:number
 }
-
 interface IDirective{
     attrName:string
     defaultValue:string|undefined

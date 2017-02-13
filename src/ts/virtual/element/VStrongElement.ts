@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "strong", nodeType?: 1): VMDOM.VStrongElement&IVNodeMethod
+interface VNodeNames{
+    "strong":VMDOM.VStrongElement
 }
 namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})

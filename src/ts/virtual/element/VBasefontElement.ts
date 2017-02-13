@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "basefont", nodeType?: 1): VMDOM.VBasefontElement&IVNodeMethod
+interface VNodeNames{
+    "basefont":VMDOM.VBasefontElement
 }
 namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})

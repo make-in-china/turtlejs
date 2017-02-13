@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "meta", nodeType?: 1): VMDOM.VMetaElement&IVNodeMethod
+interface VNodeNames{
+    "meta":VMDOM.VMetaElement
 }
 
 namespace VMDOM{

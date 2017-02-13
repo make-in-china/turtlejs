@@ -1,7 +1,7 @@
 
 /// <reference path="../../core/node.ts"/>
-interface IVNodeMethod{
-    (nodeName: "script", nodeType?: 1): VMDOM.VScriptElement&IVNodeMethod
+interface VNodeNames{
+    "script":VMDOM.VScriptElement
 }
 
 namespace VMDOM{

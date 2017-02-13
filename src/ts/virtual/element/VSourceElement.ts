@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "source", nodeType?: 1): VMDOM.VSourceElement&IVNodeMethod
+interface VNodeNames{
+    "source":VMDOM.VSourceElement
 }
 
 namespace VMDOM{

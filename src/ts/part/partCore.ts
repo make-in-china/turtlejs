@@ -19,6 +19,7 @@ interface ITurtle{
     replaceClassStore:IHTMLElement[];
     defineClassNames:string[];
 }
+
 declare var $t:ITurtle;
 let
     // $DOM,
@@ -26,7 +27,7 @@ let
     operatorRE = /\!=|==|=|<|>|\|/;
 // interface I$Node {
 //     (name:'__break__', nodeType?:number):IHTMLBreakElement
-//     (name: string, nodeType?: 1): INode
+//     (name: string, nodeType?: ENodeType.Element): INode
 //     (name: string, nodeType?: 3): IText
 //     (name: string, nodeType?: 8): IComment
 //     (name: string, nodeType?: number): INode | null

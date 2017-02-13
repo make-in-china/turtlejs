@@ -1,7 +1,8 @@
 
 
-interface IVNodeMethod{
-    (nodeName: "a", nodeType?: 1): VMDOM.VAElement&IVNodeMethod;
+
+interface VNodeNames{
+    "a":VMDOM.VAElement
 }
 namespace VMDOM{
     @mergeClass({target:'',download:'',ping:'',rel:'',hreflang:'',type:'',coords:'',charset:'',name:'',rev:'',shape:'',href:''})

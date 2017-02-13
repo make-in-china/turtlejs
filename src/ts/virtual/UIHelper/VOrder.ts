@@ -25,8 +25,4 @@ namespace VMDOM{
             return '';
         }
     }
-    // bindClassToFunction2Helper['#order']=bindClassToFunctionHelper[ENodeType.Order]=function(node:IVNodeMethod & VNode,block: JS.JavaScriptBlock){
-    //     node.__proto__=VOrder.prototype;
-    //     VOrder.call(node,block);
-    // }
 }

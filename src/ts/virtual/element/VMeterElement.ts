@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "meter", nodeType?: 1): VMDOM.VMeterElement&IVNodeMethod
+interface VNodeNames{
+    "meter":VMDOM.VMeterElement
 }
 
 namespace VMDOM{

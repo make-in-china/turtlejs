@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "ol", nodeType?: 1): VMDOM.VOlElement&IVNodeMethod
+interface VNodeNames{
+    "ol":VMDOM.VOlElement
 }
 
 namespace VMDOM{

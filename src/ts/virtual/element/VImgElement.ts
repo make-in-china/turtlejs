@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "img", nodeType?: 1): VMDOM.VImgElement&IVNodeMethod
+interface VNodeNames{
+    "img":VMDOM.VImgElement
 }
 
 namespace VMDOM{

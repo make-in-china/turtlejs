@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "textarea", nodeType?: 1): VMDOM.VTextareaElement&IVNodeMethod
+interface VNodeNames{
+    "textarea":VMDOM.VTextareaElement
 }
 
 namespace VMDOM{

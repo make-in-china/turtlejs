@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "keygen", nodeType?: 1): VMDOM.VKeygenElement&IVNodeMethod
+interface VNodeNames{
+    "keygen":VMDOM.VKeygenElement
 }
 
 namespace VMDOM{

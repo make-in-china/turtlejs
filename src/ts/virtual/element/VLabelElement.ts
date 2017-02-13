@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "label", nodeType?: 1): VMDOM.VLabelElement&IVNodeMethod
+interface VNodeNames{
+    "label":VMDOM.VLabelElement
 }
 namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})

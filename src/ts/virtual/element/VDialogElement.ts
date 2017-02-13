@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "dialog", nodeType?: 1): VMDOM.VDialogElement&IVNodeMethod
+interface VNodeNames{
+    "dialog":VMDOM.VDialogElement
 }
 namespace VMDOM{
     @mergeClass({open:''})

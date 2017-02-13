@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "svg", nodeType?: 1): VMDOM.VSvgElement&IVNodeMethod
+interface VNodeNames{
+    "svg":VMDOM.VSvgElement
 }
 namespace VMDOM{
     @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})

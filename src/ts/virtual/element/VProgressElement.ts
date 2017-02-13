@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "progress", nodeType?: 1): VMDOM.VProgressElement&IVNodeMethod
+interface VNodeNames{
+    "progress":VMDOM.VProgressElement
 }
 
 namespace VMDOM{

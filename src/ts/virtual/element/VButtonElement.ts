@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "button", nodeType?: 1): VMDOM.VButtonElement&IVNodeMethod
+interface VNodeNames{
+    "button":VMDOM.VButtonElement
 }
 namespace VMDOM{
     @mergeClass({formTarget:'',name:'',value:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})

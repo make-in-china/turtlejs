@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "style", nodeType?: 1): VMDOM.VStyleElement&IVNodeMethod
+interface VNodeNames{
+    "style":VMDOM.VStyleElement
 }
 
 namespace VMDOM{

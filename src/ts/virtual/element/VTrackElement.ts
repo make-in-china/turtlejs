@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "track", nodeType?: 1): VMDOM.VTrackElement&IVNodeMethod
+interface VNodeNames{
+    "track":VMDOM.VTrackElement
 }
 
 namespace VMDOM{

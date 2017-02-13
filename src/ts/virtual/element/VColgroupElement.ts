@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "colgroup", nodeType?: 1): VMDOM.VColgroupElement&IVNodeMethod
+interface VNodeNames{
+    "colgroup":VMDOM.VColgroupElement
 }
 namespace VMDOM{
     @mergeClass({span:'',align:'',vAlign:'',width:''})

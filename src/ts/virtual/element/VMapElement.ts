@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "map", nodeType?: 1): VMDOM.VMapElement&IVNodeMethod
+interface VNodeNames{
+    "map":VMDOM.VMapElement
 }
 
 namespace VMDOM{

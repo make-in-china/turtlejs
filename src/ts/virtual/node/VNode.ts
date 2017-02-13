@@ -23,10 +23,10 @@ const enum ENodeType{
     DocumentFragment=11,
     PlaceHolder=100
 }
-
+interface VNodeNames{}
 interface IVNodeMethod{
-    // (): VNode&IVNodeMethod;
     (nodeName: string, nodeType: ENodeType): VMDOM.VNode&IVNodeMethod;
+    <K extends keyof VNodeNames>(nodeName: K, nodeType?: ENodeType.Element): VNodeNames[K]&IVNodeMethod;
 }
 namespace VMDOM{
     export let emptyTextNodeRE = /^\s*$/;

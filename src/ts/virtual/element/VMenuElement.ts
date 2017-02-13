@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "menu", nodeType?: 1): VMDOM.VMenuElement&IVNodeMethod
+interface VNodeNames{
+    "menu":VMDOM.VMenuElement
 }
 
 namespace VMDOM{

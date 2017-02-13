@@ -1,7 +1,7 @@
-
-interface IVNodeMethod{
-    (nodeName: "area", nodeType?: 1): VMDOM.VAreaElement&IVNodeMethod
+interface VNodeName{
+    "area": VMDOM.VAreaElement
 }
+
 namespace VMDOM{
     @mergeClass({alt:'',coords:'',shape:'',target:'',ping:'',noHref:'',href:''})
     export class  VAreaElement extends VHtmlElement{

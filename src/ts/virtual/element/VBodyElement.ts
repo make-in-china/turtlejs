@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "body", nodeType?: 1): VMDOM.VBodyElement&IVNodeMethod
+interface VNodeNames{
+    "body":VMDOM.VBodyElement
 }
 namespace VMDOM{
     @mergeClass({text:'',link:'',vLink:'',aLink:'',bgColor:'',background:''})

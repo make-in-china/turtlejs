@@ -1,6 +1,6 @@
 
-interface IVNodeMethod{
-    (nodeName: "xmp", nodeType?: 1): VMDOM.VXmpElement&IVNodeMethod
+interface VNodeNames{
+    "xmp":VMDOM.VXmpElement
 }
 
 namespace VMDOM{
