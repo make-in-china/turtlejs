@@ -15,6 +15,13 @@
   },
   "homepage": "https://github.com/make-in-china/turtlejs#readme",
   "dependencies": {
-    "@types/node": "^6.0.46"
+    "@types/node": "^6.0.46",
+    "moment":"*",
+    "gulp":"*",
+    "gulp-sourcemaps":"*",
+    "gulp-typescript":"*",
+    "merge2":"*",
+    "del":"*",
+    "typescript@next":"*"
   }
 }

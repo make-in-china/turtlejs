@@ -209,7 +209,11 @@ function findTemplates(nodes: IHTMLElement[] | IArray): IElement[] | IArray {
 /**
  * 加载UI
  */
-function importUI(uiName: string, uiSortPath: string){
+function importUI(uiName: string, uiSortPath: string): {
+    path: string;
+    resPath: string;
+    part: new (props: ComponentView.IProps | null, outerChildNodes?: INode[] | undefined) => Component.Part;
+}{
     if (!$t.T.hasOwnProperty(uiName)) {
         let uiPath = baseUIPath.paths[uiSortPath];
         let path=uiPath + '/' + (uiName + '/index.js').toLowerCase();

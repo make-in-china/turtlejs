@@ -5011,10 +5011,6 @@ var VMDOM;
         VMDOM.register('#order', 102 /* Order */)
     ], VOrder);
     VMDOM.VOrder = VOrder;
-    // bindClassToFunction2Helper['#order']=bindClassToFunctionHelper[ENodeType.Order]=function(node:IVNodeMethod & VNode,block: JS.JavaScriptBlock){
-    //     node.__proto__=VOrder.prototype;
-    //     VOrder.call(node,block);
-    // }
 })(VMDOM || (VMDOM = {}));
 /// <reference path='../node/VPlaceHolder.ts'/>
 var VMDOM;
@@ -5693,55 +5689,6 @@ var loadJS = (function () {
         }
     };
 })();
-var isIE;
-try {
-    isIE = !!(typeof window !== "undefined" && window.ActiveXObject || "ActiveXObject" in window);
-}
-catch (e) {
-    isIE = false;
-}
-(function () {
-    var insertBefore = Node.prototype.insertBefore;
-    if (isIE) {
-        var reAppend_1 = [];
-        Node.prototype.insertBefore2 = function (newNode, refChild) {
-            var n;
-            if (isTextNode(newNode)) {
-                if (newNode.data === "") {
-                    return newNode;
-                }
-            }
-            else if (isCommentNode(newNode)) {
-                var node = refChild ? refChild : this.childNodes[0];
-                if (!node) {
-                    return newNode;
-                }
-                n = node.nextSibling;
-                while (n !== null) {
-                    reAppend_1.push(this.removeChild(n));
-                    n = node.nextSibling;
-                }
-                reAppend_1.unshift(this.removeChild(node));
-                this.appendChild(newNode);
-                for (var i = 0; i < reAppend_1.length; i++) {
-                    this.appendChild(reAppend_1[i]);
-                }
-                return newNode;
-            }
-            else {
-                var node = refChild ? refChild : this.childNodes[0];
-                if (!node) {
-                    return newNode;
-                }
-                return insertBefore.call(this, newNode, node);
-            }
-            return newNode;
-        };
-    }
-    else {
-        Node.prototype.insertBefore2 = insertBefore;
-    }
-})();
 /// <reference path='TemplateConfig.ts'/>
 /// <reference path='../virtual/order/VOrder.ts'/>
 /// <reference path='../core/XHR.ts'/>
@@ -5752,14 +5699,13 @@ catch (e) {
 /// <reference path='../main/Config.ts'/>
 /// <reference path="UIList.ts"/>
 /// <reference path="../main/LoadJS.ts"/>
-/// <reference path="../core/BrowserHelper.ts"/>
 var 
 // $DOM,
 // $node: I$Node,
 operatorRE = /\!=|==|=|<|>|\|/;
 // interface I$Node {
 //     (name:'__break__', nodeType?:number):IHTMLBreakElement
-//     (name: string, nodeType?: 1): INode
+//     (name: string, nodeType?: ENodeType.Element): INode
 //     (name: string, nodeType?: 3): IText
 //     (name: string, nodeType?: 8): IComment
 //     (name: string, nodeType?: number): INode | null
@@ -6898,6 +6844,55 @@ var log = Function('s', 'console.log(s)');
  * 可躲过一些js压缩库debugger;
  */
 var bp = Function('debugger');
+var isIE;
+try {
+    isIE = !!(typeof window !== "undefined" && window.ActiveXObject || "ActiveXObject" in window);
+}
+catch (e) {
+    isIE = false;
+}
+(function () {
+    var insertBefore = Node.prototype.insertBefore;
+    if (isIE) {
+        var reAppend_1 = [];
+        Node.prototype.insertBefore2 = function (newNode, refChild) {
+            var n;
+            if (isTextNode(newNode)) {
+                if (newNode.data === "") {
+                    return newNode;
+                }
+            }
+            else if (isCommentNode(newNode)) {
+                var node = refChild ? refChild : this.childNodes[0];
+                if (!node) {
+                    return newNode;
+                }
+                n = node.nextSibling;
+                while (n !== null) {
+                    reAppend_1.push(this.removeChild(n));
+                    n = node.nextSibling;
+                }
+                reAppend_1.unshift(this.removeChild(node));
+                this.appendChild(newNode);
+                for (var i = 0; i < reAppend_1.length; i++) {
+                    this.appendChild(reAppend_1[i]);
+                }
+                return newNode;
+            }
+            else {
+                var node = refChild ? refChild : this.childNodes[0];
+                if (!node) {
+                    return newNode;
+                }
+                return insertBefore.call(this, newNode, node);
+            }
+            return newNode;
+        };
+    }
+    else {
+        Node.prototype.insertBefore2 = insertBefore;
+    }
+})();
 /// <reference path="../core/Node.ts"/>
 /// <reference path='../part/Part.ts'/>
 /// <reference path='../scope/Scope.ts'/>
@@ -6914,6 +6909,7 @@ var bp = Function('debugger');
 /// <reference path='../virtual/Include.ts'/>
 /// <reference path='../part/uiList.ts'/>
 /// <reference path='LoadJS.ts'/>
+/// <reference path="../core/BrowserHelper.ts"/>
 var readyRE = /complete|loaded|interactive/;
 var Turtle = (function (_super) {
     __extends(Turtle, _super);

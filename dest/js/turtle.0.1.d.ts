@@ -813,8 +813,11 @@ declare const enum ENodeType {
     DocumentFragment = 11,
     PlaceHolder = 100,
 }
+interface VNodeNames {
+}
 interface IVNodeMethod {
     (nodeName: string, nodeType: ENodeType): VMDOM.VNode & IVNodeMethod;
+    <K extends keyof VNodeNames>(nodeName: K, nodeType?: ENodeType.Element): VNodeNames[K] & IVNodeMethod;
 }
 declare namespace VMDOM {
     let emptyTextNodeRE: RegExp;
@@ -954,9 +957,11 @@ declare namespace VMDOM {
 }
 declare let encodeHTML: (value: string) => string;
 declare let decodeHTML: (value: string) => string;
+interface VNodeNames {
+    'html': VMDOM.VHtmlElement;
+}
 interface IVNodeMethod {
     (nodeName: string, nodeType?: ENodeType.Element): VMDOM.VHtmlElement & IVNodeMethod;
-    (nodeName: 'html', nodeType?: ENodeType.Element): VMDOM.VHtmlElement & IVNodeMethod;
 }
 declare function isVHTMLElement(node: VMDOM.VNode): node is VMDOM.VHtmlElement;
 declare namespace VMDOM {
@@ -1084,8 +1089,8 @@ declare namespace VMDOM {
         constructor(nodeName: string);
     }
 }
-interface IVNodeMethod {
-    (nodeName: "a", nodeType?: 1): VMDOM.VAElement & IVNodeMethod;
+interface VNodeNames {
+    "a": VMDOM.VAElement;
 }
 declare namespace VMDOM {
     class VAElement extends VHtmlElement {
@@ -1104,8 +1109,8 @@ declare namespace VMDOM {
         href: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "area", nodeType?: 1): VMDOM.VAreaElement & IVNodeMethod;
+interface VNodeName {
+    "area": VMDOM.VAreaElement;
 }
 declare namespace VMDOM {
     class VAreaElement extends VHtmlElement {
@@ -1120,8 +1125,8 @@ declare namespace VMDOM {
         constructor();
     }
 }
-interface IVNodeMethod {
-    (nodeName: "base", nodeType?: 1): VMDOM.VBaseElement & IVNodeMethod;
+interface VNodeNames {
+    "base": VMDOM.VBaseElement;
 }
 declare namespace VMDOM {
     class VBaseElement extends VHtmlElement {
@@ -1131,8 +1136,8 @@ declare namespace VMDOM {
         constructor();
     }
 }
-interface IVNodeMethod {
-    (nodeName: "basefont", nodeType?: 1): VMDOM.VBasefontElement & IVNodeMethod;
+interface VNodeNames {
+    "basefont": VMDOM.VBasefontElement;
 }
 declare namespace VMDOM {
     class VBasefontElement extends VHtmlElement {
@@ -1145,8 +1150,8 @@ declare namespace VMDOM {
         constructor();
     }
 }
-interface IVNodeMethod {
-    (nodeName: "blockquote", nodeType?: 1): VMDOM.VBlockquoteElement & IVNodeMethod;
+interface VNodeNames {
+    "blockquote": VMDOM.VBlockquoteElement;
 }
 declare namespace VMDOM {
     class VBlockquoteElement extends VHtmlElement {
@@ -1154,8 +1159,8 @@ declare namespace VMDOM {
         cite: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "body", nodeType?: 1): VMDOM.VBodyElement & IVNodeMethod;
+interface VNodeNames {
+    "body": VMDOM.VBodyElement;
 }
 declare namespace VMDOM {
     class VBodyElement extends VHtmlElement {
@@ -1168,8 +1173,8 @@ declare namespace VMDOM {
         background: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "br", nodeType?: 1): VMDOM.VBrElement & IVNodeMethod;
+interface VNodeNames {
+    "br": VMDOM.VBrElement;
 }
 declare namespace VMDOM {
     class VBrElement extends VHtmlElement {
@@ -1178,8 +1183,8 @@ declare namespace VMDOM {
         constructor();
     }
 }
-interface IVNodeMethod {
-    (nodeName: "canvas", nodeType?: 1): VMDOM.VCanvasElement & IVNodeMethod;
+interface VNodeNames {
+    "canvas": VMDOM.VCanvasElement;
 }
 declare namespace VMDOM {
     class VCanvasElement extends VHtmlElement {
@@ -1188,8 +1193,8 @@ declare namespace VMDOM {
         height: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "caption", nodeType?: 1): VMDOM.VCaptionElement & IVNodeMethod;
+interface VNodeNames {
+    "caption": VMDOM.VCaptionElement;
 }
 declare namespace VMDOM {
     class VCaptionElement extends VHtmlElement {
@@ -1197,8 +1202,8 @@ declare namespace VMDOM {
         align: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "col", nodeType?: 1): VMDOM.VColElement & IVNodeMethod;
+interface VNodeNames {
+    "col": VMDOM.VColElement;
 }
 declare namespace VMDOM {
     class VColElement extends VHtmlElement {
@@ -1210,8 +1215,8 @@ declare namespace VMDOM {
         constructor();
     }
 }
-interface IVNodeMethod {
-    (nodeName: "colgroup", nodeType?: 1): VMDOM.VColgroupElement & IVNodeMethod;
+interface VNodeNames {
+    "colgroup": VMDOM.VColgroupElement;
 }
 declare namespace VMDOM {
     class VColgroupElement extends VHtmlElement {
@@ -1222,8 +1227,8 @@ declare namespace VMDOM {
         width: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "dialog", nodeType?: 1): VMDOM.VDialogElement & IVNodeMethod;
+interface VNodeNames {
+    "dialog": VMDOM.VDialogElement;
 }
 declare namespace VMDOM {
     class VDialogElement extends VHtmlElement {
@@ -1231,8 +1236,8 @@ declare namespace VMDOM {
         open: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "dir", nodeType?: 1): VMDOM.VDirElement & IVNodeMethod;
+interface VNodeNames {
+    "dir": VMDOM.VDirElement;
 }
 declare namespace VMDOM {
     class VDirElement extends VHtmlElement {
@@ -1240,8 +1245,8 @@ declare namespace VMDOM {
         compact: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "div", nodeType?: 1): VMDOM.VDivElement & IVNodeMethod;
+interface VNodeNames {
+    "div": VMDOM.VDivElement;
 }
 declare namespace VMDOM {
     class VDivElement extends VHtmlElement {
@@ -1249,8 +1254,8 @@ declare namespace VMDOM {
         align: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "dl", nodeType?: 1): VMDOM.VDlElement & IVNodeMethod;
+interface VNodeNames {
+    "dl": VMDOM.VDlElement;
 }
 declare namespace VMDOM {
     class VDlElement extends VHtmlElement {
@@ -1258,8 +1263,8 @@ declare namespace VMDOM {
         compact: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "fieldset", nodeType?: 1): VMDOM.VFieldsetElement & IVNodeMethod;
+interface VNodeNames {
+    "fieldset": VMDOM.VFieldsetElement;
 }
 declare namespace VMDOM {
     class VFieldsetElement extends VHtmlElement {
@@ -1268,8 +1273,8 @@ declare namespace VMDOM {
         name: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "frame", nodeType?: 1): VMDOM.VFrameElement & IVNodeMethod;
+interface VNodeNames {
+    "frame": VMDOM.VFrameElement;
 }
 declare namespace VMDOM {
     class VFrameElement extends VHtmlElement {
@@ -1287,8 +1292,8 @@ declare namespace VMDOM {
         constructor();
     }
 }
-interface IVNodeMethod {
-    (nodeName: "h1", nodeType?: 1): VMDOM.VH1Element & IVNodeMethod;
+interface VNodeNames {
+    "h1": VMDOM.VH1Element;
 }
 declare namespace VMDOM {
     class VH1Element extends VHtmlElement {
@@ -1296,8 +1301,8 @@ declare namespace VMDOM {
         align: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "h2", nodeType?: 1): VMDOM.VH2Element & IVNodeMethod;
+interface VNodeNames {
+    "h2": VMDOM.VH2Element;
 }
 declare namespace VMDOM {
     class VH2Element extends VHtmlElement {
@@ -1305,8 +1310,8 @@ declare namespace VMDOM {
         align: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "h3", nodeType?: 1): VMDOM.VH3Element & IVNodeMethod;
+interface VNodeNames {
+    "h3": VMDOM.VH3Element;
 }
 declare namespace VMDOM {
     class VH3Element extends VHtmlElement {
@@ -1314,8 +1319,8 @@ declare namespace VMDOM {
         align: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "h4", nodeType?: 1): VMDOM.VH4Element & IVNodeMethod;
+interface VNodeNames {
+    "h4": VMDOM.VH4Element;
 }
 declare namespace VMDOM {
     class VH4Element extends VHtmlElement {
@@ -1323,8 +1328,8 @@ declare namespace VMDOM {
         align: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "h5", nodeType?: 1): VMDOM.VH5Element & IVNodeMethod;
+interface VNodeNames {
+    "h5": VMDOM.VH5Element;
 }
 declare namespace VMDOM {
     class VH5Element extends VHtmlElement {
@@ -1332,8 +1337,8 @@ declare namespace VMDOM {
         align: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "h6", nodeType?: 1): VMDOM.VH6Element & IVNodeMethod;
+interface VNodeNames {
+    "h6": VMDOM.VH6Element;
 }
 declare namespace VMDOM {
     class VH6Element extends VHtmlElement {
@@ -1341,8 +1346,8 @@ declare namespace VMDOM {
         align: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "head", nodeType?: 1): VMDOM.VHeadElement & IVNodeMethod;
+interface VNodeNames {
+    "head": VMDOM.VHeadElement;
 }
 declare namespace VMDOM {
     class VHeadElement extends VHtmlElement {
@@ -1354,8 +1359,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "hr", nodeType?: 1): VMDOM.VHrElement & IVNodeMethod;
+interface VNodeNames {
+    "hr": VMDOM.VHrElement;
 }
 declare namespace VMDOM {
     class VHrElement extends VHtmlElement {
@@ -1368,8 +1373,8 @@ declare namespace VMDOM {
         constructor();
     }
 }
-interface IVNodeMethod {
-    (nodeName: "iframe", nodeType?: 1): VMDOM.VIframeElement & IVNodeMethod;
+interface VNodeNames {
+    "iframe": VMDOM.VIframeElement;
 }
 declare namespace VMDOM {
     class VIframeElement extends VHtmlElement {
@@ -1389,8 +1394,8 @@ declare namespace VMDOM {
         marginWidth: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "img", nodeType?: 1): VMDOM.VImgElement & IVNodeMethod;
+interface VNodeNames {
+    "img": VMDOM.VImgElement;
 }
 declare namespace VMDOM {
     class VImgElement extends VHtmlElement {
@@ -1414,8 +1419,8 @@ declare namespace VMDOM {
         constructor();
     }
 }
-interface IVNodeMethod {
-    (nodeName: "input", nodeType?: 1): VMDOM.VInputElement & IVNodeMethod;
+interface VNodeNames {
+    "input": VMDOM.VInputElement;
 }
 declare namespace VMDOM {
     class VInputElement extends VHtmlElement {
@@ -1459,8 +1464,8 @@ declare namespace VMDOM {
         protected emulation(): void;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "ins", nodeType?: 1): VMDOM.VInsElement & IVNodeMethod;
+interface VNodeNames {
+    "ins": VMDOM.VInsElement;
 }
 declare namespace VMDOM {
     class VInsElement extends VHtmlElement {
@@ -1469,8 +1474,8 @@ declare namespace VMDOM {
         dateTime: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "keygen", nodeType?: 1): VMDOM.VKeygenElement & IVNodeMethod;
+interface VNodeNames {
+    "keygen": VMDOM.VKeygenElement;
 }
 declare namespace VMDOM {
     class VKeygenElement extends VHtmlElement {
@@ -1482,8 +1487,8 @@ declare namespace VMDOM {
         name: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "legend", nodeType?: 1): VMDOM.VLegendElement & IVNodeMethod;
+interface VNodeNames {
+    "legend": VMDOM.VLegendElement;
 }
 declare namespace VMDOM {
     class VLegendElement extends VHtmlElement {
@@ -1491,8 +1496,8 @@ declare namespace VMDOM {
         align: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "li", nodeType?: 1): VMDOM.VLiElement & IVNodeMethod;
+interface VNodeNames {
+    "li": VMDOM.VLiElement;
 }
 declare namespace VMDOM {
     class VLiElement extends VHtmlElement {
@@ -1501,8 +1506,8 @@ declare namespace VMDOM {
         type: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "link", nodeType?: 1): VMDOM.VLinkElement & IVNodeMethod;
+interface VNodeNames {
+    "link": VMDOM.VLinkElement;
 }
 declare namespace VMDOM {
     class VLinkElement extends VHtmlElement {
@@ -1521,8 +1526,8 @@ declare namespace VMDOM {
         constructor();
     }
 }
-interface IVNodeMethod {
-    (nodeName: "map", nodeType?: 1): VMDOM.VMapElement & IVNodeMethod;
+interface VNodeNames {
+    "map": VMDOM.VMapElement;
 }
 declare namespace VMDOM {
     class VMapElement extends VHtmlElement {
@@ -1531,8 +1536,8 @@ declare namespace VMDOM {
         constructor();
     }
 }
-interface IVNodeMethod {
-    (nodeName: "menu", nodeType?: 1): VMDOM.VMenuElement & IVNodeMethod;
+interface VNodeNames {
+    "menu": VMDOM.VMenuElement;
 }
 declare namespace VMDOM {
     class VMenuElement extends VHtmlElement {
@@ -1540,8 +1545,8 @@ declare namespace VMDOM {
         compact: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "meta", nodeType?: 1): VMDOM.VMetaElement & IVNodeMethod;
+interface VNodeNames {
+    "meta": VMDOM.VMetaElement;
 }
 declare namespace VMDOM {
     class VMetaElement extends VHtmlElement {
@@ -1552,8 +1557,8 @@ declare namespace VMDOM {
         constructor();
     }
 }
-interface IVNodeMethod {
-    (nodeName: "meter", nodeType?: 1): VMDOM.VMeterElement & IVNodeMethod;
+interface VNodeNames {
+    "meter": VMDOM.VMeterElement;
 }
 declare namespace VMDOM {
     class VMeterElement extends VHtmlElement {
@@ -1566,8 +1571,8 @@ declare namespace VMDOM {
         optimum: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "ol", nodeType?: 1): VMDOM.VOlElement & IVNodeMethod;
+interface VNodeNames {
+    "ol": VMDOM.VOlElement;
 }
 declare namespace VMDOM {
     class VOlElement extends VHtmlElement {
@@ -1578,8 +1583,8 @@ declare namespace VMDOM {
         compact: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "optgroup", nodeType?: 1): VMDOM.VOptgroupElement & IVNodeMethod;
+interface VNodeNames {
+    "optgroup": VMDOM.VOptgroupElement;
 }
 declare namespace VMDOM {
     class VOptgroupElement extends VHtmlElement {
@@ -1588,8 +1593,8 @@ declare namespace VMDOM {
         label: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "option", nodeType?: 1): VMDOM.VOptionElement & IVNodeMethod;
+interface VNodeNames {
+    "option": VMDOM.VOptionElement;
 }
 declare namespace VMDOM {
     class VOptionElement extends VHtmlElement {
@@ -1600,8 +1605,8 @@ declare namespace VMDOM {
         value: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "output", nodeType?: 1): VMDOM.VOutputElement & IVNodeMethod;
+interface VNodeNames {
+    "output": VMDOM.VOutputElement;
 }
 declare namespace VMDOM {
     class VOutputElement extends VHtmlElement {
@@ -1609,8 +1614,8 @@ declare namespace VMDOM {
         name: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "param", nodeType?: 1): VMDOM.VParamElement & IVNodeMethod;
+interface VNodeNames {
+    "param": VMDOM.VParamElement;
 }
 declare namespace VMDOM {
     class VParamElement extends VHtmlElement {
@@ -1622,8 +1627,8 @@ declare namespace VMDOM {
         constructor();
     }
 }
-interface IVNodeMethod {
-    (nodeName: "p", nodeType?: 1): VMDOM.VPElement & IVNodeMethod;
+interface VNodeNames {
+    "p": VMDOM.VPElement;
 }
 declare namespace VMDOM {
     class VPElement extends VHtmlElement {
@@ -1631,8 +1636,8 @@ declare namespace VMDOM {
         align: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "pre", nodeType?: 1): VMDOM.VPreElement & IVNodeMethod;
+interface VNodeNames {
+    "pre": VMDOM.VPreElement;
 }
 declare namespace VMDOM {
     class VPreElement extends VHtmlElement {
@@ -1640,8 +1645,8 @@ declare namespace VMDOM {
         width: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "progress", nodeType?: 1): VMDOM.VProgressElement & IVNodeMethod;
+interface VNodeNames {
+    "progress": VMDOM.VProgressElement;
 }
 declare namespace VMDOM {
     class VProgressElement extends VHtmlElement {
@@ -1650,8 +1655,8 @@ declare namespace VMDOM {
         max: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "q", nodeType?: 1): VMDOM.VQElement & IVNodeMethod;
+interface VNodeNames {
+    "q": VMDOM.VQElement;
 }
 declare namespace VMDOM {
     class VQElement extends VHtmlElement {
@@ -1659,8 +1664,8 @@ declare namespace VMDOM {
         cite: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "script", nodeType?: 1): VMDOM.VScriptElement & IVNodeMethod;
+interface VNodeNames {
+    "script": VMDOM.VScriptElement;
 }
 declare namespace VMDOM {
     class VScriptElement extends VHtmlElement {
@@ -1678,8 +1683,8 @@ declare namespace VMDOM {
         onload: (this: HTMLElement, ev: Event) => any;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "select", nodeType?: 1): VMDOM.VSelectElement & IVNodeMethod;
+interface VNodeNames {
+    "select": VMDOM.VSelectElement;
 }
 declare namespace VMDOM {
     class VSelectElement extends VHtmlElement {
@@ -1694,8 +1699,8 @@ declare namespace VMDOM {
         protected emulation(): void;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "source", nodeType?: 1): VMDOM.VSourceElement & IVNodeMethod;
+interface VNodeNames {
+    "source": VMDOM.VSourceElement;
 }
 declare namespace VMDOM {
     class VSourceElement extends VHtmlElement {
@@ -1707,8 +1712,8 @@ declare namespace VMDOM {
         media: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "style", nodeType?: 1): VMDOM.VStyleElement & IVNodeMethod;
+interface VNodeNames {
+    "style": VMDOM.VStyleElement;
 }
 declare namespace VMDOM {
     class VStyleElement extends VHtmlElement {
@@ -1717,8 +1722,8 @@ declare namespace VMDOM {
         type: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "table", nodeType?: 1): VMDOM.VTableElement & IVNodeMethod;
+interface VNodeNames {
+    "table": VMDOM.VTableElement;
 }
 declare namespace VMDOM {
     class VTableElement extends VHtmlElement {
@@ -1734,8 +1739,8 @@ declare namespace VMDOM {
         cellSpacing: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "tbody", nodeType?: 1): VMDOM.VTbodyElement & IVNodeMethod;
+interface VNodeNames {
+    "tbody": VMDOM.VTbodyElement;
 }
 declare namespace VMDOM {
     class VTbodyElement extends VHtmlElement {
@@ -1744,8 +1749,8 @@ declare namespace VMDOM {
         vAlign: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "td", nodeType?: 1): VMDOM.VTdElement & IVNodeMethod;
+interface VNodeNames {
+    "td": VMDOM.VTdElement;
 }
 declare namespace VMDOM {
     class VTdElement extends VHtmlElement {
@@ -1764,8 +1769,8 @@ declare namespace VMDOM {
         scope: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "textarea", nodeType?: 1): VMDOM.VTextareaElement & IVNodeMethod;
+interface VNodeNames {
+    "textarea": VMDOM.VTextareaElement;
 }
 declare namespace VMDOM {
     class VTextareaElement extends VHtmlElement {
@@ -1788,8 +1793,8 @@ declare namespace VMDOM {
         protected emulation(): void;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "tfoot", nodeType?: 1): VMDOM.VTfootElement & IVNodeMethod;
+interface VNodeNames {
+    "tfoot": VMDOM.VTfootElement;
 }
 declare namespace VMDOM {
     class VTfootElement extends VHtmlElement {
@@ -1798,8 +1803,8 @@ declare namespace VMDOM {
         vAlign: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "thead", nodeType?: 1): VMDOM.VTheadElement & IVNodeMethod;
+interface VNodeNames {
+    "thead": VMDOM.VTheadElement;
 }
 declare namespace VMDOM {
     class VTheadElement extends VHtmlElement {
@@ -1808,8 +1813,8 @@ declare namespace VMDOM {
         vAlign: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "th", nodeType?: 1): VMDOM.VThElement & IVNodeMethod;
+interface VNodeNames {
+    "th": VMDOM.VThElement;
 }
 declare namespace VMDOM {
     class VThElement extends VHtmlElement {
@@ -1828,8 +1833,8 @@ declare namespace VMDOM {
         scope: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "track", nodeType?: 1): VMDOM.VTrackElement & IVNodeMethod;
+interface VNodeNames {
+    "track": VMDOM.VTrackElement;
 }
 declare namespace VMDOM {
     class VTrackElement extends VHtmlElement {
@@ -1841,8 +1846,8 @@ declare namespace VMDOM {
         default: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "tr", nodeType?: 1): VMDOM.VTrElement & IVNodeMethod;
+interface VNodeNames {
+    "tr": VMDOM.VTrElement;
 }
 declare namespace VMDOM {
     class VTrElement extends VHtmlElement {
@@ -1852,8 +1857,8 @@ declare namespace VMDOM {
         bgColor: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "ul", nodeType?: 1): VMDOM.VUlElement & IVNodeMethod;
+interface VNodeNames {
+    "ul": VMDOM.VUlElement;
 }
 declare namespace VMDOM {
     class VUlElement extends VHtmlElement {
@@ -1862,8 +1867,8 @@ declare namespace VMDOM {
         type: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "video", nodeType?: 1): VMDOM.VVideoElement & IVNodeMethod;
+interface VNodeNames {
+    "video": VMDOM.VVideoElement;
 }
 declare namespace VMDOM {
     class VVideoElement extends VHtmlElement {
@@ -1873,8 +1878,8 @@ declare namespace VMDOM {
         poster: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "xmp", nodeType?: 1): VMDOM.VXmpElement & IVNodeMethod;
+interface VNodeNames {
+    "xmp": VMDOM.VXmpElement;
 }
 declare namespace VMDOM {
     class VXmpElement extends VHtmlElement {
@@ -1882,8 +1887,8 @@ declare namespace VMDOM {
         width: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "title", nodeType?: 1): VMDOM.VTitleElement & IVNodeMethod;
+interface VNodeNames {
+    "title": VMDOM.VTitleElement;
 }
 declare namespace VMDOM {
     class VTitleElement extends VHtmlElement {
@@ -1895,8 +1900,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "span", nodeType?: 1): VMDOM.VSpanElement & IVNodeMethod;
+interface VNodeNames {
+    "span": VMDOM.VSpanElement;
 }
 declare namespace VMDOM {
     class VSpanElement extends VHtmlElement {
@@ -1908,8 +1913,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "em", nodeType?: 1): VMDOM.VEmElement & IVNodeMethod;
+interface VNodeNames {
+    "em": VMDOM.VEmElement;
 }
 declare namespace VMDOM {
     class VEmElement extends VHtmlElement {
@@ -1921,8 +1926,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "i", nodeType?: 1): VMDOM.VIElement & IVNodeMethod;
+interface VNodeNames {
+    "i": VMDOM.VIElement;
 }
 declare namespace VMDOM {
     class VIElement extends VHtmlElement {
@@ -1934,8 +1939,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "b", nodeType?: 1): VMDOM.VBElement & IVNodeMethod;
+interface VNodeNames {
+    "b": VMDOM.VBElement;
 }
 declare namespace VMDOM {
     class VBElement extends VHtmlElement {
@@ -1947,8 +1952,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "form", nodeType?: 1): VMDOM.VFormElement & IVNodeMethod;
+interface VNodeNames {
+    "form": VMDOM.VFormElement;
 }
 declare namespace VMDOM {
     class VFormElement extends VHtmlElement {
@@ -1962,8 +1967,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "label", nodeType?: 1): VMDOM.VLabelElement & IVNodeMethod;
+interface VNodeNames {
+    "label": VMDOM.VLabelElement;
 }
 declare namespace VMDOM {
     class VLabelElement extends VHtmlElement {
@@ -1975,8 +1980,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "dt", nodeType?: 1): VMDOM.VDtElement & IVNodeMethod;
+interface VNodeNames {
+    "dt": VMDOM.VDtElement;
 }
 declare namespace VMDOM {
     class VDtElement extends VHtmlElement {
@@ -1988,8 +1993,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "dd", nodeType?: 1): VMDOM.VDdElement & IVNodeMethod;
+interface VNodeNames {
+    "dd": VMDOM.VDdElement;
 }
 declare namespace VMDOM {
     class VDdElement extends VHtmlElement {
@@ -2001,8 +2006,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "embed", nodeType?: 1): VMDOM.VEmbedElement & IVNodeMethod;
+interface VNodeNames {
+    "embed": VMDOM.VEmbedElement;
 }
 declare namespace VMDOM {
     class VEmbedElement extends VHtmlElement {
@@ -2019,8 +2024,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "strong", nodeType?: 1): VMDOM.VStrongElement & IVNodeMethod;
+interface VNodeNames {
+    "strong": VMDOM.VStrongElement;
 }
 declare namespace VMDOM {
     class VStrongElement extends VHtmlElement {
@@ -2032,8 +2037,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "button", nodeType?: 1): VMDOM.VButtonElement & IVNodeMethod;
+interface VNodeNames {
+    "button": VMDOM.VButtonElement;
 }
 declare namespace VMDOM {
     class VButtonElement extends VHtmlElement {
@@ -2048,8 +2053,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "object", nodeType?: 1): VMDOM.VObjectElement & IVNodeMethod;
+interface VNodeNames {
+    "object": VMDOM.VObjectElement;
 }
 declare namespace VMDOM {
     class VObjectElement extends VHtmlElement {
@@ -2072,8 +2077,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "svg", nodeType?: 1): VMDOM.VSvgElement & IVNodeMethod;
+interface VNodeNames {
+    "svg": VMDOM.VSvgElement;
 }
 declare namespace VMDOM {
     class VSvgElement extends VHtmlElement {
@@ -2085,8 +2090,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "circle", nodeType?: 1): VMDOM.VCircleElement & IVNodeMethod;
+interface VNodeNames {
+    "circle": VMDOM.VCircleElement;
 }
 declare namespace VMDOM {
     class VCircleElement extends VHtmlElement {
@@ -2098,8 +2103,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "header", nodeType?: 1): VMDOM.VHeaderElement & IVNodeMethod;
+interface VNodeNames {
+    "header": VMDOM.VHeaderElement;
 }
 declare namespace VMDOM {
     class VHeaderElement extends VHtmlElement {
@@ -2111,8 +2116,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "footer", nodeType?: 1): VMDOM.VFooterElement & IVNodeMethod;
+interface VNodeNames {
+    "footer": VMDOM.VFooterElement;
 }
 declare namespace VMDOM {
     class VFooterElement extends VHtmlElement {
@@ -2322,7 +2327,7 @@ declare namespace VMDOM {
 declare const enum ENodeType {
     Script = 103,
 }
-interface IVNodeMethod {
+interface VNodeNames {
     (data: string, nodeType: ENodeType.Script): VMDOM.VScript & IVNodeMethod;
 }
 declare namespace VMDOM {
@@ -2451,13 +2456,6 @@ interface ITurtle {
     loadJS(path: string | string[], variable?: string): any;
 }
 declare let loadJS: (path: string | string[], variable?: string) => any;
-interface Window {
-    ActiveXObject?: Object;
-}
-interface Node {
-    insertBefore2<T extends INode | Node>(newNode: T, node?: T): T;
-}
-declare let isIE: boolean;
 interface ITurtle {
     T: UIList;
     xhr: XHR;
@@ -2480,7 +2478,7 @@ declare function findTemplates(nodes: IHTMLElement[] | IArray): IElement[] | IAr
 declare function importUI(uiName: string, uiSortPath: string): {
     path: string;
     resPath: string;
-    part: new (props: ComponentView.IProps, outerChildNodes?: INode[]) => Component.Part;
+    part: new (props: ComponentView.IProps | null, outerChildNodes?: INode[] | undefined) => Component.Part;
 };
 /**从DOM树获取父组件
  * @param {}
@@ -2614,6 +2612,13 @@ declare let log: Function;
  * 可躲过一些js压缩库debugger;
  */
 declare let bp: Function;
+interface Window {
+    ActiveXObject?: Object;
+}
+interface Node {
+    insertBefore2<T extends INode | Node>(newNode: T, node?: T): T;
+}
+declare let isIE: boolean;
 interface IRenderDocument {
     (): void;
     beginTime?: Date;
