@@ -12,7 +12,7 @@ interface IVNodeMethod{
 namespace VMDOM{
     @register('#order',ENodeType.Order)
     export class VOrder extends VPlaceHolder{
-        nodeName="#order"
+        nodeName:"#order"="#order"
         nodeType=ENodeType.Order
         constructor(public orderData:VOrderData){
             super('');

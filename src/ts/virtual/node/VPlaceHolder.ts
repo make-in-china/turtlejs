@@ -3,7 +3,6 @@
 interface IVNodeMethod{
     (nodeName: string, nodeType: ENodeType.PlaceHolder): VMDOM.VPlaceHolder&IVNodeMethod;
 }
-
 namespace VMDOM{
     export class VPlaceHolder extends VComment{
         nodeName="#placeholder"
