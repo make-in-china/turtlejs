@@ -14,6 +14,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+"use strict";
 var ArrayEx = (function (_super) {
     __extends(ArrayEx, _super);
     function ArrayEx() {
@@ -32,6 +33,7 @@ var ArrayEx = (function (_super) {
     };
     return ArrayEx;
 }(Array));
+"use strict";
 var IAttr = (function () {
     function IAttr(name, value) {
         this.name = name;
@@ -41,7 +43,9 @@ var IAttr = (function () {
 }());
 /// <reference path="../lib/ArrayEx.ts"/>
 /// <reference path="IAttr.ts"/>
+"use strict";
 /// <reference path="../lib/lib.ts" />
+"use strict";
 typeof Node !== 'undefined' && (function () {
     var appendChild = Node.prototype.appendChild;
     Node.prototype.appendChild = function (newChild) {
@@ -339,6 +343,7 @@ function isCommentNode(node) {
 function isTextNode(node) {
     return node.nodeType === Node.TEXT_NODE;
 }
+"use strict";
 var arrayConstructor = Array.prototype, objectConstructor = Object.prototype, stringConstructor = String.prototype, toStr = objectConstructor.toString, getPrototypeOf = objectConstructor.getPrototypeOf, replace = stringConstructor.replace, slice = arrayConstructor.slice, push = arrayConstructor.push, splice = arrayConstructor.splice, indexOf = arrayConstructor.indexOf;
 var last = function () {
     if (this.length > 0) {
@@ -485,6 +490,7 @@ var getCommentText = (function () {
         };
     }
 }());
+"use strict";
 /// <reference path="../lib/TypeHelper.ts"/>
 var persentRE = /^\s*([\d.]+)%\s*$/;
 function isNull(p) {
@@ -522,6 +528,7 @@ function isPersent(s) {
     return persentRE.test(s);
 }
 function isArrayLike(a) { return typeof a.length == 'number'; }
+"use strict";
 /// <reference path="../lib/is.ts" />
 var EventEmitter = (function () {
     function EventEmitter() {
@@ -644,6 +651,7 @@ var EventEmitter = (function () {
     ;
     return EventEmitter;
 }());
+"use strict";
 /// <reference path="EventEmitter.ts"/>
 var EventHelper = (function () {
     function EventHelper(target, type) {
@@ -681,6 +689,7 @@ var EventHelper = (function () {
     };
     return EventHelper;
 }());
+"use strict";
 /// <reference path="EventEmitter.ts"/>
 /// <reference path="EventHelper.ts"/>
 var EventEmitterEx = (function (_super) {
@@ -705,6 +714,7 @@ var EventEmitterEx = (function (_super) {
     };
     return EventEmitterEx;
 }(EventEmitter));
+"use strict";
 /**
  * 遍历树
  * @param {T[]|IArray} array 数组或类数组
@@ -758,6 +768,8 @@ function treeEach(array, propertyName, fn, beginIndex) {
     }
     return { stack: stack, return: ret, array: arr, index: i };
 }
+"use strict";
+"use strict";
 /// <reference path='../lib/Is.ts'/>
 var BasePath = (function () {
     function BasePath() {
@@ -813,6 +825,7 @@ var BasePath = (function () {
     return BasePath;
 }());
 var baseUIPath = new BasePath;
+"use strict";
 /// <reference path='BasePath.ts'/>
 var NameItem = (function () {
     function NameItem(name) {
@@ -882,6 +895,7 @@ var TemplateConfig = (function () {
     return TemplateConfig;
 }());
 var templateConfig = new TemplateConfig;
+"use strict";
 var Scope = (function () {
     function Scope(commentNode, parent, __name__) {
         this.__name__ = __name__;
@@ -914,6 +928,7 @@ var RootScope = (function () {
     }
     return RootScope;
 }());
+"use strict";
 /// <reference path="../../lib/is.ts"/>
 /// <reference path="../../lib/IAttr.ts"/>
 var VNamedNodeMap = (function () {
@@ -1004,6 +1019,7 @@ var VNamedNodeMap = (function () {
     };
     return VNamedNodeMap;
 }());
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var styleListRE = /\s*([\w\-]+)\s*\:\s*(.*?)\s*[;$]/g;
@@ -1136,6 +1152,7 @@ var VMDOM;
         setVStyleGetSet(i);
     }
 })(VMDOM || (VMDOM = {}));
+"use strict";
 /// <reference path="../lib/ArrayEx.ts"/>
 /**
  * 一个普通对象
@@ -1246,6 +1263,7 @@ var KeyArrayHashObjectManage = (function () {
 // function createKeyArrayHashObject<T>():IKeyArrayHashObject<T> & KeyArrayHashObject<T>{
 //     return <any>(new KeyArrayHashObject<T>());
 // }
+"use strict";
 //浏览器兼容
 var classSplitRE = /\s+/g;
 var ClassList = (function () {
@@ -1287,6 +1305,7 @@ var ClassList = (function () {
     };
     return ClassList;
 }());
+"use strict";
 /// <reference path='.d.ts'/>
 /// <reference path='VNode.ts'/>
 var VMDOM;
@@ -1309,6 +1328,7 @@ var VMDOM;
     }());
     VMDOM.VNodeList = VNodeList;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 /// <reference path='.d.ts'/>
 var VMDOM;
 (function (VMDOM) {
@@ -1343,6 +1363,7 @@ var VMDOM;
     }());
     VMDOM.VHTMLCollection = VHTMLCollection;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VNodeVMData = (function () {
     function VNodeVMData() {
         this.data = "";
@@ -1356,6 +1377,7 @@ var VNodeVMData = (function () {
     }
     return VNodeVMData;
 }());
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     VMDOM.bindClassToFunctionHelper = {};
@@ -1448,6 +1470,7 @@ var VMDOM;
 //         t.__proto__ = htmlNodeInfo[t.nodeName];
 //     }
 // } 
+"use strict";
 /// <reference path='.d.ts'/>
 /// <reference path='VNamedNodeMap.ts'/>
 /// <reference path='VStyle.ts'/>
@@ -1897,6 +1920,7 @@ var VNodeHelp = function (nodeName, nodeType) {
     bindClassToFunction(that, nodeName, nodeType);
     return that;
 };
+"use strict";
 /// <reference path='VNode.ts'/>
 var VMDOM;
 (function (VMDOM) {
@@ -2009,6 +2033,7 @@ var VMDOM;
     }(VMDOM.VNode));
     VMDOM.VElement = VElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var encodeHTML = (function () {
     var re = /&lt;|&gt;/g, fn = function (s) {
         switch (s) {
@@ -2037,6 +2062,7 @@ var decodeHTML = (function () {
         return value.replace(re, fn);
     };
 }());
+"use strict";
 /// <reference path='VNode.ts'/>
 /// <reference path='VElement.ts'/>
 /// <reference path='../../lib/Encode.ts'/>
@@ -2338,6 +2364,7 @@ var VMDOM;
     VMDOM.VHtmlElement = VHtmlElement;
     var VHtmlElement_1;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 /// <reference path='VNode.ts'/>
 var VMDOM;
 (function (VMDOM) {
@@ -2375,6 +2402,7 @@ var VMDOM;
     }(VMDOM.VNode));
     VMDOM.VCharacterData = VCharacterData;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 /// <reference path='VCharacterData.ts'/>
 function isVText(node) {
     return node.nodeType === 3 /* Text */;
@@ -2473,6 +2501,7 @@ var VMDOM;
     ], VText);
     VMDOM.VText = VText;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 /// <reference path='VCharacterData.ts'/>
 function isVComment(node) {
     return node.nodeType === 8 /* Comment */;
@@ -2559,6 +2588,7 @@ var VMDOM;
     ], VComment);
     VMDOM.VComment = VComment;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 /// <reference path='VNode.ts'/>
 function isVDocType(node) {
     return node.nodeType === 10 /* DocumentType */;
@@ -2594,6 +2624,7 @@ var VMDOM;
     VMDOM.VDocumentType = VDocumentType;
 })(VMDOM || (VMDOM = {}));
 /// <reference path='VNode.ts'/>
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDocument = (function (_super) {
@@ -2626,6 +2657,7 @@ var VMDOM;
     VMDOM.VDocument = VDocument;
 })(VMDOM || (VMDOM = {}));
 /// <reference path='VHtmlElement.ts'/>
+"use strict";
 function isVHTMLUnknownElement(node) {
     return node instanceof VMDOM.VHTMLUnknownElement;
 }
@@ -2645,6 +2677,7 @@ var VMDOM;
     ], VHTMLUnknownElement);
     VMDOM.VHTMLUnknownElement = VHTMLUnknownElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VAElement = (function (_super) {
@@ -2661,6 +2694,7 @@ var VMDOM;
     ], VAElement);
     VMDOM.VAElement = VAElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VAreaElement = (function (_super) {
@@ -2678,6 +2712,7 @@ var VMDOM;
     ], VAreaElement);
     VMDOM.VAreaElement = VAreaElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VBaseElement = (function (_super) {
@@ -2695,6 +2730,7 @@ var VMDOM;
     ], VBaseElement);
     VMDOM.VBaseElement = VBaseElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VBasefontElement = (function (_super) {
@@ -2712,6 +2748,7 @@ var VMDOM;
     ], VBasefontElement);
     VMDOM.VBasefontElement = VBasefontElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VBlockquoteElement = (function (_super) {
@@ -2728,6 +2765,7 @@ var VMDOM;
     ], VBlockquoteElement);
     VMDOM.VBlockquoteElement = VBlockquoteElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VBodyElement = (function (_super) {
@@ -2744,6 +2782,7 @@ var VMDOM;
     ], VBodyElement);
     VMDOM.VBodyElement = VBodyElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VBrElement = (function (_super) {
@@ -2761,6 +2800,7 @@ var VMDOM;
     ], VBrElement);
     VMDOM.VBrElement = VBrElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VCanvasElement = (function (_super) {
@@ -2777,6 +2817,7 @@ var VMDOM;
     ], VCanvasElement);
     VMDOM.VCanvasElement = VCanvasElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VCaptionElement = (function (_super) {
@@ -2793,6 +2834,7 @@ var VMDOM;
     ], VCaptionElement);
     VMDOM.VCaptionElement = VCaptionElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VColElement = (function (_super) {
@@ -2810,6 +2852,7 @@ var VMDOM;
     ], VColElement);
     VMDOM.VColElement = VColElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VColgroupElement = (function (_super) {
@@ -2826,6 +2869,7 @@ var VMDOM;
     ], VColgroupElement);
     VMDOM.VColgroupElement = VColgroupElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDialogElement = (function (_super) {
@@ -2842,6 +2886,7 @@ var VMDOM;
     ], VDialogElement);
     VMDOM.VDialogElement = VDialogElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDirElement = (function (_super) {
@@ -2858,6 +2903,7 @@ var VMDOM;
     ], VDirElement);
     VMDOM.VDirElement = VDirElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDivElement = (function (_super) {
@@ -2874,6 +2920,7 @@ var VMDOM;
     ], VDivElement);
     VMDOM.VDivElement = VDivElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDlElement = (function (_super) {
@@ -2890,6 +2937,7 @@ var VMDOM;
     ], VDlElement);
     VMDOM.VDlElement = VDlElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VFieldsetElement = (function (_super) {
@@ -2906,6 +2954,7 @@ var VMDOM;
     ], VFieldsetElement);
     VMDOM.VFieldsetElement = VFieldsetElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VFrameElement = (function (_super) {
@@ -2923,6 +2972,7 @@ var VMDOM;
     ], VFrameElement);
     VMDOM.VFrameElement = VFrameElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VH1Element = (function (_super) {
@@ -2939,6 +2989,7 @@ var VMDOM;
     ], VH1Element);
     VMDOM.VH1Element = VH1Element;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VH2Element = (function (_super) {
@@ -2955,6 +3006,7 @@ var VMDOM;
     ], VH2Element);
     VMDOM.VH2Element = VH2Element;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VH3Element = (function (_super) {
@@ -2971,6 +3023,7 @@ var VMDOM;
     ], VH3Element);
     VMDOM.VH3Element = VH3Element;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VH4Element = (function (_super) {
@@ -2987,6 +3040,7 @@ var VMDOM;
     ], VH4Element);
     VMDOM.VH4Element = VH4Element;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VH5Element = (function (_super) {
@@ -3003,6 +3057,7 @@ var VMDOM;
     ], VH5Element);
     VMDOM.VH5Element = VH5Element;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VH6Element = (function (_super) {
@@ -3019,6 +3074,7 @@ var VMDOM;
     ], VH6Element);
     VMDOM.VH6Element = VH6Element;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VHeadElement = (function (_super) {
@@ -3035,6 +3091,7 @@ var VMDOM;
     ], VHeadElement);
     VMDOM.VHeadElement = VHeadElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VHrElement = (function (_super) {
@@ -3052,6 +3109,7 @@ var VMDOM;
     ], VHrElement);
     VMDOM.VHrElement = VHrElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VIframeElement = (function (_super) {
@@ -3068,6 +3126,7 @@ var VMDOM;
     ], VIframeElement);
     VMDOM.VIframeElement = VIframeElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VImgElement = (function (_super) {
@@ -3085,6 +3144,7 @@ var VMDOM;
     ], VImgElement);
     VMDOM.VImgElement = VImgElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VInputElement = (function (_super) {
@@ -3107,6 +3167,7 @@ var VMDOM;
     ], VInputElement);
     VMDOM.VInputElement = VInputElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VInsElement = (function (_super) {
@@ -3123,6 +3184,7 @@ var VMDOM;
     ], VInsElement);
     VMDOM.VInsElement = VInsElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VKeygenElement = (function (_super) {
@@ -3139,6 +3201,7 @@ var VMDOM;
     ], VKeygenElement);
     VMDOM.VKeygenElement = VKeygenElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VLegendElement = (function (_super) {
@@ -3155,6 +3218,7 @@ var VMDOM;
     ], VLegendElement);
     VMDOM.VLegendElement = VLegendElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VLiElement = (function (_super) {
@@ -3171,6 +3235,7 @@ var VMDOM;
     ], VLiElement);
     VMDOM.VLiElement = VLiElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VLinkElement = (function (_super) {
@@ -3188,6 +3253,7 @@ var VMDOM;
     ], VLinkElement);
     VMDOM.VLinkElement = VLinkElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VMapElement = (function (_super) {
@@ -3205,6 +3271,7 @@ var VMDOM;
     ], VMapElement);
     VMDOM.VMapElement = VMapElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VMenuElement = (function (_super) {
@@ -3221,6 +3288,7 @@ var VMDOM;
     ], VMenuElement);
     VMDOM.VMenuElement = VMenuElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VMetaElement = (function (_super) {
@@ -3238,6 +3306,7 @@ var VMDOM;
     ], VMetaElement);
     VMDOM.VMetaElement = VMetaElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VMeterElement = (function (_super) {
@@ -3254,6 +3323,7 @@ var VMDOM;
     ], VMeterElement);
     VMDOM.VMeterElement = VMeterElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VOlElement = (function (_super) {
@@ -3270,6 +3340,7 @@ var VMDOM;
     ], VOlElement);
     VMDOM.VOlElement = VOlElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VOptgroupElement = (function (_super) {
@@ -3286,6 +3357,7 @@ var VMDOM;
     ], VOptgroupElement);
     VMDOM.VOptgroupElement = VOptgroupElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VOptionElement = (function (_super) {
@@ -3302,6 +3374,7 @@ var VMDOM;
     ], VOptionElement);
     VMDOM.VOptionElement = VOptionElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VOutputElement = (function (_super) {
@@ -3318,6 +3391,7 @@ var VMDOM;
     ], VOutputElement);
     VMDOM.VOutputElement = VOutputElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VParamElement = (function (_super) {
@@ -3335,6 +3409,7 @@ var VMDOM;
     ], VParamElement);
     VMDOM.VParamElement = VParamElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VPElement = (function (_super) {
@@ -3351,6 +3426,7 @@ var VMDOM;
     ], VPElement);
     VMDOM.VPElement = VPElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VPreElement = (function (_super) {
@@ -3367,6 +3443,7 @@ var VMDOM;
     ], VPreElement);
     VMDOM.VPreElement = VPreElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VProgressElement = (function (_super) {
@@ -3383,6 +3460,7 @@ var VMDOM;
     ], VProgressElement);
     VMDOM.VProgressElement = VProgressElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VQElement = (function (_super) {
@@ -3399,6 +3477,7 @@ var VMDOM;
     ], VQElement);
     VMDOM.VQElement = VQElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 /// <reference path="../../core/node.ts"/>
 var VMDOM;
 (function (VMDOM) {
@@ -3450,6 +3529,7 @@ var VMDOM;
     ], VScriptElement);
     VMDOM.VScriptElement = VScriptElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VSelectElement = (function (_super) {
@@ -3470,6 +3550,7 @@ var VMDOM;
     ], VSelectElement);
     VMDOM.VSelectElement = VSelectElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VSourceElement = (function (_super) {
@@ -3486,6 +3567,7 @@ var VMDOM;
     ], VSourceElement);
     VMDOM.VSourceElement = VSourceElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VStyleElement = (function (_super) {
@@ -3502,6 +3584,7 @@ var VMDOM;
     ], VStyleElement);
     VMDOM.VStyleElement = VStyleElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTableElement = (function (_super) {
@@ -3518,6 +3601,7 @@ var VMDOM;
     ], VTableElement);
     VMDOM.VTableElement = VTableElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTbodyElement = (function (_super) {
@@ -3534,6 +3618,7 @@ var VMDOM;
     ], VTbodyElement);
     VMDOM.VTbodyElement = VTbodyElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTdElement = (function (_super) {
@@ -3550,6 +3635,7 @@ var VMDOM;
     ], VTdElement);
     VMDOM.VTdElement = VTdElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTextareaElement = (function (_super) {
@@ -3578,6 +3664,7 @@ var VMDOM;
     ], VTextareaElement);
     VMDOM.VTextareaElement = VTextareaElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTfootElement = (function (_super) {
@@ -3594,6 +3681,7 @@ var VMDOM;
     ], VTfootElement);
     VMDOM.VTfootElement = VTfootElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTheadElement = (function (_super) {
@@ -3610,6 +3698,7 @@ var VMDOM;
     ], VTheadElement);
     VMDOM.VTheadElement = VTheadElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VThElement = (function (_super) {
@@ -3626,6 +3715,7 @@ var VMDOM;
     ], VThElement);
     VMDOM.VThElement = VThElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTrackElement = (function (_super) {
@@ -3642,6 +3732,7 @@ var VMDOM;
     ], VTrackElement);
     VMDOM.VTrackElement = VTrackElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTrElement = (function (_super) {
@@ -3658,6 +3749,7 @@ var VMDOM;
     ], VTrElement);
     VMDOM.VTrElement = VTrElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VUlElement = (function (_super) {
@@ -3674,6 +3766,7 @@ var VMDOM;
     ], VUlElement);
     VMDOM.VUlElement = VUlElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VVideoElement = (function (_super) {
@@ -3690,6 +3783,7 @@ var VMDOM;
     ], VVideoElement);
     VMDOM.VVideoElement = VVideoElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VXmpElement = (function (_super) {
@@ -3706,6 +3800,7 @@ var VMDOM;
     ], VXmpElement);
     VMDOM.VXmpElement = VXmpElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTitleElement = (function (_super) {
@@ -3722,6 +3817,7 @@ var VMDOM;
     ], VTitleElement);
     VMDOM.VTitleElement = VTitleElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VSpanElement = (function (_super) {
@@ -3738,6 +3834,7 @@ var VMDOM;
     ], VSpanElement);
     VMDOM.VSpanElement = VSpanElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VEmElement = (function (_super) {
@@ -3754,6 +3851,7 @@ var VMDOM;
     ], VEmElement);
     VMDOM.VEmElement = VEmElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VIElement = (function (_super) {
@@ -3770,6 +3868,7 @@ var VMDOM;
     ], VIElement);
     VMDOM.VIElement = VIElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VBElement = (function (_super) {
@@ -3786,6 +3885,7 @@ var VMDOM;
     ], VBElement);
     VMDOM.VBElement = VBElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VFormElement = (function (_super) {
@@ -3802,6 +3902,7 @@ var VMDOM;
     ], VFormElement);
     VMDOM.VFormElement = VFormElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VLabelElement = (function (_super) {
@@ -3818,6 +3919,7 @@ var VMDOM;
     ], VLabelElement);
     VMDOM.VLabelElement = VLabelElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDtElement = (function (_super) {
@@ -3834,6 +3936,7 @@ var VMDOM;
     ], VDtElement);
     VMDOM.VDtElement = VDtElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDdElement = (function (_super) {
@@ -3850,6 +3953,7 @@ var VMDOM;
     ], VDdElement);
     VMDOM.VDdElement = VDdElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VEmbedElement = (function (_super) {
@@ -3866,6 +3970,7 @@ var VMDOM;
     ], VEmbedElement);
     VMDOM.VEmbedElement = VEmbedElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VStrongElement = (function (_super) {
@@ -3882,6 +3987,7 @@ var VMDOM;
     ], VStrongElement);
     VMDOM.VStrongElement = VStrongElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VButtonElement = (function (_super) {
@@ -3898,6 +4004,7 @@ var VMDOM;
     ], VButtonElement);
     VMDOM.VButtonElement = VButtonElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VObjectElement = (function (_super) {
@@ -3914,6 +4021,7 @@ var VMDOM;
     ], VObjectElement);
     VMDOM.VObjectElement = VObjectElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VSvgElement = (function (_super) {
@@ -3930,6 +4038,7 @@ var VMDOM;
     ], VSvgElement);
     VMDOM.VSvgElement = VSvgElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VCircleElement = (function (_super) {
@@ -3946,6 +4055,7 @@ var VMDOM;
     ], VCircleElement);
     VMDOM.VCircleElement = VCircleElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VHeaderElement = (function (_super) {
@@ -3962,6 +4072,7 @@ var VMDOM;
     ], VHeaderElement);
     VMDOM.VHeaderElement = VHeaderElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VFooterElement = (function (_super) {
@@ -3984,6 +4095,7 @@ var VMDOM;
 /// <reference path='../node/VDocumentType.ts'/>
 /// <reference path='../node/VDocument.ts'/>
 /// <reference path='../node/VHTMLUnknownElement.ts'/>
+"use strict";
 /// <reference path='../element/VAElement.ts'/>
 /// <reference path='../element/VAreaElement.ts'/>
 /// <reference path='../element/VBaseElement.ts'/>
@@ -4063,6 +4175,7 @@ var VMDOM;
 /// <reference path='../element/VCircleElement.ts'/>
 /// <reference path='../element/VHeaderElement.ts'/>
 /// <reference path='../element/VFooterElement.ts'/>
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDomhelperElement = (function (_super) {
@@ -4076,6 +4189,7 @@ var VMDOM;
     }(VMDOM.VHtmlElement));
     VMDOM.VDomhelperElement = VDomhelperElement;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 /// <reference path='BaseVNode.ts'/>
 /// <reference path='VDomhelperElement.ts'/>
 var VDOM = (function () {
@@ -4512,6 +4626,7 @@ VDOM.parseStructor = function (html, vNode) {
 var $$$ = VNodeHelp;
 /// <reference path="Scope.ts"/>
 /// <reference path='../virtual/UIHelper/VDOM.ts'/>
+"use strict";
 typeof document === "undefined" && (document = $$$('#document'));
 var $rootScope = new RootScope(document);
 var DOMScope = (function () {
@@ -4585,6 +4700,7 @@ var DOMScope = (function () {
     return DOMScope;
 }());
 DOMScope.stack = [$rootScope];
+"use strict";
 /// <reference path='VNode.ts'/>
 var VMDOM;
 (function (VMDOM) {
@@ -4613,6 +4729,7 @@ var VMDOM;
         VPlaceHolder.call(node, nodeName);
     };
 })(VMDOM || (VMDOM = {}));
+"use strict";
 var JS;
 (function (JS) {
     var JavaScriptComment = (function () {
@@ -4629,6 +4746,7 @@ var JS;
     }());
     JS.JavaScriptComment = JavaScriptComment;
 })(JS || (JS = {}));
+"use strict";
 var JS;
 (function (JS) {
     var JavaScriptString = (function () {
@@ -4645,6 +4763,7 @@ var JS;
     }());
     JS.JavaScriptString = JavaScriptString;
 })(JS || (JS = {}));
+"use strict";
 var JS;
 (function (JS) {
     var logics = {};
@@ -4827,6 +4946,7 @@ var JS;
     }
     JS.isSpace = isSpace;
 })(JS || (JS = {}));
+"use strict";
 /// <reference path='Lib.ts'/>
 var JS;
 (function (JS) {
@@ -4837,6 +4957,7 @@ var JS;
     }());
     JS.JavaScriptLogic = JavaScriptLogic;
 })(JS || (JS = {}));
+"use strict";
 /// <reference path='JavaScriptBlock.ts'/>
 /// <reference path='JavaScriptComment.ts'/>
 /// <reference path='JavaScriptString.ts'/>
@@ -4923,6 +5044,7 @@ var JS;
     }());
     JS.JavaScriptStatement = JavaScriptStatement;
 })(JS || (JS = {}));
+"use strict";
 /// <reference path='../javascript/JavaScriptStatement.ts'/>
 var JS;
 (function (JS) {
@@ -4965,6 +5087,7 @@ var JS;
     JS.JavaScriptBlock = JavaScriptBlock;
 })(JS || (JS = {}));
 /// <reference path='../javascript/JavaScriptBlock.ts'/>
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VOrderData = (function () {
@@ -4987,6 +5110,7 @@ var VMDOM;
 /// <reference path='../node/VPlaceHolder.ts'/>
 /// <reference path='../javascript/JavaScriptBlock.ts'/>
 /// <reference path='VOrderData.ts'/>
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VOrder = (function (_super) {
@@ -5013,6 +5137,7 @@ var VMDOM;
     VMDOM.VOrder = VOrder;
 })(VMDOM || (VMDOM = {}));
 /// <reference path='../node/VPlaceHolder.ts'/>
+"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VScript = (function (_super) {
@@ -5038,6 +5163,7 @@ var VMDOM;
     ], VScript);
     VMDOM.VScript = VScript;
 })(VMDOM || (VMDOM = {}));
+"use strict";
 /// <reference path='../../scope/DOMScope.ts'/>
 /// <reference path='../UIHelper/VOrder.ts'/>
 /// <reference path='../UIHelper/VScript.ts'/>
@@ -5427,6 +5553,7 @@ var Order;
 })(Order || (Order = {}));
 /// <reference path='Lib.ts'/>
 /// <reference path='../javascript/JavaScriptStatement.ts'/>
+"use strict";
 var Order;
 (function (Order) {
     var VOrder = (function () {
@@ -5462,6 +5589,7 @@ var Order;
     }());
     Order.VOrder = VOrder;
 })(Order || (Order = {}));
+"use strict";
 var XHR = (function () {
     function XHR() {
     }
@@ -5489,6 +5617,7 @@ var XHR = (function () {
     };
     return XHR;
 }());
+"use strict";
 var includeJSFiles = (function () {
     var IncludeTask = (function () {
         function IncludeTask(parent, files, callback) {
@@ -5575,6 +5704,7 @@ var includeJSFiles = (function () {
         includeJSFile(includeTask);
     };
 }());
+"use strict";
 /// <reference path='../lib/lib.ts'/>
 var Store = (function () {
     function Store() {
@@ -5611,6 +5741,7 @@ var StoreManage = (function () {
     };
     return StoreManage;
 }());
+"use strict";
 /// <reference path="../part/templateConfig.ts"/>
 var Config = (function () {
     function Config() {
@@ -5620,11 +5751,13 @@ var Config = (function () {
     }
     return Config;
 }());
+"use strict";
 var UIPathSpace = (function () {
     function UIPathSpace() {
     }
     return UIPathSpace;
 }());
+"use strict";
 /// <reference path="UIPathSpace.ts"/>
 var UIList = (function () {
     function UIList() {
@@ -5647,6 +5780,7 @@ var UIList = (function () {
     };
     return UIList;
 }());
+"use strict";
 var loadJS = (function () {
     var requireHash = {};
     var RequireFile = (function () {
@@ -5699,6 +5833,7 @@ var loadJS = (function () {
 /// <reference path='../main/Config.ts'/>
 /// <reference path="UIList.ts"/>
 /// <reference path="../main/LoadJS.ts"/>
+"use strict";
 var 
 // $DOM,
 // $node: I$Node,
@@ -6302,6 +6437,7 @@ function getParts(childNodes) {
 // / <reference path="Server.ts"/>
 /// <reference path="View.ts"/>
 /// <reference path="partCore.ts"/>
+"use strict";
 var Component;
 (function (Component) {
     var Part = (function (_super) {
@@ -6700,6 +6836,7 @@ var Component;
     }(EventEmitterEx));
     Component.Part = Part;
 })(Component || (Component = {}));
+"use strict";
 var ClientHelper = (function () {
     function ClientHelper() {
         this.data = {};
@@ -6760,6 +6897,7 @@ var ClientHelper = (function () {
     return ClientHelper;
 }());
 var $clientHelper = new ClientHelper;
+"use strict";
 /// <reference path='../lib/is.ts'/>
 var Ready = (function () {
     function Ready() {
@@ -6807,6 +6945,7 @@ var Ready = (function () {
 //         _catch(e);
 //     }
 // }
+"use strict";
 function getQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
     var r = location.search.substr(1).match(reg);
@@ -6836,6 +6975,7 @@ function appendQueryString(name, value) {
         return location.href + '?' + name + '=' + value;
     }
 }
+"use strict";
 /**
  * 可躲过一些js压缩库console.log;
  */
@@ -6844,6 +6984,7 @@ var log = Function('s', 'console.log(s)');
  * 可躲过一些js压缩库debugger;
  */
 var bp = Function('debugger');
+"use strict";
 var isIE;
 try {
     isIE = !!(typeof window !== "undefined" && window.ActiveXObject || "ActiveXObject" in window);
@@ -6910,6 +7051,7 @@ catch (e) {
 /// <reference path='../part/uiList.ts'/>
 /// <reference path='LoadJS.ts'/>
 /// <reference path="../core/BrowserHelper.ts"/>
+"use strict";
 var readyRE = /complete|loaded|interactive/;
 var Turtle = (function (_super) {
     __extends(Turtle, _super);
@@ -7155,6 +7297,7 @@ var Turtle = (function (_super) {
     return Turtle;
 }(EventEmitterEx));
 /// <reference path='./main/Turtle.ts'/>
+"use strict";
 // if(!$DOM){
 //     $DOM=function(html){
 //         var elem=document.createElement('ui:dom');elem.innerHTML=html;return elem;
@@ -7177,3 +7320,4 @@ var Turtle = (function (_super) {
 // }
 var $t = new Turtle();
 var turtle = $t;
+

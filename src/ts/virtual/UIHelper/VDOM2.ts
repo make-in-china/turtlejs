@@ -279,7 +279,6 @@ abstract class VDOM2 extends VDOM {
                             //order;
                             throw new Error("错误的Order语句：语句不完整，缺少';'");
                         }
-
                         m.node.appendChild($$$(new VMDOM.VOrderData(name,condition),ENodeType.Order));
 
                         m.textNodeStart = m.index;

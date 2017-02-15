@@ -813,10 +813,9 @@ declare const enum ENodeType {
     DocumentFragment = 11,
     PlaceHolder = 100,
 }
-interface VNodeNames {
+interface IString extends String {
 }
 interface IVNodeMethod {
-    (nodeName: string, nodeType: ENodeType): VMDOM.VNode & IVNodeMethod;
     <K extends keyof VNodeNames>(nodeName: K, nodeType?: ENodeType.Element): VNodeNames[K] & IVNodeMethod;
 }
 declare namespace VMDOM {
@@ -1090,7 +1089,7 @@ declare namespace VMDOM {
     }
 }
 interface VNodeNames {
-    "a": VMDOM.VAElement;
+    a: VMDOM.VAElement;
 }
 declare namespace VMDOM {
     class VAElement extends VHtmlElement {
@@ -2129,8 +2128,8 @@ declare namespace VMDOM {
         id: string;
     }
 }
-interface IVNodeMethod {
-    (nodeName: "domhelper", nodeType?: ENodeType.Element): VMDOM.VDomhelperElement & IVNodeMethod;
+interface VNodeNames {
+    domhelper: VMDOM.VDomhelperElement;
 }
 declare namespace VMDOM {
     class VDomhelperElement extends VHtmlElement {

@@ -16,6 +16,7 @@ let includeJSFiles = (function () {
                     if (isString(url) && !(url in data)) {
                         arr.push(url);
                         data[url] = $$$("script");
+                        
                     }
                 }
             } else if (files) {

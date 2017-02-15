@@ -1,9 +1,7 @@
-
-
-
 interface VNodeNames{
-    "a":VMDOM.VAElement
+    a:VMDOM.VAElement
 }
+
 namespace VMDOM{
     @mergeClass({target:'',download:'',ping:'',rel:'',hreflang:'',type:'',coords:'',charset:'',name:'',rev:'',shape:'',href:''})
     export class VAElement extends VHtmlElement{
