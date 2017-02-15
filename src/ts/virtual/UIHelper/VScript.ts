@@ -3,7 +3,7 @@
 const enum ENodeType {
     Script = 103
 }
-interface VNodeNames {
+interface IVNodeMethod {
     (data: string, nodeType: ENodeType.Script): VMDOM.VScript & IVNodeMethod;
 }
 namespace VMDOM {
@@ -11,7 +11,7 @@ namespace VMDOM {
     @register('#script', ENodeType.Script)
     /** 预编译脚本 */
     export class VScript extends VPlaceHolder {
-        nodeName = "#script"
+        nodeName:"#script" = "#script"
         nodeType = ENodeType.Script
         toJS(): string {
             return `.$$__(${this.propertyName})`;

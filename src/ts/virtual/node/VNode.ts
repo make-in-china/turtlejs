@@ -25,9 +25,16 @@ const enum ENodeType{
 }
 interface IString extends String{}
 interface IVNodeMethod{
+<<<<<<< HEAD
+=======
+    (nodeName: string, nodeType: ENodeType): VMDOM.VNode&IVNodeMethod;
+    
+>>>>>>> bbda8bddeb7fe663737a1391efbf85024fc62c2f
     <K extends keyof VNodeNames>(nodeName: K, nodeType?: ENodeType.Element): VNodeNames[K]&IVNodeMethod;
     // (nodeName: string, nodeType: ENodeType): VMDOM.VNode&IVNodeMethod;
 }
+
+
 namespace VMDOM{
     export let emptyTextNodeRE = /^\s*$/;
     export let stringNode = {

@@ -3,6 +3,7 @@
 interface IVNodeMethod{
     (nodeName: string, nodeType: ENodeType.Comment): VMDOM.VComment&IVNodeMethod;
 }
+
 function isVComment(node: VMDOM.VNode): node is VMDOM.VComment {
     return node.nodeType === ENodeType.Comment
 }

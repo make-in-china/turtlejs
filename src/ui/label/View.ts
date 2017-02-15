@@ -19,3 +19,14 @@ class LabelView implements ComponentView.IView{
     }
 }
 
+
+interface A{
+    a:1
+    b:2
+}
+interface B{
+    <T extends keyof A>(a:A):A[T]
+}
+
+let b:B=<any>0;
+b("b")
