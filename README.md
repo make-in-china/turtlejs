@@ -1,6 +1,6 @@
 # turtlejs 1.0（龟计算1.0）
 
-正在努力用typescript重构改库
+正在努力用typescript重构
 
 make it for fun
 
