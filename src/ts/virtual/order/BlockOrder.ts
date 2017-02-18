@@ -1,6 +1,7 @@
 
 /// <reference path='VOrder.ts'/>
 /// <reference path='Break.ts'/>
+/// <reference path='orderEx/Vorder.ts'/>
 namespace Order {
     export interface IOrderDataBlock extends IOrderData {
         placeholder: VMDOM.VPlaceHolder
@@ -11,36 +12,62 @@ namespace Order {
     }
     export interface IOrderBlock {
         order: string
-        condition: string
-        nodes: VMDOM.VNode[]
+        // setup: IOrderSetup
+        condition:string
+        nodes:VMDOM.VNode[] 
     }
     export abstract class BlockOrder extends VOrder {
+        /**
+         * 数据块
+         * 
+         * @type {IOrderDataBlock}
+         * @memberOf BlockOrder
+         */
         data: IOrderDataBlock
+        /**
+         * 
+         * 
+         * @type {VMDOM.VComment}
+         * @memberOf BlockOrder
+         */
         endNode: VMDOM.VComment
-        constructor(node: VMDOM.VComment, condition: string, orderName: string,isBlockStart:(subOrder: string) => boolean) {
-            super(node, condition);
+        /**
+         * Creates an instance of BlockOrder.
+         * 
+         * @param {VMDOM.VComment} node
+         * @param {IOrderSetup} setup
+         * @param {string} orderName
+         * @param {(subOrder: string) => boolean} isBlockStart
+         * 
+         * @memberOf BlockOrder
+         */
+        constructor(node: VMDOM.VComment, setup: IOrderSetup, orderName: string,isBlockStart:(subOrder: string) => boolean) {
+            super(node, setup);
             let data = this.data;
             data.blocks = [];
             let i = getNodeIndex2(node);
             // let orderStack:VOrder[]=[this];
             let preOrderNode = node;
             let preNode = node;
-            let preCondition = condition;
+            // let preInfo = info.params.innerText;
+            let preSetup = setup;
             let blockNodes:INode[]=[];
-            parseOrders(data,isBlockStart, (<INode>node.parentNode).childNodes, false, (node, subOrder, condition, state) => {
+            parseOrders(isBlockStart, (<INode>node.parentNode).childNodes, false, (node, subOrder, setup) => {
                 switch (subOrder) {
                     case 'end':
                         blockNodes.push(preNode);
-                        data.blocks.push({ order: orderName, condition: preCondition, nodes: <VMDOM.VNode[]>takeBlockBetween(preOrderNode, node) });
+                        // data.blocks.push({ order: orderName, setup: preSetup, nodes: <VMDOM.VNode[]>takeBlockBetween(preOrderNode, node) });
+                        data.blocks.push({ order: orderName, condition: preSetup.params.innerText, nodes:<any>preSetup.data.children  });
                         this.endNode = node;
                         return eTreeEach.c_stopEach;
                     case 'break':
                         return;
                     default:
                         blockNodes.push(preNode);
-                        data.blocks.push({ order: orderName, condition: preCondition, nodes: <VMDOM.VNode[]>takeBlockBetween(preOrderNode, node) });
+                        // data.blocks.push({ order: orderName, setup: preSetup, nodes: <VMDOM.VNode[]>takeBlockBetween(preOrderNode, node) });
+                        data.blocks.push({ order: orderName, condition: preSetup.params.innerText, nodes:<any>preSetup.data.children });
                         preOrderNode = node;
-                        preCondition = condition;
+                        preSetup = setup;
                         preNode = node;
                         orderName = subOrder;
                         return eTreeEach.c_noIn;
@@ -60,12 +87,41 @@ namespace Order {
 
 
 
-    function parseOrders(this:void,data:IOrderDataBlock,isBlockStart: (subOrder: string) => boolean,array:INode[]|INodeList,run:boolean,fn?:(node:VMDOM.VComment,subOrder:string,condition:string,state:ITreeEachState<INode>)=>(eTreeEach|void),beginIndex:number=0):ITreeEachReturn | undefined{
+    /**
+     * 继续解析内部Order
+     * 
+     * @param {void} this
+     * @param {IOrderDataBlock} data
+     * @param {(subOrder: string) => boolean} isBlockStart
+     * @param {IArray<INode>} array
+     * @param {boolean} run
+     * @param {((
+     *             node:VMDOM.VComment,
+     *             subOrder:string,
+     *             setup:IOrderSetup,
+     *             state:ITreeEachState<INode>
+     *         )=>(eTreeEach|void))} [fn]
+     * @param {number} [beginIndex=0]
+     * @returns {(ITreeEachReturn<INode> | undefined)}
+     */
+    function parseOrders(
+        this:void,
+        isBlockStart: (subOrder: string) => boolean,
+        array:IArray<INode>,
+        run:boolean,
+        fn?:(
+            node:VMDOM.VComment,
+            subOrder:string,
+            // setup:IOrderSetup,
+            state:ITreeEachState<INode>
+        )=>(eTreeEach|void),
+        beginIndex:number=0
+    ):ITreeEachReturn<INode> | undefined{
         return VOrder.eachOrder(array, (node,info, state)=> {
             
             if (info.order) {
                 if(info.order==='break'&&fn){
-                    return fn(node,'break',"",state);
+                    return fn(node,'break',state);
                 }else{
                     if(run){
                         runOrder(info,node);
@@ -81,7 +137,7 @@ namespace Order {
             if(fn){
                 let subOrder=<string>info.subOrder;
                 if(subOrder==='end'||isBlockStart(subOrder)){
-                    return fn(node,subOrder,info.condition,state);
+                    return fn(node,subOrder,state);
                 }
             }
             return eTreeEach.c_noIn;
@@ -91,7 +147,7 @@ namespace Order {
     function runOrder(this:void,info: IOrderInfo, node: VMDOM.VComment){
         let orderName: string = <string>info.order;
         if (orderName in orders) {
-            let order=new orders[orderName](node,info.condition);
+            let order=new orders[orderName](node,info.setup);
             if(order.run&&OrderEx.canRunAtService(order)){
                 order.run();
             }
@@ -103,13 +159,13 @@ namespace Order {
         if (orderName in orders) {
             let order=orders[orderName];
             if(order.prototype instanceof BlockOrder){
-                return <BlockOrder>new order(node,info.condition);
+                return <BlockOrder>new order(node,info.setup);
             }
         }
         return null;
     }
-    export function parseBreakOrder(this:void,data: IOrderDataBlockRun,isBlockStart: (subOrder: string) => boolean,blocks:INode[],p:INode){
-        parseOrders(data,isBlockStart,blocks,true,(node:VMDOM.VComment,subOrder,condition,step)=>{
+    export function parseBreakOrder(this:void,data: IOrderDataBlockRun,isBlockStart: (subOrder: string) => boolean,blocks:INode[]){
+        parseOrders(isBlockStart,blocks,true,(node:VMDOM.VComment,subOrder,step)=>{
             if(subOrder==='break'){
                 data.isBreak=true;
                 //级联删除break后面的数据直至当前层；

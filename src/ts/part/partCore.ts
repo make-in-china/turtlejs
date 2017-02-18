@@ -57,7 +57,7 @@ function getScopeBy(scope, node: INode) {
 //     execByScope(node, '$t.extend(this,{' + s + '});', null, outerChildNodes, outerElement, props, part);
 // }
 
-function setNodeProperty(node, proName, condition, outerChildNodes, outerElement, props, part) {
+function setNodeProperty(node, proName, condition) {
     let v = Order.exec(node, condition)//debugger , null, outerChildNodes, outerElement, props, part);
     let name = camelCase(proName.substr(0, proName.length - 1));
 
@@ -75,7 +75,7 @@ function setNodeProperty(node, proName, condition, outerChildNodes, outerElement
     }
 }
 
-function getTemplate(node: IHTMLElement): string {
+function getTemplate(node: IElement): string {
     let nodeName = node.nodeName;
     if (templateConfig.hasOwnProperty(nodeName)) {
         if (templateConfig[nodeName].hasOwnProperty('getData')) {
@@ -150,7 +150,7 @@ function defineClasses(node: IHTMLElement) {
 //     }
 //     return false;
 // }
-function isTemplate(node: IHTMLElement): node is IHTMLElement {
+function isTemplate(node: IElement): node is IElement {
     let nodeName = node.nodeName;
     if (templateConfig.hasOwnProperty(nodeName)) {
         if (templateConfig[nodeName].hasOwnProperty('type')) {
@@ -161,7 +161,7 @@ function isTemplate(node: IHTMLElement): node is IHTMLElement {
     }
     return false;
 }
-function findTemplates(nodes: IHTMLElement[] | IArray): IElement[] | IArray {
+function findTemplates(nodes: IArray<IElement>):  IArray<IElement> {
     let temps:IElement[] = [];
     treeEach(nodes, 'children', function (node) {
         if (isTemplate(node)) {
@@ -388,7 +388,7 @@ function parseGet(node: IHTMLElement, outerChildNodes, outerElement, props, part
 // }
 
 let exec = eval;
-function execOnScript(node: IHTMLElement, outerChildNodes, outerElement, props, part) {
+function execOnScript(node: IHTMLElement) {
     var p = node.parentNode;
     if (p) {
         var script = node.innerHTML;
@@ -434,7 +434,7 @@ function execScript(node: IHTMLElement, outerChildNodes?, outerElement?, props?,
 function execTurtleScript(node: IHTMLElement, outerChildNodes, outerElement, props, part) {
     var type = getAttr(node, 'type', null);
     if (type == 'on') {
-        execOnScript(node, outerChildNodes, outerElement, props, part)
+        execOnScript(node)
     } else {
         execScript(node, outerChildNodes, outerElement, props, part);
     }
@@ -453,7 +453,7 @@ function parseScript(node: IHTMLElement, outerChildNodes, outerElement, props, p
         removeNode(node);
     }
 }
-function execNodeQuestion(node: IHTMLElement, outerChildNodes, outerElement, props, part) {
+function execNodeQuestion(node: IHTMLElement) {
     let v = takeAttr(node, ':', "");
     if (v && v.length > 0) {
         Order.exec(node, v);//, null, outerChildNodes, outerElement, props, part);
@@ -465,100 +465,100 @@ class ElementParser {
     // __BREAK__ = parseBreakOrder
     SCRIPT = parseScript
 }
-function render(
-    this:void,
-    uiNode:IHTMLElement|null,
-    outerChildNodes: INode[], 
-    outerElement: IHTMLCollection,
-    props:Object|null,
-    uiInfo: string | {
-        sortPath: string;
-        name: string;
-    }
-){
-    // let name:string
-    // let sortPath:string
-    // if(isString(uiInfo)){
-    //     name=uiInfo;
-    //     sortPath='ui';
-    // }else{
-    //     name=uiInfo.name;
-    //     sortPath=uiInfo.sortPath;
-    // }
-    // let UI= importUI(name, sortPath);
+// function render(
+//     this:void,
+//     uiNode:IHTMLElement|null,
+//     outerChildNodes: INode[], 
+//     outerElement: IHTMLCollection,
+//     props:Object|null,
+//     uiInfo: string | {
+//         sortPath: string;
+//         name: string;
+//     }
+// ){
+//     // let name:string
+//     // let sortPath:string
+//     // if(isString(uiInfo)){
+//     //     name=uiInfo;
+//     //     sortPath='ui';
+//     // }else{
+//     //     name=uiInfo.name;
+//     //     sortPath=uiInfo.sortPath;
+//     // }
+//     // let UI= importUI(name, sortPath);
 
-    // if (!UI) {
-    //     if(uiNode){
-    //         removeNode(uiNode);
-    //     }
-    //     throw new Error(name + '组件不存在！');
-    // }
-    // let ui=new UI({},outerChildNodes,outerElement);  
+//     // if (!UI) {
+//     //     if(uiNode){
+//     //         removeNode(uiNode);
+//     //     }
+//     //     throw new Error(name + '组件不存在！');
+//     // }
+//     // let ui=new UI({},outerChildNodes,outerElement);  
 
-    // if(props===null){
-    //     props={};
-    // }
+//     // if(props===null){
+//     //     props={};
+//     // }
 
-    // let 
-    //     ext,
-    //     attrs:INamedNodeMap,
-    //     len,
-    //     html;
+//     // let 
+//     //     ext,
+//     //     attrs:INamedNodeMap,
+//     //     len,
+//     //     html;
         
     
     
-    // if(uiNode===null){
-    //     uiNode=<IHTMLElement>$node('ui:render');//document.createElement("ui:render");
-    // }else{
-    //     // setQuestionAtrr(uiNode,outerChildNodes,outerElement,part?part.props:props,part);
+//     // if(uiNode===null){
+//     //     uiNode=<IHTMLElement>$node('ui:render');//document.createElement("ui:render");
+//     // }else{
+//     //     // setQuestionAtrr(uiNode,outerChildNodes,outerElement,part?part.props:props,part);
     
-    //     attrs=uiNode.attributes;
-    //     len=attrs.length;
-    //     for(let i=0;i<len;i++){
-    //         let name=attrs[0].name;
-    //         if(!props.hasOwnProperty(name)){
-    //             props[name]=attrs[0].value;    
-    //         }
-    //         uiNode.removeAttributeNode(attrs[0]);
-    //     }
-    // }
-    // html=this.joinDatasByProps(props);
-    // if(html===undefined){
-    //     return;
-    // }
+//     //     attrs=uiNode.attributes;
+//     //     len=attrs.length;
+//     //     for(let i=0;i<len;i++){
+//     //         let name=attrs[0].name;
+//     //         if(!props.hasOwnProperty(name)){
+//     //             props[name]=attrs[0].value;    
+//     //         }
+//     //         uiNode.removeAttributeNode(attrs[0]);
+//     //     }
+//     // }
+//     // html=this.joinDatasByProps(props);
+//     // if(html===undefined){
+//     //     return;
+//     // }
     
-    // if(reExtends){
-    //     ext=getExtends(reExtends,this.sortPath);
-    // }
-    // if(!ext){
-    //     ext=this.extends;
-    // }
-    // // if(ext instanceof PartTemplate){
-    // //     ext=ext.beExtends(uiNode,that,outerChildNodes,outerElement,props,part);
-    // // }
-    // // let newPart=new Part(this,ext,props,html,outerChildNodes,outerElement);
-    // let newPart=new Part(this,props,html,outerChildNodes,outerElement);
-    // if(refPartName){
-    //     /**放置到全局引用 */
-    //     KeyArrayHashObjectManage.push($t.parts,refPartName,newPart);
-    // }
-    // this.parts.push(newPart);
+//     // if(reExtends){
+//     //     ext=getExtends(reExtends,this.sortPath);
+//     // }
+//     // if(!ext){
+//     //     ext=this.extends;
+//     // }
+//     // // if(ext instanceof PartTemplate){
+//     // //     ext=ext.beExtends(uiNode,that,outerChildNodes,outerElement,props,part);
+//     // // }
+//     // // let newPart=new Part(this,ext,props,html,outerChildNodes,outerElement);
+//     // let newPart=new Part(this,props,html,outerChildNodes,outerElement);
+//     // if(refPartName){
+//     //     /**放置到全局引用 */
+//     //     KeyArrayHashObjectManage.push($t.parts,refPartName,newPart);
+//     // }
+//     // this.parts.push(newPart);
     
-    // if(uiNode.parentNode!==null){
-    //     //let p=uiNode.parentNode.__domNode__;
-    //     newPart.insertBefore(uiNode);
-    //     removeNode(uiNode);
-    //     /*if(p){
-    //         debugger;
-    //         vNodesToDOM(part.store);
-    //     }*/
-    // }
-    // return newPart;
-}
+//     // if(uiNode.parentNode!==null){
+//     //     //let p=uiNode.parentNode.__domNode__;
+//     //     newPart.insertBefore(uiNode);
+//     //     removeNode(uiNode);
+//     //     /*if(p){
+//     //         debugger;
+//     //         vNodesToDOM(part.store);
+//     //     }*/
+//     // }
+//     // return newPart;
+// }
 let elementParser = new ElementParser;
 // let attributeParser = new AttributeParser;
 function initHTML(arr: INode[]|INodeList, outerChildNodes?, outerElement?, props?, part?) {
-    treeEach(arr, 'childNodes', function (node: IHTMLElement, step) {
+    treeEach(arr, 'childNodes', function (node: IHTMLElement) {
         if (node instanceof VMDOM.VComment&&node.vmData.sign===undefined) {
             let order = Order.parseComment(node);
             if (order && order.run) {
@@ -579,7 +579,7 @@ function initHTML(arr: INode[]|INodeList, outerChildNodes?, outerElement?, props
         }
         let uiInfo = getUIInfo(node);
         if (uiInfo) {
-            render(node,outerChildNodes,outerElement,null,uiInfo);
+            // render(node,outerChildNodes,outerElement,null,uiInfo);
             
             // partName = takeAttr(node, 'p-name');
 
@@ -617,7 +617,7 @@ function initHTML(arr: INode[]|INodeList, outerChildNodes?, outerElement?, props
         // }
     });
 }
-function getParts(childNodes: INode[]|NodeList): Component.Part[] {
+function getParts(childNodes: IArray<INode>): Component.Part[] {
     let child: Component.Part[] = [];
     let cpn:Component.Part|undefined;
     treeEach(childNodes, "childNodes", function (node) {

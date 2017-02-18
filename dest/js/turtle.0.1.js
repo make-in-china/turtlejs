@@ -14,7 +14,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-"use strict";
 var ArrayEx = (function (_super) {
     __extends(ArrayEx, _super);
     function ArrayEx() {
@@ -33,7 +32,6 @@ var ArrayEx = (function (_super) {
     };
     return ArrayEx;
 }(Array));
-"use strict";
 var IAttr = (function () {
     function IAttr(name, value) {
         this.name = name;
@@ -43,9 +41,7 @@ var IAttr = (function () {
 }());
 /// <reference path="../lib/ArrayEx.ts"/>
 /// <reference path="IAttr.ts"/>
-"use strict";
 /// <reference path="../lib/lib.ts" />
-"use strict";
 typeof Node !== 'undefined' && (function () {
     var appendChild = Node.prototype.appendChild;
     Node.prototype.appendChild = function (newChild) {
@@ -343,7 +339,6 @@ function isCommentNode(node) {
 function isTextNode(node) {
     return node.nodeType === Node.TEXT_NODE;
 }
-"use strict";
 var arrayConstructor = Array.prototype, objectConstructor = Object.prototype, stringConstructor = String.prototype, toStr = objectConstructor.toString, getPrototypeOf = objectConstructor.getPrototypeOf, replace = stringConstructor.replace, slice = arrayConstructor.slice, push = arrayConstructor.push, splice = arrayConstructor.splice, indexOf = arrayConstructor.indexOf;
 var last = function () {
     if (this.length > 0) {
@@ -490,7 +485,6 @@ var getCommentText = (function () {
         };
     }
 }());
-"use strict";
 /// <reference path="../lib/TypeHelper.ts"/>
 var persentRE = /^\s*([\d.]+)%\s*$/;
 function isNull(p) {
@@ -528,7 +522,6 @@ function isPersent(s) {
     return persentRE.test(s);
 }
 function isArrayLike(a) { return typeof a.length == 'number'; }
-"use strict";
 /// <reference path="../lib/is.ts" />
 var EventEmitter = (function () {
     function EventEmitter() {
@@ -651,7 +644,6 @@ var EventEmitter = (function () {
     ;
     return EventEmitter;
 }());
-"use strict";
 /// <reference path="EventEmitter.ts"/>
 var EventHelper = (function () {
     function EventHelper(target, type) {
@@ -689,7 +681,6 @@ var EventHelper = (function () {
     };
     return EventHelper;
 }());
-"use strict";
 /// <reference path="EventEmitter.ts"/>
 /// <reference path="EventHelper.ts"/>
 var EventEmitterEx = (function (_super) {
@@ -714,7 +705,6 @@ var EventEmitterEx = (function (_super) {
     };
     return EventEmitterEx;
 }(EventEmitter));
-"use strict";
 /**
  * 遍历树
  * @param {T[]|IArray} array 数组或类数组
@@ -766,10 +756,13 @@ function treeEach(array, propertyName, fn, beginIndex) {
             break;
         }
     }
-    return { stack: stack, return: ret, array: arr, index: i };
+    return {
+        stack: stack,
+        return: ret,
+        array: arr,
+        index: i
+    };
 }
-"use strict";
-"use strict";
 /// <reference path='../lib/Is.ts'/>
 var BasePath = (function () {
     function BasePath() {
@@ -825,7 +818,6 @@ var BasePath = (function () {
     return BasePath;
 }());
 var baseUIPath = new BasePath;
-"use strict";
 /// <reference path='BasePath.ts'/>
 var NameItem = (function () {
     function NameItem(name) {
@@ -895,7 +887,6 @@ var TemplateConfig = (function () {
     return TemplateConfig;
 }());
 var templateConfig = new TemplateConfig;
-"use strict";
 var Scope = (function () {
     function Scope(commentNode, parent, __name__) {
         this.__name__ = __name__;
@@ -918,6 +909,8 @@ var Scope = (function () {
     }
     return Scope;
 }());
+/// <reference path='Scope.ts'/>
+/// <reference path='../part/Part.ts'/>
 var RootScope = (function () {
     function RootScope(document) {
         this.document = document;
@@ -928,7 +921,6 @@ var RootScope = (function () {
     }
     return RootScope;
 }());
-"use strict";
 /// <reference path="../../lib/is.ts"/>
 /// <reference path="../../lib/IAttr.ts"/>
 var VNamedNodeMap = (function () {
@@ -1019,99 +1011,94 @@ var VNamedNodeMap = (function () {
     };
     return VNamedNodeMap;
 }());
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var styleListRE = /\s*([\w\-]+)\s*\:\s*(.*?)\s*[;$]/g;
+    var StyleInnerData = (function () {
+        function StyleInnerData() {
+            this.data = {};
+            this.isLock = 0;
+            this.styleData = '';
+        }
+        return StyleInnerData;
+    }());
+    VMDOM.StyleInnerData = StyleInnerData;
     var VStyle = (function () {
         function VStyle(elem) {
+            this.__ = new StyleInnerData;
             var attrs = elem.attributes;
-            var style = "", isLock = 0, __ = {}, t = this;
+            this.__.elem = elem;
             for (var i in styleNode) {
-                __[i] = "";
+                this.__.data[i] = "";
             }
-            Object.defineProperty(this, '__', {
-                value: __,
-                writable: false,
-                enumerable: false,
-                configurable: false
-            });
-            Object.defineProperty(this, 'length', {
-                value: 0,
-                writable: true,
-                enumerable: false,
-                configurable: false
-            });
-            Object.defineProperty(this, '__elem__', {
-                value: elem,
-                writable: false,
-                enumerable: false,
-                configurable: false
-            });
-            Object.defineProperty(attrs, "__style__", {
-                get: function () {
-                    return style;
-                },
-                set: function (s) {
-                    if (isLock === 1 || style === s) {
-                        return;
-                    }
-                    style = s;
-                    if (isLock === 2) {
-                        return;
-                    }
-                    isLock = 1;
-                    var lst;
-                    var lst2 = [];
-                    while ((lst = styleListRE.exec(s)) !== null) {
-                        lst2.push(lst);
-                    }
-                    if (lst2.length > 0) {
-                        for (var i = 0; i < lst2.length - 1; i++) {
-                            t[camelize(lst2[i][1])] = lst2[i][2];
-                        }
-                        isLock = 2;
-                        t[camelize(lst2[i][1])] = lst2[i][2];
-                    }
-                    isLock = 0;
-                    //styleListRE.lastIndex=0;
-                }
-            });
         }
+        Object.defineProperty(VStyle.prototype, "style", {
+            get: function () {
+                return this.__.styleData;
+            },
+            set: function (s) {
+                if (this.__.isLock === 1 || this.__.styleData === s) {
+                    return;
+                }
+                this.__.styleData = s;
+                if (this.__.isLock === 2) {
+                    return;
+                }
+                this.__.isLock = 1;
+                var lst;
+                var lst2 = [];
+                while ((lst = styleListRE.exec(s)) !== null) {
+                    lst2.push(lst);
+                }
+                if (lst2.length > 0) {
+                    var i = 0;
+                    for (; i < lst2.length - 1; i++) {
+                        this[camelize(lst2[i][1])] = lst2[i][2];
+                    }
+                    this.__.isLock = 2;
+                    this[camelize(lst2[i][1])] = lst2[i][2];
+                }
+                this.__.isLock = 0;
+                //styleListRE.lastIndex=0;
+            },
+            enumerable: true,
+            configurable: true
+        });
         return VStyle;
     }());
     VMDOM.VStyle = VStyle;
     function indexOfStyleName(t, name) {
-        for (var i_1 = 0; i_1 < t.length; i_1++) {
-            if (t[i_1] === name) {
-                return i_1;
+        for (var i = 0; i < t.length; i++) {
+            if (t[i] === name) {
+                return i;
             }
         }
         return -1;
     }
-    function updateStyleAttribyte(t) {
+    var styleNode = {};
+    function updateStyleAttribyte() {
         var style = "";
-        for (var i_2 = 0; i_2 < t.length; i_2++) {
-            style += decamelize(t[i_2]) + ':' + t[t[i_2]] + ';';
+        for (var i = 0; i < this.length; i++) {
+            style += decamelize(this[i]) + ':' + this[this[i]] + ';';
         }
-        t.__elem__.setAttribute('style', style);
+        this.__.elem.setAttribute('style', style);
     }
-    function setVStyleGetSet(name) {
-        Object.defineProperty(VStyleprototype, name, {
+    var _loop_1 = function (name_1) {
+        Object.defineProperty(VStyle.prototype, name_1, {
             get: function () {
-                return this.__[name];
+                return this.__[name_1];
             },
             set: function (s) {
-                if (s === this.__[name]) {
+                if (s === this.__[name_1]) {
                     return;
                 }
                 else if (s === "") {
-                    if (this.__[name] === s) {
+                    if (this.__[name_1] === s) {
                         return;
                     }
                     //删除
-                    this.__[name] = s;
-                    var idx = indexOfStyleName(this, name);
+                    this.__[name_1] = s;
+                    var idx = indexOfStyleName(this, name_1);
                     //if(idx!==-1){
                     for (var i = idx; i < this.length - 1; i++) {
                         this[i] = this[i + 1];
@@ -1120,39 +1107,37 @@ var VMDOM;
                     this.length--;
                     //}
                     //更新标签属性
-                    updateStyleAttribyte(this);
+                    updateStyleAttribyte.call(this);
                 }
                 else {
                     //验证是否有效style
-                    var s2;
-                    styleNode[name] = s;
-                    s2 = styleNode[name];
-                    styleNode[name] = "";
+                    var s2 = void 0;
+                    styleNode[name_1] = s;
+                    s2 = styleNode[name_1];
+                    styleNode[name_1] = "";
                     if (s !== "") {
-                        this.__[name] = s;
-                        var style = this.__elem__.getAttribute(style);
-                        var idx = indexOfStyleName(this, name);
+                        this.__[name_1] = s;
+                        var style = this.__.elem.getAttribute(this.style);
+                        var idx = indexOfStyleName.call(this, name_1);
                         if (idx === -1) {
-                            this[this.length] = name;
+                            this[this.length] = name_1;
                             this.length++;
                         }
                         //更新标签属性
-                        updateStyleAttribyte(this);
+                        updateStyleAttribyte.call(this);
                     }
                     else {
-                        throw new Error(name + "不支持" + s);
+                        throw new Error(name_1 + "不支持" + s);
                     }
                 }
             }
         });
-    }
-    var VStyleprototype = {};
-    var styleNode = {};
-    for (var i in ["alignContent", "alignItems", "alignSelf", "alignmentBaseline", "animation", "animationDelay", "animationDirection", "animationDuration", "animationFillMode", "animationIterationCount", "animationName", "animationPlayState", "animationTimingFunction", "backfaceVisibility", "background", "backgroundAttachment", "backgroundClip", "backgroundColor", "backgroundImage", "backgroundOrigin", "backgroundPosition", "backgroundPositionX", "backgroundPositionY", "backgroundRepeat", "backgroundSize", "baselineShift", "border", "borderBottom", "borderBottomColor", "borderBottomLeftRadius", "borderBottomRightRadius", "borderBottomStyle", "borderBottomWidth", "borderCollapse", "borderColor", "borderImage", "borderImageOutset", "borderImageRepeat", "borderImageSlice", "borderImageSource", "borderImageWidth", "borderLeft", "borderLeftColor", "borderLeftStyle", "borderLeftWidth", "borderRadius", "borderRight", "borderRightColor", "borderRightStyle", "borderRightWidth", "borderSpacing", "borderStyle", "borderTop", "borderTopColor", "borderTopLeftRadius", "borderTopRightRadius", "borderTopStyle", "borderTopWidth", "borderWidth", "bottom", "boxShadow", "boxSizing", "breakAfter", "breakBefore", "breakInside", "captionSide", "clear", "clip", "clipPath", "clipRule", "color", "colorInterpolationFilters", "columnCount: any;columnFill", "columnGap: any;columnRule", "columnRuleColor: any;columnRuleStyle", "columnRuleWidth: any;columnSpan", "columnWidth: any;columns", "content", "counterIncrement", "counterReset", "cssFloat", "cssText: string;cursor", "direction", "display", "dominantBaseline", "emptyCells", "enableBackground", "fill", "fillOpacity", "fillRule", "filter", "flex", "flexBasis", "flexDirection", "flexFlow", "flexGrow", "flexShrink", "flexWrap", "floodColor", "floodOpacity", "font", "fontFamily", "fontFeatureSettings", "fontSize", "fontSizeAdjust", "fontStretch", "fontStyle", "fontVariant", "fontWeight", "glyphOrientationHorizontal", "glyphOrientationVertical", "height", "imeMode", "justifyContent", "kerning", "left", "length: number;letterSpacing", "lightingColor", "lineHeight", "listStyle", "listStyleImage", "listStylePosition", "listStyleType", "margin", "marginBottom", "marginLeft", "marginRight", "marginTop", "marker", "markerEnd", "markerMid", "markerStart", "mask", "maxHeight", "maxWidth", "minHeight", "minWidth", "msContentZoomChaining", "msContentZoomLimit", "msContentZoomLimitMax: any;msContentZoomLimitMin: any;msContentZoomSnap", "msContentZoomSnapPoints", "msContentZoomSnapType", "msContentZooming", "msFlowFrom", "msFlowInto", "msFontFeatureSettings", "msGridColumn: any;msGridColumnAlign", "msGridColumnSpan: any;msGridColumns", "msGridRow: any;msGridRowAlign", "msGridRowSpan: any;msGridRows", "msHighContrastAdjust", "msHyphenateLimitChars", "msHyphenateLimitLines: any;msHyphenateLimitZone: any;msHyphens", "msImeAlign", "msOverflowStyle", "msScrollChaining", "msScrollLimit", "msScrollLimitXMax: any;msScrollLimitXMin: any;msScrollLimitYMax: any;msScrollLimitYMin: any;msScrollRails", "msScrollSnapPointsX", "msScrollSnapPointsY", "msScrollSnapType", "msScrollSnapX", "msScrollSnapY", "msScrollTranslation", "msTextCombineHorizontal", "msTextSizeAdjust: any;msTouchAction", "msTouchSelect", "msUserSelect", "msWrapFlow: string;msWrapMargin: any;msWrapThrough: string;opacity", "order", "orphans", "outline", "outlineColor", "outlineStyle", "outlineWidth", "overflow", "overflowX", "overflowY", "padding", "paddingBottom", "paddingLeft", "paddingRight", "paddingTop", "pageBreakAfter", "pageBreakBefore", "pageBreakInside", "parentRule: CSSRule;perspective", "perspectiveOrigin", "pointerEvents", "position", "quotes", "right", "rubyAlign", "rubyOverhang", "rubyPosition", "stopColor", "stopOpacity", "stroke", "strokeDasharray", "strokeDashoffset", "strokeLinecap", "strokeLinejoin", "strokeMiterlimit", "strokeOpacity", "strokeWidth", "tableLayout", "textAlign", "textAlignLast", "textAnchor", "textDecoration", "textIndent", "textJustify", "textKashida", "textKashidaSpace", "textOverflow", "textShadow", "textTransform", "textUnderlinePosition", "top", "touchAction", "transform", "transformOrigin", "transformStyle", "transition", "transitionDelay", "transitionDuration", "transitionProperty", "transitionTimingFunction", "unicodeBidi", "verticalAlign", "visibility", "webkitAlignContent", "webkitAlignItems", "webkitAlignSelf", "webkitAnimation", "webkitAnimationDelay", "webkitAnimationDirection", "webkitAnimationDuration", "webkitAnimationFillMode", "webkitAnimationIterationCount", "webkitAnimationName", "webkitAnimationPlayState", "webkitAnimationTimingFunction", "webkitAppearance", "webkitBackfaceVisibility", "webkitBackgroundClip", "webkitBackgroundOrigin", "webkitBackgroundSize", "webkitBorderBottomLeftRadius", "webkitBorderBottomRightRadius", "webkitBorderImage", "webkitBorderRadius", "webkitBorderTopLeftRadius", "webkitBorderTopRightRadius", "webkitBoxAlign", "webkitBoxDirection", "webkitBoxFlex", "webkitBoxOrdinalGroup", "webkitBoxOrient", "webkitBoxPack", "webkitBoxSizing", "webkitColumnBreakAfter", "webkitColumnBreakBefore", "webkitColumnBreakInside", "webkitColumnCount: any;webkitColumnGap: any;webkitColumnRule", "webkitColumnRuleColor: any;webkitColumnRuleStyle", "webkitColumnRuleWidth: any;webkitColumnSpan", "webkitColumnWidth: any;webkitColumns", "webkitFilter", "webkitFlex", "webkitFlexBasis", "webkitFlexDirection", "webkitFlexFlow", "webkitFlexGrow", "webkitFlexShrink", "webkitFlexWrap", "webkitJustifyContent", "webkitOrder", "webkitPerspective", "webkitPerspectiveOrigin", "webkitTapHighlightColor", "webkitTextFillColor", "webkitTextSizeAdjust: any;webkitTransform", "webkitTransformOrigin", "webkitTransformStyle", "webkitTransition", "webkitTransitionDelay", "webkitTransitionDuration", "webkitTransitionProperty", "webkitTransitionTimingFunction", "webkitUserModify", "webkitUserSelect", "webkitWritingMode", "whiteSpace", "widows", "width", "wordBreak", "wordSpacing", "wordWrap", "writingMode", "zIndex", "zoom"]) {
-        setVStyleGetSet(i);
+    };
+    for (var _i = 0, _a = ["alignContent", "alignItems", "alignSelf", "alignmentBaseline", "animation", "animationDelay", "animationDirection", "animationDuration", "animationFillMode", "animationIterationCount", "animationName", "animationPlayState", "animationTimingFunction", "backfaceVisibility", "background", "backgroundAttachment", "backgroundClip", "backgroundColor", "backgroundImage", "backgroundOrigin", "backgroundPosition", "backgroundPositionX", "backgroundPositionY", "backgroundRepeat", "backgroundSize", "baselineShift", "border", "borderBottom", "borderBottomColor", "borderBottomLeftRadius", "borderBottomRightRadius", "borderBottomStyle", "borderBottomWidth", "borderCollapse", "borderColor", "borderImage", "borderImageOutset", "borderImageRepeat", "borderImageSlice", "borderImageSource", "borderImageWidth", "borderLeft", "borderLeftColor", "borderLeftStyle", "borderLeftWidth", "borderRadius", "borderRight", "borderRightColor", "borderRightStyle", "borderRightWidth", "borderSpacing", "borderStyle", "borderTop", "borderTopColor", "borderTopLeftRadius", "borderTopRightRadius", "borderTopStyle", "borderTopWidth", "borderWidth", "bottom", "boxShadow", "boxSizing", "breakAfter", "breakBefore", "breakInside", "captionSide", "clear", "clip", "clipPath", "clipRule", "color", "colorInterpolationFilters", "columnCount", "columnFill", "columnGap", "columnRule", "columnRuleColor", "columnRuleStyle", "columnRuleWidth", "columnSpan", "columnWidth", "columns", "content", "counterIncrement", "counterReset", "cssFloat", "cssText", "cursor", "direction", "display", "dominantBaseline", "emptyCells", "enableBackground", "fill", "fillOpacity", "fillRule", "filter", "flex", "flexBasis", "flexDirection", "flexFlow", "flexGrow", "flexShrink", "flexWrap", "floodColor", "floodOpacity", "font", "fontFamily", "fontFeatureSettings", "fontSize", "fontSizeAdjust", "fontStretch", "fontStyle", "fontVariant", "fontWeight", "glyphOrientationHorizontal", "glyphOrientationVertical", "height", "imeMode", "justifyContent", "kerning", "left", "letterSpacing", "lightingColor", "lineHeight", "listStyle", "listStyleImage", "listStylePosition", "listStyleType", "margin", "marginBottom", "marginLeft", "marginRight", "marginTop", "marker", "markerEnd", "markerMid", "markerStart", "mask", "maxHeight", "maxWidth", "minHeight", "minWidth", "msContentZoomChaining", "msContentZoomLimit", "msContentZoomLimitMax", "msContentZoomLimitMin", "msContentZoomSnap", "msContentZoomSnapPoints", "msContentZoomSnapType", "msContentZooming", "msFlowFrom", "msFlowInto", "msFontFeatureSettings", "msGridColumn", "msGridColumnAlign", "msGridColumnSpan", "msGridColumns", "msGridRow", "msGridRowAlign", "msGridRowSpan", "msGridRows", "msHighContrastAdjust", "msHyphenateLimitChars", "msHyphenateLimitLines", "msHyphenateLimitZone", "msHyphens", "msImeAlign", "msOverflowStyle", "msScrollChaining", "msScrollLimit", "msScrollLimitXMax", "msScrollLimitXMin", "msScrollLimitYMax", "msScrollLimitYMin", "msScrollRails", "msScrollSnapPointsX", "msScrollSnapPointsY", "msScrollSnapType", "msScrollSnapX", "msScrollSnapY", "msScrollTranslation", "msTextCombineHorizontal", "msTextSizeAdjust", "msTouchAction", "msTouchSelect", "msUserSelect", "msWrapFlow", "msWrapMargin", "msWrapThrough", "opacity", "order", "orphans", "outline", "outlineColor", "outlineStyle", "outlineWidth", "overflow", "overflowX", "overflowY", "padding", "paddingBottom", "paddingLeft", "paddingRight", "paddingTop", "pageBreakAfter", "pageBreakBefore", "pageBreakInside", "parentRule", "perspective", "perspectiveOrigin", "pointerEvents", "position", "quotes", "right", "rubyAlign", "rubyOverhang", "rubyPosition", "stopColor", "stopOpacity", "stroke", "strokeDasharray", "strokeDashoffset", "strokeLinecap", "strokeLinejoin", "strokeMiterlimit", "strokeOpacity", "strokeWidth", "tableLayout", "textAlign", "textAlignLast", "textAnchor", "textDecoration", "textIndent", "textJustify", "textKashida", "textKashidaSpace", "textOverflow", "textShadow", "textTransform", "textUnderlinePosition", "top", "touchAction", "transform", "transformOrigin", "transformStyle", "transition", "transitionDelay", "transitionDuration", "transitionProperty", "transitionTimingFunction", "unicodeBidi", "verticalAlign", "visibility", "webkitAlignContent", "webkitAlignItems", "webkitAlignSelf", "webkitAnimation", "webkitAnimationDelay", "webkitAnimationDirection", "webkitAnimationDuration", "webkitAnimationFillMode", "webkitAnimationIterationCount", "webkitAnimationName", "webkitAnimationPlayState", "webkitAnimationTimingFunction", "webkitAppearance", "webkitBackfaceVisibility", "webkitBackgroundClip", "webkitBackgroundOrigin", "webkitBackgroundSize", "webkitBorderBottomLeftRadius", "webkitBorderBottomRightRadius", "webkitBorderImage", "webkitBorderRadius", "webkitBorderTopLeftRadius", "webkitBorderTopRightRadius", "webkitBoxAlign", "webkitBoxDirection", "webkitBoxFlex", "webkitBoxOrdinalGroup", "webkitBoxOrient", "webkitBoxPack", "webkitBoxSizing", "webkitColumnBreakAfter", "webkitColumnBreakBefore", "webkitColumnBreakInside", "webkitColumnCount", "webkitColumnGap", "webkitColumnRule", "webkitColumnRuleColor", "webkitColumnRuleStyle", "webkitColumnRuleWidth", "webkitColumnSpan", "webkitColumnWidth", "webkitColumns", "webkitFilter", "webkitFlex", "webkitFlexBasis", "webkitFlexDirection", "webkitFlexFlow", "webkitFlexGrow", "webkitFlexShrink", "webkitFlexWrap", "webkitJustifyContent", "webkitOrder", "webkitPerspective", "webkitPerspectiveOrigin", "webkitTapHighlightColor", "webkitTextFillColor", "webkitTextSizeAdjust", "webkitTransform", "webkitTransformOrigin", "webkitTransformStyle", "webkitTransition", "webkitTransitionDelay", "webkitTransitionDuration", "webkitTransitionProperty", "webkitTransitionTimingFunction", "webkitUserModify", "webkitUserSelect", "webkitWritingMode", "whiteSpace", "widows", "width", "wordBreak", "wordSpacing", "wordWrap", "writingMode", "zIndex", "zoom"]; _i < _a.length; _i++) {
+        var name_1 = _a[_i];
+        _loop_1(name_1);
     }
 })(VMDOM || (VMDOM = {}));
-"use strict";
 /// <reference path="../lib/ArrayEx.ts"/>
 /**
  * 一个普通对象
@@ -1182,7 +1167,7 @@ var HashObjectManage = (function () {
     HashObjectManage.take = function (data, name) {
         if (data.hasOwnProperty(name)) {
             var ret = data[name];
-            delete this[name];
+            delete data[name];
             return ret;
         }
         return null;
@@ -1263,7 +1248,6 @@ var KeyArrayHashObjectManage = (function () {
 // function createKeyArrayHashObject<T>():IKeyArrayHashObject<T> & KeyArrayHashObject<T>{
 //     return <any>(new KeyArrayHashObject<T>());
 // }
-"use strict";
 //浏览器兼容
 var classSplitRE = /\s+/g;
 var ClassList = (function () {
@@ -1305,7 +1289,6 @@ var ClassList = (function () {
     };
     return ClassList;
 }());
-"use strict";
 /// <reference path='.d.ts'/>
 /// <reference path='VNode.ts'/>
 var VMDOM;
@@ -1328,7 +1311,6 @@ var VMDOM;
     }());
     VMDOM.VNodeList = VNodeList;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 /// <reference path='.d.ts'/>
 var VMDOM;
 (function (VMDOM) {
@@ -1363,7 +1345,6 @@ var VMDOM;
     }());
     VMDOM.VHTMLCollection = VHTMLCollection;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VNodeVMData = (function () {
     function VNodeVMData() {
         this.data = "";
@@ -1377,7 +1358,6 @@ var VNodeVMData = (function () {
     }
     return VNodeVMData;
 }());
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     VMDOM.bindClassToFunctionHelper = {};
@@ -1414,26 +1394,26 @@ var VMDOM;
     function setA_PToClassPrototype(constructor) {
         var prototype = constructor.prototype;
         var clazzSuperPrototype = prototype.prototype; //这里只是让后面的比较正常,类型并不准
-        var _loop_1 = function (name_1) {
-            Object.defineProperty(prototype, name_1, {
+        var _loop_2 = function (name_2) {
+            Object.defineProperty(prototype, name_2, {
                 get: function () {
-                    return getAttr(this, name_1);
+                    return getAttr(this, name_2);
                 },
                 set: function (v) {
-                    setAttr(this, name_1, v);
+                    setAttr(this, name_2, v);
                 }
             });
         };
         for (var _i = 0, apNames_1 = apNames; _i < apNames_1.length; _i++) {
-            var name_1 = apNames_1[_i];
-            _loop_1(name_1);
+            var name_2 = apNames_1[_i];
+            _loop_2(name_2);
         }
         prototype.cloneNode = function (deep) {
             var newNode = clazzSuperPrototype.cloneNode(deep);
             for (var _i = 0, apNames_2 = apNames; _i < apNames_2.length; _i++) {
-                var name_2 = apNames_2[_i];
-                if (this[name_2] !== "") {
-                    newNode[name_2] = this[name_2];
+                var name_3 = apNames_2[_i];
+                if (this[name_3] !== "") {
+                    newNode[name_3] = this[name_3];
                 }
             }
             return newNode;
@@ -1470,7 +1450,6 @@ var VMDOM;
 //         t.__proto__ = htmlNodeInfo[t.nodeName];
 //     }
 // } 
-"use strict";
 /// <reference path='.d.ts'/>
 /// <reference path='VNamedNodeMap.ts'/>
 /// <reference path='VStyle.ts'/>
@@ -1644,6 +1623,14 @@ var VMDOM;
         // createComment(value: string): IVComment;
         // addEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
         // removeEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
+        /**
+         * 获取生成该对象的代码
+         *
+         * @param {number} [space=0] 前置空格
+         * @returns {string}
+         *
+         * @memberOf VNode
+         */
         VNode.prototype.toJSString = function (space) {
             if (space === void 0) { space = 0; }
             return "$$$" + this.toJS(space).replace(/^\s*/, '');
@@ -1885,10 +1872,10 @@ function bindClassToFunction(node, nodeName, nodeType) {
         }
         else {
             nodeName = nodeName.toLowerCase();
-            var name_3 = "V" + nodeName[0].toUpperCase() + nodeName.substr(1).toLowerCase() + "Element";
-            if (VMDOM.hasOwnProperty(name_3)) {
-                node.__proto__ = VMDOM[name_3].prototype;
-                VMDOM[name_3].call(node);
+            var name_4 = "V" + nodeName[0].toUpperCase() + nodeName.substr(1).toLowerCase() + "Element";
+            if (VMDOM.hasOwnProperty(name_4)) {
+                node.__proto__ = VMDOM[name_4].prototype;
+                VMDOM[name_4].call(node);
             }
             else {
                 var fn = VMDOM.bindClassToFunctionHelper["-1"];
@@ -1920,7 +1907,6 @@ var VNodeHelp = function (nodeName, nodeType) {
     bindClassToFunction(that, nodeName, nodeType);
     return that;
 };
-"use strict";
 /// <reference path='VNode.ts'/>
 var VMDOM;
 (function (VMDOM) {
@@ -2033,7 +2019,6 @@ var VMDOM;
     }(VMDOM.VNode));
     VMDOM.VElement = VElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var encodeHTML = (function () {
     var re = /&lt;|&gt;/g, fn = function (s) {
         switch (s) {
@@ -2062,7 +2047,6 @@ var decodeHTML = (function () {
         return value.replace(re, fn);
     };
 }());
-"use strict";
 /// <reference path='VNode.ts'/>
 /// <reference path='VElement.ts'/>
 /// <reference path='../../lib/Encode.ts'/>
@@ -2086,9 +2070,9 @@ var VMDOM;
             var newNode = $$$('html');
             // newNode.version=this.version;
             for (var _i = 0, _a = ["title", "lang", "accessKey", "webkitdropzone", "id"]; _i < _a.length; _i++) {
-                var name_4 = _a[_i];
-                if (this[name_4] !== "") {
-                    newNode[name_4] = this[name_4];
+                var name_5 = _a[_i];
+                if (this[name_5] !== "") {
+                    newNode[name_5] = this[name_5];
                 }
             }
             var attributes = this.attributes;
@@ -2364,7 +2348,6 @@ var VMDOM;
     VMDOM.VHtmlElement = VHtmlElement;
     var VHtmlElement_1;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 /// <reference path='VNode.ts'/>
 var VMDOM;
 (function (VMDOM) {
@@ -2402,7 +2385,6 @@ var VMDOM;
     }(VMDOM.VNode));
     VMDOM.VCharacterData = VCharacterData;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 /// <reference path='VCharacterData.ts'/>
 function isVText(node) {
     return node.nodeType === 3 /* Text */;
@@ -2501,7 +2483,6 @@ var VMDOM;
     ], VText);
     VMDOM.VText = VText;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 /// <reference path='VCharacterData.ts'/>
 function isVComment(node) {
     return node.nodeType === 8 /* Comment */;
@@ -2588,7 +2569,6 @@ var VMDOM;
     ], VComment);
     VMDOM.VComment = VComment;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 /// <reference path='VNode.ts'/>
 function isVDocType(node) {
     return node.nodeType === 10 /* DocumentType */;
@@ -2624,7 +2604,6 @@ var VMDOM;
     VMDOM.VDocumentType = VDocumentType;
 })(VMDOM || (VMDOM = {}));
 /// <reference path='VNode.ts'/>
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDocument = (function (_super) {
@@ -2657,7 +2636,6 @@ var VMDOM;
     VMDOM.VDocument = VDocument;
 })(VMDOM || (VMDOM = {}));
 /// <reference path='VHtmlElement.ts'/>
-"use strict";
 function isVHTMLUnknownElement(node) {
     return node instanceof VMDOM.VHTMLUnknownElement;
 }
@@ -2677,7 +2655,6 @@ var VMDOM;
     ], VHTMLUnknownElement);
     VMDOM.VHTMLUnknownElement = VHTMLUnknownElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VAElement = (function (_super) {
@@ -2694,7 +2671,6 @@ var VMDOM;
     ], VAElement);
     VMDOM.VAElement = VAElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VAreaElement = (function (_super) {
@@ -2712,7 +2688,6 @@ var VMDOM;
     ], VAreaElement);
     VMDOM.VAreaElement = VAreaElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VBaseElement = (function (_super) {
@@ -2730,7 +2705,6 @@ var VMDOM;
     ], VBaseElement);
     VMDOM.VBaseElement = VBaseElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VBasefontElement = (function (_super) {
@@ -2748,7 +2722,6 @@ var VMDOM;
     ], VBasefontElement);
     VMDOM.VBasefontElement = VBasefontElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VBlockquoteElement = (function (_super) {
@@ -2765,7 +2738,6 @@ var VMDOM;
     ], VBlockquoteElement);
     VMDOM.VBlockquoteElement = VBlockquoteElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VBodyElement = (function (_super) {
@@ -2782,7 +2754,6 @@ var VMDOM;
     ], VBodyElement);
     VMDOM.VBodyElement = VBodyElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VBrElement = (function (_super) {
@@ -2800,7 +2771,6 @@ var VMDOM;
     ], VBrElement);
     VMDOM.VBrElement = VBrElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VCanvasElement = (function (_super) {
@@ -2817,7 +2787,6 @@ var VMDOM;
     ], VCanvasElement);
     VMDOM.VCanvasElement = VCanvasElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VCaptionElement = (function (_super) {
@@ -2834,7 +2803,6 @@ var VMDOM;
     ], VCaptionElement);
     VMDOM.VCaptionElement = VCaptionElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VColElement = (function (_super) {
@@ -2852,7 +2820,6 @@ var VMDOM;
     ], VColElement);
     VMDOM.VColElement = VColElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VColgroupElement = (function (_super) {
@@ -2869,7 +2836,6 @@ var VMDOM;
     ], VColgroupElement);
     VMDOM.VColgroupElement = VColgroupElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDialogElement = (function (_super) {
@@ -2886,7 +2852,6 @@ var VMDOM;
     ], VDialogElement);
     VMDOM.VDialogElement = VDialogElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDirElement = (function (_super) {
@@ -2903,7 +2868,6 @@ var VMDOM;
     ], VDirElement);
     VMDOM.VDirElement = VDirElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDivElement = (function (_super) {
@@ -2920,7 +2884,6 @@ var VMDOM;
     ], VDivElement);
     VMDOM.VDivElement = VDivElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDlElement = (function (_super) {
@@ -2937,7 +2900,6 @@ var VMDOM;
     ], VDlElement);
     VMDOM.VDlElement = VDlElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VFieldsetElement = (function (_super) {
@@ -2954,7 +2916,6 @@ var VMDOM;
     ], VFieldsetElement);
     VMDOM.VFieldsetElement = VFieldsetElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VFrameElement = (function (_super) {
@@ -2972,7 +2933,6 @@ var VMDOM;
     ], VFrameElement);
     VMDOM.VFrameElement = VFrameElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VH1Element = (function (_super) {
@@ -2989,7 +2949,6 @@ var VMDOM;
     ], VH1Element);
     VMDOM.VH1Element = VH1Element;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VH2Element = (function (_super) {
@@ -3006,7 +2965,6 @@ var VMDOM;
     ], VH2Element);
     VMDOM.VH2Element = VH2Element;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VH3Element = (function (_super) {
@@ -3023,7 +2981,6 @@ var VMDOM;
     ], VH3Element);
     VMDOM.VH3Element = VH3Element;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VH4Element = (function (_super) {
@@ -3040,7 +2997,6 @@ var VMDOM;
     ], VH4Element);
     VMDOM.VH4Element = VH4Element;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VH5Element = (function (_super) {
@@ -3057,7 +3013,6 @@ var VMDOM;
     ], VH5Element);
     VMDOM.VH5Element = VH5Element;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VH6Element = (function (_super) {
@@ -3074,7 +3029,6 @@ var VMDOM;
     ], VH6Element);
     VMDOM.VH6Element = VH6Element;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VHeadElement = (function (_super) {
@@ -3091,7 +3045,6 @@ var VMDOM;
     ], VHeadElement);
     VMDOM.VHeadElement = VHeadElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VHrElement = (function (_super) {
@@ -3109,7 +3062,6 @@ var VMDOM;
     ], VHrElement);
     VMDOM.VHrElement = VHrElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VIframeElement = (function (_super) {
@@ -3126,7 +3078,6 @@ var VMDOM;
     ], VIframeElement);
     VMDOM.VIframeElement = VIframeElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VImgElement = (function (_super) {
@@ -3144,7 +3095,6 @@ var VMDOM;
     ], VImgElement);
     VMDOM.VImgElement = VImgElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VInputElement = (function (_super) {
@@ -3167,7 +3117,6 @@ var VMDOM;
     ], VInputElement);
     VMDOM.VInputElement = VInputElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VInsElement = (function (_super) {
@@ -3184,7 +3133,6 @@ var VMDOM;
     ], VInsElement);
     VMDOM.VInsElement = VInsElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VKeygenElement = (function (_super) {
@@ -3201,7 +3149,6 @@ var VMDOM;
     ], VKeygenElement);
     VMDOM.VKeygenElement = VKeygenElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VLegendElement = (function (_super) {
@@ -3218,7 +3165,6 @@ var VMDOM;
     ], VLegendElement);
     VMDOM.VLegendElement = VLegendElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VLiElement = (function (_super) {
@@ -3235,7 +3181,6 @@ var VMDOM;
     ], VLiElement);
     VMDOM.VLiElement = VLiElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VLinkElement = (function (_super) {
@@ -3253,7 +3198,6 @@ var VMDOM;
     ], VLinkElement);
     VMDOM.VLinkElement = VLinkElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VMapElement = (function (_super) {
@@ -3271,7 +3215,6 @@ var VMDOM;
     ], VMapElement);
     VMDOM.VMapElement = VMapElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VMenuElement = (function (_super) {
@@ -3288,7 +3231,6 @@ var VMDOM;
     ], VMenuElement);
     VMDOM.VMenuElement = VMenuElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VMetaElement = (function (_super) {
@@ -3306,7 +3248,6 @@ var VMDOM;
     ], VMetaElement);
     VMDOM.VMetaElement = VMetaElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VMeterElement = (function (_super) {
@@ -3323,7 +3264,6 @@ var VMDOM;
     ], VMeterElement);
     VMDOM.VMeterElement = VMeterElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VOlElement = (function (_super) {
@@ -3340,7 +3280,6 @@ var VMDOM;
     ], VOlElement);
     VMDOM.VOlElement = VOlElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VOptgroupElement = (function (_super) {
@@ -3357,7 +3296,6 @@ var VMDOM;
     ], VOptgroupElement);
     VMDOM.VOptgroupElement = VOptgroupElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VOptionElement = (function (_super) {
@@ -3374,7 +3312,6 @@ var VMDOM;
     ], VOptionElement);
     VMDOM.VOptionElement = VOptionElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VOutputElement = (function (_super) {
@@ -3391,7 +3328,6 @@ var VMDOM;
     ], VOutputElement);
     VMDOM.VOutputElement = VOutputElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VParamElement = (function (_super) {
@@ -3409,7 +3345,6 @@ var VMDOM;
     ], VParamElement);
     VMDOM.VParamElement = VParamElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VPElement = (function (_super) {
@@ -3426,7 +3361,6 @@ var VMDOM;
     ], VPElement);
     VMDOM.VPElement = VPElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VPreElement = (function (_super) {
@@ -3443,7 +3377,6 @@ var VMDOM;
     ], VPreElement);
     VMDOM.VPreElement = VPreElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VProgressElement = (function (_super) {
@@ -3460,7 +3393,6 @@ var VMDOM;
     ], VProgressElement);
     VMDOM.VProgressElement = VProgressElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VQElement = (function (_super) {
@@ -3477,7 +3409,6 @@ var VMDOM;
     ], VQElement);
     VMDOM.VQElement = VQElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 /// <reference path="../../core/node.ts"/>
 var VMDOM;
 (function (VMDOM) {
@@ -3529,7 +3460,6 @@ var VMDOM;
     ], VScriptElement);
     VMDOM.VScriptElement = VScriptElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VSelectElement = (function (_super) {
@@ -3550,7 +3480,6 @@ var VMDOM;
     ], VSelectElement);
     VMDOM.VSelectElement = VSelectElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VSourceElement = (function (_super) {
@@ -3567,7 +3496,6 @@ var VMDOM;
     ], VSourceElement);
     VMDOM.VSourceElement = VSourceElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VStyleElement = (function (_super) {
@@ -3584,7 +3512,6 @@ var VMDOM;
     ], VStyleElement);
     VMDOM.VStyleElement = VStyleElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTableElement = (function (_super) {
@@ -3601,7 +3528,6 @@ var VMDOM;
     ], VTableElement);
     VMDOM.VTableElement = VTableElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTbodyElement = (function (_super) {
@@ -3618,7 +3544,6 @@ var VMDOM;
     ], VTbodyElement);
     VMDOM.VTbodyElement = VTbodyElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTdElement = (function (_super) {
@@ -3635,7 +3560,6 @@ var VMDOM;
     ], VTdElement);
     VMDOM.VTdElement = VTdElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTextareaElement = (function (_super) {
@@ -3664,7 +3588,6 @@ var VMDOM;
     ], VTextareaElement);
     VMDOM.VTextareaElement = VTextareaElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTfootElement = (function (_super) {
@@ -3681,7 +3604,6 @@ var VMDOM;
     ], VTfootElement);
     VMDOM.VTfootElement = VTfootElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTheadElement = (function (_super) {
@@ -3698,7 +3620,6 @@ var VMDOM;
     ], VTheadElement);
     VMDOM.VTheadElement = VTheadElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VThElement = (function (_super) {
@@ -3715,7 +3636,6 @@ var VMDOM;
     ], VThElement);
     VMDOM.VThElement = VThElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTrackElement = (function (_super) {
@@ -3732,7 +3652,6 @@ var VMDOM;
     ], VTrackElement);
     VMDOM.VTrackElement = VTrackElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTrElement = (function (_super) {
@@ -3749,7 +3668,6 @@ var VMDOM;
     ], VTrElement);
     VMDOM.VTrElement = VTrElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VUlElement = (function (_super) {
@@ -3766,7 +3684,6 @@ var VMDOM;
     ], VUlElement);
     VMDOM.VUlElement = VUlElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VVideoElement = (function (_super) {
@@ -3783,7 +3700,6 @@ var VMDOM;
     ], VVideoElement);
     VMDOM.VVideoElement = VVideoElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VXmpElement = (function (_super) {
@@ -3800,7 +3716,6 @@ var VMDOM;
     ], VXmpElement);
     VMDOM.VXmpElement = VXmpElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VTitleElement = (function (_super) {
@@ -3817,7 +3732,6 @@ var VMDOM;
     ], VTitleElement);
     VMDOM.VTitleElement = VTitleElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VSpanElement = (function (_super) {
@@ -3834,7 +3748,6 @@ var VMDOM;
     ], VSpanElement);
     VMDOM.VSpanElement = VSpanElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VEmElement = (function (_super) {
@@ -3851,7 +3764,6 @@ var VMDOM;
     ], VEmElement);
     VMDOM.VEmElement = VEmElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VIElement = (function (_super) {
@@ -3868,7 +3780,6 @@ var VMDOM;
     ], VIElement);
     VMDOM.VIElement = VIElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VBElement = (function (_super) {
@@ -3885,7 +3796,6 @@ var VMDOM;
     ], VBElement);
     VMDOM.VBElement = VBElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VFormElement = (function (_super) {
@@ -3902,7 +3812,6 @@ var VMDOM;
     ], VFormElement);
     VMDOM.VFormElement = VFormElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VLabelElement = (function (_super) {
@@ -3919,7 +3828,6 @@ var VMDOM;
     ], VLabelElement);
     VMDOM.VLabelElement = VLabelElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDtElement = (function (_super) {
@@ -3936,7 +3844,6 @@ var VMDOM;
     ], VDtElement);
     VMDOM.VDtElement = VDtElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDdElement = (function (_super) {
@@ -3953,7 +3860,6 @@ var VMDOM;
     ], VDdElement);
     VMDOM.VDdElement = VDdElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VEmbedElement = (function (_super) {
@@ -3970,7 +3876,6 @@ var VMDOM;
     ], VEmbedElement);
     VMDOM.VEmbedElement = VEmbedElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VStrongElement = (function (_super) {
@@ -3987,7 +3892,6 @@ var VMDOM;
     ], VStrongElement);
     VMDOM.VStrongElement = VStrongElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VButtonElement = (function (_super) {
@@ -4004,7 +3908,6 @@ var VMDOM;
     ], VButtonElement);
     VMDOM.VButtonElement = VButtonElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VObjectElement = (function (_super) {
@@ -4021,7 +3924,6 @@ var VMDOM;
     ], VObjectElement);
     VMDOM.VObjectElement = VObjectElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VSvgElement = (function (_super) {
@@ -4038,7 +3940,6 @@ var VMDOM;
     ], VSvgElement);
     VMDOM.VSvgElement = VSvgElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VCircleElement = (function (_super) {
@@ -4055,7 +3956,6 @@ var VMDOM;
     ], VCircleElement);
     VMDOM.VCircleElement = VCircleElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VHeaderElement = (function (_super) {
@@ -4072,7 +3972,6 @@ var VMDOM;
     ], VHeaderElement);
     VMDOM.VHeaderElement = VHeaderElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VFooterElement = (function (_super) {
@@ -4095,7 +3994,6 @@ var VMDOM;
 /// <reference path='../node/VDocumentType.ts'/>
 /// <reference path='../node/VDocument.ts'/>
 /// <reference path='../node/VHTMLUnknownElement.ts'/>
-"use strict";
 /// <reference path='../element/VAElement.ts'/>
 /// <reference path='../element/VAreaElement.ts'/>
 /// <reference path='../element/VBaseElement.ts'/>
@@ -4175,7 +4073,6 @@ var VMDOM;
 /// <reference path='../element/VCircleElement.ts'/>
 /// <reference path='../element/VHeaderElement.ts'/>
 /// <reference path='../element/VFooterElement.ts'/>
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VDomhelperElement = (function (_super) {
@@ -4189,7 +4086,6 @@ var VMDOM;
     }(VMDOM.VHtmlElement));
     VMDOM.VDomhelperElement = VDomhelperElement;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 /// <reference path='BaseVNode.ts'/>
 /// <reference path='VDomhelperElement.ts'/>
 var VDOM = (function () {
@@ -4624,9 +4520,8 @@ VDOM.parseStructor = function (html, vNode) {
     }
 };
 var $$$ = VNodeHelp;
-/// <reference path="Scope.ts"/>
+/// <reference path="RootScope.ts"/>
 /// <reference path='../virtual/UIHelper/VDOM.ts'/>
-"use strict";
 typeof document === "undefined" && (document = $$$('#document'));
 var $rootScope = new RootScope(document);
 var DOMScope = (function () {
@@ -4700,7 +4595,6 @@ var DOMScope = (function () {
     return DOMScope;
 }());
 DOMScope.stack = [$rootScope];
-"use strict";
 /// <reference path='VNode.ts'/>
 var VMDOM;
 (function (VMDOM) {
@@ -4729,7 +4623,6 @@ var VMDOM;
         VPlaceHolder.call(node, nodeName);
     };
 })(VMDOM || (VMDOM = {}));
-"use strict";
 var JS;
 (function (JS) {
     var JavaScriptComment = (function () {
@@ -4746,7 +4639,6 @@ var JS;
     }());
     JS.JavaScriptComment = JavaScriptComment;
 })(JS || (JS = {}));
-"use strict";
 var JS;
 (function (JS) {
     var JavaScriptString = (function () {
@@ -4763,7 +4655,6 @@ var JS;
     }());
     JS.JavaScriptString = JavaScriptString;
 })(JS || (JS = {}));
-"use strict";
 var JS;
 (function (JS) {
     var logics = {};
@@ -4809,9 +4700,9 @@ var JS;
     function findLogic(statement, firstTryNames) {
         if (firstTryNames) {
             for (var _i = 0, firstTryNames_1 = firstTryNames; _i < firstTryNames_1.length; _i++) {
-                var name_5 = firstTryNames_1[_i];
-                if (name_5 in logics) {
-                    var Logic = logics[name_5];
+                var name_6 = firstTryNames_1[_i];
+                if (name_6 in logics) {
+                    var Logic = logics[name_6];
                     var logic = Logic.new(statement);
                     if (logic) {
                         return logic;
@@ -4819,9 +4710,9 @@ var JS;
                 }
             }
             for (var _a = 0, logicNames_1 = logicNames; _a < logicNames_1.length; _a++) {
-                var name_6 = logicNames_1[_a];
-                if (name_6 in logics) {
-                    var Logic = logics[name_6];
+                var name_7 = logicNames_1[_a];
+                if (name_7 in logics) {
+                    var Logic = logics[name_7];
                     var logic = Logic.new(statement);
                     if (logic) {
                         return logic;
@@ -4831,9 +4722,9 @@ var JS;
         }
         else {
             for (var _b = 0, logicNames_2 = logicNames; _b < logicNames_2.length; _b++) {
-                var name_7 = logicNames_2[_b];
-                if (name_7 in logics) {
-                    var Logic = logics[name_7];
+                var name_8 = logicNames_2[_b];
+                if (name_8 in logics) {
+                    var Logic = logics[name_8];
                     var logic = Logic.new(statement);
                     if (logic) {
                         return logic;
@@ -4946,7 +4837,6 @@ var JS;
     }
     JS.isSpace = isSpace;
 })(JS || (JS = {}));
-"use strict";
 /// <reference path='Lib.ts'/>
 var JS;
 (function (JS) {
@@ -4957,7 +4847,6 @@ var JS;
     }());
     JS.JavaScriptLogic = JavaScriptLogic;
 })(JS || (JS = {}));
-"use strict";
 /// <reference path='JavaScriptBlock.ts'/>
 /// <reference path='JavaScriptComment.ts'/>
 /// <reference path='JavaScriptString.ts'/>
@@ -5044,7 +4933,6 @@ var JS;
     }());
     JS.JavaScriptStatement = JavaScriptStatement;
 })(JS || (JS = {}));
-"use strict";
 /// <reference path='../javascript/JavaScriptStatement.ts'/>
 var JS;
 (function (JS) {
@@ -5087,7 +4975,6 @@ var JS;
     JS.JavaScriptBlock = JavaScriptBlock;
 })(JS || (JS = {}));
 /// <reference path='../javascript/JavaScriptBlock.ts'/>
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VOrderData = (function () {
@@ -5110,7 +4997,6 @@ var VMDOM;
 /// <reference path='../node/VPlaceHolder.ts'/>
 /// <reference path='../javascript/JavaScriptBlock.ts'/>
 /// <reference path='VOrderData.ts'/>
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VOrder = (function (_super) {
@@ -5137,7 +5023,6 @@ var VMDOM;
     VMDOM.VOrder = VOrder;
 })(VMDOM || (VMDOM = {}));
 /// <reference path='../node/VPlaceHolder.ts'/>
-"use strict";
 var VMDOM;
 (function (VMDOM) {
     var VScript = (function (_super) {
@@ -5163,7 +5048,6 @@ var VMDOM;
     ], VScript);
     VMDOM.VScript = VScript;
 })(VMDOM || (VMDOM = {}));
-"use strict";
 /// <reference path='../../scope/DOMScope.ts'/>
 /// <reference path='../UIHelper/VOrder.ts'/>
 /// <reference path='../UIHelper/VScript.ts'/>
@@ -5251,7 +5135,6 @@ var Order;
         if (!(orderName in Order.orders)) {
             return;
         }
-        debugger;
         var order = new Order.orders[orderName](node, info.condition);
         return order;
     }
@@ -5373,9 +5256,9 @@ var Order;
     Order.testSetVar = testSetVar;
     function createFakeObject(that) {
         var obj = {};
-        for (var name_8 in that) {
-            if (that.hasOwnProperty(name_8)) {
-                defineCloneProperty(obj, name_8, that);
+        for (var name_9 in that) {
+            if (that.hasOwnProperty(name_9)) {
+                defineCloneProperty(obj, name_9, that);
             }
         }
         if (that.__proto__ !== Object.prototype) {
@@ -5553,7 +5436,6 @@ var Order;
 })(Order || (Order = {}));
 /// <reference path='Lib.ts'/>
 /// <reference path='../javascript/JavaScriptStatement.ts'/>
-"use strict";
 var Order;
 (function (Order) {
     var VOrder = (function () {
@@ -5589,7 +5471,6 @@ var Order;
     }());
     Order.VOrder = VOrder;
 })(Order || (Order = {}));
-"use strict";
 var XHR = (function () {
     function XHR() {
     }
@@ -5617,7 +5498,7 @@ var XHR = (function () {
     };
     return XHR;
 }());
-"use strict";
+/// <reference path="./uiHelper/BaseVNode.ts"/>
 var includeJSFiles = (function () {
     var IncludeTask = (function () {
         function IncludeTask(parent, files, callback) {
@@ -5704,7 +5585,6 @@ var includeJSFiles = (function () {
         includeJSFile(includeTask);
     };
 }());
-"use strict";
 /// <reference path='../lib/lib.ts'/>
 var Store = (function () {
     function Store() {
@@ -5741,7 +5621,6 @@ var StoreManage = (function () {
     };
     return StoreManage;
 }());
-"use strict";
 /// <reference path="../part/templateConfig.ts"/>
 var Config = (function () {
     function Config() {
@@ -5751,13 +5630,11 @@ var Config = (function () {
     }
     return Config;
 }());
-"use strict";
 var UIPathSpace = (function () {
     function UIPathSpace() {
     }
     return UIPathSpace;
 }());
-"use strict";
 /// <reference path="UIPathSpace.ts"/>
 var UIList = (function () {
     function UIList() {
@@ -5780,7 +5657,6 @@ var UIList = (function () {
     };
     return UIList;
 }());
-"use strict";
 var loadJS = (function () {
     var requireHash = {};
     var RequireFile = (function () {
@@ -5833,7 +5709,6 @@ var loadJS = (function () {
 /// <reference path='../main/Config.ts'/>
 /// <reference path="UIList.ts"/>
 /// <reference path="../main/LoadJS.ts"/>
-"use strict";
 var 
 // $DOM,
 // $node: I$Node,
@@ -6089,9 +5964,9 @@ function parseLazy(node, outerChildNodes, outerElement, props, part) {
 function getUIInfo(node) {
     var nodeName = node.nodeName;
     if (nodeName === 'SCRIPT' && getAttr(node, 'type') === 'ui') {
-        var name_9 = node.getAttribute('name');
-        if (name_9) {
-            return name_9.toLowerCase();
+        var name_10 = node.getAttribute('name');
+        if (name_10) {
+            return name_10.toLowerCase();
         }
         else {
             return '';
@@ -6437,13 +6312,13 @@ function getParts(childNodes) {
 // / <reference path="Server.ts"/>
 /// <reference path="View.ts"/>
 /// <reference path="partCore.ts"/>
-"use strict";
+/// <reference path='../scope/DOMScope.ts'/>
 var Component;
 (function (Component) {
     var Part = (function (_super) {
         __extends(Part, _super);
         /**初始化对象 */
-        function Part(partName /*组件名*/, dom, props, nodes) {
+        function Part(partName /*组件名*/, dom, props, propsNodes) {
             var _this = _super.call(this) || this;
             _this.partName = partName; /*组件名*/
             _this.props = props;
@@ -6456,7 +6331,7 @@ var Component;
              */
             // $: Service;
             /** DOM节点存储数组 */
-            _this.nodeStore = [];
+            _this.nodestore = [];
             //事件管理器
             /**resize事件管理器*/
             _this.$resize = _this.getEventHelper("resize");
@@ -6466,8 +6341,23 @@ var Component;
             _this.$online = _this.getEventHelper("online");
             /**remove事件管理器 */
             _this.$offline = _this.getEventHelper("offline");
+            $rootScope.lastRenderPart = _this;
+            var propsElements = [];
+            if (propsNodes) {
+                for (var _i = 0, propsNodes_1 = propsNodes; _i < propsNodes_1.length; _i++) {
+                    var node = propsNodes_1[_i];
+                    if (isVHTMLElement(node)) {
+                        propsElements.push(node);
+                    }
+                }
+            }
+            else {
+                propsNodes = [];
+            }
+            _this.propsNodes = propsNodes;
+            _this.propsElements = propsElements;
             _this.dom = dom;
-            _this.dom.initDOM(props, nodes);
+            _this.dom.initDOM(props, propsNodes);
             // this.$ = new Service(template.service);
             // if(extPart){
             //     /**继承 */
@@ -6477,22 +6367,10 @@ var Component;
             //     this.super=extPart;
             // }
             var topNodes = _this.dom.tops;
-            var outerElement = [];
-            if (nodes) {
-                for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
-                    var node = nodes_1[_i];
-                    if (isVHTMLElement(node)) {
-                        outerElement.push(node);
-                    }
-                }
-            }
-            else {
-                nodes = [];
-            }
             if (topNodes) {
-                initHTML(topNodes, nodes, outerElement, props, _this);
+                initHTML(topNodes, propsNodes, propsElements, props, _this);
                 for (var i = topNodes.length; i > 0; i--) {
-                    _this.nodeStore.push(topNodes[0]);
+                    _this.nodestore.push(topNodes[0]);
                 }
             }
             var name = _this.partName;
@@ -6513,14 +6391,14 @@ var Component;
             // }
             // this.basePart=sp?sp:this;
             // this.basePart.isInDOM=false;
-            // initHTML(nodes, nodes, outerElement, props, this);
+            // initHTML(propsNodes, propsNodes, propsElements, props, this);
             // if(extPart){
             //     (<ExtendsPart>extPart).to(this);
             // }
-            var store = _this.nodeStore;
-            // push.apply(store, <any>nodes);  ?这里是bug
-            // for (let i = nodes.length; i > 0; i--) {
-            //     dom.removeChild(nodes[0]);
+            var store = _this.nodestore;
+            // push.apply(store, <any>propsNodes);  ?这里是bug
+            // for (let i = propsNodes.length; i > 0; i--) {
+            //     dom.removeChild(propsNodes[0]);
             // }
             store.unshift(begin);
             store.push(end);
@@ -6537,7 +6415,7 @@ var Component;
             /**子节点数目 */
             get: function () {
                 if (this.isInDOM) {
-                    return this.nodeStore.length;
+                    return this.nodestore.length;
                 }
                 else {
                     return 1;
@@ -6568,8 +6446,8 @@ var Component;
                         return [];
                     }
                 }
-                if (isArray(this.nodeStore)) {
-                    return this.nodeStore.slice().splice(1, this.nodeStore.length - 2);
+                if (isArray(this.nodestore)) {
+                    return this.nodestore.slice().splice(1, this.nodestore.length - 2);
                 }
                 else {
                     return [];
@@ -6602,16 +6480,16 @@ var Component;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Part.prototype, "scopeNodes", {
+        Object.defineProperty(Part.prototype, "scopenodes", {
             get: function () {
-                var scopeNodes = [];
+                var scopenodes = [];
                 treeEach(this.elements, "children", function (node) {
                     if (node.hasOwnProperty("scope")) {
-                        scopeNodes.push(node);
+                        scopenodes.push(node);
                         return 4 /* c_noIn */;
                     }
                 });
-                return scopeNodes;
+                return scopenodes;
             },
             enumerable: true,
             configurable: true
@@ -6752,23 +6630,23 @@ var Component;
                 elems.unshift(this.refs.begin);
                 elems.push(this.refs.end);
                 /*cut scope*/
-                var scopeNodes = this.scopeNodes;
-                for (var i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.unlink(scopeNodes[i].__scope__);
+                var scopenodes = this.scopenodes;
+                for (var i = 0; i < scopenodes.length; i++) {
+                    DOMScope.unlink(scopenodes[i].__scope__);
                 }
                 appendNodes(elems, elem);
                 /*link scope*/
-                for (var i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.link(scopeNodes[i].__scope__, elem);
+                for (var i = 0; i < scopenodes.length; i++) {
+                    DOMScope.link(scopenodes[i].__scope__, elem);
                 }
                 this.$online.emit(this, elem);
             }
             else {
-                appendNodes(this.nodeStore, elem);
+                appendNodes(this.nodestore, elem);
                 /*link scope*/
-                var scopeNodes = this.scopeNodes;
-                for (var i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.link(scopeNodes[i].__scope__, elem);
+                var scopenodes = this.scopenodes;
+                for (var i = 0; i < scopenodes.length; i++) {
+                    DOMScope.link(scopenodes[i].__scope__, elem);
                 }
                 this.$online.emit(this, elem);
                 this.isInDOM = true;
@@ -6783,23 +6661,23 @@ var Component;
                 elems.unshift(this.refs.begin);
                 elems.push(this.refs.end);
                 /*cut scope*/
-                var scopeNodes = this.scopeNodes;
-                for (var i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.unlink(scopeNodes[i].__scope__);
+                var scopenodes = this.scopenodes;
+                for (var i = 0; i < scopenodes.length; i++) {
+                    DOMScope.unlink(scopenodes[i].__scope__);
                 }
                 insertNodesBefore(elem, elems);
                 /*link scope*/
-                for (var i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.link(scopeNodes[i].__scope__, elem);
+                for (var i = 0; i < scopenodes.length; i++) {
+                    DOMScope.link(scopenodes[i].__scope__, elem);
                 }
                 this.$online.emit(this, elem);
             }
             else {
-                insertNodesBefore(elem, this.nodeStore);
+                insertNodesBefore(elem, this.nodestore);
                 /*link scope*/
-                var scopeNodes = this.scopeNodes;
-                for (var i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.link(scopeNodes[i].__scope__, elem);
+                var scopenodes = this.scopenodes;
+                for (var i = 0; i < scopenodes.length; i++) {
+                    DOMScope.link(scopenodes[i].__scope__, elem);
                 }
                 this.$online.emit(this, elem);
                 // this.basePart.isInsert=true;
@@ -6813,10 +6691,10 @@ var Component;
                 var elems = this.elements;
                 elems.unshift(this.refs.begin);
                 elems.push(this.refs.end);
-                var scopeNodes = this.scopeNodes;
+                var scopenodes = this.scopenodes;
                 /*cut scope*/
-                for (var i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.unlink(scopeNodes[i].__scope__);
+                for (var i = 0; i < scopenodes.length; i++) {
+                    DOMScope.unlink(scopenodes[i].__scope__);
                 }
                 var p = this.refs.begin.parentNode;
                 if (p !== null) {
@@ -6824,7 +6702,7 @@ var Component;
                         p.removeChild(elems[i]);
                     }
                 }
-                this.nodeStore = elems;
+                this.nodestore = elems;
                 // this.basePart.isInsert=false;
                 this.$offline.emit(this);
                 if (this.parent) {
@@ -6836,7 +6714,6 @@ var Component;
     }(EventEmitterEx));
     Component.Part = Part;
 })(Component || (Component = {}));
-"use strict";
 var ClientHelper = (function () {
     function ClientHelper() {
         this.data = {};
@@ -6897,7 +6774,6 @@ var ClientHelper = (function () {
     return ClientHelper;
 }());
 var $clientHelper = new ClientHelper;
-"use strict";
 /// <reference path='../lib/is.ts'/>
 var Ready = (function () {
     function Ready() {
@@ -6945,7 +6821,6 @@ var Ready = (function () {
 //         _catch(e);
 //     }
 // }
-"use strict";
 function getQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
     var r = location.search.substr(1).match(reg);
@@ -6975,7 +6850,6 @@ function appendQueryString(name, value) {
         return location.href + '?' + name + '=' + value;
     }
 }
-"use strict";
 /**
  * 可躲过一些js压缩库console.log;
  */
@@ -6984,7 +6858,6 @@ var log = Function('s', 'console.log(s)');
  * 可躲过一些js压缩库debugger;
  */
 var bp = Function('debugger');
-"use strict";
 var isIE;
 try {
     isIE = !!(typeof window !== "undefined" && window.ActiveXObject || "ActiveXObject" in window);
@@ -7034,9 +6907,1920 @@ catch (e) {
         Node.prototype.insertBefore2 = insertBefore;
     }
 })();
+/// <reference path='VOrder.ts'/>
+var Order;
+(function (Order) {
+    /**仅作其他命令的辅助标记 */
+    var Break = (function (_super) {
+        __extends(Break, _super);
+        function Break() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Break.run = function () { };
+        return Break;
+    }(Order.VOrder));
+    Break.orderName = "break";
+    Break = __decorate([
+        Order.register
+    ], Break);
+})(Order || (Order = {}));
+/// <reference path='../VOrder.ts'/>
+var OrderEx;
+(function (OrderEx) {
+    OrderEx.tryRun = 'tryRun';
+    OrderEx.replaceToScriptNode = 'replaceToScriptNode';
+    function extendsOrderGet(clazz, name, fn) {
+        Object.defineProperty(clazz.prototype, name, { get: fn });
+    }
+    OrderEx.extendsOrderGet = extendsOrderGet;
+    OrderEx.extendsOrderFunction = function (clazz, name, fn) {
+        Object.defineProperty(clazz.prototype, name, { value: fn });
+    };
+    function canRunAtService(order) {
+        try {
+            if (OrderEx.tryRun in order) {
+                order[OrderEx.tryRun]();
+            }
+            Order.resetTest();
+            return true;
+        }
+        catch (e) {
+            Order.resetTest();
+            return false;
+        }
+    }
+    OrderEx.canRunAtService = canRunAtService;
+    function toScriptNode(order) {
+        if (OrderEx.replaceToScriptNode in order) {
+            var str = order[OrderEx.replaceToScriptNode]();
+            replaceNodeByNode(order.data.placeholder, $$$(str, 103 /* Script */));
+        }
+    }
+    OrderEx.toScriptNode = toScriptNode;
+})(OrderEx || (OrderEx = {}));
+/// <reference path='VOrder.ts'/>
+/// <reference path='Break.ts'/>
+/// <reference path='orderEx/Vorder.ts'/>
+var Order;
+(function (Order) {
+    var BlockOrder = (function (_super) {
+        __extends(BlockOrder, _super);
+        function BlockOrder(node, condition, orderName, isBlockStart) {
+            var _this = _super.call(this, node, condition) || this;
+            var data = _this.data;
+            data.blocks = [];
+            var i = getNodeIndex2(node);
+            // let orderStack:VOrder[]=[this];
+            var preOrderNode = node;
+            var preNode = node;
+            var preCondition = condition;
+            var blockNodes = [];
+            parseOrders(data, isBlockStart, node.parentNode.childNodes, false, function (node, subOrder, condition, state) {
+                switch (subOrder) {
+                    case 'end':
+                        blockNodes.push(preNode);
+                        data.blocks.push({ order: orderName, condition: preCondition, nodes: takeBlockBetween(preOrderNode, node) });
+                        _this.endNode = node;
+                        return 1 /* c_stopEach */;
+                    case 'break':
+                        return;
+                    default:
+                        blockNodes.push(preNode);
+                        data.blocks.push({ order: orderName, condition: preCondition, nodes: takeBlockBetween(preOrderNode, node) });
+                        preOrderNode = node;
+                        preCondition = condition;
+                        preNode = node;
+                        orderName = subOrder;
+                        return 4 /* c_noIn */;
+                }
+            }, i + 1);
+            for (var _i = 0, blockNodes_1 = blockNodes; _i < blockNodes_1.length; _i++) {
+                var blockNode = blockNodes_1[_i];
+                blockNode.parentNode.removeChild(blockNode);
+            }
+            data.placeholder = $$$("PlaceHolder", 100 /* PlaceHolder */);
+            replaceNodeByNode(_this.endNode, data.placeholder);
+            return _this;
+        }
+        return BlockOrder;
+    }(Order.VOrder));
+    Order.BlockOrder = BlockOrder;
+    //必须注册end；
+    Order.addSubOrderName('end');
+    function parseOrders(data, isBlockStart, array, run, fn, beginIndex) {
+        if (beginIndex === void 0) { beginIndex = 0; }
+        return Order.VOrder.eachOrder(array, function (node, info, state) {
+            if (info.order) {
+                if (info.order === 'break' && fn) {
+                    return fn(node, 'break', "", state);
+                }
+                else {
+                    if (run) {
+                        runOrder(info, node);
+                    }
+                    else {
+                        var innerBlock = parseBlock(info, node);
+                        if (innerBlock) {
+                            state.nextStepLength = getNodeIndex2(innerBlock.data.placeholder) - getNodeIndex2(node) + 1;
+                        }
+                        return 8 /* c_noRepeat */ & 4 /* c_noIn */;
+                    }
+                }
+            }
+            if (fn) {
+                var subOrder = info.subOrder;
+                if (subOrder === 'end' || isBlockStart(subOrder)) {
+                    return fn(node, subOrder, info.condition, state);
+                }
+            }
+            return 4 /* c_noIn */;
+        }, beginIndex);
+    }
+    function runOrder(info, node) {
+        var orderName = info.order;
+        if (orderName in Order.orders) {
+            var order = new Order.orders[orderName](node, info.condition);
+            if (order.run && OrderEx.canRunAtService(order)) {
+                order.run();
+            }
+        }
+    }
+    function parseBlock(info, node) {
+        var orderName = info.order;
+        if (orderName in Order.orders) {
+            var order = Order.orders[orderName];
+            if (order.prototype instanceof BlockOrder) {
+                return new order(node, info.condition);
+            }
+        }
+        return null;
+    }
+    function parseBreakOrder(data, isBlockStart, blocks, p) {
+        parseOrders(data, isBlockStart, blocks, true, function (node, subOrder, condition, step) {
+            if (subOrder === 'break') {
+                data.isBreak = true;
+                //级联删除break后面的数据直至当前层；
+                var node1 = node;
+                var pNode = node.parentNode;
+                var level = step.stack.length / 2;
+                while (level > 1) {
+                    var cs = pNode.childNodes;
+                    var length_1 = cs.length;
+                    var index = getNodeIndex2(node1) + 1;
+                    for (var i_1 = index; i_1 < length_1; i_1++) {
+                        //删除后面的数据；
+                        pNode.removeChild(cs[index]);
+                    }
+                    node1 = pNode;
+                    pNode = pNode.parentNode;
+                    level--;
+                }
+                for (var i = step.currentIndex + 1; i < blocks.length; i++) {
+                    // pNode=<INode>blocks[i].parentNode;
+                    pNode.removeChild(blocks[i]);
+                }
+                node.remove();
+                return 1 /* c_stopEach */;
+            }
+        });
+    }
+    Order.parseBreakOrder = parseBreakOrder;
+})(Order || (Order = {}));
+/// <reference path='BlockOrder.ts'/>
+var Order;
+(function (Order) {
+    var If = If_1 = (function (_super) {
+        __extends(If, _super);
+        function If(node, condition) {
+            var _this = _super.call(this, node, condition, 'if', If_1.isBlockStart) || this;
+            _this.data.condition = condition;
+            return _this;
+        }
+        If.isBlockStart = function (subOrder) {
+            switch (subOrder) {
+                case 'else':
+                case 'else if':
+                    return true;
+            }
+            return false;
+        };
+        If.run = function (data) {
+            var hit = -1;
+            if (parseBool(Order.exec(data.placeholder, data.condition))) {
+                hit = 0;
+            }
+            var blocks = data.blocks;
+            for (var i = 1; i < blocks.length; i++) {
+                var block = blocks[i];
+                if (block.order === 'else' || parseBool(Order.exec(data.placeholder, block.condition))) {
+                    hit = i;
+                    break;
+                }
+            }
+            if (hit !== -1) {
+                replaceNodeByNodes(data.placeholder, data.blocks[hit].nodes);
+            }
+        };
+        return If;
+    }(Order.BlockOrder));
+    If.orderName = "if";
+    If.subOrder = ["else if", "else"];
+    If = If_1 = __decorate([
+        Order.register
+    ], If);
+    Order.If = If;
+    var If_1;
+})(Order || (Order = {}));
+/// <reference path='BlockOrder.ts'/>
+var Order;
+(function (Order) {
+    var RepeatBlockOrder = (function (_super) {
+        __extends(RepeatBlockOrder, _super);
+        function RepeatBlockOrder(node, condition, orderName) {
+            return _super.call(this, node, condition, orderName, RepeatBlockOrder.isBlockStart) || this;
+        }
+        RepeatBlockOrder.run = function (data, canRepeat) {
+            if (canRepeat(data)) {
+                var runData = data;
+                runData.isBreak = false;
+                parseRepeatBlock(runData, canRepeat);
+            }
+            data.placeholder.remove();
+        };
+        RepeatBlockOrder.isBlockStart = function (subOrder) {
+            return subOrder === 'end';
+        };
+        return RepeatBlockOrder;
+    }(Order.BlockOrder));
+    Order.RepeatBlockOrder = RepeatBlockOrder;
+    function parseRepeatBlock(data, canRepeat) {
+        var nodes = data.blocks[0].nodes;
+        var cloneBlocks = [];
+        for (var i = 0; i < nodes.length; i++) {
+            cloneBlocks.push(nodes[i].cloneNode(true));
+        }
+        insertNodesBefore(data.placeholder, cloneBlocks);
+        var p = data.placeholder.parentNode;
+        //执行order
+        Order.parseBreakOrder(data, RepeatBlockOrder.isBlockStart, cloneBlocks, p);
+        if (!data.isBreak && canRepeat(data)) {
+            parseRepeatBlock(data, canRepeat);
+        }
+    }
+})(Order || (Order = {}));
+/// <reference path='../JavaScriptLogic.ts'/>
+var JS;
+(function (JS) {
+    var Var = (function (_super) {
+        __extends(Var, _super);
+        function Var(varInfos) {
+            var _this = _super.call(this) || this;
+            _this.varInfos = varInfos;
+            return _this;
+        }
+        Var.new = function (statement) {
+            JS.mergeStatementSpace(statement, true);
+            var keyWords = statement.children;
+            if (keyWords.length === 0) {
+                return null;
+            }
+            var varInfos = [];
+            if (keyWords[0] !== 'var') {
+                return null;
+            }
+            var step = 0;
+            var varName = "";
+            for (var i = 1; i < keyWords.length; i++) {
+                var keyWord = keyWords[i];
+                if (keyWord === " ") {
+                    continue;
+                }
+                switch (step) {
+                    case 0:
+                        if (isString(keyWord)) {
+                            //声明变量
+                            varName = keyWord;
+                            step++;
+                        }
+                        else {
+                            // throw new Error("此处不该出现："+keyWord);
+                            return null;
+                        }
+                        break;
+                    case 1:
+                        if (keyWord === ',') {
+                            varInfos.push([varName, undefined, false]);
+                            step = 0;
+                        }
+                        else if (keyWord === '=') {
+                            step++;
+                        }
+                        else {
+                            // throw new Error('keyword后只能出现"="或","');
+                            return null;
+                        }
+                        break;
+                    case 2:
+                        if (isString(keyWord)) {
+                            var v = JS.toConst(keyWord);
+                            varInfos.push([varName, v, isString(v)]);
+                        }
+                        else {
+                            varInfos.push([varName, keyWord.toString(), true]);
+                        }
+                        step++;
+                        break;
+                    case 3:
+                        if (keyWord !== ',' && keyWord !== ';') {
+                            //value后只能出现","、";"'
+                            return null;
+                        }
+                        step = 0;
+                        break;
+                }
+            }
+            return new this(varInfos);
+        };
+        Var.prototype.getVars = function () {
+            var vars = [];
+            for (var _i = 0, _a = this.varInfos; _i < _a.length; _i++) {
+                var info = _a[_i];
+                vars.push(info[0]);
+            }
+            return vars;
+        };
+        return Var;
+    }(JS.JavaScriptLogic));
+    Var.logicName = 'var';
+    JS.Var = Var;
+    JS.registerLogic(Var);
+})(JS || (JS = {}));
+/// <reference path='../JavaScriptLogic.ts'/>
+/// <reference path='Var.ts'/>
+var JS;
+(function (JS) {
+    var For = (function (_super) {
+        __extends(For, _super);
+        function For(mode, info) {
+            var _this = _super.call(this) || this;
+            _this.mode = mode;
+            _this.info = info;
+            return _this;
+        }
+        For.new = function (statement) {
+            JS.mergeStatementSpace(statement, true);
+            var keyWords = statement.children;
+            var count = 3;
+            if (keyWords.length < count) {
+                //至少3个空格
+                return null;
+            }
+            if (keyWords[0] !== 'for') {
+                return null;
+            }
+            var index = 1;
+            if (keyWords[index] === ' ') {
+                index++;
+                count++;
+            }
+            var keyWord = keyWords[index];
+            if (!(keyWord instanceof JS.JavaScriptBlock)) {
+                //应该是一个block;
+                return null;
+            }
+            if (keyWord.begin !== '(') {
+                //应该是一个(...)
+                return null;
+            }
+            var controlParamsBlock = keyWord;
+            index++;
+            if (keyWords[index] === ' ') {
+                index++;
+                count++;
+            }
+            keyWord = keyWords[index];
+            if (!(keyWord instanceof JS.JavaScriptBlock)) {
+                //应该是一个block;
+                return null;
+            }
+            if (keyWord.begin !== '{') {
+                //应该是一个{...}
+                return null;
+            }
+            //判断controlParamsBlock内容是否有效;
+            var conditionsInfo = this.parseConditions(controlParamsBlock);
+            if (conditionsInfo) {
+                return new this(conditionsInfo.mode, conditionsInfo);
+            }
+            return null;
+        };
+        For.parseConditions = function (block) {
+            var paramStatements = block.children;
+            if (paramStatements.length === 3) {
+                //可能是step for
+                return this.parseStep(paramStatements);
+            }
+            else if (paramStatements.length === 1) {
+                //可能是 for in
+                debugger;
+                return this.parseForIn(paramStatements[0].children);
+            }
+            return null;
+        };
+        For.parseStep = function (statements) {
+            if (statements[0].children.length === 0 ||
+                statements[1].children.length === 0 ||
+                statements[2].children.length === 0) {
+                return null;
+            }
+            var variable = JS.Var.new(statements[0]);
+            return {
+                mode: 1 /* Step */,
+                variable: variable,
+                first: statements[0],
+                exec: statements[1],
+                step: statements[2]
+            };
+        };
+        For.parseForIn = function (keyWords) {
+            var count = 5;
+            var index = 1;
+            var info;
+            var hasVar;
+            if (keyWords[0] === 'var') {
+                //var开头;
+                hasVar = true;
+                if (keyWords[index] !== ' ') {
+                    return null;
+                }
+                index += 2;
+                count += 2;
+            }
+            else {
+                hasVar = false;
+            }
+            var varName = keyWords[index];
+            if (!isString(varName) || !JS.isVarName(varName)) {
+                //需求一个变量名
+                return null;
+            }
+            index++;
+            if (keyWords[index] !== ' ') {
+                return null;
+            }
+            index++;
+            var keyWord = keyWords[index];
+            if (keyWord !== 'in') {
+                //需求一个in
+                return null;
+            }
+            index++;
+            if (keyWords[index] !== ' ') {
+                return null;
+            }
+            index++;
+            //后面可能是一串语句
+            var bindingExp = new JS.JavaScriptStatement();
+            if (keyWords.length === count) {
+                //这是最后一个词了，所以
+                var destVarName = keyWords[index];
+                if (!isString(destVarName) || !JS.isVarName(destVarName)) {
+                    //需求一个变量名
+                    return null;
+                }
+                bindingExp.push(destVarName);
+            }
+            else {
+                //都扔进去吧
+                push.apply(bindingExp.children, keyWords.slice(index));
+            }
+            return {
+                mode: 0 /* In */,
+                hasVar: hasVar,
+                varName: varName,
+                bindingExp: bindingExp
+            };
+        };
+        return For;
+    }(JS.JavaScriptLogic));
+    For.logicName = 'for';
+    JS.For = For;
+    JS.registerLogic(For);
+})(JS || (JS = {}));
+/// <reference path='RepeatBlockOrder.ts'/>
+/// <reference path='../javascript/logic/For.ts'/>
+var Order;
+(function (Order) {
+    var For = (function (_super) {
+        __extends(For, _super);
+        function For(node, condition) {
+            var _this = _super.call(this, node, condition, 'for') || this;
+            var jsblock = JS.Parser.parseStructor(condition);
+            var info = JS.For.parseConditions(jsblock);
+            if (info) {
+                _this.data.forMode = info.mode;
+                if (info.mode === 0 /* In */) {
+                    var infoForIn = info;
+                    _this.data.forInInfo = {
+                        var: infoForIn.hasVar ? infoForIn.varName : '',
+                        object: infoForIn.bindingExp.toString(),
+                        names: []
+                    };
+                }
+                else {
+                    var infoForStep = info;
+                    var first = void 0;
+                    if (infoForStep.variable) {
+                        first = infoForStep.variable.varInfos;
+                    }
+                    else {
+                        infoForStep.first.children.pop();
+                        first = infoForStep.first.toString();
+                    }
+                    infoForStep.exec.children.pop();
+                    _this.data.forStepInfo = {
+                        first: first,
+                        exec: infoForStep.exec.toString(),
+                        step: infoForStep.step.toString()
+                    };
+                }
+            }
+            else {
+                throw new Error("错误的for表达式！");
+            }
+            return _this;
+        }
+        For.run = function (data) {
+            if (data.forMode === 0 /* In */) {
+                var runData = data;
+                runData.index = 0;
+                runData.source = null;
+                _super.run.call(this, runData, canRepeat);
+            }
+            else {
+                var runData = data;
+                runData.isFirst = true;
+                _super.run.call(this, runData, canRepeat);
+            }
+        };
+        return For;
+    }(Order.RepeatBlockOrder));
+    For.orderName = "for";
+    For = __decorate([
+        Order.register
+    ], For);
+    Order.For = For;
+    /**
+     * 返回是否可以重复
+     */
+    function canRepeat(data) {
+        if (data.forMode === 0 /* In */) {
+            return checkForIn(data);
+        }
+        else {
+            return checkForStep(data);
+        }
+    }
+    function checkForStep(data) {
+        var forStepInfo = data.forStepInfo;
+        if (data.isFirst) {
+            data.isFirst = false;
+            if (isString(forStepInfo.first)) {
+                Order.exec(data.placeholder, forStepInfo.first);
+            }
+            else {
+                Order.runVarInfos(DOMScope.get(data.placeholder), data.placeholder, forStepInfo.first);
+            }
+        }
+        else {
+            Order.exec(data.placeholder, forStepInfo.step);
+        }
+        return Order.exec(data.placeholder, forStepInfo.exec);
+    }
+    function initForInSourceData(data) {
+        var forInInfo = data.forInInfo;
+        if (!data.source) {
+            data.source = Order.exec(data.placeholder, forInInfo.object);
+            if (!data.source) {
+                return false;
+            }
+            for (var i in data.source) {
+                forInInfo.names.push(i);
+            }
+        }
+        return true;
+    }
+    function checkForIn(data) {
+        if (!initForInSourceData(data)) {
+            throw new Error("计算出错！");
+        }
+        var forInInfo = data.forInInfo;
+        if (data.index < forInInfo.names.length) {
+            //预编译时运行操作
+            Order.exec(data.placeholder, forInInfo.var + '=\'' + forInInfo.names[data.index] + '\';');
+            data.index++;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+})(Order || (Order = {}));
+/// <reference path='BlockOrder.ts'/>
+var Order;
+(function (Order) {
+    var Switch = Switch_1 = (function (_super) {
+        __extends(Switch, _super);
+        function Switch(node, condition) {
+            var _this = _super.call(this, node, condition, 'switch', Switch_1.isBlockStart) || this;
+            _this.data.condition = condition;
+            return _this;
+        }
+        Switch.isBlockStart = function (subOrder) {
+            switch (subOrder) {
+                case 'case':
+                case 'default':
+                    return true;
+            }
+            return false;
+        };
+        Switch.run = function (data) {
+            var hit = -1;
+            var blocks = data.blocks;
+            var runData = data;
+            runData.isBreak = false;
+            for (var i = 1; i < blocks.length; i++) {
+                var block = blocks[i];
+                if (block.order === 'default' || Order.exec(data.placeholder, data.condition) === Order.exec(data.placeholder, data.condition)) {
+                    if (hit === -1) {
+                        hit = i;
+                    }
+                    else if (hit === i - 1) {
+                        hit++;
+                    }
+                    else {
+                        break;
+                    }
+                    insertNodesBefore(data.placeholder, block.nodes);
+                    var p = data.placeholder.parentNode;
+                    Order.parseBreakOrder(runData, this.isBlockStart, block.nodes, p);
+                    if (runData.isBreak) {
+                        break;
+                    }
+                }
+            }
+            data.placeholder.remove();
+        };
+        return Switch;
+    }(Order.BlockOrder));
+    Switch.orderName = "switch";
+    Switch.subOrder = ["case", "default"];
+    Switch = Switch_1 = __decorate([
+        Order.register
+    ], Switch);
+    Order.Switch = Switch;
+    var Switch_1;
+})(Order || (Order = {}));
+/// <reference path='RepeatBlockOrder.ts'/>
+var Order;
+(function (Order) {
+    var While = (function (_super) {
+        __extends(While, _super);
+        function While(node, condition) {
+            var _this = _super.call(this, node, condition, 'while') || this;
+            _this.data.condition = condition;
+            return _this;
+        }
+        While.run = function (data) {
+            _super.run.call(this, data, canRepeat);
+        };
+        return While;
+    }(Order.RepeatBlockOrder));
+    While.orderName = "while";
+    While = __decorate([
+        Order.register
+    ], While);
+    Order.While = While;
+    function canRepeat(data) {
+        return parseBool(Order.exec(data.placeholder, data.condition));
+    }
+})(Order || (Order = {}));
+/// <reference path='RepeatBlockOrder.ts'/>
+var Order;
+(function (Order) {
+    var Do = (function (_super) {
+        __extends(Do, _super);
+        function Do(node, condition) {
+            var _this = _super.call(this, node, condition, 'do') || this;
+            _this.data.isFirst = true;
+            _this.data.condition = condition;
+            return _this;
+        }
+        Do.run = function (data) {
+            _super.run.call(this, data, canRepeat);
+        };
+        return Do;
+    }(Order.RepeatBlockOrder));
+    Do.orderName = "do";
+    Do = __decorate([
+        Order.register
+    ], Do);
+    Order.Do = Do;
+    function canRepeat(data) {
+        if (data.isFirst) {
+            data.isFirst = false;
+            return true;
+        }
+        else {
+            return parseBool(Order.exec(data.placeholder, data.condition));
+        }
+    }
+})(Order || (Order = {}));
+/// <reference path='JavaScriptStatement.ts'/>
+var JS;
+(function (JS) {
+    var Parser = (function () {
+        function Parser() {
+        }
+        Parser.getInitData = function (condition, start) {
+            if (start === void 0) { start = 0; }
+            var root = new JS.JavaScriptBlock('', '');
+            return {
+                condition: condition,
+                index: start,
+                action: '',
+                length: condition.length,
+                block: root,
+                root: root,
+                keyWordStart: -1,
+                commentStart: -1,
+                stringStart: -1,
+                stringStartBy: ""
+            };
+        };
+        Parser[''] = function (m) {
+            switch (m.condition[m.index]) {
+                case " ":
+                    m.action = "space";
+                    m.index++;
+                    break;
+                case "\n":
+                    m.index++;
+                    break;
+                default:
+                    m.action = "keyWord";
+                    m.keyWordStart = m.index;
+                    break;
+            }
+        };
+        /**是否跟随回车换行 */
+        Parser.isFollowCarriageReturnOrLineFeed = function (m) {
+            var statement = last.call(m.block.children);
+            if (!statement) {
+                return false;
+            }
+            var keyWords = statement.children;
+            var length = keyWords.length;
+            if (length === 0) {
+                return false;
+            }
+            var lastKeyWord = keyWords[length - 1];
+            switch (lastKeyWord) {
+                case '\r':
+                case '\n':
+                    return true;
+                case ' ':
+                    break;
+                default:
+                    return false;
+            }
+            if (length === 1) {
+                return false;
+            }
+            var beforeLastKeyWord = keyWords[length - 2];
+            switch (beforeLastKeyWord) {
+                case '\r':
+                case '\n':
+                    return true;
+                default:
+                    return false;
+            }
+        };
+        Parser.parseKeyWord = function (m) {
+            var keyWordEnd = m.index;
+            var keyWord = m.condition.substring(m.keyWordStart, keyWordEnd);
+            m.keyWordStart = -1;
+            if (keyWord === "") {
+                return false;
+            }
+            if (this.isFollowCarriageReturnOrLineFeed(m)) {
+                this.pushKeyWord(m, ';');
+                this.getLastStatement(m).isEnd = true;
+            }
+            // switch(keyWord){
+            //     case "break":
+            //     case "for":
+            //     case "var":
+            //     case "case":
+            //     case "catch":
+            //     case "continue":
+            //     case "debugger":
+            //     case "default":
+            //     case "delete":
+            //     case "do":
+            //     case "else":
+            //     case "finally":
+            //     case "function":
+            //     case "if":
+            //     case "in":
+            //     case "instanceof":
+            //     case "new":
+            //     case "return":
+            //     case "switch":
+            //     case "this":
+            //     case "throw":
+            //     case "try":
+            //     case "typeof":
+            //     case "void":
+            //     case "with":
+            //     case "while":
+            // }
+            this.pushKeyWord(m, keyWord);
+            return true;
+        };
+        Parser.pushComment = function (m, comment) {
+            this.pushKeyWordOrBlock(m, comment);
+        };
+        Parser.pushKeyWord = function (m, keyWord) {
+            this.pushKeyWordOrBlock(m, keyWord);
+        };
+        Parser.pushString = function (m, string) {
+            this.pushKeyWordOrBlock(m, string);
+        };
+        Parser.pushBlock = function (m, block) {
+            this.pushKeyWordOrBlock(m, block);
+            m.block = block;
+        };
+        Parser.pushKeyWordOrBlock = function (m, keyWordOrBlockOrComment) {
+            this.getLastStatement(m).push(keyWordOrBlockOrComment);
+        };
+        Parser.getLastStatement = function (m) {
+            if (m.block.isEnd) {
+                m.block = m.block.parent.parent;
+            }
+            var statement;
+            var old = last.call(m.block.children);
+            if (old) {
+                statement = old;
+            }
+            else {
+                statement = new JS.JavaScriptStatement();
+                m.block.push(statement);
+            }
+            if (statement.isEnd) {
+                statement = new JS.JavaScriptStatement();
+                m.block.push(statement);
+            }
+            return statement;
+        };
+        Parser['*/<>'] = function (m, keyWord) {
+            if (!this['?='](m, keyWord)) {
+                this.parseKeyWord(m);
+                this.pushKeyWord(m, keyWord);
+                m.action = '';
+                m.index++;
+            }
+        };
+        Parser['<>'] = function (m, keyWord) {
+            if (!this['<<>>'](m, keyWord) && !this['?='](m, keyWord)) {
+                this.parseKeyWord(m);
+                this.pushKeyWord(m, keyWord);
+                m.action = '';
+                m.index++;
+            }
+        };
+        Parser['<<>>'] = function (m, keyWord) {
+            if (m.condition[m.index + 1] === keyWord) {
+                if (this['<<<>>>'](m, keyWord)) {
+                    return true;
+                }
+                if (!this.parseKeyWord(m)) {
+                    throw new Error("此处不该有'" + keyWord + keyWord);
+                }
+                this.pushKeyWord(m, keyWord + keyWord);
+                m.action = '';
+                m.index += 2;
+            }
+            return false;
+        };
+        Parser['<<<>>>'] = function (m, keyWord) {
+            if (m.condition[m.index + 2] === keyWord) {
+                if (!this.parseKeyWord(m)) {
+                    throw new Error("此处不该有'" + keyWord + keyWord + keyWord);
+                }
+                this.pushKeyWord(m, keyWord + keyWord + keyWord);
+                m.action = '';
+                m.index += 3;
+                return true;
+            }
+            return false;
+        };
+        Parser.comment = function (m) {
+            if (m.condition[m.index] === '\n') {
+                this.pushComment(m, new JS.JavaScriptComment(m.condition.substring(m.commentStart, m.index)));
+            }
+            m.index++;
+            m.action = "";
+        };
+        Parser.comment2 = function (m) {
+            if (m.condition[m.index] === '*' && m.condition[m.index + 1] === '/') {
+                this.pushComment(m, new JS.JavaScriptComment(m.condition.substring(m.commentStart, m.index + 2)));
+            }
+            m.index += 2;
+            m.action = "";
+        };
+        Parser['/'] = function (m) {
+            switch (m.condition[m.index + 1]) {
+                case "/":
+                    //注释
+                    this.parseKeyWord(m);
+                    m.commentStart = m.index;
+                    m.index += 2;
+                    m.action = "comment";
+                    break;
+                case "*":
+                    /*注释*/
+                    this.parseKeyWord(m);
+                    m.commentStart = m.index;
+                    m.index += 2;
+                    m.action = "comment2";
+                    break;
+                default:
+                    this['*/<>'](m, '/');
+            }
+        };
+        Parser['+-%'] = function (m, keyWord) {
+            if (m.condition[m.index + 1] === keyWord) {
+                this.parseKeyWord(m);
+                this.pushKeyWord(m, keyWord + keyWord);
+                m.index += 2;
+                m.action = "";
+            }
+            else {
+                if (!this['?='](m, keyWord)) {
+                    this.parseKeyWord(m);
+                    this.pushKeyWord(m, keyWord);
+                    m.index++;
+                    m.action = "";
+                }
+            }
+        };
+        Parser['?='] = function (m, keyWord) {
+            if (m.condition[m.index + 1] === '=') {
+                if (this['?=='](m, keyWord)) {
+                    return true;
+                }
+                if (!this.parseKeyWord(m)) {
+                    throw new Error("此处不该有'" + keyWord + "='");
+                }
+                this.pushKeyWord(m, keyWord + '=');
+                m.action = '';
+                m.index += 2;
+                return true;
+            }
+            return false;
+        };
+        Parser['=>'] = function (m) {
+            if (m.condition[m.index + 1] === '>') {
+                this.parseKeyWord(m);
+                this.pushKeyWord(m, '=>');
+                m.action = '';
+                m.index += 2;
+                return true;
+            }
+            return false;
+        };
+        Parser['?=='] = function (m, keyWord) {
+            if (m.condition[m.index + 2] === '=') {
+                if (!this.parseKeyWord(m)) {
+                    throw new Error("此处不该有'" + keyWord + "='");
+                }
+                this.pushKeyWord(m, keyWord + '==');
+                m.index += 3;
+                m.action = '';
+                return true;
+            }
+            return false;
+        };
+        Parser[';'] = function (m) {
+            this.parseKeyWord(m);
+            this.pushKeyWord(m, ';');
+            this.getLastStatement(m).isEnd = true;
+            m.action = "";
+            m.index++;
+        };
+        Parser['.'] = function (m) {
+            if (!this.parseKeyWord(m)) {
+                var statement = last.call(m.block.children);
+                if (statement.children.length > 0) {
+                    var lastKeyWord = last.call(statement.children);
+                    if (!(lastKeyWord instanceof JS.JavaScriptBlock && lastKeyWord.begin === '(')) {
+                        throw new Error("此处不该有'.'");
+                    }
+                }
+            }
+            this.pushKeyWord(m, '.');
+            m.action = "";
+            m.index++;
+        };
+        Parser['!~'] = function (m, keyWord) {
+            if (this.parseKeyWord(m)) {
+                //不能在keyword后面出现!
+                throw new Error("此处不该有'" + keyWord + "'");
+            }
+            this.pushKeyWord(m, keyWord);
+            m.action = "";
+            m.index++;
+        };
+        Parser.isStatementBegin = function (m) {
+            if (m.block.isEnd) {
+                return true;
+            }
+            var statement = last.call(m.block.children);
+            if (statement) {
+                return statement.children.length === 0;
+            }
+            else {
+                return true;
+            }
+        };
+        Parser.space = function (m) {
+            if (m.condition[m.index] === ' ') {
+                m.index++;
+                return;
+            }
+            //不添加为语句的开始。
+            if (!this.isStatementBegin(m)) {
+                this.pushKeyWord(m, ' ');
+            }
+            m.action = '';
+        };
+        Parser['({['] = function (m, keyWord, keyWordEnd) {
+            //终止
+            this.parseKeyWord(m);
+            this.pushBlock(m, new JS.JavaScriptBlock(keyWord, keyWordEnd));
+            m.index++;
+            m.action = "";
+        };
+        Parser[')}]'] = function (m, keyWord, keyWordBegin) {
+            //终止
+            this.parseKeyWord(m);
+            if (m.block.begin !== keyWordBegin) {
+                throw new Error("缺少'" + keyWordBegin + "'");
+            }
+            var block = m.block;
+            block.isEnd = true;
+            m.block = block.parent.parent;
+            m.index++;
+            m.action = "";
+        };
+        Parser['"`\''] = function (m, keyWord) {
+            m.stringStart = m.index;
+            m.index++;
+            m.action = 'string';
+            m.stringStartBy = keyWord;
+        };
+        Parser.string = function (m) {
+            switch (m.condition[m.index]) {
+                case '\\':
+                    m.index += 2;
+                    return;
+                case m.stringStartBy:
+                    this.pushString(m, new JS.JavaScriptString(m.condition.substring(m.stringStart, m.index + 1)));
+                    m.action = '';
+                    m.index++;
+                    return;
+                default:
+                    m.index++;
+            }
+        };
+        Parser.parseEnd = function (m) {
+            switch (m.action) {
+                case "keyWord":
+                    this.parseKeyWord(m);
+                    break;
+                case "space":
+                    this.pushKeyWord(m, ' ');
+                    break;
+                case "string":
+                    throw new Error("字符串没有闭合！");
+            }
+            if (m.block !== m.root) {
+                if (!m.block.isEnd) {
+                    throw new Error(m.block.begin + "没有闭合！");
+                }
+            }
+        };
+        Parser.keyWord = function (m) {
+            var keyWord = m.condition[m.index];
+            switch (keyWord) {
+                case ".":
+                case ";":
+                case "/":
+                    this[m.condition[m.index]](m);
+                    break;
+                case " ":
+                    this.parseKeyWord(m);
+                    m.stringStart = m.index - 1;
+                    m.action = "space";
+                    m.index++;
+                    break;
+                case "=":
+                    if (!this['?='](m, '=') && !this['=>'](m)) {
+                        //赋值
+                        if (!this.parseKeyWord(m)) {
+                            throw new Error("此处不该有'='");
+                        }
+                        this.pushKeyWord(m, '=');
+                        m.action = "";
+                        m.index++;
+                    }
+                    break;
+                case "!":
+                case "~":
+                    this['!~'](m, keyWord);
+                    break;
+                case '"':
+                case "'":
+                case "`":
+                    this['"`\''](m, keyWord);
+                    break;
+                case "}":
+                    this[')}]'](m, keyWord, '{');
+                    break;
+                case "]":
+                    this[')}]'](m, keyWord, '[');
+                    break;
+                case ")":
+                    this[')}]'](m, keyWord, '(');
+                    break;
+                case "(":
+                    this['({['](m, keyWord, ')');
+                    break;
+                case "{":
+                    this['({['](m, keyWord, '}');
+                    break;
+                case "[":
+                    this['({['](m, keyWord, ']');
+                    break;
+                case "+":
+                case "-":
+                case "%":
+                    this['+-%'](m, keyWord);
+                    break;
+                case "*":
+                    this['*/<>'](m, keyWord);
+                    break;
+                case "<":
+                case ">":
+                    this['<>'](m, keyWord);
+                    break;
+                case "\n":
+                case "\r":
+                case "\t":
+                case ",":
+                case ":":
+                    this.parseKeyWord(m);
+                    this.pushKeyWord(m, keyWord);
+                    m.action = "";
+                    m.index++;
+                    break;
+                case "&":
+                case "|":
+                case "?":
+                    throw new Error("未实现");
+                default:
+                    m.index++;
+            }
+        };
+        /**解析结构 */
+        Parser.parseStructor = function (condition, start, checkCallback) {
+            if (start === void 0) { start = 0; }
+            var m = this.getInitData(condition, start);
+            var length = condition.length;
+            if (checkCallback) {
+                while (m.index < length) {
+                    if (checkCallback(m)) {
+                        break;
+                    }
+                    this[m.action](m, condition);
+                }
+            }
+            else {
+                while (m.index < length) {
+                    this[m.action](m, condition);
+                }
+                this.parseEnd(m);
+            }
+            return m.root;
+        };
+        /**仅从文本流里解析出一个代码块 */
+        Parser.parseBlock = function (condition, start) {
+            var m = this.getInitData(condition, start);
+            var length = condition.length;
+            var block = null;
+            while (m.index < length) {
+                if (!block && m.block !== m.root) {
+                    //记录第一个block
+                    block = m.block;
+                }
+                if (block && block.isEnd) {
+                    break;
+                }
+                this[m.action](m, condition);
+            }
+            return { length: m.index - start, block: block };
+        };
+        Parser.parseStatement = function (condition, start) {
+            var m = this.getInitData(condition, start);
+            var length = condition.length;
+            var chds = m.root.children;
+            while (m.index < length) {
+                this[m.action](m, condition);
+                if (chds.length > 0 && chds[0].isEnd) {
+                    break;
+                }
+            }
+            return { length: m.index - start, statement: chds[0] };
+        };
+        return Parser;
+    }());
+    JS.Parser = Parser;
+})(JS || (JS = {}));
+/// <reference path='../../scope/Scope.ts'/>
+/// <reference path='VOrder.ts'/>
+/// <reference path='../javascript/Parser.ts'/>
+/// <reference path='../javascript/logic/Var.ts'/>
+var Order;
+(function (Order) {
+    var Var = (function (_super) {
+        __extends(Var, _super);
+        function Var(node, condition) {
+            var _this = _super.call(this, node, condition) || this;
+            _this.initStatement();
+            _this.initvarInfos();
+            _this.data.placeholder = node;
+            return _this;
+        }
+        Var.prototype.initStatement = function () {
+            var data = this.data;
+            this.block = this.getBlock('var ' + this.condition);
+        };
+        Var.prototype.getBlock = function (condition) {
+            return JS.Parser.parseStructor(condition);
+        };
+        Var.prototype.initvarInfos = function () {
+            var data = this.data;
+            var block = this.block;
+            if (!block) {
+                return;
+            }
+            var statements = block.children;
+            if (statements.length > 1) {
+                throw new Error("不支持多句！");
+            }
+            var logic = JS.getLogic(statements[0], "var");
+            if (logic) {
+                data.varInfos = logic.varInfos;
+            }
+        };
+        Var.run = function (data) {
+            runVarInfos(DOMScope.get(data.placeholder), data.placeholder, data.varInfos);
+            removeNode(data.placeholder);
+        };
+        return Var;
+    }(Order.VOrder));
+    Var.orderName = "var";
+    Var = __decorate([
+        Order.register
+    ], Var);
+    Order.Var = Var;
+    function tryRunVarInfos(node, varInfos) {
+        for (var _i = 0, varInfos_1 = varInfos; _i < varInfos_1.length; _i++) {
+            var varInfo = varInfos_1[_i];
+            if (varInfo[2]) {
+                Order.testVar(node, varInfo[0], varInfo[1]);
+            }
+            else {
+                Order.testSetVar(node, varInfo[0], varInfo[1]);
+            }
+        }
+    }
+    Order.tryRunVarInfos = tryRunVarInfos;
+    function runVarInfos(scope, node, varInfos) {
+        for (var _i = 0, varInfos_2 = varInfos; _i < varInfos_2.length; _i++) {
+            var varInfo = varInfos_2[_i];
+            if (varInfo[2]) {
+                scope[varInfo[0]] = Order.exec(node, varInfo[1]);
+            }
+            else {
+                scope[varInfo[0]] = varInfo[1];
+            }
+        }
+    }
+    Order.runVarInfos = runVarInfos;
+})(Order || (Order = {}));
+/// <reference path='Var.ts'/>
+var Order;
+(function (Order) {
+    var ScopeOrder = (function (_super) {
+        __extends(ScopeOrder, _super);
+        function ScopeOrder() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        ScopeOrder.prototype.initBlock = function () {
+            var data = this.data;
+            var conditionArr = splitByOnce(this.condition, ":");
+            data.scopeName = conditionArr[0];
+            if (conditionArr.length === 2) {
+                this.block = this.getBlock(conditionArr[1]);
+            }
+        };
+        ScopeOrder.run = function (data) {
+            var scope = DOMScope.create(data.placeholder, data.scopeName);
+            if (data.varInfos && data.varInfos.length > 0) {
+                Order.runVarInfos(scope, data.placeholder, data.varInfos);
+            }
+            removeNode(data.placeholder);
+        };
+        return ScopeOrder;
+    }(Order.Var));
+    ScopeOrder.orderName = "scope";
+    ScopeOrder = __decorate([
+        Order.register
+    ], ScopeOrder);
+})(Order || (Order = {}));
+/// <reference path='VOrder.ts'/>
+var Order;
+(function (Order) {
+    var Equal = (function (_super) {
+        __extends(Equal, _super);
+        function Equal(node, condition) {
+            var _this = _super.call(this, node, condition) || this;
+            _this.data.condition = condition;
+            return _this;
+        }
+        Equal.run = function (data) {
+            var v = Order.exec(data.placeholder, data.condition);
+            if (v instanceof VMDOM.VNode) {
+                replaceNodeByNode(data.placeholder, v);
+                return;
+            }
+            replaceNodeByNode(data.placeholder, $$$('' + v, 3 /* Text */));
+        };
+        return Equal;
+    }(Order.VOrder));
+    Equal.orderName = "=";
+    Equal = __decorate([
+        Order.register
+    ], Equal);
+    Order.Equal = Equal;
+})(Order || (Order = {}));
+var JS;
+(function (JS) {
+    var JavaScriptExpressions = (function () {
+        function JavaScriptExpressions() {
+            this.children = [];
+        }
+        JavaScriptExpressions.prototype.push = function (child) {
+            this.children.push(child);
+            return this;
+        };
+        JavaScriptExpressions.prototype.toString = function () {
+            var ret = "";
+            for (var _i = 0, _a = this.children; _i < _a.length; _i++) {
+                var child = _a[_i];
+                ret += child;
+            }
+            return ret;
+        };
+        return JavaScriptExpressions;
+    }());
+    JS.JavaScriptExpressions = JavaScriptExpressions;
+    /**获得分级代码数组
+     * @param {JavaScriptBlock} block 语句块
+     */
+    function getExps(block) {
+        var exps = new JavaScriptExpressions;
+        exps.push(block.begin);
+        for (var _i = 0, _a = block.children; _i < _a.length; _i++) {
+            var statement = _a[_i];
+            exps.push(getStatementExps(statement));
+        }
+        exps.push(block.end);
+        return exps;
+    }
+    JS.getExps = getExps;
+    /**获得分级代码数组
+     * @param {JavaScriptStatement} statement 语句
+     */
+    function getStatementExps(statement) {
+        var keyWords = statement.children;
+        var exps = new JavaScriptExpressions;
+        var exp = '';
+        var isPush = false;
+        for (var _i = 0, keyWords_1 = keyWords; _i < keyWords_1.length; _i++) {
+            var keyWord = keyWords_1[_i];
+            if (isString(keyWord)) {
+                switch (JS.getKeyWordType(keyWord)) {
+                    case JS.EKeyWordType.Member_Access_Operator:
+                        exp += keyWord;
+                        exps.push(exp);
+                        exp = '';
+                        isPush = true;
+                        break;
+                    case JS.EKeyWordType.Unary_Operator:
+                    case JS.EKeyWordType.Operator:
+                    case JS.EKeyWordType.UnKnown:
+                        exp += keyWord;
+                        isPush = false;
+                        break;
+                    default:
+                        throw new Error('不支持该运算符：' + keyWord);
+                }
+            }
+            else if (keyWord instanceof JS.JavaScriptBlock) {
+                exps.push(getExps(keyWord));
+            }
+        }
+        if (isPush === false && exp !== '') {
+            exps.push(exp);
+        }
+        return exps;
+    }
+    JS.getStatementExps = getStatementExps;
+    var EKeyWordType;
+    (function (EKeyWordType) {
+        EKeyWordType[EKeyWordType["UnKnown"] = 0] = "UnKnown";
+        EKeyWordType[EKeyWordType["Unary_Operator"] = 1] = "Unary_Operator";
+        EKeyWordType[EKeyWordType["Operator"] = 2] = "Operator";
+        EKeyWordType[EKeyWordType["Assigning_Operator"] = 3] = "Assigning_Operator";
+        EKeyWordType[EKeyWordType["Comparison_Operator"] = 4] = "Comparison_Operator";
+        EKeyWordType[EKeyWordType["Compound_Assigning_Operator"] = 5] = "Compound_Assigning_Operator";
+        EKeyWordType[EKeyWordType["Instruction_Operator"] = 6] = "Instruction_Operator";
+        EKeyWordType[EKeyWordType["Ternary_Operator"] = 7] = "Ternary_Operator";
+        EKeyWordType[EKeyWordType["Member_Access_Operator"] = 8] = "Member_Access_Operator";
+    })(EKeyWordType = JS.EKeyWordType || (JS.EKeyWordType = {}));
+    /**获取keyWord类型*/
+    function getKeyWordType(keyWord) {
+        switch (keyWord) {
+            case '++':
+            case '--':
+            case '~':
+            case '!':
+                return EKeyWordType.Unary_Operator;
+            case '+':
+            case '-':
+            case '*':
+            case '/':
+            case '%':
+            case '&':
+            case '|':
+            case '&&':
+            case '||':
+            case '>>':
+            case '<<':
+            case ',':
+                return EKeyWordType.Operator;
+            case '+=':
+            case '-=':
+            case '*=':
+            case '/=':
+            case '%=':
+            case '&=':
+            case '|=':
+                return EKeyWordType.Compound_Assigning_Operator;
+            case '=':
+                return EKeyWordType.Assigning_Operator;
+            case '>=':
+            case '>':
+            case '<=':
+            case '<':
+            case '==':
+            case '===':
+            case '!=':
+            case '!==':
+            case 'instanceof':
+            case 'in':
+                return EKeyWordType.Comparison_Operator;
+            case 'new':
+            case 'delete':
+            case 'typeof':
+            case 'void':
+                return EKeyWordType.Instruction_Operator;
+            case '?':
+            case ':':
+                return EKeyWordType.Ternary_Operator;
+            case '.':
+                return EKeyWordType.Member_Access_Operator;
+            default:
+                return EKeyWordType.UnKnown;
+        }
+    }
+    JS.getKeyWordType = getKeyWordType;
+})(JS || (JS = {}));
+/// <reference path='../JavaScriptLogic.ts'/>
+var JS;
+(function (JS) {
+    var Function = (function (_super) {
+        __extends(Function, _super);
+        function Function(params, isLambda, content) {
+            var _this = _super.call(this) || this;
+            _this.params = params;
+            _this.isLambda = isLambda;
+            _this.content = content;
+            return _this;
+        }
+        Function.new = function (statement) {
+            JS.mergeStatementSpace(statement, true);
+            var keyWords = statement.children;
+            if (keyWords.length < 2) {
+                return null;
+            }
+            var keyWord = keyWords[0];
+            var params = [];
+            var isLambda = false;
+            var content;
+            if (keyWord === 'function') {
+                var index = 1;
+                if (keyWords[index] === ' ') {
+                    index++;
+                }
+                keyWord = keyWords[index];
+                if (keyWord instanceof JS.JavaScriptBlock && keyWord.begin === '(') {
+                    if (!this.setParams(params, keyWord)) {
+                        return null;
+                    }
+                    index++;
+                    if (keyWords[index] === ' ') {
+                        index++;
+                    }
+                    keyWord = keyWords[index];
+                    if (keyWord instanceof JS.JavaScriptBlock && keyWord.begin === '{') {
+                        content = keyWord;
+                    }
+                    else {
+                        return null;
+                    }
+                }
+                else {
+                    return null;
+                }
+            }
+            else {
+                var index = 1;
+                if (keyWord instanceof JS.JavaScriptBlock && keyWord.begin === '(') {
+                    if (keyWords[index] === ' ') {
+                        index++;
+                    }
+                    if (keyWords[index] === '=>') {
+                        //lambda
+                        if (!this.setParams(params, keyWord)) {
+                            return null;
+                        }
+                        index++;
+                    }
+                    else {
+                        return null;
+                    }
+                }
+                else if (isString(keyWord) && JS.isVarName(keyWord)) {
+                    if (keyWords[index] === ' ') {
+                        index++;
+                    }
+                    if (keyWords[index] === '=>') {
+                        //lambda
+                        params.push(keyWord);
+                        index++;
+                    }
+                    else {
+                        return null;
+                    }
+                }
+                else {
+                    return null;
+                }
+                isLambda = true;
+                if (keyWords[index] === ' ') {
+                    index++;
+                }
+                keyWord = keyWords[index];
+                if (keyWord instanceof JS.JavaScriptBlock && keyWord.begin === '{') {
+                    //执行块
+                    content = keyWord;
+                }
+                else if (keyWord === "return") {
+                    return null;
+                }
+                else {
+                    //单句
+                    content = '';
+                    for (var i = index; i < keyWords.length; i++) {
+                        content += keyWords[i].toString();
+                    }
+                }
+            }
+            return new this(params, isLambda, content);
+        };
+        Function.setParams = function (params, block) {
+            var statements = block.children;
+            if (statements.length !== 1) {
+                return false;
+            }
+            var statement = statements[0];
+            var needVar = true;
+            for (var _i = 0, _a = statement.children; _i < _a.length; _i++) {
+                var keyWord = _a[_i];
+                if (!isString(keyWord)) {
+                    return false;
+                }
+                if (needVar) {
+                    if (JS.isVarName(keyWord)) {
+                        params.push(keyWord);
+                    }
+                    else {
+                        return false;
+                    }
+                    needVar = false;
+                }
+                else {
+                    needVar = true;
+                }
+            }
+            return true;
+        };
+        // toFunction(){
+        //     let params=this.params.slice();
+        //     if(isString(this.content)){
+        //         params.push((this.isLambda?'return ':'')+this.content);
+        //     }else{
+        //         params.push(this.content.toString());
+        //     }
+        //     return global.Function.apply(global,params);
+        // }
+        Function.prototype.toString = function () {
+            var ret = '';
+            if (this.isLambda) {
+                ret += '(' + this.params.join(',') + ')=>';
+                if (isString(this.content)) {
+                    ret += this.content;
+                }
+                else {
+                    ret += this.content.toString();
+                }
+            }
+            else {
+                ret += 'function(' + this.params.join(',') + ')' + this.content.toString();
+            }
+            return ret;
+        };
+        return Function;
+    }(JS.JavaScriptLogic));
+    Function.logicName = 'function';
+    JS.Function = Function;
+    JS.registerLogic(Function);
+})(JS || (JS = {}));
+/// <reference path='../javascript/JavaScriptExpressions.ts'/>
+/// <reference path='../javascript/logic/Function.ts'/>
+/// <reference path='VOrder.ts'/>
+var Order;
+(function (Order) {
+    var BindExpressions = (function (_super) {
+        __extends(BindExpressions, _super);
+        function BindExpressions(node, condition) {
+            var _this = _super.call(this, node, condition) || this;
+            var data = _this.data;
+            var block = JS.Parser.parseStructor(condition);
+            //只支持一个语句
+            if (block.children.length !== 1) {
+                throw new Error('语句超出范围：' + condition);
+            }
+            //  xx1   、  xx1.xx2   或    xx1['xx2']  
+            //取后面的访问
+            var statement = block.children[0];
+            var statements = statement.splitKeyWord(':');
+            if (statements.length > 2) {
+                throw new Error('语句应该是如下格式：\n(表达式):(回调函数)');
+            }
+            statement = statements[0];
+            JS.deleteStatementSpace(statement, false); //删除空格回车换行
+            if (statement.children.length === 1) {
+                //如果只有一个单词，并且符合变量名规则，则确认为绑定scope变量
+                var keyWord = statement.children[0];
+                if (isString(keyWord) && JS.isVarName(keyWord)) {
+                    data.object = ['', keyWord];
+                }
+            }
+            else if (statement.children.length === 0) {
+                throw new Error("语句应该是如下格式：\n(表达式):(回调函数)");
+            }
+            if (!data.object) {
+                var chds = statement.children;
+                var keyWord = chds.pop();
+                data.object = [JS.getStatementExps(statement).toString()];
+                if (keyWord instanceof JS.JavaScriptBlock) {
+                    if (keyWord.begin === '[') {
+                        var propertyName = JS.getExps(keyWord);
+                        var chds_2 = propertyName.children;
+                        chds_2.shift();
+                        chds_2.pop();
+                        data.object.push(propertyName.toString());
+                    }
+                    else {
+                        throw new Error("\"" + keyWord + "\"\u4E0D\u662F\u4E00\u4E2A\u5408\u6CD5\u7684\u53D8\u91CF\u540D");
+                    }
+                }
+                else if (isString(keyWord)) {
+                    if (JS.isVarName(keyWord)) {
+                        data.object.push(keyWord);
+                        //再去掉一个.
+                        keyWord = last.call(chds);
+                        if (keyWord === '.') {
+                            chds.pop();
+                        }
+                    }
+                    else {
+                        throw new Error("\"" + keyWord + "\"\u4E0D\u662F\u4E00\u4E2A\u5408\u6CD5\u7684\u53D8\u91CF\u540D");
+                    }
+                }
+                else {
+                    //什么鬼
+                    throw new Error('无非识别的keyWord:' + keyWord);
+                }
+            }
+            if (statements.length === 1) {
+                data.function = null;
+                return _this;
+            }
+            statement = statements[1];
+            JS.mergeStatementSpace(statement, false); //删除空格回车换行
+            var fn = JS.Function.new(statement);
+            if (fn) {
+                if (fn.params.length !== 1) {
+                    throw new Error('函数参数数量不正确！');
+                }
+                var content = void 0;
+                if (isString(fn.content)) {
+                    content = fn.content;
+                }
+                else {
+                    content = 'function(){' + fn.content.innerText + '}()';
+                }
+                data.function = {
+                    content: content,
+                    params: fn.params
+                };
+            }
+            else {
+                data.function = null;
+            }
+            return _this;
+        }
+        /** 计算*/
+        BindExpressions.run = function (data) {
+            var propertyName;
+            var textNode = $$$('', 3 /* Text */);
+            var obj;
+            var objectExps = data.object[0];
+            var objectName = data.object[1];
+            if (objectExps !== '') {
+                //对象+属性
+                obj = Order.exec(data.placeholder, objectExps);
+                if (!obj) {
+                    throw new Error('获取对象失败：' + objectExps);
+                }
+                if (isString(objectName)) {
+                    propertyName = objectName;
+                }
+                else {
+                    propertyName = Order.exec(data.placeholder, objectName);
+                }
+            }
+            else {
+                //scope+属性
+                obj = DOMScope.get(data.placeholder);
+                propertyName = objectName;
+            }
+            if (data.function) {
+                var fn_1 = makeExpressFunction(data.function.content, data.function.params);
+                var exp = function (v) {
+                    return fn_1(data.placeholder, [v]);
+                };
+                exp.__me__ = exp;
+                Order.bindProperty(obj, propertyName, exp, '__me__');
+                Order.bindElementProperty(exp, '__me__', textNode, 'data');
+                textNode['data'] = exp.__me__;
+            }
+            else {
+                Order.bindElementProperty(obj, propertyName, textNode, 'data');
+                textNode['data'] = obj[propertyName];
+            }
+            replaceNodeByNode(data.placeholder, textNode);
+        };
+        return BindExpressions;
+    }(Order.VOrder));
+    BindExpressions.orderName = "-";
+    BindExpressions = __decorate([
+        Order.register
+    ], BindExpressions);
+    Order.BindExpressions = BindExpressions;
+    function makeExpressFunction(content, params) {
+        var scopeFun = Order.newScopeFunction(params);
+        return function (node, args) {
+            var scope = DOMScope.get(node);
+            args.push(content);
+            args.push(node);
+            return scopeFun.apply(scope, args);
+        };
+    }
+    Order.makeExpressFunction = makeExpressFunction;
+})(Order || (Order = {}));
+/// <reference path='VOrder.ts'/>
+var Order;
+(function (Order) {
+    var Script = (function (_super) {
+        __extends(Script, _super);
+        function Script(node, condition) {
+            var _this = _super.call(this, node, condition) || this;
+            _this.init();
+            return _this;
+        }
+        Script.prototype.init = function () {
+            this.block = JS.Parser.parseStructor(this.condition);
+        };
+        Script.run = function (data) {
+        };
+        return Script;
+    }(Order.VOrder));
+    Script.orderName = ":";
+    Script = __decorate([
+        Order.register
+    ], Script);
+})(Order || (Order = {}));
+/// <reference path='VOrder.ts'/>
+var Order;
+(function (Order) {
+    /**
+     * 插入传递进组件的dom元素
+     */
+    var Elements = Elements_1 = (function (_super) {
+        __extends(Elements, _super);
+        function Elements() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Elements.prototype.run = function () {
+            Elements_1.run(this.data);
+        };
+        Elements.run = function (data) {
+            replaceNodeByNodes(data.placeholder, $rootScope.lastRenderPart.propsElements);
+        };
+        return Elements;
+    }(Order.VOrder));
+    Elements.orderName = "elements";
+    Elements = Elements_1 = __decorate([
+        Order.register
+    ], Elements);
+    Order.Elements = Elements;
+    var Elements_1;
+})(Order || (Order = {}));
+/// <reference path='VOrder.ts'/>
+var Order;
+(function (Order) {
+    /**
+     * 插入传递进组件的dom元素
+     */
+    var Nodes = Nodes_1 = (function (_super) {
+        __extends(Nodes, _super);
+        function Nodes() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Nodes.prototype.run = function () {
+            Nodes_1.run(this.data);
+        };
+        Nodes.run = function (data) {
+            replaceNodeByNodes(data.placeholder, $rootScope.lastRenderPart.propsNodes);
+        };
+        return Nodes;
+    }(Order.VOrder));
+    Nodes.orderName = "nodes";
+    Nodes = Nodes_1 = __decorate([
+        Order.register
+    ], Nodes);
+    Order.Nodes = Nodes;
+    var Nodes_1;
+})(Order || (Order = {}));
 /// <reference path="../core/Node.ts"/>
 /// <reference path='../part/Part.ts'/>
-/// <reference path='../scope/Scope.ts'/>
 /// <reference path='ClientHelper.ts'/>
 /// <reference path='Ready.ts'/>
 /// <reference path='../lib/is.ts'/>
@@ -7051,7 +8835,18 @@ catch (e) {
 /// <reference path='../part/uiList.ts'/>
 /// <reference path='LoadJS.ts'/>
 /// <reference path="../core/BrowserHelper.ts"/>
-"use strict";
+/// <reference path='../virtual/order/VOrder.ts'/>
+/// <reference path='../virtual/order/If.ts'/>
+/// <reference path='../virtual/order/For.ts'/>
+/// <reference path='../virtual/order/Switch.ts'/>
+/// <reference path='../virtual/order/while.ts'/>
+/// <reference path='../virtual/order/Do.ts'/>
+/// <reference path='../virtual/order/Scope.ts'/>
+/// <reference path='../virtual/order/=.ts'/>
+/// <reference path='../virtual/order/-.ts'/>
+/// <reference path='../virtual/order/Script.ts'/>
+/// <reference path='../virtual/order/Elements.ts'/>
+/// <reference path='../virtual/order/Nodes.ts'/>
 var readyRE = /complete|loaded|interactive/;
 var Turtle = (function (_super) {
     __extends(Turtle, _super);
@@ -7129,11 +8924,11 @@ var Turtle = (function (_super) {
         //预加载依赖项
         if (load) {
             var loads_1 = load.split(",");
-            var i_3 = 0;
+            var i_2 = 0;
             var fnLoad_1 = function () {
-                i_3++;
-                if (i_3 < loads_1.length) {
-                    includeJSFiles(loads_1[i_3], fnLoad_1);
+                i_2++;
+                if (i_2 < loads_1.length) {
+                    includeJSFiles(loads_1[i_2], fnLoad_1);
                 }
                 else {
                     if (compileInfo && compileInfo.isOn && compileInfo.url) {
@@ -7297,7 +9092,6 @@ var Turtle = (function (_super) {
     return Turtle;
 }(EventEmitterEx));
 /// <reference path='./main/Turtle.ts'/>
-"use strict";
 // if(!$DOM){
 //     $DOM=function(html){
 //         var elem=document.createElement('ui:dom');elem.innerHTML=html;return elem;
@@ -7318,6 +9112,5 @@ var Turtle = (function (_super) {
 //         }
 //     };
 // }
-var $t = new Turtle();
-var turtle = $t;
-
+var turtle = new Turtle();
+var $t = turtle;

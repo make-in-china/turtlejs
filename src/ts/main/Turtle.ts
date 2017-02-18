@@ -1,7 +1,6 @@
 
 /// <reference path="../core/Node.ts"/>
 /// <reference path='../part/Part.ts'/>
-/// <reference path='../scope/Scope.ts'/>
 /// <reference path='ClientHelper.ts'/>
 /// <reference path='Ready.ts'/>
 /// <reference path='../lib/is.ts'/>
@@ -16,6 +15,18 @@
 /// <reference path='../part/uiList.ts'/>
 /// <reference path='LoadJS.ts'/>
 /// <reference path="../core/BrowserHelper.ts"/>
+/// <reference path='../virtual/order/VOrder.ts'/>
+/// <reference path='../virtual/order/If.ts'/>
+/// <reference path='../virtual/order/For.ts'/>
+/// <reference path='../virtual/order/Switch.ts'/>
+/// <reference path='../virtual/order/while.ts'/>
+/// <reference path='../virtual/order/Do.ts'/>
+/// <reference path='../virtual/order/Scope.ts'/>
+/// <reference path='../virtual/order/=.ts'/>
+/// <reference path='../virtual/order/-.ts'/>
+/// <reference path='../virtual/order/Script.ts'/>
+/// <reference path='../virtual/order/Elements.ts'/>
+/// <reference path='../virtual/order/Nodes.ts'/>
 
 interface IRenderDocument{
     ():void;
@@ -146,7 +157,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
             parts[i].$resize.emit(parts[i]);
         }
     }
-    renderTemplate(tp:IHTMLElement){
+    renderTemplate(tp:IElement){
         let sHTML=getTemplate(tp);
         let vDOM=VDOM.parseStructor(sHTML);
         let vDOMs:(VMDOM.VNode&IVNodeMethod)[];
@@ -176,7 +187,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
         let 
             xmps=findTemplates(document.body.children),
             i,
-            templateXMP:IHTMLElement[]=[];
+            templateXMP:IElement[]=[];
         /*优先处理定义相关的模板*/
         for(i=0;i<xmps.length;i++){
             // if(isDefine(xmps[i])){

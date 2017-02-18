@@ -6,9 +6,10 @@ var ts = require('gulp-typescript');
 var merge = require('merge2');  // Requires separate installation
 
 function uibuildTs(path){
+    console.log('['+moment().format("HH:mm:ss")+']\n开始编译'+path.replace(/html$/,'ts'));
     var UIHelper=require('./dest/virtual/UIHelper.0.1.js').UIHelper;
     UIHelper.makeClass(path);
-    console.log('\n['+moment().format("HH:mm:ss")+']\n'+path.replace(/html$/,'ts'));
+    console.log('['+moment().format("HH:mm:ss")+']\n结束编译'+path.replace(/html$/,'ts'));
 }
 
 function uibuildJs(path){

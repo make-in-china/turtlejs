@@ -12,9 +12,9 @@ namespace OrderEx {
         
         let data=this.data;
         return `
-        Order.Equal.run({
-            condition:'${data.condition}',
-            placeholder:this
-        });`;
+            Order.Equal.run({
+                condition:'${data.condition}',
+                placeholder:this
+            });`;
     });
 }

@@ -32,21 +32,22 @@ namespace Order {
     export class For extends RepeatBlockOrder {
         static orderName = "for"
         data:IOrderDataFor
-        constructor(node: VMDOM.VComment, condition: string) {
-            super(node, condition,'for');
-            let jsblock=JS.Parser.parseStructor(condition);
-            let info=JS.For.parseConditions(jsblock);
-            if(info){
-                this.data.forMode = info.mode;
-                if(info.mode===JS.EForMode.In){
-                    let infoForIn:JS.IInfoForIn=<JS.IInfoForIn>info;
+        constructor(node: VMDOM.VComment, setup: IOrderSetup) {
+            super(node, setup,'for');
+            // let jsblock=JS.Parser.parseStructor(info);
+            let jsblock=setup.data;
+            let jsInfo=JS.For.parseConditions(jsblock);
+            if(jsInfo){
+                this.data.forMode = jsInfo.mode;
+                if(jsInfo.mode===JS.EForMode.In){
+                    let infoForIn:JS.IInfoForIn=<JS.IInfoForIn>jsInfo;
                     this.data.forInInfo = {
                         var: infoForIn.hasVar?infoForIn.varName:'',
                         object:infoForIn.bindingExp.toString(),
                         names: []
                     }
                 }else{
-                    let infoForStep:JS.IInfoForStep=<JS.IInfoForStep>info;
+                    let infoForStep:JS.IInfoForStep=<JS.IInfoForStep>jsInfo;
                     let first:string|[string,string|undefined,boolean][];
                     if(infoForStep.variable){
                         first=infoForStep.variable.varInfos

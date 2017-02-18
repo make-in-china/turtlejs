@@ -40,15 +40,15 @@ namespace OrderEx {
             forInInfo='undefined';
         }
         return `
-        Order.For.run({
-            forStepInfo:${forStepInfo},
-            forInInfo:${forInInfo},
-            forMode:${data.forMode},
-            placeholder:this,
-            blocks:[
-                ${blocks.join(`,
-                `)}]
-        });
+            Order.For.run({
+                forStepInfo:${forStepInfo},
+                forInInfo:${forInInfo},
+                forMode:${data.forMode},
+                placeholder:this,
+                blocks:[
+                    ${blocks.join(`,
+                    `)}]
+            });
 `;
     });
 }

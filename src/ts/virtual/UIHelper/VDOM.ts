@@ -2,6 +2,7 @@
 /// <reference path='BaseVNode.ts'/>
 /// <reference path='VDomhelperElement.ts'/>
 interface IMember {
+    do:boolean
     index: number
     node: VMDOM.VNode & IVNodeMethod
     action: string
@@ -19,6 +20,7 @@ interface IMember {
     stringNodeRegExp: RegExp | null
     stringNodeKeyLength: number
     commentStart: number
+    endChar:string
 }
 interface IVDOMBuilder {
     (html: string, vNode?: undefined): VMDOM.VNode & IVNodeMethod | (VMDOM.VNode & IVNodeMethod)[]
@@ -27,26 +29,44 @@ interface IVDOMBuilder {
 
 abstract class VDOM {
     protected static htmlwordRE = /[a-zA-Z\/\!]/
-    protected static ''(html: string, m: IMember) {
+
+
+
+    
+    /**
+     * 主循环函数
+     * 
+     * @protected
+     * @static
+     * @param {string} html
+     * @param {IMember} m
+     * @returns
+     * 
+     * @memberOf VDOM
+     */
+    protected static ''(this:VDOM,html: string, m: IMember) {
         let nodeName = m.node.nodeName;
         if (m.node.vmData.closeSelf) {
             m.node = <any>m.node.parentNode;
-            m.action = 'textNode';
-            m.textNodeStart = m.index;
         } else if (VMDOM.stringNode.hasOwnProperty(nodeName)) {
+            //跳转到字符串检测程序
             m.action = 'stringNode';
-            m.stringNodeRegExp = VMDOM.stringNode[nodeName];
+            m.stringNodeRegExp = (<any>VMDOM.stringNode)[nodeName];
             m.stringNodeKeyLength = nodeName.length + 2;
             m.stringNodeStart = m.index;
             return;
-        } else {
-            m.action = 'textNode';
-            m.textNodeStart = m.index;
         }
+        //跳转到textNode检测程序
+        m.action = 'textNode';
+        m.textNodeStart = m.index;
     }
+
     protected static textNode(html: string, m: IMember) {
         let data;
         switch (html[m.index]) {
+            case m.endChar:
+                m.do=false
+                return;
             case '<':
                 if (m.index < m.length + 1 && this.htmlwordRE.test(html[m.index + 1])) {
 
@@ -98,7 +118,7 @@ abstract class VDOM {
 
         //m.node(name, 8);
     }
-    protected static setAttrStart(m) {
+    protected static setAttrStart(m:IMember) {
         m.action = 'attributes';
         m.attrStart = 0;
         m.attrNameEnd = 0;
@@ -398,12 +418,17 @@ abstract class VDOM {
             debugger;
         }
     }
-    protected static getInitData(vNode: VMDOM.VNode & IVNodeMethod | undefined, length: number): IMember {
+    protected static getInitData(
+        vNode: VMDOM.VNode & IVNodeMethod | undefined,
+        length: number,
+        endChar:string
+    ): IMember {
         if (!vNode) {
             vNode = $$$('domhelper');
             vNode.vmData.isClose = true;
         }
         return {
+            do:true,
             index: 0,
             node: vNode,
             action: '',
@@ -420,13 +445,21 @@ abstract class VDOM {
             stringNodeStart: 0,
             stringNodeRegExp: null,
             stringNodeKeyLength: 0,
-            commentStart: 0
+            commentStart: 0,
+            endChar:endChar
         };
     }
-    static readonly parseStructor:IVDOMBuilder=function(html: string, vNode?: VMDOM.VNode & IVNodeMethod) {
-        let m = this.getInitData(vNode, html.length);
+    static readonly parseStructor:IVDOMBuilder=
+    function(
+        this:typeof VDOM,
+        html: string,
+        vNode?: VMDOM.VNode & IVNodeMethod,
+        endChar:string=''
+    ) {
+        let m = this.getInitData(vNode, html.length,endChar);
+        m.endChar=endChar;
         let parent = m.node;
-        while (m.index < html.length) {
+        while (m.do&&m.index < html.length) {
             this[m.action](html, m);
         }
         this.checkEnd(html, m);

@@ -1,0 +1,21 @@
+
+/// <reference path='VOrder.ts'/>
+namespace Order {
+    @register
+    class Script extends VOrder {
+        static orderName = ":"
+        block:JS.JavaScriptBlock<'{'>
+        constructor(node:VMDOM.VComment , setup: IOrderSetup){
+            super(node,setup);
+            this.init();
+        }
+        init(){
+            // this.block=JS.Parser.parseStructor(this.info);
+            debugger;
+            this.block=this.setup.data;
+        }
+        static run(data:IOrderData){
+
+        }
+    }
+}

@@ -1,5 +1,8 @@
 
 /// <reference path='VNode.ts'/>
+interface VNodeNames{
+    '#document':VMDOM.VDocument&IVNodeMethod
+}
 interface IVNodeMethod{
     (nodeName: null, nodeType?: ENodeType.Document): VMDOM.VDocument&IVNodeMethod;
 }

@@ -2,16 +2,25 @@
 
 
 namespace VMDOM{
+
     export class VOrderData{
-        name:string
-        condition:JS.JavaScriptBlock|null|undefined
-        constructor(name:string,condition:JS.JavaScriptBlock|null|undefined){
-            this.name=name
-            this.condition=condition;
-        }
+        constructor(
+            public name:string,
+            public setup:Order.IOrderSetup|null|undefined
+        ){}
         clone():VOrderData{
-            if(this.condition){
-                return new VOrderData(this.name,this.condition.clone());
+            if(this.setup){
+                let params,data
+                if(this.setup.params){
+                    params=this.setup.params.clone();
+                }
+                if(this.setup.data){
+                    data=this.setup.data.clone();
+                }
+                return new VOrderData(this.name,{
+                    params:params,
+                    data:data
+                });
             }else{
                 return new VOrderData(this.name,null);
             }

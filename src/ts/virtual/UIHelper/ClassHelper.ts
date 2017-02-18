@@ -17,7 +17,7 @@ namespace UIHelper {
         }
         return sAttr + s;
     }
-    function initOrder(chds:VMDOM.VNode[] | IArray,path:string):boolean{
+    function initOrder(chds:IArray<VMDOM.VNode>,path:string):boolean{
         let isAllRun:boolean=true;
         treeEach(<VMDOM.VNode[]>chds, "childNodes", (node, state) => {
             if (node instanceof VMDOM.VComment) {
@@ -63,8 +63,8 @@ namespace UIHelper {
         }
     }
     
-    function init_Ref_Part_Info(chds:VMDOM.VNode[] | IArray,props:string[],defaultValues:string[],refInfo:RefInfo,scripts: VMDOM.VScript[]){
-        treeEach(<VMDOM.VNode[]>chds, "childNodes", (node, state) => {
+    function init_Ref_Part_Info(chds:IArray<VMDOM.VNode>,props:string[],defaultValues:string[],refInfo:RefInfo,scripts: VMDOM.VScript[]){
+        treeEach(<VMDOM.VNode[]>chds, "childNodes", (node) => {
 
             if (node instanceof VMDOM.VHtmlElement) {
                 
@@ -131,7 +131,7 @@ namespace UIHelper {
         let index=0;
         for (let i = scripts.length - 1; i >= 0; i--) {
             let script = scripts[i];
-            let p = <VMDOM.VElement & IVNodeMethod>scripts[i].parentNode;
+            // let p = <VMDOM.VElement & IVNodeMethod>scripts[i].parentNode;
             let name = 'order' + index;
             let hashScript=functionHash[script.toFunction()];
             if(hashScript){
@@ -139,7 +139,7 @@ namespace UIHelper {
             }else{
                 functionHash[script.toFunction()]=script;
                 script.propertyName = name;
-                scriptFunctions += '\n    ' + script.toFunction();
+                scriptFunctions += '\n        ' + script.toFunction();
                 index++;
             }
         }
@@ -225,7 +225,7 @@ namespace UIHelper {
         }
         let dom = VDOM2.parseStructor(html);
         let tops: VMDOM.VNode[];
-        let chds: VMDOM.VNode[] | IArray;
+        let chds: IArray<VMDOM.VNode>;
         if (isArray(dom)) {
             chds = dom;
             tops = dom
@@ -234,11 +234,12 @@ namespace UIHelper {
             tops = [dom];
         }
     //1.初始化 Order
-        let isAllRun=initOrder(chds,path);
+        // let isAllRun=
+        initOrder(chds,path);
         
         let refInfo = new RefInfo;
         let scripts: VMDOM.VScript[] = [];
-        let paramInfos:PartParam[]=[];
+        // let paramInfos:PartParam[]=[];
         let props:string[]=[];
         let defaultValues:string[]=[];
         
@@ -311,7 +312,7 @@ namespace UIHelper {
         for (let i = 0; i < stack.length; i += 2) {
             let arr: INode[] = <INode[]>stack[i];
             let index: number = <number>stack[i + 1];
-            let info: string[] = [];
+            // let info: string[] = [];
             strStack = '    at childNodes.' + index + ':' + arr[index].nodeName + '\n' + strStack;
         }
         strStack = '    at childNodes.' + state.currentIndex + ':' + node.data + '\n' + strStack;

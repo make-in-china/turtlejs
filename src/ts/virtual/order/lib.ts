@@ -47,11 +47,11 @@ namespace Order {
     export function getOrderInfoByString(s: string): IOrderInfo | null {
         let order = s.match(orderRE);
         if (order) {
-            return { order: trim(order[0]), condition: s.substring(order[0].length, s.length) }
+            return { order: trim(order[0]), setup: s.substring(order[0].length, s.length) }
         } else {
             let subOrder = s.match(subOrderRE);
             if (subOrder) {
-                return { subOrder: trim(subOrder[0]), condition: s.substring(subOrder[0].length, s.length) }
+                return { subOrder: trim(subOrder[0]), setup: s.substring(subOrder[0].length, s.length) }
             }
         }
         return null;
@@ -64,19 +64,19 @@ namespace Order {
         let order = name.match(orderRE);
 
         if (order) {
-            if(vOrder.orderData.condition){
-                return { order: order[0], condition: vOrder.orderData.condition.innerText }
+            if(vOrder.orderData.setup){
+                return { order: order[0], setup: vOrder.orderData.setup }
             }else{
-                return { order: order[0], condition: '' }
+                return { order: order[0], setup: '' }
             }
         }
 
         let subOrder = name.match(subOrderRE);
         if (subOrder) {
-            if(vOrder.orderData.condition){
-                return { subOrder: subOrder[0], condition: vOrder.orderData.condition.innerText }
+            if(vOrder.orderData.setup){
+                return { subOrder: subOrder[0], setup: vOrder.orderData.setup }
             }else{
-                return { subOrder: subOrder[0], condition: '' }
+                return { subOrder: subOrder[0], setup: '' }
             }
         }
     
@@ -86,11 +86,11 @@ namespace Order {
     export interface IOrderInfo {
         order?: string;
         subOrder?: string;
-        /*no name*/condition: string;
+        setup: IOrderSetup;
     }
     
     export interface IOrderConstructor {
-        new (node: IComment, condition: string,...args:any[]): VOrder;
+        new (node: IComment, setup: IOrderSetup,...args:any[]): VOrder;
         orderName: string;
         subOrder?:string[];
         run(data:IOrderData):void;
@@ -131,8 +131,7 @@ namespace Order {
         if (!(orderName in orders)) {
             return;
         }
-        debugger;
-        let order: VOrder = new orders[orderName](node, info.condition);
+        let order: VOrder = new orders[orderName](node, info.setup);
         return order;
     }
     export function parseComment(this:void,node: VMDOM.VComment): VOrder | undefined {
@@ -148,7 +147,7 @@ namespace Order {
         if (!(orderName in orders)) {
             return;
         }
-        let order: VOrder = new orders[orderName](node, info.condition);
+        let order: VOrder = new orders[orderName](node, info.setup);
         
         return order;
     }

@@ -10,13 +10,13 @@ declare class IAttr {
 }
 interface INamedNodeMap {
     [index: number]: IAttr;
-    indexOfName(name: string): any;
-    indexOf(o: any): any;
+    indexOfName(name: string): number;
+    indexOf(o: any): number;
     getNamedItem(name: string): IAttr | null;
     item(index: number): IAttr | undefined;
     readonly length: number;
-    removeNamedItem(v: string | Object): any;
-    setNamedItem(arg: IAttr): any;
+    removeNamedItem(v: string | Object): void;
+    setNamedItem(arg: IAttr): void;
 }
 interface IExp {
     (...arg: any[]): any;
@@ -459,6 +459,7 @@ interface IHTMLScriptElement extends IHTMLElement {
     type?: string;
 }
 interface Object {
+    [index: string]: any;
     __proto__: Object;
 }
 interface Node {
@@ -473,7 +474,7 @@ declare function replaceNodeByNodes(node: INode, nodes: INode[]): void;
 declare function insertNode(refChilde: INode, newChild: INode): number;
 declare function nodesToString(nodes: INode[]): string;
 declare function cloneBetween(node1: INode, node2: INode): INode[] | null;
-declare function removeBlockBetween(node1: INode, node2: INode): any;
+declare function removeBlockBetween(node1: INode, node2: INode): null | undefined;
 declare function replaceNodeByNode(refChilde: INode, newChild: INode): void;
 declare function appendNodes(nodes: INode[] | INodeList | IHTMLCollection, parent: INode): void;
 declare function takeChildNodes(node: INode): INode[];
@@ -506,22 +507,22 @@ declare let arrayConstructor: Array<any>, objectConstructor: ObjectConstructor, 
     (searchValue: RegExp, replacer: (substring: string, ...args: any[]) => string): string;
 }, slice: {
     <T>(start?: number, end?: number): T[];
-    call<T>(arr: IArray | T[], start?: number, end?: number): T[];
+    call<T>(arr: IArray<T> | T[], start?: number, end?: number): T[];
 }, push: {
     <T>(...items: T[]): number;
-    apply<T>(arr: IArray | T[], items: T[]): number;
-    call<T>(arr: IArray | T[], ...items: T[]): number;
+    apply<T>(arr: IArray<T> | T[], items: T[]): number;
+    call<T>(arr: IArray<T> | T[], ...items: T[]): number;
 }, splice: {
     <T>(start: number): T[];
-    call<T>(arr: IArray | T[], start: number): T[];
-    call<T>(arr: IArray | T[], start: number, deleteCount: number, ...items: T[]): T[];
+    call<T>(arr: IArray<T> | T[], start: number): T[];
+    call<T>(arr: IArray<T> | T[], start: number, deleteCount: number, ...items: T[]): T[];
 }, indexOf: {
     <T>(searchElement: T, fromIndex?: number): number;
-    call<T>(arr: IArray | T[], searchElement: T, fromIndex?: number): number;
+    call<T>(arr: IArray<T> | T[], searchElement: T, fromIndex?: number): number;
 };
 declare let last: {
     <T>(): T | undefined;
-    call<T>(arr: IArray | T[]): T | undefined;
+    call<T>(arr: IArray<T> | T[]): T | undefined;
 };
 interface Constructor {
     prototype: Object;
@@ -616,17 +617,18 @@ declare const enum eTreeEach {
     c_noRepeat = 8,
 }
 interface ITreeEachState<T> {
-    stack: [T[] | IArray, number];
+    stack: [T[] | IArray<T>, number];
     nextStepLength: number;
     currentIndex: number;
 }
-interface IArray {
+interface IArray<T> {
+    [index: number]: T;
     length: number;
 }
-interface ITreeEachReturn {
-    stack: [IArray | INode[], number];
+interface ITreeEachReturn<T> {
+    stack: [IArray<T> | T[], number];
     return: eTreeEach | undefined;
-    array: IArray | INode[];
+    array: IArray<T> | T[];
     index: number;
 }
 /**
@@ -636,13 +638,13 @@ interface ITreeEachReturn {
  * @param {(node:T,step?:ITreeEachStep)=>eTreeEach|undefined} fn 回调函数
  * @param {number} beginIndex 遍历起始位置
  */
-declare function treeEach<T>(array: T[] | IArray | NodeList, propertyName: string, fn: (node: T, state: ITreeEachState<T>) => (eTreeEach | void), beginIndex?: number): ITreeEachReturn | undefined;
+declare function treeEach<T extends Object>(array: T[] | IArray<T>, propertyName: string, fn: (node: T, state: ITreeEachState<T>) => (eTreeEach | void), beginIndex?: number): ITreeEachReturn<T> | undefined;
 declare namespace ComponentView {
     interface IProps {
     }
     interface IView {
         tops?: (VMDOM.VNode & IVNodeMethod)[];
-        initDOM(props: IProps, nodes?: (VMDOM.VNode & IVNodeMethod)[]): void;
+        initDOM(props: IProps, propsNodes?: (VMDOM.VNode & IVNodeMethod)[]): void;
     }
 }
 declare class BasePath {
@@ -703,6 +705,7 @@ declare class RootScope implements Scope {
     __proto__: Scope | null;
     __name__: undefined;
     constructor(document: INode);
+    lastRenderPart: Component.Part;
 }
 declare class VNamedNodeMap {
     [index: number]: IAttr;
@@ -716,8 +719,351 @@ declare class VNamedNodeMap {
     setNamedItem(arg: IAttr): void;
 }
 declare namespace VMDOM {
+    class StyleInnerData {
+        data: {
+            [index: string]: string;
+        };
+        elem: VElement;
+        isLock: 0 | 1 | 2;
+        styleData: string;
+    }
     class VStyle {
+        [index: number]: string;
+        readonly length: number;
+        readonly __: StyleInnerData;
         constructor(elem: VElement);
+        style: string;
+        alignContent: string;
+        alignItems: string;
+        alignSelf: string;
+        alignmentBaseline: string;
+        animation: string;
+        animationDelay: string;
+        animationDirection: string;
+        animationDuration: string;
+        animationFillMode: string;
+        animationIterationCount: string;
+        animationName: string;
+        animationPlayState: string;
+        animationTimingFunction: string;
+        backfaceVisibility: string;
+        background: string;
+        backgroundAttachment: string;
+        backgroundClip: string;
+        backgroundColor: string;
+        backgroundImage: string;
+        backgroundOrigin: string;
+        backgroundPosition: string;
+        backgroundPositionX: string;
+        backgroundPositionY: string;
+        backgroundRepeat: string;
+        backgroundSize: string;
+        baselineShift: string;
+        border: string;
+        borderBottom: string;
+        borderBottomColor: string;
+        borderBottomLeftRadius: string;
+        borderBottomRightRadius: string;
+        borderBottomStyle: string;
+        borderBottomWidth: string;
+        borderCollapse: string;
+        borderColor: string;
+        borderImage: string;
+        borderImageOutset: string;
+        borderImageRepeat: string;
+        borderImageSlice: string;
+        borderImageSource: string;
+        borderImageWidth: string;
+        borderLeft: string;
+        borderLeftColor: string;
+        borderLeftStyle: string;
+        borderLeftWidth: string;
+        borderRadius: string;
+        borderRight: string;
+        borderRightColor: string;
+        borderRightStyle: string;
+        borderRightWidth: string;
+        borderSpacing: string;
+        borderStyle: string;
+        borderTop: string;
+        borderTopColor: string;
+        borderTopLeftRadius: string;
+        borderTopRightRadius: string;
+        borderTopStyle: string;
+        borderTopWidth: string;
+        borderWidth: string;
+        bottom: string;
+        boxShadow: string;
+        boxSizing: string;
+        breakAfter: string;
+        breakBefore: string;
+        breakInside: string;
+        captionSide: string;
+        clear: string;
+        clip: string;
+        clipPath: string;
+        clipRule: string;
+        color: string;
+        colorInterpolationFilters: string;
+        columnCount: string;
+        columnFill: string;
+        columnGap: string;
+        columnRule: string;
+        columnRuleColor: string;
+        columnRuleStyle: string;
+        columnRuleWidth: string;
+        columnSpan: string;
+        columnWidth: string;
+        columns: string;
+        content: string;
+        counterIncrement: string;
+        counterReset: string;
+        cssFloat: string;
+        cssText: string;
+        cursor: string;
+        direction: string;
+        display: string;
+        dominantBaseline: string;
+        emptyCells: string;
+        enableBackground: string;
+        fill: string;
+        fillOpacity: string;
+        fillRule: string;
+        filter: string;
+        flex: string;
+        flexBasis: string;
+        flexDirection: string;
+        flexFlow: string;
+        flexGrow: string;
+        flexShrink: string;
+        flexWrap: string;
+        floodColor: string;
+        floodOpacity: string;
+        font: string;
+        fontFamily: string;
+        fontFeatureSettings: string;
+        fontSize: string;
+        fontSizeAdjust: string;
+        fontStretch: string;
+        fontStyle: string;
+        fontVariant: string;
+        fontWeight: string;
+        glyphOrientationHorizontal: string;
+        glyphOrientationVertical: string;
+        height: string;
+        imeMode: string;
+        justifyContent: string;
+        kerning: string;
+        left: string;
+        letterSpacing: string;
+        lightingColor: string;
+        lineHeight: string;
+        listStyle: string;
+        listStyleImage: string;
+        listStylePosition: string;
+        listStyleType: string;
+        margin: string;
+        marginBottom: string;
+        marginLeft: string;
+        marginRight: string;
+        marginTop: string;
+        marker: string;
+        markerEnd: string;
+        markerMid: string;
+        markerStart: string;
+        mask: string;
+        maxHeight: string;
+        maxWidth: string;
+        minHeight: string;
+        minWidth: string;
+        msContentZoomChaining: string;
+        msContentZoomLimit: string;
+        msContentZoomLimitMax: string;
+        msContentZoomLimitMin: string;
+        msContentZoomSnap: string;
+        msContentZoomSnapPoints: string;
+        msContentZoomSnapType: string;
+        msContentZooming: string;
+        msFlowFrom: string;
+        msFlowInto: string;
+        msFontFeatureSettings: string;
+        msGridColumn: string;
+        msGridColumnAlign: string;
+        msGridColumnSpan: string;
+        msGridColumns: string;
+        msGridRow: string;
+        msGridRowAlign: string;
+        msGridRowSpan: string;
+        msGridRows: string;
+        msHighContrastAdjust: string;
+        msHyphenateLimitChars: string;
+        msHyphenateLimitLines: string;
+        msHyphenateLimitZone: string;
+        msHyphens: string;
+        msImeAlign: string;
+        msOverflowStyle: string;
+        msScrollChaining: string;
+        msScrollLimit: string;
+        msScrollLimitXMax: string;
+        msScrollLimitXMin: string;
+        msScrollLimitYMax: string;
+        msScrollLimitYMin: string;
+        msScrollRails: string;
+        msScrollSnapPointsX: string;
+        msScrollSnapPointsY: string;
+        msScrollSnapType: string;
+        msScrollSnapX: string;
+        msScrollSnapY: string;
+        msScrollTranslation: string;
+        msTextCombineHorizontal: string;
+        msTextSizeAdjust: string;
+        msTouchAction: string;
+        msTouchSelect: string;
+        msUserSelect: string;
+        msWrapFlow: string;
+        msWrapMargin: string;
+        msWrapThrough: string;
+        opacity: string;
+        order: string;
+        orphans: string;
+        outline: string;
+        outlineColor: string;
+        outlineStyle: string;
+        outlineWidth: string;
+        overflow: string;
+        overflowX: string;
+        overflowY: string;
+        padding: string;
+        paddingBottom: string;
+        paddingLeft: string;
+        paddingRight: string;
+        paddingTop: string;
+        pageBreakAfter: string;
+        pageBreakBefore: string;
+        pageBreakInside: string;
+        parentRule: string;
+        perspective: string;
+        perspectiveOrigin: string;
+        pointerEvents: string;
+        position: string;
+        quotes: string;
+        right: string;
+        rubyAlign: string;
+        rubyOverhang: string;
+        rubyPosition: string;
+        stopColor: string;
+        stopOpacity: string;
+        stroke: string;
+        strokeDasharray: string;
+        strokeDashoffset: string;
+        strokeLinecap: string;
+        strokeLinejoin: string;
+        strokeMiterlimit: string;
+        strokeOpacity: string;
+        strokeWidth: string;
+        tableLayout: string;
+        textAlign: string;
+        textAlignLast: string;
+        textAnchor: string;
+        textDecoration: string;
+        textIndent: string;
+        textJustify: string;
+        textKashida: string;
+        textKashidaSpace: string;
+        textOverflow: string;
+        textShadow: string;
+        textTransform: string;
+        textUnderlinePosition: string;
+        top: string;
+        touchAction: string;
+        transform: string;
+        transformOrigin: string;
+        transformStyle: string;
+        transition: string;
+        transitionDelay: string;
+        transitionDuration: string;
+        transitionProperty: string;
+        transitionTimingFunction: string;
+        unicodeBidi: string;
+        verticalAlign: string;
+        visibility: string;
+        webkitAlignContent: string;
+        webkitAlignItems: string;
+        webkitAlignSelf: string;
+        webkitAnimation: string;
+        webkitAnimationDelay: string;
+        webkitAnimationDirection: string;
+        webkitAnimationDuration: string;
+        webkitAnimationFillMode: string;
+        webkitAnimationIterationCount: string;
+        webkitAnimationName: string;
+        webkitAnimationPlayState: string;
+        webkitAnimationTimingFunction: string;
+        webkitAppearance: string;
+        webkitBackfaceVisibility: string;
+        webkitBackgroundClip: string;
+        webkitBackgroundOrigin: string;
+        webkitBackgroundSize: string;
+        webkitBorderBottomLeftRadius: string;
+        webkitBorderBottomRightRadius: string;
+        webkitBorderImage: string;
+        webkitBorderRadius: string;
+        webkitBorderTopLeftRadius: string;
+        webkitBorderTopRightRadius: string;
+        webkitBoxAlign: string;
+        webkitBoxDirection: string;
+        webkitBoxFlex: string;
+        webkitBoxOrdinalGroup: string;
+        webkitBoxOrient: string;
+        webkitBoxPack: string;
+        webkitBoxSizing: string;
+        webkitColumnBreakAfter: string;
+        webkitColumnBreakBefore: string;
+        webkitColumnBreakInside: string;
+        webkitColumnCount: string;
+        webkitColumnGap: string;
+        webkitColumnRule: string;
+        webkitColumnRuleColor: string;
+        webkitColumnRuleStyle: string;
+        webkitColumnRuleWidth: string;
+        webkitColumnSpan: string;
+        webkitColumnWidth: string;
+        webkitColumns: string;
+        webkitFilter: string;
+        webkitFlex: string;
+        webkitFlexBasis: string;
+        webkitFlexDirection: string;
+        webkitFlexFlow: string;
+        webkitFlexGrow: string;
+        webkitFlexShrink: string;
+        webkitFlexWrap: string;
+        webkitJustifyContent: string;
+        webkitOrder: string;
+        webkitPerspective: string;
+        webkitPerspectiveOrigin: string;
+        webkitTapHighlightColor: string;
+        webkitTextFillColor: string;
+        webkitTextSizeAdjust: string;
+        webkitTransform: string;
+        webkitTransformOrigin: string;
+        webkitTransformStyle: string;
+        webkitTransition: string;
+        webkitTransitionDelay: string;
+        webkitTransitionDuration: string;
+        webkitTransitionProperty: string;
+        webkitTransitionTimingFunction: string;
+        webkitUserModify: string;
+        webkitUserSelect: string;
+        webkitWritingMode: string;
+        whiteSpace: string;
+        widows: string;
+        width: string;
+        wordBreak: string;
+        wordSpacing: string;
+        wordWrap: string;
+        writingMode: string;
+        zIndex: string;
+        zoom: string;
     }
 }
 /**
@@ -726,6 +1072,7 @@ declare namespace VMDOM {
  * @param {any} defaultValue 初始化时每个属性的默认值
  */
 declare class HashObject {
+    [index: string]: any;
     constructor(s: string, defaultValue?: any);
 }
 interface IHashObject<T> {
@@ -802,6 +1149,7 @@ declare namespace VMDOM {
     }) => void;
 }
 interface Node {
+    [index: string]: any;
     __vdomNode__: VMDOM.VNode & IVNodeMethod;
 }
 declare const enum ENodeType {
@@ -816,7 +1164,9 @@ declare const enum ENodeType {
 interface IString extends String {
 }
 interface IVNodeMethod {
+    [index: string]: any;
     <K extends keyof VNodeNames>(nodeName: K, nodeType?: ENodeType.Element): VNodeNames[K] & IVNodeMethod;
+    (nodeName: any, nodeType?: ENodeType): VMDOM.VNode & IVNodeMethod;
 }
 declare namespace VMDOM {
     let emptyTextNodeRE: RegExp;
@@ -832,6 +1182,15 @@ declare namespace VMDOM {
         vmData: VNodeVMData;
         abstract nodeType: ENodeType;
         abstract nodeName: string;
+        /**
+         * 获取生成该对象的代码
+         *
+         * @abstract
+         * @param {number} [space]  前置空格
+         * @returns {string}
+         *
+         * @memberOf VNode
+         */
         abstract toJS(space?: number): string;
         abstract toCreateJS(space?: number): string;
         readonly childNodes: VNodeList;
@@ -880,6 +1239,14 @@ declare namespace VMDOM {
         getData(this: VNode): string;
         abstract cloneNode(deep: boolean): VNode & IVNodeMethod;
         abstract toHTMLString(): string[];
+        /**
+         * 获取生成该对象的代码
+         *
+         * @param {number} [space=0] 前置空格
+         * @returns {string}
+         *
+         * @memberOf VNode
+         */
         toJSString(space?: number): string;
         toDOM(): Node;
         protected doToDOM(): Node;
@@ -900,7 +1267,7 @@ declare namespace VMDOM {
     function getFunctionComment(fn: Function): string;
 }
 interface IBindClassToFunction {
-    [index: number]: (node: IVNodeMethod & VMDOM.VNode, nodeName: any) => void;
+    [index: string]: (node: IVNodeMethod & VMDOM.VNode, nodeName: any) => void;
 }
 declare function bindClassToFunction(node: IVNodeMethod & VMDOM.VNode, nodeName: string, nodeType?: ENodeType | undefined): string;
 declare function getVNodeMethod(): VMDOM.VNode & IVNodeMethod;
@@ -958,9 +1325,6 @@ declare let encodeHTML: (value: string) => string;
 declare let decodeHTML: (value: string) => string;
 interface VNodeNames {
     'html': VMDOM.VHtmlElement;
-}
-interface IVNodeMethod {
-    (nodeName: string, nodeType?: ENodeType.Element): VMDOM.VHtmlElement & IVNodeMethod;
 }
 declare function isVHTMLElement(node: VMDOM.VNode): node is VMDOM.VHtmlElement;
 declare namespace VMDOM {
@@ -1068,13 +1432,16 @@ declare namespace VMDOM {
         toHTMLString(): string[];
     }
 }
+interface VNodeNames {
+    '#document': VMDOM.VDocument & IVNodeMethod;
+}
 interface IVNodeMethod {
-    (nodeName: "#document", nodeType?: ENodeType.Document): VMDOM.VDocument & IVNodeMethod;
+    (nodeName: null, nodeType?: ENodeType.Document): VMDOM.VDocument & IVNodeMethod;
 }
 declare namespace VMDOM {
     class VDocument extends VNode {
         nodeType: ENodeType.Document;
-        nodeName: string;
+        nodeName: "#document";
         cloneNode(deep: boolean): VDocument & IVNodeMethod;
         toCreateJS(space?: number): string;
         toJS(): string;
@@ -2165,7 +2532,7 @@ declare abstract class VDOM {
     protected static textNode(html: string, m: IMember): void;
     protected static createHTMLNode(html: string, m: IMember): void;
     protected static setHTMLNodeClose(html: string, m: IMember): void;
-    protected static setAttrStart(m: any): void;
+    protected static setAttrStart(m: IMember): void;
     protected static htmlNode(html: string, m: IMember): void;
     protected static endXmlNode(html: string, m: IMember): void;
     protected static comment(html: string, m: IMember): void;
@@ -2316,7 +2683,7 @@ interface IVNodeMethod {
 declare namespace VMDOM {
     class VOrder extends VPlaceHolder {
         orderData: VOrderData;
-        nodeName: string;
+        nodeName: "#order";
         nodeType: ENodeType;
         constructor(orderData: VOrderData);
         cloneNode(deep: boolean): VOrder & IVNodeMethod;
@@ -2326,12 +2693,12 @@ declare namespace VMDOM {
 declare const enum ENodeType {
     Script = 103,
 }
-interface VNodeNames {
+interface IVNodeMethod {
     (data: string, nodeType: ENodeType.Script): VMDOM.VScript & IVNodeMethod;
 }
 declare namespace VMDOM {
     class VScript extends VPlaceHolder {
-        nodeName: string;
+        nodeName: "#script";
         nodeType: ENodeType;
         toJS(): string;
         propertyName: string;
@@ -2408,7 +2775,7 @@ declare namespace Order {
         condition: string;
         run(): void;
         constructor(node: VMDOM.VComment, condition: string);
-        static eachOrder(this: void, array: INode[] | INodeList, fn: (node: VMDOM.VComment, info: IOrderInfo, state: ITreeEachState<INode>) => (eTreeEach | void), beginIndex?: number): ITreeEachReturn | undefined;
+        static eachOrder(this: void, array: IArray<INode>, fn: (node: VMDOM.VComment, info: IOrderInfo, state: ITreeEachState<INode>) => (eTreeEach | void), beginIndex?: number): ITreeEachReturn<INode> | undefined;
     }
 }
 declare class XHR {
@@ -2467,10 +2834,10 @@ declare let operatorRE: RegExp;
 declare function replaceCls(): void;
 declare function getScopeBy(scope: any, node: INode): any;
 declare function setNodeProperty(node: any, proName: any, condition: any, outerChildNodes: any, outerElement: any, props: any, part: any): void;
-declare function getTemplate(node: IHTMLElement): string;
+declare function getTemplate(node: IElement): string;
 declare function defineClasses(node: IHTMLElement): void;
-declare function isTemplate(node: IHTMLElement): node is IHTMLElement;
-declare function findTemplates(nodes: IHTMLElement[] | IArray): IElement[] | IArray;
+declare function isTemplate(node: IElement): node is IElement;
+declare function findTemplates(nodes: IArray<IElement>): IArray<IElement>;
 /**
  * 加载UI
  */
@@ -2509,7 +2876,7 @@ declare function render(this: void, uiNode: IHTMLElement | null, outerChildNodes
 }): void;
 declare let elementParser: ElementParser;
 declare function initHTML(arr: INode[] | INodeList, outerChildNodes?: any, outerElement?: any, props?: any, part?: any): void;
-declare function getParts(childNodes: INode[] | NodeList): Component.Part[];
+declare function getParts(childNodes: IArray<INode>): Component.Part[];
 interface VNodeVMData {
     sign?: 0 | 1;
     part: Component.Part;
@@ -2540,7 +2907,7 @@ declare namespace Component {
          * 组件的方法属性
          */
         /** DOM节点存储数组 */
-        protected nodeStore: (VMDOM.VNode & IVNodeMethod)[];
+        protected nodestore: (VMDOM.VNode & IVNodeMethod)[];
         /**节点命名空间 */
         refs: IPartRefs;
         /**资源路径 */
@@ -2553,8 +2920,10 @@ declare namespace Component {
         $online: EventHelper<(this: void, part: Part, node: HTMLElement) => void, (this: void, part: Part, node: HTMLElement) => boolean>;
         /**remove事件管理器 */
         $offline: EventHelper<(this: void, part: Part) => void, (this: void, part: Part) => boolean>;
+        propsNodes: (VMDOM.VNode & IVNodeMethod)[];
+        propsElements: (VMDOM.VNode & IVNodeMethod)[];
         /**初始化对象 */
-        constructor(partName: string, dom: ComponentView.IView, props: ComponentView.IProps, nodes?: (VMDOM.VNode & IVNodeMethod)[]);
+        constructor(partName: string, dom: ComponentView.IView, props: ComponentView.IProps, propsNodes?: (VMDOM.VNode & IVNodeMethod)[]);
         /**即时子Part数组 */
         readonly child: Part[];
         /**子节点数目 */
@@ -2567,7 +2936,7 @@ declare namespace Component {
         readonly innerHTML: string;
         /**读取父节点 */
         readonly elemParent: VMDOM.VNode & IVNodeMethod;
-        readonly scopeNodes: INode[];
+        readonly scopenodes: INode[];
         /**获取组件区块（试验） */
         /**设置组件宽高
          * @param {ClientRect} rect 区块
@@ -2618,6 +2987,335 @@ interface Node {
     insertBefore2<T extends INode | Node>(newNode: T, node?: T): T;
 }
 declare let isIE: boolean;
+declare namespace Order {
+}
+declare namespace OrderEx {
+    const tryRun = "tryRun";
+    const replaceToScriptNode = "replaceToScriptNode";
+    interface IExtendsOrderFunction {
+        <U>(clazz: {
+            prototype: U;
+        }, name: 'tryRun', fn: (this: U) => void): void;
+        <U>(clazz: {
+            prototype: U;
+        }, name: 'replaceToScriptNode', fn: (this: U) => string): void;
+    }
+    function extendsOrderGet<U extends Order.VOrder>(clazz: {
+        prototype: U;
+    }, name: string, fn: (this: U) => void): void;
+    const extendsOrderFunction: IExtendsOrderFunction;
+    function canRunAtService(order: Order.VOrder): boolean;
+    function toScriptNode(order: Order.VOrder): void;
+}
+declare namespace Order {
+    interface IOrderDataBlock extends IOrderData {
+        placeholder: VMDOM.VPlaceHolder;
+        blocks: IOrderBlock[];
+    }
+    interface IOrderDataBlockRun extends IOrderDataBlock {
+        isBreak: boolean;
+    }
+    interface IOrderBlock {
+        order: string;
+        condition: string;
+        nodes: VMDOM.VNode[];
+    }
+    abstract class BlockOrder extends VOrder {
+        data: IOrderDataBlock;
+        endNode: VMDOM.VComment;
+        constructor(node: VMDOM.VComment, condition: string, orderName: string, isBlockStart: (subOrder: string) => boolean);
+    }
+    function parseBreakOrder(this: void, data: IOrderDataBlockRun, isBlockStart: (subOrder: string) => boolean, blocks: INode[], p: INode): void;
+}
+declare namespace Order {
+    interface IOrderDataIf extends IOrderDataBlock {
+        condition: string;
+    }
+    class If extends BlockOrder {
+        static orderName: string;
+        static subOrder: string[];
+        data: IOrderDataIf;
+        constructor(node: VMDOM.VComment, condition: string);
+        static isBlockStart(subOrder: string): boolean;
+        static run(this: void, data: IOrderDataIf): void;
+    }
+}
+declare namespace Order {
+    abstract class RepeatBlockOrder extends BlockOrder {
+        constructor(node: VMDOM.VComment, condition: string, orderName: string);
+        static run(data: IOrderDataBlock, canRepeat: (data: IOrderDataBlock) => boolean): void;
+        static isBlockStart(subOrder: string): boolean;
+    }
+}
+declare namespace JS {
+    class Var extends JavaScriptLogic {
+        static logicName: string;
+        varInfos: [string, string | undefined, boolean][];
+        static new(statement: JavaScriptStatement): Var | null;
+        protected constructor(varInfos: [string, string | undefined, boolean][]);
+        getVars(): string[];
+    }
+}
+declare namespace JS {
+    const enum EForMode {
+        In = 0,
+        Step = 1,
+    }
+    interface IInfoForIn {
+        mode: EForMode;
+        hasVar: boolean;
+        varName: string;
+        bindingExp: JavaScriptStatement;
+    }
+    interface IInfoForStep {
+        mode: EForMode;
+        variable: Var | null;
+        first: JavaScriptStatement;
+        exec: JavaScriptStatement;
+        step: JavaScriptStatement;
+    }
+    class For extends JavaScriptLogic {
+        static logicName: string;
+        static new(statement: JavaScriptStatement): For | null;
+        static parseConditions(block: JavaScriptBlock): IInfoForStep | IInfoForIn | null;
+        private static parseStep(statements);
+        private static parseForIn(keyWords);
+        mode: EForMode;
+        info: IInfoForIn | IInfoForStep;
+        constructor(mode: EForMode, info: IInfoForIn | IInfoForStep);
+    }
+}
+declare namespace Order {
+    interface IOrderDataForIn extends IOrderDataBlock {
+        forInInfo: {
+            var: string;
+            object: string;
+            names: string[];
+        };
+    }
+    interface IOrderDataForStep extends IOrderDataBlock {
+        forStepInfo: {
+            first: string | [string, string | undefined, boolean][];
+            exec: string;
+            step: string;
+        };
+    }
+    interface IOrderDataFor extends IOrderDataForIn, IOrderDataForStep {
+        forMode: JS.EForMode;
+    }
+    class For extends RepeatBlockOrder {
+        static orderName: string;
+        data: IOrderDataFor;
+        constructor(node: VMDOM.VComment, condition: string);
+        static run(data: IOrderDataFor): void;
+    }
+}
+declare namespace Order {
+    interface IOrderDataSwitch extends IOrderDataBlock {
+        condition: string;
+    }
+    class Switch extends BlockOrder {
+        static orderName: string;
+        static subOrder: string[];
+        data: IOrderDataSwitch;
+        constructor(node: VMDOM.VComment, condition: string);
+        static isBlockStart(subOrder: string): boolean;
+        static run(data: IOrderDataSwitch): void;
+    }
+}
+declare namespace Order {
+    interface IOrderDataWhile extends IOrderDataBlock {
+        condition: string;
+    }
+    class While extends RepeatBlockOrder {
+        static orderName: string;
+        data: IOrderDataWhile;
+        constructor(node: VMDOM.VComment, condition: string);
+        static run(data: IOrderDataWhile): void;
+    }
+}
+declare namespace Order {
+    interface IOrderDataDo extends IOrderDataWhile {
+        isFirst: boolean;
+    }
+    class Do extends RepeatBlockOrder {
+        static orderName: string;
+        data: IOrderDataDo;
+        constructor(node: VMDOM.VComment, condition: string);
+        static run(data: IOrderDataDo): void;
+    }
+}
+declare namespace JS {
+    interface IJavaScriptParseState {
+        condition: string;
+        index: number;
+        action: string;
+        length: number;
+        block: JavaScriptBlock;
+        root: JavaScriptBlock;
+        keyWordStart: number;
+        commentStart: number;
+        stringStart: number;
+        stringStartBy: string;
+    }
+    class Parser {
+        private static getInitData(condition, start?);
+        private static ''(m);
+        /**是否跟随回车换行 */
+        private static isFollowCarriageReturnOrLineFeed(m);
+        private static parseKeyWord(m);
+        private static pushComment(m, comment);
+        private static pushKeyWord(m, keyWord);
+        private static pushString(m, string);
+        private static pushBlock(m, block);
+        private static pushKeyWordOrBlock(m, keyWordOrBlockOrComment);
+        private static getLastStatement(m);
+        private static '*/<>'(m, keyWord);
+        private static '<>'(m, keyWord);
+        private static '<<>>'(m, keyWord);
+        private static '<<<>>>'(m, keyWord);
+        private static comment(m);
+        private static comment2(m);
+        private static '/'(m);
+        private static '+-%'(m, keyWord);
+        private static '?='(m, keyWord);
+        private static '=>'(m);
+        private static '?=='(m, keyWord);
+        private static ';'(m);
+        private static '.'(m);
+        private static '!~'(m, keyWord);
+        private static isStatementBegin(m);
+        private static space(m);
+        private static '({['(m, keyWord, keyWordEnd);
+        private static ')}]'(m, keyWord, keyWordBegin);
+        private static '"`\''(m, keyWord);
+        private static string(m);
+        private static parseEnd(m);
+        private static keyWord(m);
+        /**解析结构 */
+        static parseStructor(condition: string, start?: number, checkCallback?: (m: IJavaScriptParseState) => boolean): JavaScriptBlock;
+        /**仅从文本流里解析出一个代码块 */
+        static parseBlock(condition: string, start: number): {
+            length: number;
+            block: JavaScriptBlock;
+        };
+        static parseStatement(condition: string, start: number): {
+            length: number;
+            statement: JavaScriptStatement;
+        };
+    }
+}
+declare namespace Order {
+    interface IOrderDataVar extends IOrderData {
+        varInfos: [string, string | undefined, boolean][];
+        placeholder: VMDOM.VComment;
+    }
+    class Var extends VOrder {
+        static orderName: string;
+        data: IOrderDataVar;
+        block: JS.JavaScriptBlock;
+        constructor(node: VMDOM.VComment, condition: string);
+        initStatement(): void;
+        getBlock(condition: string): JS.JavaScriptBlock;
+        initvarInfos(): void;
+        static run(data: IOrderDataVar): void;
+    }
+    function tryRunVarInfos(this: void, node: INode, varInfos: [string, string | undefined, boolean][]): void;
+    function runVarInfos(this: void, scope: Scope, node: VMDOM.VNode, varInfos: [string, string | undefined, boolean][]): void;
+}
+declare namespace Order {
+}
+declare namespace Order {
+    /**运行并插入返回的节点 */
+    interface IOrderDataEqual extends IOrderData {
+        condition: string;
+    }
+    class Equal extends VOrder {
+        static orderName: string;
+        data: IOrderDataEqual;
+        constructor(node: VMDOM.VComment, condition: string);
+        static run(this: void, data: IOrderDataEqual): void;
+    }
+}
+declare namespace JS {
+    class JavaScriptExpressions {
+        children: (JavaScriptExpressions | string)[];
+        push(child: JavaScriptExpressions | string): this;
+        toString(): string;
+    }
+    /**获得分级代码数组
+     * @param {JavaScriptBlock} block 语句块
+     */
+    function getExps(block: JS.JavaScriptBlock): JavaScriptExpressions;
+    /**获得分级代码数组
+     * @param {JavaScriptStatement} statement 语句
+     */
+    function getStatementExps(statement: JS.JavaScriptStatement): JavaScriptExpressions;
+    enum EKeyWordType {
+        UnKnown = 0,
+        Unary_Operator = 1,
+        Operator = 2,
+        Assigning_Operator = 3,
+        Comparison_Operator = 4,
+        Compound_Assigning_Operator = 5,
+        Instruction_Operator = 6,
+        Ternary_Operator = 7,
+        Member_Access_Operator = 8,
+    }
+    /**获取keyWord类型*/
+    function getKeyWordType(keyWord: string): EKeyWordType;
+}
+declare namespace JS {
+    class Function extends JavaScriptLogic {
+        params: string[];
+        isLambda: boolean;
+        content: JavaScriptBlock | string;
+        static logicName: string;
+        static new(statement: JavaScriptStatement): Function | null;
+        static setParams(params: string[], block: JavaScriptBlock): boolean;
+        protected constructor(params: string[], isLambda: boolean, content: JavaScriptBlock | string);
+        toString(): string;
+    }
+}
+declare namespace Order {
+    interface IOrderDataBindExpressions extends IOrderData {
+        function: {
+            params: string[];
+            content: string;
+        } | null;
+        object: [string, string];
+    }
+    class BindExpressions extends VOrder {
+        static orderName: string;
+        data: IOrderDataBindExpressions;
+        constructor(node: VMDOM.VComment, condition: string);
+        /** 计算*/
+        static run(data: IOrderDataBindExpressions): void;
+    }
+    function makeExpressFunction(this: void, content: string, params: string[]): (node: INode, args: any[]) => any;
+}
+declare namespace Order {
+}
+declare namespace Order {
+    /**
+     * 插入传递进组件的dom元素
+     */
+    class Elements extends VOrder {
+        static orderName: string;
+        run(): void;
+        static run(this: void, data: IOrderData): void;
+    }
+}
+declare namespace Order {
+    /**
+     * 插入传递进组件的dom元素
+     */
+    class Nodes extends VOrder {
+        static orderName: string;
+        run(): void;
+        static run(this: void, data: IOrderData): void;
+    }
+}
 interface IRenderDocument {
     (): void;
     beginTime?: Date;
@@ -2645,11 +3343,11 @@ declare class Turtle extends EventEmitterEx implements ITurtle {
     private getScriptNode();
     readonly rootParts: Component.Part[];
     emitResize(): void;
-    renderTemplate(tp: IHTMLElement): void;
+    renderTemplate(tp: IElement): void;
     renderDocument: IRenderDocument;
     private r1(scriptNode, compileuilist, compileName, compileInfo, compile);
     private r2();
     ready(fn: () => void): this;
 }
+declare let turtle: Turtle;
 declare var $t: ITurtle;
-declare let turtle: ITurtle;

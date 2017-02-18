@@ -1,9 +1,13 @@
 {
     "compilerOptions": {
-        "noImplicitAny": true,
+        // "noImplicitAny": true,
+        // "strictNullChecks": true,
+        "noImplicitThis":true,
         "alwaysStrict":true,
         "target":"es5",
         "experimentalDecorators":true,
-        "strictNullChecks": true
+        "skipLibCheck":true,
+        "noUnusedParameters":true,
+        "noUnusedLocals":true
     }
 }

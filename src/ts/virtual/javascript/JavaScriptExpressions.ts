@@ -17,7 +17,7 @@ namespace JS{
     /**获得分级代码数组
      * @param {JavaScriptBlock} block 语句块
      */
-    export function getExps(block:JS.JavaScriptBlock):JavaScriptExpressions{
+    export function getExps(block:JS.JavaScriptBlock<keyof IBreakes>):JavaScriptExpressions{
         let exps:JavaScriptExpressions=new JavaScriptExpressions;
         exps.push(block.begin);
         for(const statement of block.children){

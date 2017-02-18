@@ -5,12 +5,12 @@ namespace Order {
         scopeName:string
     }
     @register
-    class ScopeOrder extends Var {
+    export class ScopeOrder extends Var {
         static orderName = "scope";
         data:IOrderDataScope
         initBlock(){
             let data=this.data;
-            let conditionArr=splitByOnce(this.condition,":");
+            let conditionArr=splitByOnce(this.setup.params.toString(),":");
             data.scopeName=conditionArr[0];
             if(conditionArr.length===2){
                 this.block=this.getBlock(conditionArr[1]);

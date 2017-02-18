@@ -7,6 +7,7 @@
 // / <reference path="Server.ts"/>
 /// <reference path="View.ts"/>
 /// <reference path="partCore.ts"/>
+/// <reference path='../scope/DOMScope.ts'/>
 
 interface VNodeVMData{
     sign?:0|1
@@ -40,7 +41,7 @@ namespace Component{
         // $: Service;
 
         /** DOM节点存储数组 */
-        protected nodeStore: (VMDOM.VNode&IVNodeMethod)[] = [];
+        protected nodestore: (VMDOM.VNode&IVNodeMethod)[] = [];
 
         /**节点命名空间 */
         refs: IPartRefs
@@ -72,12 +73,26 @@ namespace Component{
             (this: void, part: Part) => void,
             (this: void, part: Part) => boolean>("offline");
 
+        propsNodes:(VMDOM.VNode&IVNodeMethod)[]
+        propsElements:(VMDOM.VNode&IVNodeMethod)[]
         /**初始化对象 */
-        constructor(public partName:string/*组件名*/,dom:ComponentView.IView,public props: ComponentView.IProps,nodes?: (VMDOM.VNode&IVNodeMethod)[]) {
+        constructor(public partName:string/*组件名*/,dom:ComponentView.IView,public props: ComponentView.IProps,propsNodes?: (VMDOM.VNode&IVNodeMethod)[]) {
             super();
-            
+            $rootScope.lastRenderPart=this;
+            let propsElements: (VMDOM.VHtmlElement&IVNodeMethod)[]=<any>[];
+            if(propsNodes){
+                for(let node of propsNodes){
+                    if(isVHTMLElement(node)){
+                        propsElements.push(node);
+                    }
+                }
+            }else{
+                propsNodes=[];
+            }
+            this.propsNodes=propsNodes;
+            this.propsElements=propsElements;
             this.dom=dom;
-            this.dom.initDOM(props,nodes);
+            this.dom.initDOM(props,propsNodes);
             // this.$ = new Service(template.service);
             // if(extPart){
             //     /**继承 */
@@ -89,20 +104,10 @@ namespace Component{
             
             let topNodes = this.dom.tops;
             
-            let outerElement: (VMDOM.VHtmlElement&IVNodeMethod)[]=<any>[];
-            if(nodes){
-                for(let node of nodes){
-                    if(isVHTMLElement(node)){
-                        outerElement.push(node);
-                    }
-                }
-            }else{
-                nodes=[];
-            }
             if(topNodes){
-                initHTML(topNodes, nodes, outerElement, props, this);
+                initHTML(topNodes, propsNodes, propsElements, props, this);
                 for (let i = topNodes.length; i > 0; i--) {
-                    this.nodeStore.push(topNodes[0]);
+                    this.nodestore.push(topNodes[0]);
                 }    
             }
             let name = this.partName;
@@ -126,14 +131,14 @@ namespace Component{
             // this.basePart.isInDOM=false;
 
 
-            // initHTML(nodes, nodes, outerElement, props, this);
+            // initHTML(propsNodes, propsNodes, propsElements, props, this);
             // if(extPart){
             //     (<ExtendsPart>extPart).to(this);
             // }
-            let store = this.nodeStore;
-            // push.apply(store, <any>nodes);  ?这里是bug
-            // for (let i = nodes.length; i > 0; i--) {
-            //     dom.removeChild(nodes[0]);
+            let store = this.nodestore;
+            // push.apply(store, <any>propsNodes);  ?这里是bug
+            // for (let i = propsNodes.length; i > 0; i--) {
+            //     dom.removeChild(propsNodes[0]);
             // }
             store.unshift(begin);
             store.push(end);
@@ -146,7 +151,7 @@ namespace Component{
         /**子节点数目 */
         get elementLength() {
             if (this.isInDOM) {
-                return this.nodeStore.length;
+                return this.nodestore.length;
             } else {
                 return 1;
             }
@@ -171,8 +176,8 @@ namespace Component{
                     return [];
                 }
             }
-            if (isArray(this.nodeStore)) {
-                return this.nodeStore.slice().splice(1, this.nodeStore.length - 2);
+            if (isArray(this.nodestore)) {
+                return this.nodestore.slice().splice(1, this.nodestore.length - 2);
             } else {
                 return [];
             }
@@ -189,15 +194,15 @@ namespace Component{
         get elemParent() {
             return this.refs.begin.parentNode;
         }
-        get scopeNodes() {
-            let scopeNodes:INode[] = [];
+        get scopenodes() {
+            let scopenodes:INode[] = [];
             treeEach(this.elements, "children", function (node) {
                 if (node.hasOwnProperty("scope")) {
-                    scopeNodes.push(node);
+                    scopenodes.push(node);
                     return eTreeEach.c_noIn;
                 }
             });
-            return scopeNodes;
+            return scopenodes;
         }
         /**设置组件宽高 
          * @param {ClientRect} rect 区块
@@ -335,22 +340,22 @@ namespace Component{
                 elems.unshift(this.refs.begin);
                 elems.push(this.refs.end);
                 /*cut scope*/
-                let scopeNodes = this.scopeNodes;
-                for (let i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.unlink(<Scope>scopeNodes[i].__scope__);
+                let scopenodes = this.scopenodes;
+                for (let i = 0; i < scopenodes.length; i++) {
+                    DOMScope.unlink(<Scope>scopenodes[i].__scope__);
                 }
                 appendNodes(elems, elem);
                 /*link scope*/
-                for (let i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.link(<Scope>scopeNodes[i].__scope__, elem);
+                for (let i = 0; i < scopenodes.length; i++) {
+                    DOMScope.link(<Scope>scopenodes[i].__scope__, elem);
                 }
                 this.$online.emit(this, elem);
             } else {
-                appendNodes(this.nodeStore, elem);
+                appendNodes(this.nodestore, elem);
                 /*link scope*/
-                let scopeNodes = this.scopeNodes;
-                for (let i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.link(<Scope>scopeNodes[i].__scope__, elem);
+                let scopenodes = this.scopenodes;
+                for (let i = 0; i < scopenodes.length; i++) {
+                    DOMScope.link(<Scope>scopenodes[i].__scope__, elem);
                 }
                 this.$online.emit(this, elem);
                 this.isInDOM = true;
@@ -366,22 +371,22 @@ namespace Component{
                 elems.unshift(this.refs.begin);
                 elems.push(this.refs.end);
                 /*cut scope*/
-                let scopeNodes = this.scopeNodes;
-                for (let i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.unlink(<Scope>scopeNodes[i].__scope__);
+                let scopenodes = this.scopenodes;
+                for (let i = 0; i < scopenodes.length; i++) {
+                    DOMScope.unlink(<Scope>scopenodes[i].__scope__);
                 }
                 insertNodesBefore(elem, elems);
                 /*link scope*/
-                for (let i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.link(<Scope>scopeNodes[i].__scope__, elem);
+                for (let i = 0; i < scopenodes.length; i++) {
+                    DOMScope.link(<Scope>scopenodes[i].__scope__, elem);
                 }
                 this.$online.emit(this, elem);
             } else {
-                insertNodesBefore(elem, this.nodeStore);
+                insertNodesBefore(elem, this.nodestore);
                 /*link scope*/
-                let scopeNodes = this.scopeNodes;
-                for (let i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.link(<Scope>scopeNodes[i].__scope__, elem);
+                let scopenodes = this.scopenodes;
+                for (let i = 0; i < scopenodes.length; i++) {
+                    DOMScope.link(<Scope>scopenodes[i].__scope__, elem);
                 }
                 this.$online.emit(this, elem);
                 // this.basePart.isInsert=true;
@@ -396,10 +401,10 @@ namespace Component{
                 let elems = this.elements;
                 elems.unshift(this.refs.begin);
                 elems.push(this.refs.end);
-                let scopeNodes = this.scopeNodes;
+                let scopenodes = this.scopenodes;
                 /*cut scope*/
-                for (let i = 0; i < scopeNodes.length; i++) {
-                    DOMScope.unlink(<Scope>scopeNodes[i].__scope__);
+                for (let i = 0; i < scopenodes.length; i++) {
+                    DOMScope.unlink(<Scope>scopenodes[i].__scope__);
                 }
                 let p = this.refs.begin.parentNode;
                 if (p !== null) {
@@ -407,7 +412,7 @@ namespace Component{
                         p.removeChild(elems[i]);
                     }
                 }
-                this.nodeStore = elems;
+                this.nodestore = elems;
                 // this.basePart.isInsert=false;
                 this.$offline.emit(this);
                 if (this.parent) {

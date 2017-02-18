@@ -7,6 +7,18 @@ gulp.task('ui:w', function () {
         console.log(e);
     });
 });
+var tsconfig={
+    target: 'es5',//把typescript转换成es5标准的js文件,也可以是es6,但这个node版本不支持
+    outFile:'virtual/UIHelper.0.1.js',
+    experimentalDecorators:true,
+    declaration: true,
+    "noImplicitThis":true,
+    "skipLibCheck":true,
+    "noUnusedParameters":true,
+    "noUnusedLocals":true
+    // "noImplicitAny": true,
+    // "alwaysStrict":true
+    }
 //virtual
 gulp.task('vm',function(){
     var fs=require('fs');
@@ -19,14 +31,7 @@ gulp.task('vm',function(){
     del(['dest/virtual/*']);
     var tsResult=gulp.src('src/ts/virtual/UIHelper/UIHelper.ts')
         .pipe(sourcemaps.init())
-        .pipe(ts({
-            target: 'es5',//把typescript转换成es5标准的js文件,也可以是es6,但这个node版本不支持
-            outFile:'virtual/UIHelper.0.1.js',
-            experimentalDecorators:true,
-            declaration: true,
-            "noImplicitAny": true,
-            "alwaysStrict":true
-            })
+        .pipe(ts(tsconfig)
         );
      merge([
          tsResult.js.pipe(gulp.dest('dest')),
@@ -45,14 +50,7 @@ gulp.task('turtle',function(){
     var del = require('del');
 
     var tsResult=gulp.src('src/ts/index.ts')
-        .pipe(ts({
-            target: 'es5',//把typescript转换成es5标准的js文件,也可以是es6,但这个node版本不支持
-            outFile:'js/turtle.0.1.js',
-            experimentalDecorators:true,
-            declaration: true,
-            "noImplicitAny": true,
-            "alwaysStrict":true
-            })
+        .pipe(ts(tsconfig)
         );
         // tsResult.pipe(sourcemaps.init()).pipe(sourcemaps.write('../maps', {addComment: false}))
      merge([

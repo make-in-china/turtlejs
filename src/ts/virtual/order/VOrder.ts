@@ -3,28 +3,27 @@
 /// <reference path='../javascript/JavaScriptStatement.ts'/>
 
 namespace Order {
-    
+    export interface IOrderSetup{
+        params?:JS.JavaScriptBlock<'('>,
+        data?:JS.JavaScriptBlock<'{'>
+    }
     export interface IOrderData{
         placeholder:VMDOM.VComment
     }
     export abstract class VOrder {
         data:IOrderData=<any>{};
-        node: VMDOM.VComment
-        condition: string
         run(){
             (<IOrderConstructor>this.constructor).run(this.data);
         }
-        constructor(node: VMDOM.VComment, condition: string) {
-            this.node = node;
-            this.condition = condition;
+        constructor(public node: VMDOM.VComment,public setup: IOrderSetup) {
             this.data.placeholder=node;
         }
         static eachOrder(
                 this:void,
-                array:INode[]|INodeList,
+                array:IArray<INode>,
                 fn:(node:VMDOM.VComment,info:IOrderInfo,state:ITreeEachState<INode>)=>(eTreeEach|void),
                 beginIndex:number=0
-            ):ITreeEachReturn | undefined{
+            ):ITreeEachReturn<INode> | undefined{
             return treeEach(array, 'childNodes', (node: INode, state)=> {
                 if (!(node instanceof VMDOM.VComment)) {
                     return;

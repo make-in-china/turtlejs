@@ -26,6 +26,6 @@
 //     };
 // }
 
-var $t=new Turtle();
-let turtle=$t;
+let turtle=new Turtle();
 
+var $t=<ITurtle>turtle;

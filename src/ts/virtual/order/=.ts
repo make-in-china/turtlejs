@@ -9,9 +9,9 @@ namespace Order {
     export class Equal extends VOrder {
         static orderName = "="
         data:IOrderDataEqual
-        constructor(node:VMDOM.VComment,condition:string){
-            super(node,condition);
-            this.data.condition=condition;
+        constructor(node:VMDOM.VComment,setup: IOrderSetup){
+            super(node,setup);
+            this.data.condition=setup.params.innerText;
         }
         static run(this:void,data:IOrderDataEqual){
             let v=exec(data.placeholder,data.condition);

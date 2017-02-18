@@ -12,30 +12,30 @@ let
     
     slice:{
         <T>(start?: number, end?: number): T[]
-        call<T>(arr:IArray|T[],start?: number, end?: number):T[]
+        call<T>(arr:IArray<T>|T[],start?: number, end?: number):T[]
     }
                                                 =   arrayConstructor.slice,
     
     push:{
         <T>(...items: T[]):number
-        apply<T>(arr:IArray|T[],items:T[]):number
-        call<T>(arr:IArray|T[],...items:T[]):number
+        apply<T>(arr:IArray<T>|T[],items:T[]):number
+        call<T>(arr:IArray<T>|T[],...items:T[]):number
     }                                           =   arrayConstructor.push,
     
     splice:{
         <T>(start: number): T[]
-        call<T>(arr:IArray|T[],start: number):T[]
-        call<T>(arr:IArray|T[],start: number, deleteCount: number, ...items: T[]): T[];
+        call<T>(arr:IArray<T>|T[],start: number):T[]
+        call<T>(arr:IArray<T>|T[],start: number, deleteCount: number, ...items: T[]): T[];
     }                                           =   arrayConstructor.splice,
 
     indexOf:{
         <T>(searchElement: T, fromIndex?: number): number
-        call<T>(arr:IArray|T[],searchElement: T, fromIndex?: number): number
+        call<T>(arr:IArray<T>|T[],searchElement: T, fromIndex?: number): number
     }                                           =   arrayConstructor.indexOf;
 
 let last:{
         <T>(): T|undefined
-        call<T>(arr:IArray|T[]): T|undefined
+        call<T>(arr:IArray<T>|T[]): T|undefined
     }=function<T>(this:T[]):T|undefined{
     if(this.length>0){
         return this[this.length-1];

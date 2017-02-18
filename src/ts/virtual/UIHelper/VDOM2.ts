@@ -1,5 +1,6 @@
 
 /// <reference path='VDOM.ts'/>
+/// <reference path='javascriptEx/JavaScriptStatement.ts'/>
 class AttrValueFilter{
     nameStart:number=0
     nameEnd:number=0
@@ -238,9 +239,8 @@ abstract class VDOM2 extends VDOM {
                         m.textNodeStart = m.index;
                         return;
                     case m.index<m.length-2&&html[m.index+1]==='@':
-                        //@@order;
-                        //@@order();
-                        //@@order   ();
+                        //@@order   ()   {}     ;
+                        //         可选  可选   前面2个有其中一个时可选
                         m.index+=2;
                         var {length,statement}=JS.Parser.parseStatement(html,m.index);
                         m.index+=length;
@@ -257,29 +257,55 @@ abstract class VDOM2 extends VDOM {
                         let name=itm;
                         let idx=1;
                         itm=chds[idx];
-                        if(isString(itm)&&JS.isSpace(itm)){
-                            idx++;
-                            count++;
-                            if(chds.length<count){
-                                throw new Error("错误的Order语句：语句不完整，缺少';'");
+                        let parseSpace=function(){
+                            if(isString(itm)&&JS.isSpace(itm)){
+                                idx++;
+                                count++;
+                                if(chds.length<count){
+                                    throw new Error("错误的Order语句：语句不完整，缺少';'");
+                                }
+                                itm=chds[idx];
                             }
-                            itm=chds[idx];
                         }
-                        let condition:JS.JavaScriptBlock|undefined;
+                        parseSpace();
+                        let setup:Order.IOrderSetup|undefined;
                         if(itm instanceof JS.JavaScriptBlock){
                             idx++;
                             count++;
                             if(chds.length<count){
                                 throw new Error("错误的Order语句：语句不完整，缺少';'");
                             }
-                            condition=itm;
+                            if(itm.begin==="("){
+                                
+                                setup=<any>{params:itm};
+                            }else{
+                                setup=<any>{data:itm};
+                            }
+                            itm=chds[idx];
                         }
-
+                        parseSpace();
+                        if(itm instanceof JS.JavaScriptBlock){
+                            idx++;
+                            count++;
+                            if(chds.length<count){
+                                throw new Error("错误的Order语句：语句不完整，缺少';'");
+                            }
+                            if(setup){
+                                if(itm.begin==="("){
+                                    throw new Error("错误的Order语句：重复的()");
+                                }else if (setup.data){
+                                    throw new Error("错误的Order语句：重复的{}");
+                                }
+                            }
+                            setup=<any>{data:itm};
+                            itm=chds[idx];
+                        }
+                        parseSpace();
                         if(!isString(itm)||itm!==';'){
                             //order;
                             throw new Error("错误的Order语句：语句不完整，缺少';'");
                         }
-                        m.node.appendChild($$$(new VMDOM.VOrderData(name,condition),ENodeType.Order));
+                        m.node.appendChild($$$(new VMDOM.VOrderData(name,setup),ENodeType.Order));
 
                         m.textNodeStart = m.index;
                         return;
@@ -305,8 +331,8 @@ abstract class VDOM2 extends VDOM {
                 super.textNode(html,m);
         }
     }
-    protected static getInitData(vNode: VMDOM.VNode & IVNodeMethod | undefined, length: number): IMember2 {
-        let data:IMember2=<IMember2>super.getInitData(vNode,length);
+    protected static getInitData(vNode: VMDOM.VNode & IVNodeMethod | undefined, length: number,endChar:string=''): IMember2 {
+        let data:IMember2=<IMember2>super.getInitData(vNode,length,endChar);
         data.attrValueStart=0;
         data.attrValueEnd=0;
         return data;

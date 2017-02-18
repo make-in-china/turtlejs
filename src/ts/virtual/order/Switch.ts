@@ -4,6 +4,7 @@ namespace Order {
 
     
     export interface IOrderDataSwitch extends IOrderDataBlock {
+        setup: IOrderSetup
         condition:string
     }
 
@@ -13,9 +14,11 @@ namespace Order {
         static orderName = "switch"
         static subOrder=["case","default"];
         data:IOrderDataSwitch
-        constructor(node: VMDOM.VComment, condition: string) {
-            super(node, condition,'switch',Switch.isBlockStart);
-            this.data.condition=condition;
+        constructor(node: VMDOM.VComment, setup: IOrderSetup) {
+            super(node, setup,'switch',Switch.isBlockStart);
+            debugger;
+            this.data.setup=setup;
+            this.data.condition=setup.params.toString();
         }
         static isBlockStart(subOrder:string):boolean{
             switch (subOrder) {
@@ -42,8 +45,8 @@ namespace Order {
                         break;
                     }
                     insertNodesBefore(data.placeholder , block.nodes);
-                    let p=data.placeholder.parentNode;
-                    parseBreakOrder(runData,this.isBlockStart,block.nodes,<INode>p);
+                    // let p=data.placeholder.parentNode;
+                    parseBreakOrder(runData,this.isBlockStart,block.nodes);
                     if(runData.isBreak){
                         break;
                     }

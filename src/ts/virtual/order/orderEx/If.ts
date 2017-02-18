@@ -15,12 +15,12 @@ namespace OrderEx {
         let data=this.data;
         let blocks=getBlocksDataString(data);
         return `
-        Order.If.run({
-            placeholder:this,
-            blocks:[
-                ${blocks.join(`,
-                `)}]
-        });`;
+            Order.If.run({
+                placeholder:this,
+                blocks:[
+                    ${blocks.join(`,
+                    `)}]
+            });`;
     });
     
     export function getBlocksDataString(data:Order.IOrderDataBlock){

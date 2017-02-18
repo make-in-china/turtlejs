@@ -1,14 +1,14 @@
 
 /// <reference path='VOrder.ts'/>
-/// <reference path='../Nodes.ts'/>
+/// <reference path='../Elements.ts'/>
 namespace OrderEx {
-    extendsOrderFunction(Order.Nodes,tryRun,function(this:Order.Nodes){
+    extendsOrderFunction(Order.Elements,tryRun,function(this:Order.Elements){
         throw new Error("不能预编译项");
     });
-    extendsOrderFunction(Order.Nodes,replaceToScriptNode,function(this:Order.Nodes){
+    extendsOrderFunction(Order.Elements,replaceToScriptNode,function(this:Order.Elements){
         //生成中间数据  的  生成代码
         return `
-            Order.Nodes.run({
+            Order.Elements.run({
                 placeholder:this
             });`;
     });

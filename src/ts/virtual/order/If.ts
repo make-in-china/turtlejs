@@ -4,6 +4,13 @@ namespace Order {
 
     
     export interface IOrderDataIf extends IOrderDataBlock {
+        // info:IOrderSetup
+        /**
+         * 用于判断的表达式字符串
+         * 
+         * @type {string}
+         * @memberOf IOrderDataIf
+         */
         condition:string
     }
 
@@ -12,9 +19,9 @@ namespace Order {
         static orderName = "if"
         static subOrder=["else if","else"];
         data:IOrderDataIf
-        constructor(node: VMDOM.VComment, condition: string) {
-            super(node, condition,'if',If.isBlockStart);
-            this.data.condition=condition;
+        constructor(node: VMDOM.VComment, setup: IOrderSetup) {
+            super(node, setup,'if',If.isBlockStart);
+            this.data.condition=setup.params.innerText;
         }
 
         static isBlockStart(subOrder:string):boolean{
@@ -26,7 +33,6 @@ namespace Order {
             return false
         }
         static run(this:void,data:IOrderDataIf){
-
             let hit=-1;
             if( parseBool(exec(data.placeholder, data.condition))){
                 hit=0;

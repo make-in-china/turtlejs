@@ -5,6 +5,7 @@
  * @param {any} defaultValue 初始化时每个属性的默认值
  */
 class HashObject{
+    [index:string]:any
     constructor(s:string,defaultValue:any=null){
         let arr=s.split(',');
         for(let i in arr){
@@ -17,8 +18,8 @@ interface IHashObject<T>{
     [index:string]:T
 }
 
-class HashObjectManage<T> {
-    static clean<T>(data:IHashObject<T>){
+class HashObjectManage {
+    static clean(data:IHashObject<any>){
         for(var i in data){
             if(!data.hasOwnProperty(i)){
                 delete data[i]
@@ -28,7 +29,7 @@ class HashObjectManage<T> {
     static take<T>(data:IHashObject<T>,name:string):T|null{
         if(data.hasOwnProperty(name)){
             let ret:T=data[name];
-            delete this[name];
+            delete data[name];
             return ret;
         }
         return null;

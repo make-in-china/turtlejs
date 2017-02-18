@@ -1,4 +1,4 @@
-/// <reference path="Scope.ts"/>
+/// <reference path="RootScope.ts"/>
 /// <reference path='../virtual/UIHelper/VDOM.ts'/>
 
 

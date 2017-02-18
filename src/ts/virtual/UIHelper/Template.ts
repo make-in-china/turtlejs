@@ -28,7 +28,15 @@ class ${className} extends Component.Part{
     }
 }`
     }
-    export function getViewString(className:string,propertyInfo:string,varInfo:string,domInitScript:string,scripts:string,props:string,defaultValuesInfo:string){
+    export function getViewString(
+        className:string,
+        propertyInfo:string,
+        varInfo:string,
+        domInitScript:string,
+        scripts:string,
+        props:string,
+        defaultValuesInfo:string
+    ){
         return `/// <reference path="../../../dest/js/turtle.0.1.d.ts"/>
 
 //本模块由引擎生成，请勿手动修改此文件
@@ -43,7 +51,6 @@ class ${className}View implements ComponentView.IView{${defaultValuesInfo!==''?`
     initDOM(props:I${className}Props,nodes?:(VMDOM.VNode&IVNodeMethod)[]){
         ${varInfo}${domInitScript}
         ${scripts!==''?`
-        //因为无法推测运行结果，所以生成中间数据算法在此
         ${scripts}`:''}
     }
 }

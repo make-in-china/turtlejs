@@ -4,20 +4,20 @@
 
 interface INamedNodeMap{
     [index:number]:IAttr
-    indexOfName(name:string)
-    indexOf(o:any) 
+    indexOfName(name:string):number
+    indexOf(o:any):number
     getNamedItem(name:string):IAttr|null
     //getNamedItemNS: getNamedItemNS()
-    item(index:number):IAttr|undefined 
+    item(index:number):IAttr|undefined
     readonly length:number
-    removeNamedItem(v:string|Object)
+    removeNamedItem(v:string|Object):void
     //removeNamedItemNS: removeNamedItemNS()
-    setNamedItem(arg:IAttr)
+    setNamedItem(arg:IAttr):void
     //setNamedItemNS: setNamedItemNS()
 }
 
 interface IExp{
-    (...arg):any
+    (...arg:any[]):any
     __me__:IExp
 }
 interface INodeList {
@@ -518,5 +518,6 @@ interface IHTMLScriptElement extends IHTMLElement {
 }
 
 interface Object {
+    [index:string]:any
     __proto__:Object
 }

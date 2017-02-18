@@ -3,11 +3,18 @@
 /// <reference path='JavaScriptString.ts'/>
 /// <reference path='JavaScriptLogic.ts'/>
 namespace JS{
+    export interface IJavaScriptStatementChild {
+        "JavaScriptBlock":JavaScriptBlock<keyof IBreakes>
+        "string":string
+        "JavaScriptComment":JavaScriptComment
+        "JavaScriptString":JavaScriptString
+    }
+    export type TJavaScriptStatementChild=IJavaScriptStatementChild[keyof IJavaScriptStatementChild]
     export class JavaScriptStatement{
-        parent:JavaScriptBlock
-        children:(JavaScriptBlock|string|JavaScriptComment|JavaScriptString)[]=[]
+        parent:JavaScriptBlock<keyof IBreakes>
+        children:TJavaScriptStatementChild[]=[]
         isEnd:boolean=false
-        push(child:JavaScriptBlock|string|JavaScriptComment|JavaScriptString){
+        push(child:TJavaScriptStatementChild){
             this.children.push(child);
             if(child instanceof JavaScriptBlock){
                 child.parent=this;
@@ -65,8 +72,10 @@ namespace JS{
             for(const keyWord of this.children){
                 if(isString(keyWord)){
                     ret.push(keyWord);
-                }else{
+                }else if(keyWord instanceof JavaScriptBlock||keyWord instanceof JavaScriptString||keyWord instanceof JavaScriptComment){
                     ret.push(keyWord.clone());
+                }else{
+                    throw new Error('不支持克隆额外内容！');
                 }
             }
             return ret;

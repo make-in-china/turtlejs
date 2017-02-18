@@ -12,7 +12,7 @@ function isUndefined<T>(p:T|undefined):p is undefined{
     return p=== void 0;
 }
 
-function isObject<T>(p:any): p is Object {
+function isObject(p:any): p is Object {
     let type = typeof p;
     return type === 'function' || type === 'object' && !!p;
 }
@@ -41,4 +41,4 @@ function isPersent(s:any){
     return persentRE.test(s);
 }
 
-function isArrayLike(a){return typeof a.length=='number'}
+function isArrayLike(a:any){return typeof a.length=='number'}

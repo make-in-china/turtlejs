@@ -9,3 +9,4 @@
 /// <reference path='-.ts'/>
 /// <reference path='Var.ts'/>
 /// <reference path='Nodes.ts'/>
+/// <reference path='Elements.ts'/>

@@ -11,18 +11,19 @@ namespace Order {
     export class Var extends VOrder {
         static orderName = "var";
         data:IOrderDataVar
-        block:JS.JavaScriptBlock
-        constructor(node:VMDOM.VComment , condition:string){
-            super(node,condition);
+        block:JS.JavaScriptBlock<keyof JS.IBreakes>
+        constructor(node:VMDOM.VComment , setup: IOrderSetup){
+            super(node,setup);
             this.initStatement();
             this.initvarInfos();
             this.data.placeholder=node;
         }
         initStatement(){
-            let data=this.data;
-            this.block=this.getBlock('var '+this.condition);
+            // let data=this.data;
+            // debugger;
+            this.block=this.getBlock('var '+this.setup.params.innerText);
         }
-        getBlock(condition:string):JS.JavaScriptBlock{
+        getBlock(condition:string):JS.JavaScriptBlock<keyof JS.IBreakes>{
             return JS.Parser.parseStructor(condition);
         }
         initvarInfos(){

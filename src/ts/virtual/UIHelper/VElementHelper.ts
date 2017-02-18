@@ -30,7 +30,7 @@ namespace VMDOM{
         }
         return names;
     }
-    private static buildByName(name:string):string{
+    static buildByName(name:string):string{
         return this.build(name.toUpperCase(),this.checkAttr_Prop(name));
     }
 }

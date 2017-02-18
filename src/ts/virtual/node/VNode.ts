@@ -11,6 +11,7 @@
 /// <reference path='VNodeVMData.ts'/>
 /// <reference path='Lib.ts'/>
 interface Node {
+    [index:string]:any
     __vdomNode__: VMDOM.VNode&IVNodeMethod
 }
 
@@ -25,15 +26,10 @@ const enum ENodeType{
 }
 interface IString extends String{}
 interface IVNodeMethod{
-<<<<<<< HEAD
-=======
-    (nodeName: string, nodeType: ENodeType): VMDOM.VNode&IVNodeMethod;
-    
->>>>>>> bbda8bddeb7fe663737a1391efbf85024fc62c2f
+    [index:string]:any
     <K extends keyof VNodeNames>(nodeName: K, nodeType?: ENodeType.Element): VNodeNames[K]&IVNodeMethod;
-    // (nodeName: string, nodeType: ENodeType): VMDOM.VNode&IVNodeMethod;
+    (nodeName: any, nodeType?: ENodeType): VMDOM.VNode&IVNodeMethod;
 }
-
 
 namespace VMDOM{
     export let emptyTextNodeRE = /^\s*$/;
@@ -49,7 +45,19 @@ namespace VMDOM{
         vmData:VNodeVMData=new VNodeVMData();
         abstract nodeType: ENodeType;
         abstract nodeName: string;
+
+        
+        /**
+         * 获取生成该对象的代码
+         * 
+         * @abstract
+         * @param {number} [space]  前置空格
+         * @returns {string}
+         * 
+         * @memberOf VNode
+         */
         abstract toJS(space?:number):string;
+        
         abstract toCreateJS(space?:number):string;
         readonly childNodes: VNodeList=new VNodeList;
         parentNode: (VNode&IVNodeMethod) | null;
@@ -203,6 +211,17 @@ namespace VMDOM{
         // createComment(value: string): IVComment;
         // addEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
         // removeEventListener(name: string, fn?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
+
+
+        
+        /**
+         * 获取生成该对象的代码
+         * 
+         * @param {number} [space=0] 前置空格
+         * @returns {string}
+         * 
+         * @memberOf VNode
+         */
         toJSString(space:number=0):string{
             return "$$$"+this.toJS(space).replace(/^\s*/,'');
         }
@@ -416,7 +435,7 @@ namespace VMDOM{
     }
 }
 interface IBindClassToFunction{
-    [index:number]:(node:IVNodeMethod & VMDOM.VNode,nodeName: any)=>void
+    [index:string]:(node:IVNodeMethod & VMDOM.VNode,nodeName: any)=>void
 }
 
 function bindClassToFunction(node:IVNodeMethod & VMDOM.VNode,nodeName: string, nodeType?: ENodeType|undefined){
@@ -438,8 +457,8 @@ function bindClassToFunction(node:IVNodeMethod & VMDOM.VNode,nodeName: string, n
             nodeName=nodeName.toLowerCase();
             let name="V"+nodeName[0].toUpperCase()+nodeName.substr(1).toLowerCase()+"Element";
             if(VMDOM.hasOwnProperty(name)){
-                node.__proto__=VMDOM[name].prototype;
-                VMDOM[name].call(node);
+                node.__proto__=(<any>VMDOM)[name].prototype;
+                (<any>VMDOM)[name].call(node);
             }else{
                 let fn=VMDOM.bindClassToFunctionHelper["-1"];
                 if(fn){

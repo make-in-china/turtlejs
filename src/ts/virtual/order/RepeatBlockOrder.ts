@@ -3,8 +3,8 @@
 namespace Order {
     
     export abstract class RepeatBlockOrder extends BlockOrder {
-        constructor(node: VMDOM.VComment, condition: string, orderName: string) {
-            super(node,condition,orderName,RepeatBlockOrder.isBlockStart);
+        constructor(node: VMDOM.VComment, setup: IOrderSetup, orderName: string) {
+            super(node,setup,orderName,RepeatBlockOrder.isBlockStart);
         }
         static run(data:IOrderDataBlock,canRepeat:(data:IOrderDataBlock)=>boolean){
             if(canRepeat(data)){
@@ -19,15 +19,16 @@ namespace Order {
         }
     }
     function parseRepeatBlock(this:void,data:IOrderDataBlockRun,canRepeat:(data:IOrderDataBlock)=>boolean){
+
         let nodes=data.blocks[0].nodes;
         let cloneBlocks:INode[]=[];
         for(var i=0;i<nodes.length;i++){
             cloneBlocks.push(nodes[i].cloneNode(true));
         }
         insertNodesBefore(data.placeholder , cloneBlocks);
-        let p=data.placeholder.parentNode;
+        // let p=data.placeholder.parentNode;
         //执行order
-        parseBreakOrder(data,RepeatBlockOrder.isBlockStart,cloneBlocks,<INode>p);
+        parseBreakOrder(data,RepeatBlockOrder.isBlockStart,cloneBlocks);
         if(!data.isBreak&&canRepeat(data)){
             parseRepeatBlock(data,canRepeat);
         }

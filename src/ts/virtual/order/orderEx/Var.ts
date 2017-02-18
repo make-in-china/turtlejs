@@ -19,10 +19,10 @@ namespace OrderEx {
             }
         }
         return `
-        Order.Var.run({
-            placeholder:this,
-            varInfos:[${varInfos.join(',')}]
-        });`;
+            Order.Var.run({
+                placeholder:this,
+                varInfos:[${varInfos.join(',')}]
+            });`;
     });
 }
             

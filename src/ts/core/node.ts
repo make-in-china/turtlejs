@@ -8,10 +8,10 @@ interface Node {
 }
 typeof Node!=='undefined'&&(function(){
     let appendChild=Node.prototype.appendChild;
-    Node.prototype.appendChild =function(newChild:INode):Node {
+    Node.prototype.appendChild =function(this:Node,newChild:INode):Node {
         return appendChild.call(this,newChild.toDOM());
     }
-    Node.prototype.toDOM =Node.prototype.valueOf = function () {
+    Node.prototype.toDOM =Node.prototype.valueOf = function (this:Node) {
         return this
     }
 }());
@@ -81,7 +81,7 @@ function cloneBetween(node1: INode, node2: INode):INode[]|null {
     }
     return nodes;
 }
-function removeBlockBetween(node1: INode, node2: INode) {
+function removeBlockBetween(node1: INode, node2: INode):null|undefined {
     let p1 = node1.parentNode;
     let l1 = getNodeIndex2(node1) + 1;
     let l2 = getNodeIndex2(node2);
@@ -100,7 +100,7 @@ function replaceNodeByNode(refChilde: INode, newChild: INode) {
     }
 }
 function appendNodes(nodes: INode[]|INodeList|IHTMLCollection, parent: INode) {
-    let cds =[];
+    let cds:INode[] =[];
     push.apply(cds,<INode[]>nodes);
     for(const c of cds){
         parent.appendChild(c);

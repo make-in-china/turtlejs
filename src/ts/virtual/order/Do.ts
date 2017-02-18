@@ -3,15 +3,16 @@
 namespace Order {
     export interface IOrderDataDo extends IOrderDataWhile{
         isFirst:boolean
+        setup: IOrderSetup
     }
     @register
     export class Do extends RepeatBlockOrder {
         static orderName = "do"
         data:IOrderDataDo
-        constructor(node: VMDOM.VComment, condition: string) {
-            super(node, condition,'do');
+        constructor(node: VMDOM.VComment, setup: IOrderSetup) {
+            super(node, setup,'do');
             this.data.isFirst=true;
-            this.data.condition=condition;
+            this.data.condition=setup.params.innerText;
         }
         static run(data:IOrderDataDo){
             super.run(data,canRepeat);
