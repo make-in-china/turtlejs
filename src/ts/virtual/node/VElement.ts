@@ -96,7 +96,7 @@ namespace VMDOM{
             ret.push(`<${lowCaseName}${sAttr}>`);
             let cs = this.childNodes;
             if (cs.length>0) {
-                let data:string[] = [];
+                // let data:string[] = [];
                 for (let i = 0; i < cs.length; i++) {
                     push.apply(ret,(<VNode>cs[i]).toHTMLString());
                 }

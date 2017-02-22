@@ -46,7 +46,6 @@ namespace VMDOM{
         abstract nodeType: ENodeType;
         abstract nodeName: string;
 
-        
         /**
          * 获取生成该对象的代码
          * 
@@ -60,7 +59,16 @@ namespace VMDOM{
         
         abstract toCreateJS(space?:number):string;
         readonly childNodes: VNodeList=new VNodeList;
-        parentNode: (VNode&IVNodeMethod) | null;
+        get parentNode(): (VNode&IVNodeMethod) | null{
+            return this.vmData.parentNode;
+        }
+        set parentNode(this:VNode&IVNodeMethod,v:VNode&IVNodeMethod|null){
+            if(this.vmData.parentNode===v){
+                return;
+            }
+            this.vmData.parentNode=v;
+            this.vmData.$setParentNode.emit(this,v);
+        }
         // get parentElement():(VHtmlElement&IVNodeMethod) | null{
         //     let node=this.parentNode;
         //     if(node&&isVHTMLElement(node)){
@@ -290,7 +298,7 @@ namespace VMDOM{
             }
         }
         /**与真实DOM交互 */
-        protected connectParent<T extends IVNodeMethod>(this: VNode, elem: Node) {
+        protected connectParent(this: VNode, elem: Node) {
             let p:VNode|null = this.parentNode;
             if (p && p.vmData.domNode) {
                 let pE = p.vmData.domNode;
@@ -490,3 +498,4 @@ let VNodeHelp:IVNodeMethod=<any>function(nodeName: string, nodeType?: ENodeType|
     bindClassToFunction(that,nodeName,nodeType);
     return that;
 };
+

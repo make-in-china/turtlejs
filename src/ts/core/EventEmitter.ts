@@ -1,18 +1,18 @@
 
 /// <reference path="../lib/is.ts" />
 interface ICallBack {
-    (this: void, ...arg:any[]): void
+    (...arg:any[]): void
 }
-
+interface EventEmitter{
+    on(type: string, listener: ICallBack): this
+    off(type: string, listener: ICallBack): this
+}
 class EventEmitter{
     protected events: {
         [index: string]: ICallBack | ICallBack[] | undefined
         error?: ICallBack | ICallBack[]
     }
-    constructor() {
-        this.on = this.addListener;
-        this.off = this.removeListener;
-    }
+    constructor() {}
     emit(type: string, ...args:any[]): boolean {
         // If there is no 'error' event listener then throw.
         if (type === 'error') {
@@ -44,7 +44,6 @@ class EventEmitter{
         }
     };
 
-    on: (type: string, listener: ICallBack) => this
     // EventEmitter is defined in src/nodeevents.cc
     // EventEmitter.prototype.emit() is also defined there.
     addListener(type: string, listener: ICallBack) {
@@ -81,7 +80,6 @@ class EventEmitter{
         });
     };
 
-    off: (type: string, listener: ICallBack) => this
     removeListener(type: string, listener: ICallBack) {
         if ('function' !== typeof listener) {
             throw new Error('removeListener only takes instances of Function');
@@ -124,3 +122,5 @@ class EventEmitter{
         return this.events[<string>type];
     };
 }
+EventEmitter.prototype.on=EventEmitter.prototype.addListener
+EventEmitter.prototype.off=EventEmitter.prototype.removeListener

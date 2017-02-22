@@ -254,22 +254,24 @@ namespace VMDOM{
         }
         get outerHTML() {
             let
-                xmlNode = this.toHTMLString(),
-                chds = this.childNodes,
-                data = [xmlNode[0]];
+                xmlNode = this.toHTMLString();
+            //     ,
+            //     chds = this.childNodes,
+            //     data = [xmlNode[0]];
 
-            for (let i = 0; i < chds.length; i++) {
-                let chn:VNode=<VNode>chds[i];
-                if(isVHTMLElement(chn)){
-                    data.push(chn.outerHTML);
-                }else{
-                    data.push(chn.toHTMLString().join(''));
-                }
-            }
-            if (xmlNode.length === 2) {
-                data.push(xmlNode[1]);
-            }
-            return data.join('');
+            // for (let i = 0; i < chds.length; i++) {
+            //     let chn:VNode=<VNode>chds[i];
+            //     if(isVHTMLElement(chn)){
+            //         data.push(chn.outerHTML);
+            //     }else{
+            //         data.push(chn.toHTMLString().join(''));
+            //     }
+            // }
+            // if (xmlNode.length === 2) {
+            //     data.push(xmlNode[1]);
+            // }
+            // return data.join('');
+            return xmlNode.join('');
         }
         set outerHTML(this:VHtmlElement&IVNodeMethod,v:string){
             let p=this.parentNode;

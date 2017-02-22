@@ -1,6 +1,9 @@
 
 
-
+interface IArray<T> {
+    [index: number]: T
+    length: number
+}
 
 let
     arrayConstructor:Array<any>                 =   <any>Array.prototype,

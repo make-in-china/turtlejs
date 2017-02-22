@@ -8,14 +8,14 @@ function isVDocType(node: VMDOM.VNode): node is VMDOM.VDocumentType {
     return node.nodeType === ENodeType.DocumentType
 }
 namespace VMDOM{
-    // @register('html',ENodeType.DocumentType)
+    @register('html',ENodeType.DocumentType)
     export class VDocumentType extends VMDOM.VNode{
         nodeType:ENodeType.DocumentType=ENodeType.DocumentType
         nodeName="html"
-        cloneNode(deep:boolean):VDocumentType&IVNodeMethod{
+        cloneNode():VDocumentType&IVNodeMethod{
             return $$$("",ENodeType.DocumentType);
         }
-        toCreateJS(space:number=0):string{
+        toCreateJS():string{
             return `("",${ENodeType.DocumentType})`;
         }
         toJS():string{

@@ -8,14 +8,14 @@ interface IVNodeMethod{
 }
 namespace VMDOM{
     @register('#document',ENodeType.Document)
-    export class VDocument extends VNode{
+    export abstract class VDocument extends VNode{
         nodeType:ENodeType.Document=ENodeType.Document;
         nodeName:"#document"="#document"
         
-        cloneNode(deep:boolean):VDocument&IVNodeMethod{
+        cloneNode():VDocument&IVNodeMethod{
             throw new Error("本标签不支持cloneNode");
         }
-        toCreateJS(space:number=0):string{
+        toCreateJS():string{
             throw new Error("本标签不支持输出JS");
         }
         toJS():string{
@@ -24,6 +24,16 @@ namespace VMDOM{
         protected emulation():void{}
         toHTMLString():string[]{
             throw new Error("本标签不支持输出HTML");
+        }
+        scripts:VMDOM.VScriptElement[]=[]
+        body:VMDOM.VBodyElement|null=null
+        head:VMDOM.VHeadElement|null=null
+        get parentNode():null{
+            return null;
+        }
+        constructor(){
+            super();
+            this.vmData.document=this;
         }
     }
 }
