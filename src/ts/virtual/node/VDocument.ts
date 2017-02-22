@@ -25,15 +25,6 @@ namespace VMDOM{
         toHTMLString():string[]{
             throw new Error("本标签不支持输出HTML");
         }
-        scripts:VMDOM.VScriptElement[]=[]
-        body:VMDOM.VBodyElement|null=null
-        head:VMDOM.VHeadElement|null=null
-        get parentNode():null{
-            return null;
-        }
-        constructor(){
-            super();
-            this.vmData.document=this;
-        }
+        
     }
 }

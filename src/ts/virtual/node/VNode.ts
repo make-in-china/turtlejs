@@ -67,16 +67,8 @@ namespace VMDOM{
                 return null;
             }
         }
-        get parentNode(): (VNode&IVNodeMethod) | null{
-            return this.vmData.parentNode;
-        }
-        set parentNode(this:VNode&IVNodeMethod,v:VNode&IVNodeMethod|null){
-            if(this.vmData.parentNode===v){
-                return;
-            }
-            this.vmData.parentNode=v;
-            this.vmData.$setParentNode.emit(this,v);
-        }
+        parentNode: (VNode&IVNodeMethod) | null
+        
         /**
          * 用自身做环境调用函数,并返回父
          */

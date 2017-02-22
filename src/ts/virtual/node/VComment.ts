@@ -7,15 +7,15 @@ interface IVNodeMethod{
 function isVComment(node: VMDOM.VNode): node is VMDOM.VComment {
     return node.nodeType === ENodeType.Comment
 }
-interface VNodeVMData{
-    /**是否有两个- */
-    doubleMinus?:boolean;
-}
 
 interface Comment{
-    vmData?:VNodeVMData
+    vmData?:VMDOM.VNodeVMData
 }
 namespace VMDOM{
+    export interface VNodeVMData{
+        /**是否有两个- */
+        doubleMinus?:boolean;
+    }
     @register('#comment',ENodeType.Comment)
     export class VComment extends VCharacterData{
         nodeName="#comment"

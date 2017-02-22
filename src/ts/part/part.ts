@@ -8,17 +8,18 @@
 /// <reference path="View.ts"/>
 /// <reference path="partCore.ts"/>
 /// <reference path='../scope/DOMScope.ts'/>
-
-interface VNodeVMData{
-    sign?:0|1
-    part:Component.Part
+namespace VMDOM{
+    export interface VNodeVMData{
+        sign?:0|1
+        part:Component.Part
+    }
 }
 
 interface IComment{
     vmData?:VNodeVMData
 }
 interface Comment{
-    vmData?:VNodeVMData
+    vmData?:VMDOM.VNodeVMData
 }
 namespace Component{
     

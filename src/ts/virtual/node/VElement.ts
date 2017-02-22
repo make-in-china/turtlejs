@@ -1,12 +1,8 @@
 
 /// <reference path='VNode.ts'/>
-interface VElementVMData extends VNodeVMData{
-    events:[string, EventListenerOrEventListenerObject | undefined, boolean][]
-}
 
 namespace VMDOM{
     export abstract class VElement extends VNode{
-        vmData:VElementVMData
         attributes:VNamedNodeMap=new VNamedNodeMap;
         style: VStyle=new VStyle(this);
         children=new VHTMLCollection();
