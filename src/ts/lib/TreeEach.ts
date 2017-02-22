@@ -18,10 +18,6 @@ interface ITreeEachState<T> {
 }
 
 
-interface IArray<T> {
-    [index: number]: T
-    length: number
-}
 
 interface ITreeEachReturn<T> {
     stack: [IArray<T> | T[], number];

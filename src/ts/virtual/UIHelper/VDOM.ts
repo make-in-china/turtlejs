@@ -1,6 +1,7 @@
 
 /// <reference path='BaseVNode.ts'/>
 /// <reference path='VDomhelperElement.ts'/>
+/// <reference path='../../lib/TreeEach.ts'/>
 interface IMember {
     do:boolean
     index: number
@@ -28,6 +29,7 @@ interface IVDOMBuilder {
 }
 
 abstract class VDOM {
+    static treeEach=treeEach
     protected static htmlwordRE = /[a-zA-Z\/\!]/
 
 

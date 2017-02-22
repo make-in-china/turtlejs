@@ -8,7 +8,7 @@ function isVDocType(node: VMDOM.VNode): node is VMDOM.VDocumentType {
     return node.nodeType === ENodeType.DocumentType
 }
 namespace VMDOM{
-    // @register('html',ENodeType.DocumentType)
+    @register('html',ENodeType.DocumentType)
     export class VDocumentType extends VMDOM.VNode{
         nodeType:ENodeType.DocumentType=ENodeType.DocumentType
         nodeName="html"
