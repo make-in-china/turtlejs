@@ -30,12 +30,22 @@ interface IHTMLCollectionOf<T extends IElement> extends IHTMLCollection {
     item(index: number): T;
     namedItem(name: string): T;
 }
-interface INode extends EventTarget {
+interface INode{// extends EventTarget 
+    // readonly parentElement: IHTMLElement | null;
     toDOM():Node
-    insertBefore2(newChild: INode, refChild: INode): INode;
     readonly childNodes: INodeList;
     readonly nextSibling: INode | null;
-    // readonly parentElement: IHTMLElement | null;
+    insertBefore(newChild: INode, refChild: INode | null): INode;
+    normalize(): void;
+    removeChild(oldChild: INode): INode;
+    replaceChild(newChild: INode, oldChild: INode): INode;
+    insertBefore2(newChild: INode, refChild: INode): INode;
+    readonly nodeName: string;
+    readonly nodeType: number;
+    readonly parentNode: INode | null;
+    readonly previousSibling: INode | null;
+    appendChild<T extends INode>(newChild: T): T;
+    cloneNode(deep?: boolean): INode;
 
     // readonly attributes: INamedNodeMap;
     // readonly baseURI: string | null;
@@ -43,28 +53,18 @@ interface INode extends EventTarget {
     // readonly lastChild: INode | null;
     // readonly localName: string | null;
     // readonly namespaceURI: string | null;
-    readonly nodeName: string;
-    readonly nodeType: number;
     // nodeValue: string | null;
     // readonly ownerDocument: Document;
-    readonly parentNode: INode | null;
-    readonly previousSibling: INode | null;
     // textContent: string | null;
-    appendChild<T extends INode>(newChild: T): T;
-    cloneNode(deep?: boolean): INode;
     // compareDocumentPosition(other: INode): number;
     // contains(child: INode): boolean;
     // hasAttributes(): boolean;
     // hasChildNodes(): boolean;
-    insertBefore(newChild: INode, refChild: INode | null): INode;
     // isDefaultNamespace(namespaceURI: string | null): boolean;
     // isEqualNode(arg: INode): boolean;
     // isSameNode(other: INode): boolean;
     // lookupNamespaceURI(prefix: string | null): string | null;
     // lookupPrefix(namespaceURI: string | null): string | null;
-    normalize(): void;
-    removeChild(oldChild: INode): INode;
-    replaceChild(newChild: INode, oldChild: INode): INode;
     // readonly ATTRIBUTE_NODE: number;
     // readonly CDATA_SECTION_NODE: number;
     // readonly COMMENT_NODE: number;
@@ -213,7 +213,7 @@ interface ICharacterData extends INode, IChildNode {
     insertData(offset: number, arg: string): void;
     replaceData(offset: number, count: number, arg: string): void;
     substringData(offset: number, count: number): string;
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
+    // addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
 }
 
 interface IText extends ICharacterData {

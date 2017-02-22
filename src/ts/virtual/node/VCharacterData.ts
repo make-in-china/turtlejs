@@ -12,7 +12,8 @@ namespace VMDOM{
         appendData(arg: string): void{
             this.data+=arg
         }
-        deleteData(offset: number, count: number): void{
+        // deleteData(offset: number, count: number): void{
+        deleteData(offset: number): void{
             this.data=this.data.substring(0,offset)+this.data.substr(offset);
         }
         insertData(offset: number, arg: string): void{

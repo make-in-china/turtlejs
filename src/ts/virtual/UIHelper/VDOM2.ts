@@ -1,6 +1,7 @@
 
 /// <reference path='VDOM.ts'/>
 /// <reference path='javascriptEx/JavaScriptStatement.ts'/>
+/// <reference path='javascriptParser.ts'/>
 class AttrValueFilter{
     nameStart:number=0
     nameEnd:number=0
@@ -26,6 +27,16 @@ interface IDirective{
 interface VNodeVMData{
     directives?:IDirective[]
 }
+
+
+
+/**
+ * 额外支持@指令
+ * 
+ * @abstract
+ * @class VDOM2
+ * @extends {VDOM}
+ */
 abstract class VDOM2 extends VDOM {
 
     private static varNameKeyWordFirst="$abcdefghigklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
@@ -242,7 +253,9 @@ abstract class VDOM2 extends VDOM {
                         //@@order   ()   {}     ;
                         //         可选  可选   前面2个有其中一个时可选
                         m.index+=2;
-                        var {length,statement}=JS.Parser.parseStatement(html,m.index);
+
+
+                        var {length,statement}=JS.ParserX.parseStatement(html,m.index);
                         m.index+=length;
                         
                         let count:number=2;

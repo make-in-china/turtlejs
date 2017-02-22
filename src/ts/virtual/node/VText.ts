@@ -35,7 +35,7 @@ namespace VMDOM{
                 this.__value__=data.toString();
             }
         }
-        cloneNode(deep:boolean):VText&IVNodeMethod{
+        cloneNode():VText&IVNodeMethod{
             return $$$(this.__value__,ENodeType.Text);
         }
         

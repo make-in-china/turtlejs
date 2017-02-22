@@ -76,7 +76,7 @@ namespace JS{
             return null;
             
         }
-        static parseConditions(block:JavaScriptBlock):IInfoForStep|IInfoForIn|null{
+        static parseConditions(block:JavaScriptBlock<keyof IBreakes>):IInfoForStep|IInfoForIn|null{
             let paramStatements=block.children;
             if(paramStatements.length===3){
                 //可能是step for
@@ -103,10 +103,10 @@ namespace JS{
                 step:statements[2]
             }
         }
-        private static parseForIn(keyWords:(string | JavaScriptBlock | JavaScriptComment | JavaScriptString)[]):IInfoForIn|null{
+        private static parseForIn(keyWords:(TJavaScriptStatementChild)[]):IInfoForIn|null{
             let count=5;
             let index=1;
-            let info:{count:number,index:number}|null;
+            // let info:{count:number,index:number}|null;
             let hasVar;
             if(keyWords[0]==='var'){
                 //var开头;

@@ -27,7 +27,7 @@ interface IBindInfo {
 }
 
 namespace Order {
-    interface VNodeVMData {
+    export interface VNodeVMData {
         /**命令 */
         order: VOrder
     }
@@ -276,7 +276,7 @@ namespace Order {
                     return ret;
                 }
             },
-            set(v:any){}
+            set(){}
         })
     }
     function onPropertyChange(obj:Object, name:string, fnOnSet:Function) {
@@ -292,10 +292,10 @@ namespace Order {
         if (desc.hasOwnProperty('value')) {
             let _value = desc.value;
             if (isFunction(_value)) {
-                newProperty.get = function () {
+                newProperty.get = function (this:any) {
                     return _value.call(this, value);
                 };
-                newProperty.set = function (newValue) {
+                newProperty.set = function (this:any,newValue:any) {
                     value = newValue;
                     _value.call(this, value);
                     fnOnSet.call(obj, name);
@@ -312,13 +312,13 @@ namespace Order {
         } else {
             if (desc.hasOwnProperty('get')) {
                 let get = <Function>desc.get;
-                newProperty.get = function () {
+                newProperty.get = function (this:any) {
                     return get.call(this);
                 };
             }
             if (desc.hasOwnProperty('set')) {
                 let set = <Function>desc.set;
-                newProperty.set = function (newValue) {
+                newProperty.set = function (this:any,newValue:any) {
                     set.call(this, newValue);
                     fnOnSet.call(obj, name);
                 };
@@ -327,11 +327,11 @@ namespace Order {
         Object.defineProperty(obj, name, newProperty);
         desc = null;
     }
-    function objectPropertyChange(obj:Object, name:string, fnOnSet:Function) {
-        if (obj.hasOwnProperty(name)) {
-            onPropertyChange(obj, name, fnOnSet);
-        }
-    }
+    // function objectPropertyChange(obj:Object, name:string, fnOnSet:Function) {
+    //     if (obj.hasOwnProperty(name)) {
+    //         onPropertyChange(obj, name, fnOnSet);
+    //     }
+    // }
     export function bindElementProperty(obj: any, name: string, obj2: Object, name2: string) {
         bindProperty(obj, name, obj2, name2, 2);
     }
@@ -390,7 +390,7 @@ namespace Order {
         }
     }
     function bindPropertyByName(obj: Object, name: string, obj2: Object, name2: string): IBindFunction {
-        let t: IBindFunction = <any>function (name:string) {
+        let t: IBindFunction = <any>function (this:any,name:string) {
             if (!t.isBinding) {
                 t.isBinding = true;
                 for (let i = 0; i < t.list.length; i++) {

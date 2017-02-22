@@ -12,10 +12,10 @@ namespace VMDOM{
         nodeType:ENodeType.Document=ENodeType.Document;
         nodeName:"#document"="#document"
         
-        cloneNode(deep:boolean):VDocument&IVNodeMethod{
+        cloneNode():VDocument&IVNodeMethod{
             throw new Error("本标签不支持cloneNode");
         }
-        toCreateJS(space:number=0):string{
+        toCreateJS():string{
             throw new Error("本标签不支持输出JS");
         }
         toJS():string{

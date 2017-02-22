@@ -3,7 +3,7 @@ namespace JS{
     export interface IJavaScriptParseState{
         condition:string
         index: number
-        action: string
+        action: keyof typeof Parser
         length: number
         block:JavaScriptBlock<keyof IBreakes>
         root:JavaScriptBlock<keyof IBreakes>
@@ -12,8 +12,8 @@ namespace JS{
         stringStart:number
         stringStartBy:string
     }
-    export class Parser{
-        private static getInitData(condition:string,start:number=0):IJavaScriptParseState{
+    export abstract class Parser{
+        protected static getInitData(condition:string,start:number=0):IJavaScriptParseState{
             let root=new JavaScriptBlock('','');
             return {
                 condition:condition,
@@ -28,7 +28,7 @@ namespace JS{
                 stringStartBy:""
             }
         }
-        private static ''(this:typeof Parser,m:IJavaScriptParseState){
+        static ''(this:typeof Parser,m:IJavaScriptParseState){
             switch(m.condition[m.index]){
                 case " ":
                     m.action="space";
@@ -45,7 +45,7 @@ namespace JS{
             }
         }
         /**是否跟随回车换行 */
-        private static isFollowCarriageReturnOrLineFeed(this:typeof Parser,m:IJavaScriptParseState):boolean{
+        static isFollowCarriageReturnOrLineFeed(this:typeof Parser,m:IJavaScriptParseState):boolean{
             let statement=last.call(m.block.children);
             if(!statement){
                 return false;
@@ -78,7 +78,7 @@ namespace JS{
                     return false;
             }
         }
-        private static parseKeyWord(this:typeof Parser,m:IJavaScriptParseState):boolean{
+        static parseKeyWord(this:typeof Parser,m:IJavaScriptParseState):boolean{
             
             let keyWordEnd=m.index;
             let keyWord=m.condition.substring(m.keyWordStart,keyWordEnd);
@@ -122,23 +122,23 @@ namespace JS{
             this.pushKeyWord(m,keyWord);
             return true;
         }
-        private static pushComment(this:typeof Parser,m:IJavaScriptParseState,comment:JavaScriptComment){
+        static pushComment(this:typeof Parser,m:IJavaScriptParseState,comment:JavaScriptComment){
             this.pushKeyWordOrBlock(m,comment);
         }
-        private static pushKeyWord(this:typeof Parser,m:IJavaScriptParseState,keyWord:string){
+        static pushKeyWord(this:typeof Parser,m:IJavaScriptParseState,keyWord:string){
             this.pushKeyWordOrBlock(m,keyWord);
         }
-        private static pushString(this:typeof Parser,m:IJavaScriptParseState,string:JavaScriptString){
+        static pushString(this:typeof Parser,m:IJavaScriptParseState,string:JavaScriptString){
             this.pushKeyWordOrBlock(m,string);
         }
-        private static pushBlock(this:typeof Parser,m:IJavaScriptParseState,block:JavaScriptBlock<keyof IBreakes>){
+        static pushBlock(this:typeof Parser,m:IJavaScriptParseState,block:JavaScriptBlock<keyof IBreakes>){
             this.pushKeyWordOrBlock(m,block);
             m.block=block;
         }
-        private static pushKeyWordOrBlock(this:typeof Parser,m:IJavaScriptParseState,keyWordOrBlockOrComment:TJavaScriptStatementChild){
+        static pushKeyWordOrBlock(this:typeof Parser,m:IJavaScriptParseState,keyWordOrBlockOrComment:TJavaScriptStatementChild){
             this.getLastStatement(m).push(keyWordOrBlockOrComment)
         }
-        private static getLastStatement(this:typeof Parser,m:IJavaScriptParseState):JavaScriptStatement{
+        static getLastStatement(this:typeof Parser,m:IJavaScriptParseState):JavaScriptStatement{
             if(m.block.isEnd){
                 m.block=m.block.parent.parent;
             }
@@ -157,7 +157,7 @@ namespace JS{
             }
             return statement;
         }
-        private static '*/<>'(this:typeof Parser,m:IJavaScriptParseState,keyWord:string){
+        static '*/<>'(this:typeof Parser,m:IJavaScriptParseState,keyWord:string){
             if(!this['?='](m,keyWord)){
                 this.parseKeyWord(m);
                 this.pushKeyWord(m,keyWord);
@@ -165,7 +165,7 @@ namespace JS{
                 m.index++;
             }
         }
-        private static '<>'(this:typeof Parser,m:IJavaScriptParseState,keyWord:string){
+        static '<>'(this:typeof Parser,m:IJavaScriptParseState,keyWord:string){
             if(!this['<<>>'](m,keyWord)&&!this['?='](m,keyWord)){
                 this.parseKeyWord(m);
                 this.pushKeyWord(m,keyWord);
@@ -173,7 +173,7 @@ namespace JS{
                 m.index++;
             }
         }
-        private static '<<>>'(this:typeof Parser,m:IJavaScriptParseState,keyWord:string):boolean{
+        static '<<>>'(this:typeof Parser,m:IJavaScriptParseState,keyWord:string):boolean{
             if(m.condition[m.index+1]===keyWord){
                 if(this['<<<>>>'](m,keyWord)){
                     return true;
@@ -187,7 +187,7 @@ namespace JS{
             }
             return false;
         }
-        private static '<<<>>>'(this:typeof Parser,m:IJavaScriptParseState,keyWord:string):boolean{
+        static '<<<>>>'(this:typeof Parser,m:IJavaScriptParseState,keyWord:string):boolean{
             if(m.condition[m.index+2]===keyWord){
                 if(!this.parseKeyWord(m)){
                     throw new Error("此处不该有'"+keyWord+keyWord+keyWord);
@@ -199,21 +199,21 @@ namespace JS{
             }
             return false;
         }
-        private static comment(this:typeof Parser,m:IJavaScriptParseState){
+        static comment(this:typeof Parser,m:IJavaScriptParseState){
             if(m.condition[m.index]==='\n'){
                 this.pushComment(m,new JavaScriptComment(m.condition.substring(m.commentStart,m.index)));
             }
             m.index++;
             m.action="";
         }   
-        private static comment2(this:typeof Parser,m:IJavaScriptParseState){
+        static comment2(this:typeof Parser,m:IJavaScriptParseState){
             if(m.condition[m.index]==='*'&&m.condition[m.index+1]==='/'){
                 this.pushComment(m,new JavaScriptComment(m.condition.substring(m.commentStart,m.index+2)));
             }
             m.index+=2;
             m.action="";
         }
-        private static '/'(this:typeof Parser,m:IJavaScriptParseState){
+        static '/'(this:typeof Parser,m:IJavaScriptParseState){
             switch(m.condition[m.index+1]){
                 case "/":
                     //注释
@@ -233,7 +233,7 @@ namespace JS{
                     this['*/<>'](m,'/');
             }
         }
-        private static '+-%'(this:typeof Parser,m:IJavaScriptParseState,keyWord:string){
+        static '+-%'(this:typeof Parser,m:IJavaScriptParseState,keyWord:string){
             if(m.condition[m.index+1]===keyWord){
                 this.parseKeyWord(m);
                 this.pushKeyWord(m,keyWord+keyWord);
@@ -248,7 +248,7 @@ namespace JS{
                 }
             }
         }
-        private static '?='(this:typeof Parser,m:IJavaScriptParseState,keyWord:string):boolean{
+        static '?='(this:typeof Parser,m:IJavaScriptParseState,keyWord:string):boolean{
             if(m.condition[m.index+1]==='='){
                 if(this['?=='](m,keyWord)){
                     return true;
@@ -263,7 +263,7 @@ namespace JS{
             }
             return false;
         }
-        private static '=>'(this:typeof Parser,m:IJavaScriptParseState):boolean{
+        static '=>'(this:typeof Parser,m:IJavaScriptParseState):boolean{
             if(m.condition[m.index+1]==='>'){
                 this.parseKeyWord(m);
                 this.pushKeyWord(m,'=>');
@@ -274,7 +274,7 @@ namespace JS{
             return false;
         }
         
-        private static '?=='(this:typeof Parser,m:IJavaScriptParseState,keyWord:string):boolean{
+        static '?=='(this:typeof Parser,m:IJavaScriptParseState,keyWord:string):boolean{
             if(m.condition[m.index+2]==='='){
                 if(!this.parseKeyWord(m)){
                     throw new Error("此处不该有'"+keyWord+"='");
@@ -287,14 +287,14 @@ namespace JS{
             }
             return false
         }
-        private static ';'(this:typeof Parser,m:IJavaScriptParseState){
+        static ';'(this:typeof Parser,m:IJavaScriptParseState){
             this.parseKeyWord(m);
             this.pushKeyWord(m,';');
             this.getLastStatement(m).isEnd=true;
             m.action="";
             m.index++;
         }
-        private static '.'(this:typeof Parser,m:IJavaScriptParseState){
+        static '.'(this:typeof Parser,m:IJavaScriptParseState){
             if(!this.parseKeyWord(m)){
                 let statement=<JavaScriptStatement>last.call(m.block.children);
                 if(statement.children.length>0){
@@ -309,7 +309,7 @@ namespace JS{
             m.index++;
         }
 
-        private static '!~'(this:typeof Parser,m:IJavaScriptParseState,keyWord:string){
+        static '!~'(this:typeof Parser,m:IJavaScriptParseState,keyWord:string){
             if(this.parseKeyWord(m)){
                 //不能在keyword后面出现!
                 throw new Error("此处不该有'"+keyWord+"'");
@@ -318,7 +318,7 @@ namespace JS{
             m.action="";
             m.index++;
         }
-        private static isStatementBegin(m:IJavaScriptParseState):boolean{
+        static isStatementBegin(m:IJavaScriptParseState):boolean{
             if(m.block.isEnd){
                 return true;
             }
@@ -330,7 +330,7 @@ namespace JS{
                 return true;
             }
         }
-        private static space(this:typeof Parser,m:IJavaScriptParseState){
+        static space(this:typeof Parser,m:IJavaScriptParseState){
             if(m.condition[m.index]===' '){
                 m.index++;
                 return ;
@@ -341,14 +341,14 @@ namespace JS{
             }
             m.action='';
         }
-        private static '({['(this:typeof Parser,m:IJavaScriptParseState,keyWord:string,keyWordEnd:string){
+        static '({['<T extends keyof IBreakes>(this:typeof Parser,m:IJavaScriptParseState,keyWord:string,keyWordEnd:IBreakes[T]){
             //终止
             this.parseKeyWord(m);
-            this.pushBlock(m,new JavaScriptBlock(keyWord,keyWordEnd));
+            this.pushBlock(m,new JavaScriptBlock(<T>keyWord,keyWordEnd));
             m.index++;
             m.action="";
         }
-        private static ')}]'(this:typeof Parser,m:IJavaScriptParseState,keyWord:string,keyWordBegin:string){
+        static ')}]'<T extends keyof IBreakes>(this:typeof Parser,m:IJavaScriptParseState,keyWordBegin:T){
             //终止
             this.parseKeyWord(m);
             if(m.block.begin!==keyWordBegin){
@@ -361,13 +361,13 @@ namespace JS{
             m.action="";
         }
 
-        private static '"`\''(this:typeof Parser,m:IJavaScriptParseState,keyWord:"'"|'"'|'`'){
+        static '"`\''(this:typeof Parser,m:IJavaScriptParseState,keyWord:"'"|'"'|'`'){
             m.stringStart=m.index;
             m.index++;
             m.action='string';
             m.stringStartBy=keyWord;
         }
-        private static string(this:typeof Parser,m:IJavaScriptParseState){
+        static string(this:typeof Parser,m:IJavaScriptParseState){
             switch(m.condition[m.index]){
                 case '\\':
                     m.index+=2;
@@ -381,7 +381,7 @@ namespace JS{
                     m.index++;
             }
         }
-        private static parseEnd(this:typeof Parser,m:IJavaScriptParseState){
+        static parseEnd(this:typeof Parser,m:IJavaScriptParseState){
             switch(m.action){
                 case "keyWord":
                     this.parseKeyWord(m);
@@ -398,7 +398,7 @@ namespace JS{
                 }
             }
         }
-        private static keyWord(this:typeof Parser,m:IJavaScriptParseState){
+        static keyWord(this:typeof Parser,m:IJavaScriptParseState){
             let keyWord=m.condition[m.index];
             switch(keyWord){
                 case ".":
@@ -433,13 +433,13 @@ namespace JS{
                     this['"`\''](m,keyWord);
                     break;
                 case "}":
-                    this[')}]'](m,keyWord,'{');
+                    this[')}]'](m,'{');
                     break;
                 case "]":
-                    this[')}]'](m,keyWord,'[');
+                    this[')}]'](m,'[');
                     break;
                 case ")":
-                    this[')}]'](m,keyWord,'(');
+                    this[')}]'](m,'(');
                     break;
                 case "(":
                     this['({['](m,keyWord,')');
@@ -537,5 +537,4 @@ namespace JS{
         }
     }
 }
-
 

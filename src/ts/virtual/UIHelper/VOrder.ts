@@ -18,10 +18,10 @@ namespace VMDOM{
             super('');
         }
         
-        cloneNode(deep:boolean):VOrder&IVNodeMethod{
+        cloneNode():VOrder&IVNodeMethod{
             return $$$(this.orderData.clone(),ENodeType.Order);
         }
-        toJS(space:number=0):string{
+        toJS():string{
             return '';
         }
     }

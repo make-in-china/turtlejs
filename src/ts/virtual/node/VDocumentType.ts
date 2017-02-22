@@ -12,10 +12,10 @@ namespace VMDOM{
     export class VDocumentType extends VMDOM.VNode{
         nodeType:ENodeType.DocumentType=ENodeType.DocumentType
         nodeName="html"
-        cloneNode(deep:boolean):VDocumentType&IVNodeMethod{
+        cloneNode():VDocumentType&IVNodeMethod{
             return $$$("",ENodeType.DocumentType);
         }
-        toCreateJS(space:number=0):string{
+        toCreateJS():string{
             return `("",${ENodeType.DocumentType})`;
         }
         toJS():string{

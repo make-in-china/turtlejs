@@ -13,7 +13,7 @@ namespace JS{
             let keyWord=keyWords[0];
             let params:string[]=[];
             let isLambda:boolean=false;
-            let content:JavaScriptBlock|string;
+            let content:JavaScriptBlock<keyof IBreakes>|string;
             if(keyWord==='function'){
                 let index=1;
                 if(keyWords[index]===' '){
@@ -86,7 +86,7 @@ namespace JS{
             }
             return new this(params,isLambda,content);
         }
-        static setParams(params:string[],block:JavaScriptBlock):boolean{
+        static setParams(params:string[],block:JavaScriptBlock<keyof IBreakes>):boolean{
             let statements=block.children;
             if(statements.length!==1){
                 return false;
@@ -113,7 +113,7 @@ namespace JS{
         protected constructor(
             public params:string[],
             public isLambda:boolean,
-            public content:JavaScriptBlock|string
+            public content:JavaScriptBlock<keyof IBreakes>|string
         ){
             super();
         }

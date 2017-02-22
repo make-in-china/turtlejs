@@ -61,14 +61,14 @@ namespace VMDOM{
         abstract toCreateJS(space?:number):string;
         readonly childNodes: VNodeList=new VNodeList;
         parentNode: (VNode&IVNodeMethod) | null;
-        // get parentElement():(VHtmlElement&IVNodeMethod) | null{
-        //     let node=this.parentNode;
-        //     if(node&&isVHTMLElement(node)){
-        //         return node;
-        //     }else{
-        //         return null;
-        //     }
-        // }
+        get parentElement():(VHtmlElement&IVNodeMethod) | null{
+            let node=this.parentNode;
+            if(node&&isVHTMLElement(node)){
+                return node;
+            }else{
+                return null;
+            }
+        }
         /**
          * 用自身做环境调用函数,并返回父
          */
@@ -111,18 +111,18 @@ namespace VMDOM{
                 return this;
             }
         }
-        addEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void
-        {
+        // addEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void
+        // {
 
-        }
-        dispatchEvent(evt: Event): boolean
-        {   
-            return false;
-        }
-        removeEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void
-        {
+        // }
+        // dispatchEvent(evt: Event): boolean
+        // {   
+        //     return false;
+        // }
+        // removeEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void
+        // {
             
-        }
+        // }
         addText(this: VNode&IVNodeMethod, ...args:string[]): VNode&IVNodeMethod {
             let s = args.join('\r\n');
             let t = this(s, 3);
@@ -249,6 +249,7 @@ namespace VMDOM{
             throw new Error('未实现');
         }
         replaceChild(newChild: VNode&IVNodeMethod, oldChild: VNode&IVNodeMethod): VNode&IVNodeMethod{
+            replaceNodeByNode(oldChild,newChild);
             return oldChild;
         }
         protected copyPropertyToNode(elem:Node){
@@ -290,7 +291,7 @@ namespace VMDOM{
             }
         }
         /**与真实DOM交互 */
-        protected connectParent<T extends IVNodeMethod>(this: VNode, elem: Node) {
+        protected connectParent(this: VNode, elem: Node) {
             let p:VNode|null = this.parentNode;
             if (p && p.vmData.domNode) {
                 let pE = p.vmData.domNode;
@@ -346,7 +347,7 @@ namespace VMDOM{
         protected createHomologyFunction(name:string) {
             return function (this:VNode&IVNodeMethod) {
                 let objects:Node[] = [], 
-                    toDOMs:INode[] = [];
+                    toDOMs:VNode[] = [];
                 for (let i = 0; i < arguments.length; i++) {
                     //获取对象
                     let o:INode = <INode>arguments[i].valueOf();
@@ -368,7 +369,7 @@ namespace VMDOM{
                 for (let i = 0; i < toDOMs.length; i++) {
                     let chds = toDOMs[i].childNodes;
                     for (let j = 0; j < chds.length; j++) {
-                        let node:VNode=<VNode>chds[j];
+                        let node:VNode=chds[j];
                         let chds2 = node.childNodes;
                         if (chds2.length !== (<Node>this.vmData.domNode).childNodes.length) {
                             for (let k = 0; k < chds2.length; k++) {

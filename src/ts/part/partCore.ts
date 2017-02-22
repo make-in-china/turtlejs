@@ -388,21 +388,21 @@ function parseGet(node: IHTMLElement, outerChildNodes, outerElement, props, part
 // }
 
 let exec = eval;
-function execOnScript(node: IHTMLElement) {
-    var p = node.parentNode;
-    if (p) {
-        var script = node.innerHTML;
-        if (script.length > 0) {
-            /*设置父对象事件*/
-            var events = exec('({' + script + '})');
-            for (var i in events) {
-                if (isFunction(events[i])) {
-                    p.addEventListener(i, events[i]);
-                }
-            }
-        }
-    }
-}
+// function execOnScript(node: IHTMLElement) {
+//     var p = node.parentNode;
+//     if (p) {
+//         var script = node.innerHTML;
+//         if (script.length > 0) {
+//             /*设置父对象事件*/
+//             var events = exec('({' + script + '})');
+//             for (var i in events) {
+//                 if (isFunction(events[i])) {
+//                     p.addEventListener(i, events[i]);
+//                 }
+//             }
+//         }
+//     }
+// }
 function execScript(node: IHTMLElement, outerChildNodes?, outerElement?, props?, part?) {
     var script = node.innerHTML;
     if (script.length > 0) {
@@ -431,40 +431,40 @@ function execScript(node: IHTMLElement, outerChildNodes?, outerElement?, props?,
         fn = null;
     }
 }
-function execTurtleScript(node: IHTMLElement, outerChildNodes, outerElement, props, part) {
-    var type = getAttr(node, 'type', null);
-    if (type == 'on') {
-        execOnScript(node)
-    } else {
-        execScript(node, outerChildNodes, outerElement, props, part);
-    }
-}
+// function execTurtleScript(node: IHTMLElement, outerChildNodes, outerElement, props, part) {
+//     var type = getAttr(node, 'type', null);
+//     if (type == 'on') {
+//         execOnScript(node)
+//     } else {
+//         execScript(node, outerChildNodes, outerElement, props, part);
+//     }
+// }
 interface INode {
     type?: string
 }
-function parseScript(node: IHTMLElement, outerChildNodes, outerElement, props, part) {
-    if (node.type === "" || node.type === "on" || node.type === "text/javascript") {
-        let src = getAttr(node, 'src', '');
-        if (src) {
-            includeJSFiles(src);
-        } else {
-            execTurtleScript(node, outerChildNodes, outerElement, props, part);
-        }
-        removeNode(node);
-    }
-}
+// function parseScript(node: IHTMLElement, outerChildNodes, outerElement, props, part) {
+//     if (node.type === "" || node.type === "on" || node.type === "text/javascript") {
+//         let src = getAttr(node, 'src', '');
+//         if (src) {
+//             includeJSFiles(src);
+//         } else {
+//             execTurtleScript(node, outerChildNodes, outerElement, props, part);
+//         }
+//         removeNode(node);
+//     }
+// }
 function execNodeQuestion(node: IHTMLElement) {
     let v = takeAttr(node, ':', "");
     if (v && v.length > 0) {
         Order.exec(node, v);//, null, outerChildNodes, outerElement, props, part);
     }
 }
-class ElementParser {
-    GET = parseGet
-    // SET = parseSet
-    // __BREAK__ = parseBreakOrder
-    SCRIPT = parseScript
-}
+// class ElementParser {
+//     GET = parseGet
+//     // SET = parseSet
+//     // __BREAK__ = parseBreakOrder
+//     SCRIPT = parseScript
+// }
 // function render(
 //     this:void,
 //     uiNode:IHTMLElement|null,
@@ -555,7 +555,7 @@ class ElementParser {
 //     // }
 //     // return newPart;
 // }
-let elementParser = new ElementParser;
+// let elementParser = new ElementParser;
 // let attributeParser = new AttributeParser;
 function initHTML(arr: INode[]|INodeList, outerChildNodes?, outerElement?, props?, part?) {
     treeEach(arr, 'childNodes', function (node: IHTMLElement) {
@@ -603,12 +603,12 @@ function initHTML(arr: INode[]|INodeList, outerChildNodes?, outerElement?, props
             parseTemp(node);
             return;
         }*/
-        if (elementParser.hasOwnProperty(node.nodeName)) {
-            /* let ret=*/return elementParser[node.nodeName](node, outerChildNodes, outerElement, props, part);
-            /* if(ret){
-                return ret;
-                };*/
-        }
+        // if (elementParser.hasOwnProperty(node.nodeName)) {
+        //     /* let ret=*/return elementParser[node.nodeName](node, outerChildNodes, outerElement, props, part);
+        //     /* if(ret){
+        //         return ret;
+        //         };*/
+        // }
         // let attrs = slice.call(node.attributes);
         // for (let i = 0; i < attrs.length; i++) {
         //     if (attributeParser.hasOwnProperty(attrs[i].name)) {

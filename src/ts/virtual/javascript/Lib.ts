@@ -80,7 +80,7 @@ namespace JS{
      * @param {JavaScriptBlock} block 语句块
      * @param {boolean=false} deep 递归
      */
-    export function mergeSpace(block:JavaScriptBlock,deep:boolean=false):void{
+    export function mergeSpace(block:JavaScriptBlock<keyof IBreakes>,deep:boolean=false):void{
         for(const statement of block.children){
             mergeStatementSpace(statement,deep);
         }
@@ -125,7 +125,7 @@ namespace JS{
      * @param {JavaScriptBlock} block 语句块
      * @param {boolean=false} deep 递归
      */
-    export function deleteSpace(block:JavaScriptBlock,deep:boolean=false):void{
+    export function deleteSpace(block:JavaScriptBlock<keyof IBreakes>,deep:boolean=false):void{
         for(const statement of block.children){
             deleteStatementSpace(statement,deep);
         }

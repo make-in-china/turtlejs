@@ -1,7 +1,7 @@
 
-/// <reference path='Var.ts'/>
+ 
 namespace Order {
-    interface IOrderDataScope extends IOrderDataVar{
+    export interface IOrderDataScope extends IOrderDataVar{
         scopeName:string
     }
     @register
