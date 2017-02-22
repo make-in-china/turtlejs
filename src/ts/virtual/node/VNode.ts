@@ -59,8 +59,6 @@ namespace VMDOM{
         
         abstract toCreateJS(space?:number):string;
         readonly childNodes: VNodeList=new VNodeList;
-<<<<<<< HEAD
-        parentNode: (VNode&IVNodeMethod) | null;
         get parentElement():(VHtmlElement&IVNodeMethod) | null{
             let node=this.parentNode;
             if(node&&isVHTMLElement(node)){
@@ -69,7 +67,6 @@ namespace VMDOM{
                 return null;
             }
         }
-=======
         get parentNode(): (VNode&IVNodeMethod) | null{
             return this.vmData.parentNode;
         }
@@ -80,15 +77,6 @@ namespace VMDOM{
             this.vmData.parentNode=v;
             this.vmData.$setParentNode.emit(this,v);
         }
-        // get parentElement():(VHtmlElement&IVNodeMethod) | null{
-        //     let node=this.parentNode;
-        //     if(node&&isVHTMLElement(node)){
-        //         return node;
-        //     }else{
-        //         return null;
-        //     }
-        // }
->>>>>>> 68ae10a4b0870cf919e5178cca699dfbe04b1cdf
         /**
          * 用自身做环境调用函数,并返回父
          */
