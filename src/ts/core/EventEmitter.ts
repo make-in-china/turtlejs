@@ -74,7 +74,7 @@ class EventEmitter{
 
     once(type: string, listener: ICallBack):void {
         let self = this;
-        self.on(type, function g() {
+        self.on(type, function g(this:any) {
             self.removeListener(type, g);
             listener.apply(this, arguments);
         });

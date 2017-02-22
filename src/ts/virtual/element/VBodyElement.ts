@@ -1,4 +1,4 @@
-
+/// <reference path="../node/VHtmlElement.ts"/>
 interface VNodeNames{
     "body":VMDOM.VBodyElement
 }

@@ -8,16 +8,16 @@ gulp.task('ui:w', function () {
     });
 });
 var tsconfig={
-    target: 'es5',//把typescript转换成es5标准的js文件,也可以是es6,但这个node版本不支持
     // outFile:,
-    experimentalDecorators:true,
-    declaration: true,
-    "noImplicitThis":true,
-    "skipLibCheck":true,
-    "noUnusedParameters":true,
-    "noUnusedLocals":true
     // "noImplicitAny": true,
-    // "alwaysStrict":true
+        // "strictNullChecks": true,
+        "noImplicitThis":true,
+        "alwaysStrict":true,
+        "target":"es5",
+        "experimentalDecorators":true,
+        "skipLibCheck":true
+        // "noUnusedParameters":true,
+        // "noUnusedLocals":true
     }
 //virtual
 
@@ -58,9 +58,13 @@ gulp.task('turtle',function(){
     init();
     doTSC('src/ts/index.ts','virtual/UIHelper.0.1.js')
 });
+gulp.task('vdom1',function(){
+    init();
+    doTSC('src/ts/virtual/UIHelper/export/DocumentVDOM.ts','virtual/documentVDOM.0.1.js')
+});
 gulp.task('vdom',function(){
     init();
-    doTSC('src/ts/virtual/UIHelper/ExportVDOM.ts','virtual/vdom.0.1.js')
+    doTSC('src/ts/virtual/UIHelper/export/VDOM.ts','virtual/VDOM.0.1.js')
 });
 gulp.task('default',function(){
     console.log(`任务列表：
@@ -69,7 +73,8 @@ gulp.task('default',function(){
     ui:w      监视ui工程
     turtle    构建turtle.js
     vm        构建 uihealper.js
-    vdom      构建 vdom.js`);
+    vdom      构建 VDOM.js
+    vdom1     构建 documentVDOM.js`);
 });
 gulp.task('project',function(){
     var args=process.argv.slice(3);
