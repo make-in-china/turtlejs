@@ -14,8 +14,8 @@ var tsconfig={
     declaration: true,
     "noImplicitThis":true,
     "skipLibCheck":true,
-    "noUnusedParameters":true,
-    "noUnusedLocals":true
+    // "noUnusedParameters":true,
+    // "noUnusedLocals":true
     // "noImplicitAny": true,
     // "alwaysStrict":true
     }
