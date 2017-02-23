@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({reversed:'',start:'',type:'',compact:''})
-    export class  VOlElement extends VHtmlElement{
+    export class  VOlElement extends VHTMLElement{
         nodeName:"OL"="OL";
         reversed:string
         start:string

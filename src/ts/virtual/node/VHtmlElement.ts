@@ -4,25 +4,13 @@
 /// <reference path='../../lib/Encode.ts'/>
 /// <reference path='../../core/Node.ts'/>
 /// <reference path='Lib.ts'/>
-interface VNodeNames{
-    'html': VMDOM.VHtmlElement
-}
-
-function isVHTMLElement(node: VMDOM.VNode): node is VMDOM.VHtmlElement {
+function isVHTMLElement(node: VMDOM.VNode): node is VMDOM.VHTMLElement {
     return node.nodeType === ENodeType.Element
 }
 namespace VMDOM{
-    @mergeClass({title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
-    export class VHtmlElement extends VElement{
+    export abstract class VHTMLElement extends VElement{
         nodeType:ENodeType.Element=ENodeType.Element;
-        nodeName="HTML"
-        // version:string
-        title:string
-        lang:string
-        accessKey:string
-        webkitdropzone:string
-        id:string
-        cloneNode(deep:boolean=false): VHtmlElement&IVNodeMethod {
+        cloneNode(deep:boolean=false): VHTMLElement&IVNodeMethod {
             let newNode=$$$('html');
             
             // newNode.version=this.version;
@@ -46,12 +34,12 @@ namespace VMDOM{
         getData():string{
             return this.outerHTML;
         }
-        get innerText(this:VHtmlElement&IVNodeMethod):string {
+        get innerText(this:VHTMLElement&IVNodeMethod):string {
             let s = "";
             let chdns = this.childNodes;
             for (let i = 0; i < chdns.length; i++) {
                 let cd:VNode=<VNode>chdns[i];
-                if(cd instanceof VHtmlElement){
+                if(cd instanceof VHTMLElement){
                     s += encodeHTML(cd.innerText);
                 }else{
                     s +=cd.getData();
@@ -59,7 +47,7 @@ namespace VMDOM{
             }
             return s;
         }
-        set innerText(this:VHtmlElement&IVNodeMethod, s: string) {
+        set innerText(this:VHTMLElement&IVNodeMethod, s: string) {
             let chds= this.children;
             for (let i=chds.length-1;i>=0;i--) {
                 delete chds[i];
@@ -119,11 +107,7 @@ namespace VMDOM{
             for (let j = 0; j < attrs.length; j++) {
                 (<any>elem).setAttribute(attrs[j].name, attrs[j].value);
             }
-            let arr = this.vmData.events;
-            for (let j in arr) {
-                let e = arr[j];
-                elem.addEventListener(e[0], <any>e[1], e[2]);
-            }
+            
             let obj = this.vmData.__;
             if (obj) {
                 for (let j in obj) {
@@ -273,7 +257,7 @@ namespace VMDOM{
             // return data.join('');
             return xmlNode.join('');
         }
-        set outerHTML(this:VHtmlElement&IVNodeMethod,v:string){
+        set outerHTML(this:VHTMLElement&IVNodeMethod,v:string){
             let p=this.parentNode;
             if(!p){
                 throw new Error("This element has no parent node.");
@@ -289,7 +273,7 @@ namespace VMDOM{
         get outerText():string{
             return this.innerText;
         }
-        set outerText(this:VHtmlElement&IVNodeMethod,v:string){
+        set outerText(this:VHTMLElement&IVNodeMethod,v:string){
             let p=this.parentNode;
             if(!p){
                 throw new Error("This element has no parent node.");

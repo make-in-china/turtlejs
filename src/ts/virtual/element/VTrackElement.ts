@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({kind:'',src:'',srclang:'',label:'',default:''})
-    export class  VTrackElement extends VHtmlElement{
+    export class  VTrackElement extends VHTMLElement{
         nodeName:"TRACK"="TRACK";
         kind:string
         src:string

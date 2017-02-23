@@ -15,7 +15,8 @@ var tsconfig={
         "alwaysStrict":true,
         "target":"es5",
         "experimentalDecorators":true,
-        "skipLibCheck":true
+        "skipLibCheck":true,
+        declaration: true
         // "noUnusedParameters":true,
         // "noUnusedLocals":true
     }

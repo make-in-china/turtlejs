@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({value:'',min:'',max:'',low:'',high:'',optimum:''})
-    export class  VMeterElement extends VHtmlElement{
+    export class  VMeterElement extends VHTMLElement{
         nodeName:"METER"="METER";
         value:string
         min:string

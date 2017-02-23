@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({media:'',type:''})
-    export class  VStyleElement extends VHtmlElement{
+    export class  VStyleElement extends VHTMLElement{
         nodeName:"STYLE"="STYLE";
         media:string
         type:string

@@ -6,10 +6,6 @@ namespace VMDOM{
         attributes:VNamedNodeMap=new VNamedNodeMap;
         style: VStyle=new VStyle(this);
         children=new VHTMLCollection();
-        constructor(){
-            super();
-            this.vmData.events=[];
-        }
         removeAttribute( name: string): void {
             this.attributes.removeNamedItem(name);
         }

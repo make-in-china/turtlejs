@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({width:'',height:'',poster:''})
-    export class  VVideoElement extends VHtmlElement{
+    export class  VVideoElement extends VHTMLElement{
         nodeName:"VIDEO"="VIDEO";
         width:string
         height:string

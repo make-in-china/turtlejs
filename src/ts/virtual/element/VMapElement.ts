@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({name:''})
-    export class  VMapElement extends VHtmlElement{
+    export class  VMapElement extends VHTMLElement{
         nodeName:"MAP"="MAP";
         name:string
         

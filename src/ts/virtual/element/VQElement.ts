@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({cite:''})
-    export class  VQElement extends VHtmlElement{
+    export class  VQElement extends VHTMLElement{
         nodeName:"Q"="Q";
         cite:string
         

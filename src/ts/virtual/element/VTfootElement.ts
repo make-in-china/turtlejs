@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({align:'',vAlign:''})
-    export class  VTfootElement extends VHtmlElement{
+    export class  VTfootElement extends VHTMLElement{
         nodeName:"TFOOT"="TFOOT";
         align:string
         vAlign:string

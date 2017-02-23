@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({compact:''})
-    export class  VMenuElement extends VHtmlElement{
+    export class  VMenuElement extends VHTMLElement{
         nodeName:"MENU"="MENU";
         compact:string
         

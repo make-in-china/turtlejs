@@ -59,7 +59,7 @@ namespace VMDOM{
         
         abstract toCreateJS(space?:number):string;
         readonly childNodes: VNodeList=new VNodeList;
-        get parentElement():(VHtmlElement&IVNodeMethod) | null{
+        get parentElement():(VHTMLElement&IVNodeMethod) | null{
             let node=this.parentNode;
             if(node&&isVHTMLElement(node)){
                 return node;

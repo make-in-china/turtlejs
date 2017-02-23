@@ -4,7 +4,7 @@ interface VNodeNames{
 }
 namespace VMDOM{
     @mergeClass({disabled:'',name:''})
-    export class  VFieldsetElement extends VHtmlElement{
+    export class  VFieldsetElement extends VHTMLElement{
         nodeName:"FIELDSET"="FIELDSET"
         disabled:string
         name:string

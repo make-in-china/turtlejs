@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({value:'',type:''})
-    export class  VLiElement extends VHtmlElement{
+    export class  VLiElement extends VHTMLElement{
         nodeName:"LI"="LI";
         value:string
         type:string

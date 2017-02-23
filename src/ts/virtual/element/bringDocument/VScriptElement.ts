@@ -6,8 +6,7 @@ namespace VMDOM {
     delete VExConstructor.prototype;
     VMDOM.VScriptElement = <any>function (this: VScriptElement) {
         VExConstructor.apply(this);
-        this.vmData.$beforeSetInDOM.on((node, parent, v) => {
-            let document = v;
+        this.vmData.$beforeSetInDOM.on((node, parent, document) => {
             if (document) {
                 //不是从dom里删除
                 if (node.vmData.document) {

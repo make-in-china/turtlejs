@@ -4,7 +4,7 @@ interface VNodeNames{
 }
 namespace VMDOM{
     @mergeClass({align:'',color:'',noShade:'',size:'',width:''})
-    export class VHrElement extends VHtmlElement{
+    export class VHrElement extends VHTMLElement{
         nodeName:"HR"="HR";
         align:string
         color:string

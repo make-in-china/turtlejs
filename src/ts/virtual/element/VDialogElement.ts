@@ -4,7 +4,7 @@ interface VNodeNames{
 }
 namespace VMDOM{
     @mergeClass({open:''})
-    export class  VDialogElement extends VHtmlElement{
+    export class  VDialogElement extends VHTMLElement{
         nodeName:"DIALOG"="DIALOG";
         open:string
         

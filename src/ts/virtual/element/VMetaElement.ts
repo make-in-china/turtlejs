@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({name:'',content:'',scheme:''})
-    export class  VMetaElement extends VHtmlElement{
+    export class  VMetaElement extends VHTMLElement{
         nodeName:"META"="META";
         name:string
         content:string

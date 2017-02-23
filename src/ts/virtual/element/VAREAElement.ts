@@ -4,7 +4,7 @@ interface VNodeName{
 
 namespace VMDOM{
     @mergeClass({alt:'',coords:'',shape:'',target:'',ping:'',noHref:'',href:''})
-    export class  VAreaElement extends VHtmlElement{
+    export class  VAreaElement extends VHTMLElement{
         nodeName:"AREA"="AREA";
         alt:string
         coords:string

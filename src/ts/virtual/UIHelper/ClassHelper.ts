@@ -4,7 +4,7 @@
 namespace UIHelper {
 
     
-    function getAttrAndChildsJS(name: string, refNode: VMDOM.VHtmlElement): string {
+    function getAttrAndChildsJS(name: string, refNode: VMDOM.VHTMLElement): string {
         let sAttr = refNode.attributesToJS();
         if (sAttr.length !== 0) {
             sAttr = `this.${name}${sAttr};`;
@@ -66,7 +66,7 @@ namespace UIHelper {
     function init_Ref_Part_Info(chds:IArray<VMDOM.VNode>,props:string[],defaultValues:string[],refInfo:RefInfo,scripts: VMDOM.VScript[]){
         treeEach(<VMDOM.VNode[]>chds, "childNodes", (node) => {
 
-            if (node instanceof VMDOM.VHtmlElement) {
+            if (node instanceof VMDOM.VHTMLElement) {
                 
 
                 //预执行指令
@@ -185,7 +185,7 @@ namespace UIHelper {
                 propertys.push(name + ':' + toClassName(refNode));
             }
         }
-        function setPropertyInitScript(name:string,node:VMDOM.VHtmlElement){
+        function setPropertyInitScript(name:string,node:VMDOM.VHTMLElement){
             propertyInitScript[name] = `this.${name}=<any>$$$${
                         node.toCreateJS()
                         };

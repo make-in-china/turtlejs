@@ -8,7 +8,7 @@ const enum ENodeType{
 }
 namespace VMDOM{
     @register('#domhelper', ENodeType.DOMHELPER)
-    export class VDomhelperElement extends VHtmlElement{
+    export class VDomhelperElement extends VHTMLElement{
         nodeName="DOMHELPER"
     }
 }

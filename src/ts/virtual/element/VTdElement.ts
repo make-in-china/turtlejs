@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({colSpan:'',rowSpan:'',headers:'',align:'',axis:'',height:'',width:'',noWrap:'',vAlign:'',bgColor:'',abbr:'',scope:''})
-    export class  VTdElement extends VHtmlElement{
+    export class  VTdElement extends VHTMLElement{
         nodeName:"TD"="TD";
         colSpan:string
         rowSpan:string

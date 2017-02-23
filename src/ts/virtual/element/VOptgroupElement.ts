@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({disabled:'',label:''})
-    export class  VOptgroupElement extends VHtmlElement{
+    export class  VOptgroupElement extends VHTMLElement{
         nodeName:"OPTGROUP"="OPTGROUP";
         disabled:string
         label:string

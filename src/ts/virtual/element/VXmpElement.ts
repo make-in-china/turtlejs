@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({width:''})
-    export class  VXmpElement extends VHtmlElement{
+    export class  VXmpElement extends VHTMLElement{
         nodeName:"XMP"="XMP";
         width:string
     }

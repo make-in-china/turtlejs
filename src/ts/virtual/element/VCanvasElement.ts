@@ -4,7 +4,7 @@ interface VNodeNames{
 }
 namespace VMDOM{
     @mergeClass({width:'',height:''})
-    export class  VCanvasElement extends VHtmlElement{
+    export class  VCanvasElement extends VHTMLElement{
         nodeName:"CANVAS"="CANVAS";
         width:string
         height:string

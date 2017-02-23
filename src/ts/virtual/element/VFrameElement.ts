@@ -4,7 +4,7 @@ interface VNodeNames{
 }
 namespace VMDOM{
     @mergeClass({name:'',scrolling:'',frameBorder:'',marginHeight:'',marginWidth:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
-    export class VFrameElement extends VHtmlElement{
+    export class VFrameElement extends VHTMLElement{
         nodeName:"FRAME"="FRAME"
         name:string
         scrolling:string

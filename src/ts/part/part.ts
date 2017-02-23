@@ -80,7 +80,7 @@ namespace Component{
         constructor(public partName:string/*组件名*/,dom:ComponentView.IView,public props: ComponentView.IProps,propsNodes?: (VMDOM.VNode&IVNodeMethod)[]) {
             super();
             $rootScope.lastRenderPart=this;
-            let propsElements: (VMDOM.VHtmlElement&IVNodeMethod)[]=<any>[];
+            let propsElements: (VMDOM.VHTMLElement&IVNodeMethod)[]=<any>[];
             if(propsNodes){
                 for(let node of propsNodes){
                     if(isVHTMLElement(node)){

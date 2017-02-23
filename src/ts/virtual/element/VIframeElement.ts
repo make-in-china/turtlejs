@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({src:'',srcdoc:'',name:'',sandbox:'',allowFullscreen:'',width:'',height:'',align:'',scrolling:'',frameBorder:'',longDesc:'',marginHeight:'',marginWidth:''})
-    export class  VIframeElement extends VHtmlElement{
+    export class  VIframeElement extends VHTMLElement{
         nodeName:"IFRAME"="IFRAME";
         src:string
         srcdoc:string

@@ -4,7 +4,7 @@ interface VNodeNames{
 }
 namespace VMDOM{
     @mergeClass({type:'',width:'',height:'',align:'',name:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
-    export class VEmbedElement extends VHtmlElement{
+    export class VEmbedElement extends VHTMLElement{
         nodeName:"EMBED"="EMBED"
         type:string
         width:string

@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({align:'',vAlign:'',bgColor:''})
-    export class  VTrElement extends VHtmlElement{
+    export class  VTrElement extends VHTMLElement{
         nodeName:"TR"="TR";
         align:string
         vAlign:string

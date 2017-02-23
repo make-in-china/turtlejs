@@ -357,8 +357,8 @@ abstract class VDOM2 extends VDOM {
 
 //修改attributesToJS;   
 //tag:hook
-let VHtmlElement_attributesToJS=VMDOM.VHtmlElement.prototype.attributesToJS;
-VMDOM.VHtmlElement.prototype.attributesToJS=function(this:VMDOM.VHtmlElement&IVNodeMethod):string{
+let VHtmlElement_attributesToJS=VMDOM.VHTMLElement.prototype.attributesToJS;
+VMDOM.VHTMLElement.prototype.attributesToJS=function(this:VMDOM.VHTMLElement&IVNodeMethod):string{
     let s:string=VHtmlElement_attributesToJS.call(this);
     //解析directive
     let directives=this.vmData.directives;

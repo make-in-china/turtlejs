@@ -11,7 +11,6 @@ namespace VMDOM{
     export abstract class VDocument extends VNode{
         nodeType:ENodeType.Document=ENodeType.Document;
         nodeName:"#document"="#document"
-        
         cloneNode():VDocument&IVNodeMethod{
             throw new Error("本标签不支持cloneNode");
         }

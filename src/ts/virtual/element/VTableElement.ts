@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({align:'',border:'',frame:'',rules:'',summary:'',width:'',bgColor:'',cellPadding:'',cellSpacing:''})
-    export class  VTableElement extends VHtmlElement{
+    export class  VTableElement extends VHTMLElement{
         nodeName:"TABLE"="TABLE";
         align:string
         border:string

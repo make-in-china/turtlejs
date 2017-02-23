@@ -4,7 +4,7 @@ interface VNodeNames{
 }
 namespace VMDOM{
     @mergeClass({title:'', lang:'', accessKey:'', webkitdropzone:'', id:''})
-    export class  VHeadElement extends VHtmlElement{
+    export class  VHeadElement extends VHTMLElement{
         nodeName:"HEAD"="HEAD";
         title:string
         lang:string

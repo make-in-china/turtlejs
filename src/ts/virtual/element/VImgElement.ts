@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({alt:'',src:'',srcset:'',sizes:'',crossOrigin:'',useMap:'',isMap:'',width:'',height:'',name:'',lowsrc:'',align:'',hspace:'',vspace:'',longDesc:'',border:''})
-    export class  VImgElement extends VHtmlElement{
+    export class  VImgElement extends VHTMLElement{
         nodeName:"IMG"="IMG";
         alt:string
         src:string

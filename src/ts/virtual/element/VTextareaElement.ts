@@ -4,7 +4,7 @@ interface VNodeNames{
 }
 namespace VMDOM{
     @mergeClass({autofocus:'',cols:'',dirName:'',disabled:'',maxLength:'',minLength:'',name:'',placeholder:'',readOnly:'',required:'',rows:'',wrap:'',autocapitalize:''})
-    export class  VTextareaElement extends VHtmlElement{
+    export class  VTextareaElement extends VHTMLElement{
         nodeName:"TEXTAREA"="TEXTAREA";
         autofocus:string
         cols:string

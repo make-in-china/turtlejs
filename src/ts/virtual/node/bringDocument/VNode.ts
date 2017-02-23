@@ -1,4 +1,4 @@
-
+/// <reference path='../VNode.ts'/>
 namespace VMDOM{
     let VExConstructor=VMDOM.VNode;
     let VEx=VExConstructor.prototype;

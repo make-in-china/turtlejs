@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({autofocus:'',disabled:'',multiple:'',name:'',required:'',size:''})
-    export class  VSelectElement extends VHtmlElement{
+    export class  VSelectElement extends VHTMLElement{
         nodeName:"SELECT"="SELECT";
         autofocus:string
         disabled:string

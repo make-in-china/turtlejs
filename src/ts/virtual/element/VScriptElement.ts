@@ -6,7 +6,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({src:'',type:'',charset:'',async:'',defer:'',crossOrigin:'',event:'',integrity:''})
-    export class  VScriptElement extends VHtmlElement{
+    export class  VScriptElement extends VHTMLElement{
         nodeName:"SCRIPT"="SCRIPT";
         src:string
         type:string

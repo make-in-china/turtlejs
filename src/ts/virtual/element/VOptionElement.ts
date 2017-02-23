@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({disabled:'',label:'',selected:'',value:''})
-    export class  VOptionElement extends VHtmlElement{
+    export class  VOptionElement extends VHTMLElement{
         nodeName:"OPTION"="OPTION";
         disabled:string
         label:string

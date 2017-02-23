@@ -4,7 +4,7 @@ interface VNodeNames{
 }
 namespace VMDOM{
     @mergeClass({span:'',align:'',vAlign:'',width:''})
-    export class  VColgroupElement extends VHtmlElement{
+    export class  VColgroupElement extends VHTMLElement{
         nodeName:"COLGROUP"="COLGROUP";
         span:string
         align:string

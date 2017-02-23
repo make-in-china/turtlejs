@@ -5,7 +5,7 @@ interface VNodeNames{
 
 namespace VMDOM{
     @mergeClass({name:''})
-    export class  VOutputElement extends VHtmlElement{
+    export class  VOutputElement extends VHTMLElement{
         nodeName:"OUTPUT"="OUTPUT";
         name:string
         

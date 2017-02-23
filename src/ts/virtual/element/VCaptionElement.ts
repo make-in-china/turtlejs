@@ -4,7 +4,7 @@ interface VNodeNames{
 }
 namespace VMDOM{
     @mergeClass({align:''})
-    export class  VCaptionElement extends VHtmlElement{
+    export class  VCaptionElement extends VHTMLElement{
         nodeName:"CAPTION"="CAPTION";
         align:string
         

@@ -4,7 +4,7 @@ interface VNodeNames{
 }
 namespace VMDOM{
     @mergeClass({formTarget:'',name:'',value:'',title:'',lang:'',accessKey:'',webkitdropzone:'',id:''})
-    export class VButtonElement extends VHtmlElement{
+    export class VButtonElement extends VHTMLElement{
         nodeName:"BUTTON"="BUTTON"
         formTarget:string
         name:string

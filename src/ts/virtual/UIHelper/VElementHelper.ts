@@ -12,7 +12,7 @@ interface IVNodeMethod{
     (nodeName: "${name.toLowerCase()}", nodeType?: ENodeType.Element): VMDOM.${className}&IVNodeMethod;
 }
 namespace VMDOM{
-    export class ${className} extends VHtmlElement{
+    export class ${className} extends VHTMLElement{
         nodeName="${name.toUpperCase()}"
         ${propertys}
     }

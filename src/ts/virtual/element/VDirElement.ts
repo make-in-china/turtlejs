@@ -4,7 +4,7 @@ interface VNodeNames{
 }
 namespace VMDOM{
     @mergeClass({compact:''})
-    export class  VDirElement extends VHtmlElement{
+    export class  VDirElement extends VHTMLElement{
         nodeName:"DIR"="DIR"
         compact:string
         
