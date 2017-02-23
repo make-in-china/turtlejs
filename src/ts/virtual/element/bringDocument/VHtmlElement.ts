@@ -1,11 +1,12 @@
 
-/// <reference path='../VHTMLElement.ts'/>
+/// <reference path='../VHtmlElement.ts'/>
 namespace VMDOM {
-    let VExConstructor = VMDOM.VHTMLElement;
+    let VExConstructor = VMDOM.VHtmlElement;
     let VEx = VExConstructor.prototype;
     delete VExConstructor.prototype;
-    VMDOM.VHTMLElement = <any>function (this: VHTMLElement) {
+    VMDOM.VHtmlElement = <any>function (this: VHtmlElement) {
         VExConstructor.apply(this);
+        document.documentElement = null;
         this.vmData.$beforeSetInDOM.on((node: any, parent, document) => {
             if (document) {
                 if (this.vmData.document && this.vmData.document !== document) {
@@ -15,8 +16,8 @@ namespace VMDOM {
                     if (document.documentElement === null) {
                         document.documentElement = node;
                     } else if (document.documentElement !== node) {
-                        //合并html
-                        debugger;
+                        throw new Error('Can\'t change HTML');
+                    // } else{
                     }
                 } else {
                     throw new Error('HTML only can put in document');
@@ -28,6 +29,6 @@ namespace VMDOM {
             }
         });
     }
-    VMDOM.VHTMLElement.prototype = VEx;
+    VMDOM.VHtmlElement.prototype = VEx;
 
 }

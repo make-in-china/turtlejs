@@ -236,7 +236,7 @@ namespace VMDOM{
         
             
         }
-        get outerHTML() {
+        get outerHTML():string {
             let
                 xmlNode = this.toHTMLString();
             //     ,
