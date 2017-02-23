@@ -370,7 +370,7 @@
         }
     </style>
     <script>
-        var path=part.template.path+'/'+part.template.name+'.res/';
+        var path="{path}";
         $t.service.SyntaxHighlighter=$t.require([path+'shCore.js',path+'shBrushXml.js'],"SyntaxHighlighter");
     </script>
 </xmp>
@@ -387,7 +387,7 @@
     <script>
         if(!$t.service.SyntaxHighlighter){
             var t=this;
-            $t.renderBefore("highlightcode.style",part.template.sortPath,t.childNodes[0],outer,outerElement);
+            $t.renderBefore("highlightcode.style",part.template.sortPath,t.childNodes[0],outer,outerElement,{path:part.template.path+'/'+part.template.name+'.res/'});
         }
         if(outer.length>0){
             var code;
