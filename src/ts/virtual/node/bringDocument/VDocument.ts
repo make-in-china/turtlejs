@@ -1,6 +1,7 @@
 /// <reference path='../../element/bringDocument/VBodyElement.ts'/>
 /// <reference path='../../element/bringDocument/VHeadElement.ts'/>
 /// <reference path='../../element/bringDocument/VHTMLElement.ts'/>
+/// <reference path='../VDocumentType.ts'/>
 /// <reference path='../VDocument.ts'/>
 namespace VMDOM{
     let VExConstructor=VMDOM.VDocument;
@@ -10,6 +11,7 @@ namespace VMDOM{
         scripts:VMDOM.VScriptElement[]
         body:VMDOM.VBodyElement|null
         head:VMDOM.VHeadElement|null
+        doctype:VMDOM.VDocumentType|null
         documentElement:VMDOM.VHTMLElement|null
         parentNode:null
         createElement:IVNodeMethod
@@ -25,6 +27,7 @@ namespace VMDOM{
         this.scripts=[];
         this.body=null;
         this.head=null;
+        this.doctype=null;
         this.vmData.document=this;
         this.createElement=$$$;
     }

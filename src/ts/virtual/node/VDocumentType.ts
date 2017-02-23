@@ -12,6 +12,7 @@ namespace VMDOM{
     export class VDocumentType extends VMDOM.VNode{
         nodeType:ENodeType.DocumentType=ENodeType.DocumentType
         nodeName="html"
+        get name():'html'{return 'html'};
         cloneNode():VDocumentType&IVNodeMethod{
             return $$$("",ENodeType.DocumentType);
         }
