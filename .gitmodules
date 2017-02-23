@@ -1,0 +1,3 @@
+[submodule "src/ts/virtual"]
+	path = src/ts/virtual
+	url = git@github.com:make-in-china/turtlejs-vdom.git
