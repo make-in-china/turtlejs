@@ -59,23 +59,13 @@ gulp.task('turtle',function(){
     init();
     doTSC('src/ts/index.ts','virtual/UIHelper.0.1.js')
 });
-gulp.task('vdom1',function(){
-    init();
-    doTSC('src/ts/virtual/UIHelper/export/DocumentVDOM.ts','virtual/documentVDOM.0.1.js')
-});
-gulp.task('vdom',function(){
-    init();
-    doTSC('src/ts/virtual/UIHelper/export/VDOM.ts','virtual/VDOM.0.1.js')
-});
 gulp.task('default',function(){
     console.log(`任务列表：
     project   创建工程
         name  工程名
     ui:w      监视ui工程
     turtle    构建turtle.js
-    vm        构建 uihealper.js
-    vdom      构建 VDOM.js
-    vdom1     构建 documentVDOM.js`);
+    vm        构建 uihealper.js`);
 });
 gulp.task('project',function(){
     var args=process.argv.slice(3);
