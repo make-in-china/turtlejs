@@ -44,15 +44,15 @@ function init(){
             );
             // tsResult.pipe(sourcemaps.init()).pipe(sourcemaps.write('../maps', {addComment: false}))
         merge([
-            tsResult.js.pipe(gulp.dest('dest')),
-            tsResult.dts.pipe(gulp.dest('dest'))])
+            tsResult.js.pipe(gulp.dest('dist')),
+            tsResult.dts.pipe(gulp.dest('dist'))])
     }
 }
 
 gulp.task('vm',function(){
     init();
 
-    del(['dest/virtual/*']);
+    del(['dist/virtual/*']);
     doTSC('src/ts/virtual/UIHelper/UIHelper.ts','virtual/turtle.0.1.js')
 });
 gulp.task('turtle',function(){
@@ -69,7 +69,7 @@ gulp.task('default',function(){
 });
 gulp.task('project',function(){
     var args=process.argv.slice(3);
-    var UIHelper=require('./dest/virtual/UIHelper.0.1.js').UIHelper;
+    var UIHelper=require('./dist/virtual/UIHelper.0.1.js').UIHelper;
     for(const arg of args){
         let name=arg.replace(/^\-/,'');
         let path='src/ui/'+name;

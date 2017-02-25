@@ -1,7 +1,7 @@
 
 /// <reference path='../core/EventEmitterEx.ts'/>
 /// <reference path='../lib/ArrayEx.ts'/>
-/// <reference path='../lib/TreeEach.ts'/>
+/// <reference path='../virtual/lib/TreeEach.ts'/>
 /// <reference path='../lib/lib.ts'/>
 /// <reference path='../lib/is.ts'/>
 // / <reference path="Server.ts"/>
