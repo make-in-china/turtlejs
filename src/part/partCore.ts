@@ -161,7 +161,7 @@ function isTemplate(node: IElement): node is IElement {
     }
     return false;
 }
-function findTemplates(nodes: IArray<IElement>):  IArray<IElement> {
+function findTemplates(nodes: IArray<IHTMLElement>):  IArray<IElement> {
     let temps:IElement[] = [];
     treeEach(nodes, 'children', function (node) {
         if (isTemplate(node)) {

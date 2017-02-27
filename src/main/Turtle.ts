@@ -208,7 +208,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
     }
     
     private r1(scriptNode:IHTMLScriptElement,compileuilist:string|undefined,compileName:string|undefined,compileInfo:{isOn?:boolean,url?:string},compile:string|undefined){
-        this.ready(function() {
+        this.ready(()=> {
             this.compileDocument(scriptNode,compileuilist,function(html:string,compileJS:{name:string,path:string,script:string}[],importScripts:string){
                 if(compileName===""){
                     compileName=getNameByURL(getFileNameByURL(location.href));
