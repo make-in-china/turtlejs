@@ -10,7 +10,7 @@ class ClientHelper{
     }
     private setSizeProperty(name,fn){
         this.data[name]=undefined;
-        this[name]=function(v){
+        this[name]=function(this:any,v){
             /*此属性用于被绑定*/
             if(this.data[name]===undefined&&this.__bind__){
                 if(this.isListen===false){

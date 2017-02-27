@@ -1,6 +1,6 @@
 
 /// <reference path='Lib.ts'/>
-/// <reference path='../javascript/JavaScriptStatement.ts'/>
+/// <reference path='../../virtual/javascript/JavaScriptStatement.ts'/>
 
 namespace Order {
     export interface IOrderSetup{

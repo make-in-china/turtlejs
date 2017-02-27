@@ -1,7 +1,7 @@
 /// <reference path='../../scope/Scope.ts'/>
 /// <reference path='VOrder.ts'/>
-/// <reference path='../javascript/Parser.ts'/>
-/// <reference path='../javascript/logic/Var.ts'/>
+/// <reference path='../../virtual/javascript/Parser.ts'/>
+/// <reference path='../../virtual/javascript/logic/Var.ts'/>
 namespace Order {
     export interface IOrderDataVar extends IOrderData{
         varInfos:[string,string|undefined,boolean][]

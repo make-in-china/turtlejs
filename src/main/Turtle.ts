@@ -11,22 +11,22 @@
 /// <reference path='../lib/DebugHelper.ts'/>
 /// <reference path='../core/xhr.ts'/>
 /// <reference path='../part/store.ts'/>
-/// <reference path='../virtual/Include.ts'/>
+/// <reference path='../view/Include.ts'/>
 /// <reference path='../part/uiList.ts'/>
 /// <reference path='LoadJS.ts'/>
 /// <reference path="../core/BrowserHelper.ts"/>
-/// <reference path='../virtual/order/VOrder.ts'/>
-/// <reference path='../virtual/order/If.ts'/>
-/// <reference path='../virtual/order/For.ts'/>
-/// <reference path='../virtual/order/Switch.ts'/>
-/// <reference path='../virtual/order/while.ts'/>
-/// <reference path='../virtual/order/Do.ts'/>
-/// <reference path='../virtual/order/Scope.ts'/>
-/// <reference path='../virtual/order/=.ts'/>
-/// <reference path='../virtual/order/-.ts'/>
-/// <reference path='../virtual/order/Script.ts'/>
-/// <reference path='../virtual/order/Elements.ts'/>
-/// <reference path='../virtual/order/Nodes.ts'/>
+/// <reference path='../view/order/VOrder.ts'/>
+/// <reference path='../view/order/If.ts'/>
+/// <reference path='../view/order/For.ts'/>
+/// <reference path='../view/order/Switch.ts'/>
+/// <reference path='../view/order/while.ts'/>
+/// <reference path='../view/order/Do.ts'/>
+/// <reference path='../view/order/Scope.ts'/>
+/// <reference path='../view/order/=.ts'/>
+/// <reference path='../view/order/-.ts'/>
+//// <reference path='../view/order/Script.ts'/>
+/// <reference path='../view/order/Elements.ts'/>
+/// <reference path='../view/order/Nodes.ts'/>
 
 interface IRenderDocument{
     ():void;

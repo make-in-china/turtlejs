@@ -1,4 +1,4 @@
-/// <reference path="./uiHelper/BaseVNode.ts"/>
+/// <reference path="../virtual/vdom/BaseVNode.ts"/>
 let includeJSFiles = (function () {
     class IncludeTask {
         static jsScript: IHashObject<VMDOM.VScriptElement> = {};
