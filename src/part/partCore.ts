@@ -1,9 +1,9 @@
 
 /// <reference path='TemplateConfig.ts'/>
-/// <reference path='../virtual/order/VOrder.ts'/>
+/// <reference path='../view/order/VOrder.ts'/>
 /// <reference path='../core/XHR.ts'/>
-/// <reference path='../virtual/Include.ts'/>
-/// <reference path='../lib/treeEach.ts'/>
+/// <reference path='../view/Include.ts'/>
+/// <reference path='../virtual/lib/TreeEach.ts'/>
 /// <reference path='Part.ts'/>
 /// <reference path='Store.ts'/>
 /// <reference path='../main/Config.ts'/>
