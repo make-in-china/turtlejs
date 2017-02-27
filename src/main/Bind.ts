@@ -5,6 +5,7 @@
 /// <reference path="../lib/TypeHelper.ts"/>
 /// <reference path="../core/Node.ts"/>
 /// <reference path="../part/PartCore.ts"/>
+/// <reference path='../view/order/lib.ts'/>
 
 
 function _getBindObject(scope:Scope, arrNames: Array<string>) {
