@@ -113,20 +113,20 @@ class Turtle extends EventEmitterEx implements ITurtle{
                 if(i<loads.length){
                     includeJSFiles(loads[i],fnLoad);
                 }else{
-                    if(compileInfo && compileInfo.isOn && compileInfo.url){
-                        this.r1(scriptNode,compileuilist,compileName,compileInfo,compile);
-                    }else{
+                    // if(compileInfo && compileInfo.isOn && compileInfo.url){
+                    //     this.r1(scriptNode,compileuilist,compileName,compileInfo,compile);
+                    // }else{
                         this.r2();
-                    }
+                    // }
                 }
             }
             includeJSFiles(loads[0],fnLoad);
         }else{
-            if(compileInfo && compileInfo.isOn && compileInfo.url){
-                this.r1(scriptNode,compileuilist,compileName,compileInfo,compile);
-            }else{
+            // if(compileInfo && compileInfo.isOn && compileInfo.url){
+            //     this.r1(scriptNode,compileuilist,compileName,compileInfo,compile);
+            // }else{
                 this.r2();
-            }
+            // }
         }
         
         if(script.length>0){
@@ -185,7 +185,7 @@ class Turtle extends EventEmitterEx implements ITurtle{
     renderDocument:IRenderDocument=()=>{
         this.renderDocument.beginTime=new Date();
         let 
-            xmps=findTemplates(document.body.children),
+            xmps=findTemplates(<any>document.body.children),
             i,
             templateXMP:IElement[]=[];
         /*优先处理定义相关的模板*/
@@ -207,58 +207,58 @@ class Turtle extends EventEmitterEx implements ITurtle{
         this.renderDocument.endTime=new Date();
     }
     
-    private r1(scriptNode:IHTMLScriptElement,compileuilist:string|undefined,compileName:string|undefined,compileInfo:{isOn?:boolean,url?:string},compile:string|undefined){
-        this.ready(()=> {
-            this.compileDocument(scriptNode,compileuilist,function(html:string,compileJS:{name:string,path:string,script:string}[],importScripts:string){
-                if(compileName===""){
-                    compileName=getNameByURL(getFileNameByURL(location.href));
-                    if(/\./.test(compileName)){
-                        compileName=compileName.split('.')[0];
-                    }
-                    console.log('未提供compileName，自动设置为“'+compileName+'”');
-                }
-                let url = compileInfo.url + "?htmlName=" + compileName;
+    // private r1(scriptNode:IHTMLScriptElement,compileuilist:string|undefined,compileName:string|undefined,compileInfo:{isOn?:boolean,url?:string},compile:string|undefined){
+    //     this.ready(()=> {
+    //         this.compileDocument(scriptNode,compileuilist,function(html:string,compileJS:{name:string,path:string,script:string}[],importScripts:string){
+    //             if(compileName===""){
+    //                 compileName=getNameByURL(getFileNameByURL(location.href));
+    //                 if(/\./.test(compileName)){
+    //                     compileName=compileName.split('.')[0];
+    //                 }
+    //                 console.log('未提供compileName，自动设置为“'+compileName+'”');
+    //             }
+    //             let url = compileInfo.url + "?htmlName=" + compileName;
                 
-                let b=document.body;
-                b.innerHTML='<div style="background-color:#fff;position:absolute;left:0;right:0;bottom:0;top:0;">开始编译页面</div>';
-                let c=b.children[0];
-                switch(compile){
-                    case 'onlyBody':
+    //             let b=document.body;
+    //             b.innerHTML='<div style="background-color:#fff;position:absolute;left:0;right:0;bottom:0;top:0;">开始编译页面</div>';
+    //             let c=b.children[0];
+    //             switch(compile){
+    //                 case 'onlyBody':
                     
-                        html='<xmp><script>'+importScripts+'</script></xmp>'+html.match(/(<body[\s\S]*?>)([\s\S]*?)(<\/body>)/)[2];
-                        break;
-                }
-                this.xhr.post(url,html,false,function(text:string){
-                    let br= document.createElement('br');
-                    let sec=document.createElement('span');
-                    let timeout=1000;
-                    sec.innerHTML="?";
-                    sec.style.color="#f00";
-                    c.appendChild(br);
-                    c.appendChild(br.cloneNode());
-                    c.appendChild(document.createTextNode('刷新页面剩余时间：'));
-                    c.appendChild(sec);
-                    c.appendChild(br.cloneNode());
-                    c.appendChild(br.cloneNode());
-                    c.appendChild(document.createTextNode(text));
-                    for(let i=0;i<compileJS.length;i++){
-                        let url = compileInfo.url + "?uiName=" + compileJS[i].name + "&uiPath=" + compileJS[i].path;
-                        this.xhr.post(url,compileJS[i].script,false,function(text:string){
-                            c.appendChild(br.cloneNode());
-                            c.appendChild(document.createTextNode(text));
-                        });
-                    }
-                    setTimeout(function(){
-                        window.location.href=appendQueryString("turtle_nocompile","1");
-                    },timeout);
-                    setInterval(function(){
-                        timeout=timeout-100;
-                        sec.innerHTML=''+timeout/1000;
-                    },100);
-                });
-            });
-        });
-    }
+    //                     html='<xmp><script>'+importScripts+'</script></xmp>'+html.match(/(<body[\s\S]*?>)([\s\S]*?)(<\/body>)/)[2];
+    //                     break;
+    //             }
+    //             this.xhr.post(url,html,false,function(text:string){
+    //                 let br= document.createElement('br');
+    //                 let sec=document.createElement('span');
+    //                 let timeout=1000;
+    //                 sec.innerHTML="?";
+    //                 sec.style.color="#f00";
+    //                 c.appendChild(br);
+    //                 c.appendChild(br.cloneNode());
+    //                 c.appendChild(document.createTextNode('刷新页面剩余时间：'));
+    //                 c.appendChild(sec);
+    //                 c.appendChild(br.cloneNode());
+    //                 c.appendChild(br.cloneNode());
+    //                 c.appendChild(document.createTextNode(text));
+    //                 for(let i=0;i<compileJS.length;i++){
+    //                     let url = compileInfo.url + "?uiName=" + compileJS[i].name + "&uiPath=" + compileJS[i].path;
+    //                     this.xhr.post(url,compileJS[i].script,false,function(text:string){
+    //                         c.appendChild(br.cloneNode());
+    //                         c.appendChild(document.createTextNode(text));
+    //                     });
+    //                 }
+    //                 setTimeout(function(){
+    //                     window.location.href=appendQueryString("turtle_nocompile","1");
+    //                 },timeout);
+    //                 setInterval(function(){
+    //                     timeout=timeout-100;
+    //                     sec.innerHTML=''+timeout/1000;
+    //                 },100);
+    //             });
+    //         });
+    //     });
+    // }
     private r2(){
         this.ready(()=>{
             this.renderDocument();

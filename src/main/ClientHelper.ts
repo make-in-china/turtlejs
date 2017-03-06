@@ -8,9 +8,9 @@ class ClientHelper{
             this.events[i]();
         }
     }
-    private setSizeProperty(name,fn){
+    private setSizeProperty(name:'onResize'|'width'|'height'|'left'|'top'|'bottom'|'right',fn){
         this.data[name]=undefined;
-        this[name]=function(this:any,v){
+        this[name]=function(this:ClientHelper,v){
             /*此属性用于被绑定*/
             if(this.data[name]===undefined&&this.__bind__){
                 if(this.isListen===false){
@@ -18,7 +18,7 @@ class ClientHelper{
                     window.addEventListener('resize',this.emit);
                 }
                 var bind=this.__bind__;
-                var getV=function(){
+                var getV=function(this:ClientHelper){
                     this[name]=fn();
                 }
                 this.data[name]=fn();

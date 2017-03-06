@@ -1,5 +1,6 @@
 
 /// <reference path='../VOrder.ts'/>
+/// <reference path='../../VScript.ts'/>
 
 namespace OrderEx {
     export const tryRun = 'tryRun'

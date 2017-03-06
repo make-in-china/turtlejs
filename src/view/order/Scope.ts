@@ -1,4 +1,5 @@
 
+/// <reference path='Var.ts'/>
  
 namespace Order {
     export interface IOrderDataScope extends IOrderDataVar{

@@ -1,4 +1,4 @@
-/// <reference path="../src/ts/virtual/node/.d.ts" />
+/// <reference path="src/virtual/node/.d.ts" />
 declare class ArrayEx<T> extends Array<T> {
     last(): T | undefined;
     clear(): void;
@@ -31,21 +31,21 @@ interface IHTMLCollectionOf<T extends IElement> extends IHTMLCollection {
     item(index: number): T;
     namedItem(name: string): T;
 }
-interface INode extends EventTarget {
+interface INode {
     toDOM(): Node;
-    insertBefore2(newChild: INode, refChild: INode): INode;
     readonly childNodes: INodeList;
     readonly nextSibling: INode | null;
+    insertBefore(newChild: INode, refChild: INode | null): INode;
+    normalize(): void;
+    removeChild(oldChild: INode): INode;
+    replaceChild(newChild: INode, oldChild: INode): INode;
+    insertBefore2(newChild: INode, refChild: INode): INode;
     readonly nodeName: string;
     readonly nodeType: number;
     readonly parentNode: INode | null;
     readonly previousSibling: INode | null;
     appendChild<T extends INode>(newChild: T): T;
     cloneNode(deep?: boolean): INode;
-    insertBefore(newChild: INode, refChild: INode | null): INode;
-    normalize(): void;
-    removeChild(oldChild: INode): INode;
-    replaceChild(newChild: INode, oldChild: INode): INode;
 }
 interface IElementTraversal {
     childElementCount: number;
@@ -173,7 +173,6 @@ interface ICharacterData extends INode, IChildNode {
     insertData(offset: number, arg: string): void;
     replaceData(offset: number, count: number, arg: string): void;
     substringData(offset: number, count: number): string;
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
 }
 interface IText extends ICharacterData {
     wholeText: string;
@@ -500,6 +499,10 @@ declare function toggleClass(elem: IElement, a: string, t: Function, f: Function
 declare function isCommentNode(node: INode): node is IComment;
 /**判断是否文本节点 */
 declare function isTextNode(node: INode): node is IText;
+interface IArray<T> {
+    [index: number]: T;
+    length: number;
+}
 declare let arrayConstructor: Array<any>, objectConstructor: ObjectConstructor, stringConstructor: String, toStr: () => string, getPrototypeOf: (o: any) => any, replace: {
     (searchValue: string, replaceValue: string): string;
     (searchValue: string, replacer: (substring: string, ...args: any[]) => string): string;
@@ -553,7 +556,7 @@ declare let getCommentText: (node: IComment) => string;
 declare let persentRE: RegExp;
 declare function isNull<T>(p: T | null): p is null;
 declare function isUndefined<T>(p: T | undefined): p is undefined;
-declare function isObject<T>(p: any): p is Object;
+declare function isObject(p: any): p is Object;
 declare function isRegExp(a: any): a is RegExp;
 declare function isDate(a: any): a is Date;
 declare function isNumber(a: any): a is number;
@@ -563,7 +566,11 @@ declare let isArray: (arg: any) => arg is any[];
 declare function isPersent(s: any): boolean;
 declare function isArrayLike(a: any): boolean;
 interface ICallBack {
-    (this: void, ...arg: any[]): void;
+    (...arg: any[]): void;
+}
+interface EventEmitter {
+    on(type: string, listener: ICallBack): this;
+    off(type: string, listener: ICallBack): this;
 }
 declare class EventEmitter {
     protected events: {
@@ -572,10 +579,8 @@ declare class EventEmitter {
     };
     constructor();
     emit(type: string, ...args: any[]): boolean;
-    on: (type: string, listener: ICallBack) => this;
     addListener(type: string, listener: ICallBack): this;
     once(type: string, listener: ICallBack): void;
-    off: (type: string, listener: ICallBack) => this;
     removeListener(type: string, listener: ICallBack): this;
     removeAllListeners(type: string): this;
     listeners(type: string): ICallBack | ICallBack[];
@@ -600,6 +605,13 @@ declare class EventEmitterEx extends EventEmitter {
     private eventHelpers;
     /**
      * 生成或获取一个事件管理器
+     *
+     * @template T 回调函数
+     * @template U
+     * @param {string} type 事件名
+     * @returns {EventHelper<T,U>}
+     *
+     * @memberOf EventEmitterEx
      */
     getEventHelper<T extends ICallBack, U extends Function>(type: string): EventHelper<T, U>;
 }
@@ -621,10 +633,6 @@ interface ITreeEachState<T> {
     nextStepLength: number;
     currentIndex: number;
 }
-interface IArray<T> {
-    [index: number]: T;
-    length: number;
-}
 interface ITreeEachReturn<T> {
     stack: [IArray<T> | T[], number];
     return: eTreeEach | undefined;
@@ -633,12 +641,12 @@ interface ITreeEachReturn<T> {
 }
 /**
  * 遍历树
- * @param {T[]|IArray} array 数组或类数组
+ * @param {T[]|IArray<T>} array 数组或类数组
  * @param {string} propertyName 数组元素包含的属性名
  * @param {(node:T,step?:ITreeEachStep)=>eTreeEach|undefined} fn 回调函数
  * @param {number} beginIndex 遍历起始位置
  */
-declare function treeEach<T extends Object>(array: T[] | IArray<T>, propertyName: string, fn: (node: T, state: ITreeEachState<T>) => (eTreeEach | void), beginIndex?: number): ITreeEachReturn<T> | undefined;
+declare function treeEach<T, U extends keyof T>(array: T[] | IArray<T>, propertyName: U, fn: (node: T, state: ITreeEachState<T>) => (eTreeEach | void), beginIndex?: number): ITreeEachReturn<T> | undefined;
 declare namespace ComponentView {
     interface IProps {
     }
@@ -1078,8 +1086,8 @@ declare class HashObject {
 interface IHashObject<T> {
     [index: string]: T;
 }
-declare class HashObjectManage<T> {
-    static clean<T>(data: IHashObject<T>): void;
+declare class HashObjectManage {
+    static clean(data: IHashObject<any>): void;
     static take<T>(data: IHashObject<T>, name: string): T | null;
 }
 interface IKeyArrayHashObject<T> {
@@ -1128,15 +1136,17 @@ declare namespace VMDOM {
         [index: number]: VElement & IVNodeMethod | undefined;
     }
 }
-declare class VNodeVMData {
-    data: string;
-    __: Object;
-    domNode: Node | null;
-    /**是否闭合 */
-    isClose: boolean;
-    /**是否自闭合 */
-    /** */
-    closeSelf: boolean;
+declare namespace VMDOM {
+    class VNodeVMData {
+        data: string;
+        __: Object;
+        domNode: Node | null;
+        /**是否闭合 */
+        isClose: boolean;
+        /**是否自闭合 */
+        /** */
+        closeSelf: boolean;
+    }
 }
 declare namespace VMDOM {
     let bindClassToFunctionHelper: IBindClassToFunction;
@@ -1145,7 +1155,7 @@ declare namespace VMDOM {
         prototype: VNode;
     }) => void;
     function mergeClass<U>(v: U): (constructor: {
-        prototype: VMDOM.VHtmlElement & U;
+        prototype: VMDOM.VHTMLElement & U;
     }) => void;
 }
 interface Node {
@@ -1194,6 +1204,7 @@ declare namespace VMDOM {
         abstract toJS(space?: number): string;
         abstract toCreateJS(space?: number): string;
         readonly childNodes: VNodeList;
+        readonly parentElement: (VHTMLElement & IVNodeMethod) | null;
         parentNode: (VNode & IVNodeMethod) | null;
         /**
          * 用自身做环境调用函数,并返回父
@@ -1215,9 +1226,6 @@ declare namespace VMDOM {
          * 返回父节点，如果无，返回自己
          */
         readonly $: VElement & IVNodeMethod;
-        addEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
-        dispatchEvent(evt: Event): boolean;
-        removeEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
         addText(this: VNode & IVNodeMethod, ...args: string[]): VNode & IVNodeMethod;
         addText2(this: VNode & IVNodeMethod, fn: Function): VNode & IVNodeMethod;
         /**
@@ -1254,7 +1262,7 @@ declare namespace VMDOM {
         replaceChild(newChild: VNode & IVNodeMethod, oldChild: VNode & IVNodeMethod): VNode & IVNodeMethod;
         protected copyPropertyToNode(elem: Node): void;
         /**与真实DOM交互 */
-        protected connectParent<T extends IVNodeMethod>(this: VNode, elem: Node): void;
+        protected connectParent(this: VNode, elem: Node): void;
         protected createHomologyFunction(name: string): (this: VNode & IVNodeMethod) => any;
         protected createBridgeFunction(name: string): (this: VNode) => any;
         protected setBridgeGet(name: string): void;
@@ -1272,16 +1280,11 @@ interface IBindClassToFunction {
 declare function bindClassToFunction(node: IVNodeMethod & VMDOM.VNode, nodeName: string, nodeType?: ENodeType | undefined): string;
 declare function getVNodeMethod(): VMDOM.VNode & IVNodeMethod;
 declare let VNodeHelp: IVNodeMethod;
-interface VElementVMData extends VNodeVMData {
-    events: [string, EventListenerOrEventListenerObject | undefined, boolean][];
-}
 declare namespace VMDOM {
     abstract class VElement extends VNode {
-        vmData: VElementVMData;
         attributes: VNamedNodeMap;
         style: VStyle;
         children: VHTMLCollection;
-        constructor();
         removeAttribute(name: string): void;
         removeAttributeNode(item: Object): void;
         hasAttribute(name: string): boolean;
@@ -1323,20 +1326,11 @@ declare namespace VMDOM {
 }
 declare let encodeHTML: (value: string) => string;
 declare let decodeHTML: (value: string) => string;
-interface VNodeNames {
-    'html': VMDOM.VHtmlElement;
-}
-declare function isVHTMLElement(node: VMDOM.VNode): node is VMDOM.VHtmlElement;
+declare function isVHTMLElement(node: VMDOM.VNode): node is VMDOM.VHTMLElement;
 declare namespace VMDOM {
-    class VHtmlElement extends VElement {
+    abstract class VHTMLElement extends VElement {
         nodeType: ENodeType.Element;
-        nodeName: string;
-        title: string;
-        lang: string;
-        accessKey: string;
-        webkitdropzone: string;
-        id: string;
-        cloneNode(deep?: boolean): VHtmlElement & IVNodeMethod;
+        cloneNode(deep?: boolean): VHTMLElement & IVNodeMethod;
         getData(): string;
         innerText: string;
         insertBefore(newNode: VNode & IVNodeMethod, refChild: VNode & IVNodeMethod): VNode & IVNodeMethod;
@@ -1349,7 +1343,7 @@ declare namespace VMDOM {
         toJS(space?: number): string;
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation(): void;
-        outerHTML: VHtmlElement & IVNodeMethod;
+        outerHTML: string;
         outerText: string;
     }
 }
@@ -1359,7 +1353,7 @@ declare namespace VMDOM {
         getData(): string;
         readonly length: number;
         appendData(arg: string): void;
-        deleteData(offset: number, count: number): void;
+        deleteData(offset: number): void;
         insertData(offset: number, arg: string): void;
         replaceData(offset: number, count: number, arg: string): void;
         substringData(offset: number, count: number): string;
@@ -1376,7 +1370,7 @@ declare namespace VMDOM {
         nodeType: ENodeType.Text;
         private __value__;
         constructor(data: any);
-        cloneNode(deep: boolean): VText & IVNodeMethod;
+        cloneNode(): VText & IVNodeMethod;
         data: string;
         value: string;
         toCreateJS(space?: number): string;
@@ -1391,20 +1385,20 @@ interface IVNodeMethod {
     (nodeName: string, nodeType: ENodeType.Comment): VMDOM.VComment & IVNodeMethod;
 }
 declare function isVComment(node: VMDOM.VNode): node is VMDOM.VComment;
-interface VNodeVMData {
-    /**是否有两个- */
-    doubleMinus?: boolean;
-}
 interface Comment {
-    vmData?: VNodeVMData;
+    vmData?: VMDOM.VNodeVMData;
 }
 declare namespace VMDOM {
+    interface VNodeVMData {
+        /**是否有两个- */
+        doubleMinus?: boolean;
+    }
     class VComment extends VCharacterData {
         nodeName: string;
         nodeType: ENodeType;
         private __value__;
         constructor(data: any);
-        cloneNode(deep: boolean): VComment & IVNodeMethod;
+        cloneNode(): VComment & IVNodeMethod;
         data: string;
         textContent: string;
         toCreateJS(space?: number): string;
@@ -1424,8 +1418,9 @@ declare namespace VMDOM {
     class VDocumentType extends VMDOM.VNode {
         nodeType: ENodeType.DocumentType;
         nodeName: string;
-        cloneNode(deep: boolean): VDocumentType & IVNodeMethod;
-        toCreateJS(space?: number): string;
+        readonly name: 'html';
+        cloneNode(): VDocumentType & IVNodeMethod;
+        toCreateJS(): string;
         toJS(): string;
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation(): void;
@@ -1439,11 +1434,11 @@ interface IVNodeMethod {
     (nodeName: null, nodeType?: ENodeType.Document): VMDOM.VDocument & IVNodeMethod;
 }
 declare namespace VMDOM {
-    class VDocument extends VNode {
+    abstract class VDocument extends VNode {
         nodeType: ENodeType.Document;
         nodeName: "#document";
-        cloneNode(deep: boolean): VDocument & IVNodeMethod;
-        toCreateJS(space?: number): string;
+        cloneNode(): VDocument & IVNodeMethod;
+        toCreateJS(): string;
         toJS(): string;
         protected emulation(): void;
         toHTMLString(): string[];
@@ -1451,7 +1446,8 @@ declare namespace VMDOM {
 }
 declare function isVHTMLUnknownElement(node: VMDOM.VNode): node is VMDOM.VHTMLUnknownElement;
 declare namespace VMDOM {
-    class VHTMLUnknownElement extends VHtmlElement {
+    class VHTMLUnknownElement extends VHTMLElement {
+        nodeName: string;
         constructor(nodeName: string);
     }
 }
@@ -1459,7 +1455,7 @@ interface VNodeNames {
     a: VMDOM.VAElement;
 }
 declare namespace VMDOM {
-    class VAElement extends VHtmlElement {
+    class VAElement extends VHTMLElement {
         nodeName: "A";
         target: string;
         download: string;
@@ -1479,7 +1475,7 @@ interface VNodeName {
     "area": VMDOM.VAreaElement;
 }
 declare namespace VMDOM {
-    class VAreaElement extends VHtmlElement {
+    class VAreaElement extends VHTMLElement {
         nodeName: "AREA";
         alt: string;
         coords: string;
@@ -1495,7 +1491,7 @@ interface VNodeNames {
     "base": VMDOM.VBaseElement;
 }
 declare namespace VMDOM {
-    class VBaseElement extends VHtmlElement {
+    class VBaseElement extends VHTMLElement {
         nodeName: "BASE";
         href: string;
         target: string;
@@ -1506,7 +1502,7 @@ interface VNodeNames {
     "basefont": VMDOM.VBasefontElement;
 }
 declare namespace VMDOM {
-    class VBasefontElement extends VHtmlElement {
+    class VBasefontElement extends VHTMLElement {
         nodeName: "BASEFONT";
         title: string;
         lang: string;
@@ -1520,7 +1516,7 @@ interface VNodeNames {
     "blockquote": VMDOM.VBlockquoteElement;
 }
 declare namespace VMDOM {
-    class VBlockquoteElement extends VHtmlElement {
+    class VBlockquoteElement extends VHTMLElement {
         nodeName: "BLOCKQUOTE";
         cite: string;
     }
@@ -1529,7 +1525,7 @@ interface VNodeNames {
     "body": VMDOM.VBodyElement;
 }
 declare namespace VMDOM {
-    class VBodyElement extends VHtmlElement {
+    class VBodyElement extends VHTMLElement {
         nodeName: "BODY";
         text: string;
         link: string;
@@ -1543,7 +1539,7 @@ interface VNodeNames {
     "br": VMDOM.VBrElement;
 }
 declare namespace VMDOM {
-    class VBrElement extends VHtmlElement {
+    class VBrElement extends VHTMLElement {
         nodeName: "BR";
         clear: string;
         constructor();
@@ -1553,7 +1549,7 @@ interface VNodeNames {
     "canvas": VMDOM.VCanvasElement;
 }
 declare namespace VMDOM {
-    class VCanvasElement extends VHtmlElement {
+    class VCanvasElement extends VHTMLElement {
         nodeName: "CANVAS";
         width: string;
         height: string;
@@ -1563,7 +1559,7 @@ interface VNodeNames {
     "caption": VMDOM.VCaptionElement;
 }
 declare namespace VMDOM {
-    class VCaptionElement extends VHtmlElement {
+    class VCaptionElement extends VHTMLElement {
         nodeName: "CAPTION";
         align: string;
     }
@@ -1572,7 +1568,7 @@ interface VNodeNames {
     "col": VMDOM.VColElement;
 }
 declare namespace VMDOM {
-    class VColElement extends VHtmlElement {
+    class VColElement extends VHTMLElement {
         nodeName: "COL";
         span: string;
         align: string;
@@ -1585,7 +1581,7 @@ interface VNodeNames {
     "colgroup": VMDOM.VColgroupElement;
 }
 declare namespace VMDOM {
-    class VColgroupElement extends VHtmlElement {
+    class VColgroupElement extends VHTMLElement {
         nodeName: "COLGROUP";
         span: string;
         align: string;
@@ -1597,7 +1593,7 @@ interface VNodeNames {
     "dialog": VMDOM.VDialogElement;
 }
 declare namespace VMDOM {
-    class VDialogElement extends VHtmlElement {
+    class VDialogElement extends VHTMLElement {
         nodeName: "DIALOG";
         open: string;
     }
@@ -1606,7 +1602,7 @@ interface VNodeNames {
     "dir": VMDOM.VDirElement;
 }
 declare namespace VMDOM {
-    class VDirElement extends VHtmlElement {
+    class VDirElement extends VHTMLElement {
         nodeName: "DIR";
         compact: string;
     }
@@ -1615,7 +1611,7 @@ interface VNodeNames {
     "div": VMDOM.VDivElement;
 }
 declare namespace VMDOM {
-    class VDivElement extends VHtmlElement {
+    class VDivElement extends VHTMLElement {
         nodeName: "DIV";
         align: string;
     }
@@ -1624,7 +1620,7 @@ interface VNodeNames {
     "dl": VMDOM.VDlElement;
 }
 declare namespace VMDOM {
-    class VDlElement extends VHtmlElement {
+    class VDlElement extends VHTMLElement {
         nodeName: "DL";
         compact: string;
     }
@@ -1633,7 +1629,7 @@ interface VNodeNames {
     "fieldset": VMDOM.VFieldsetElement;
 }
 declare namespace VMDOM {
-    class VFieldsetElement extends VHtmlElement {
+    class VFieldsetElement extends VHTMLElement {
         nodeName: "FIELDSET";
         disabled: string;
         name: string;
@@ -1643,7 +1639,7 @@ interface VNodeNames {
     "frame": VMDOM.VFrameElement;
 }
 declare namespace VMDOM {
-    class VFrameElement extends VHtmlElement {
+    class VFrameElement extends VHTMLElement {
         nodeName: "FRAME";
         name: string;
         scrolling: string;
@@ -1662,7 +1658,7 @@ interface VNodeNames {
     "h1": VMDOM.VH1Element;
 }
 declare namespace VMDOM {
-    class VH1Element extends VHtmlElement {
+    class VH1Element extends VHTMLElement {
         nodeName: "H1";
         align: string;
     }
@@ -1671,7 +1667,7 @@ interface VNodeNames {
     "h2": VMDOM.VH2Element;
 }
 declare namespace VMDOM {
-    class VH2Element extends VHtmlElement {
+    class VH2Element extends VHTMLElement {
         nodeName: "H2";
         align: string;
     }
@@ -1680,7 +1676,7 @@ interface VNodeNames {
     "h3": VMDOM.VH3Element;
 }
 declare namespace VMDOM {
-    class VH3Element extends VHtmlElement {
+    class VH3Element extends VHTMLElement {
         nodeName: "H3";
         align: string;
     }
@@ -1689,7 +1685,7 @@ interface VNodeNames {
     "h4": VMDOM.VH4Element;
 }
 declare namespace VMDOM {
-    class VH4Element extends VHtmlElement {
+    class VH4Element extends VHTMLElement {
         nodeName: "H4";
         align: string;
     }
@@ -1698,7 +1694,7 @@ interface VNodeNames {
     "h5": VMDOM.VH5Element;
 }
 declare namespace VMDOM {
-    class VH5Element extends VHtmlElement {
+    class VH5Element extends VHTMLElement {
         nodeName: "H5";
         align: string;
     }
@@ -1707,7 +1703,7 @@ interface VNodeNames {
     "h6": VMDOM.VH6Element;
 }
 declare namespace VMDOM {
-    class VH6Element extends VHtmlElement {
+    class VH6Element extends VHTMLElement {
         nodeName: "H6";
         align: string;
     }
@@ -1716,7 +1712,7 @@ interface VNodeNames {
     "head": VMDOM.VHeadElement;
 }
 declare namespace VMDOM {
-    class VHeadElement extends VHtmlElement {
+    class VHeadElement extends VHTMLElement {
         nodeName: "HEAD";
         title: string;
         lang: string;
@@ -1729,7 +1725,7 @@ interface VNodeNames {
     "hr": VMDOM.VHrElement;
 }
 declare namespace VMDOM {
-    class VHrElement extends VHtmlElement {
+    class VHrElement extends VHTMLElement {
         nodeName: "HR";
         align: string;
         color: string;
@@ -1743,7 +1739,7 @@ interface VNodeNames {
     "iframe": VMDOM.VIframeElement;
 }
 declare namespace VMDOM {
-    class VIframeElement extends VHtmlElement {
+    class VIframeElement extends VHTMLElement {
         nodeName: "IFRAME";
         src: string;
         srcdoc: string;
@@ -1764,7 +1760,7 @@ interface VNodeNames {
     "img": VMDOM.VImgElement;
 }
 declare namespace VMDOM {
-    class VImgElement extends VHtmlElement {
+    class VImgElement extends VHTMLElement {
         nodeName: "IMG";
         alt: string;
         src: string;
@@ -1789,7 +1785,7 @@ interface VNodeNames {
     "input": VMDOM.VInputElement;
 }
 declare namespace VMDOM {
-    class VInputElement extends VHtmlElement {
+    class VInputElement extends VHTMLElement {
         nodeName: "INPUT";
         accept: string;
         alt: string;
@@ -1834,7 +1830,7 @@ interface VNodeNames {
     "ins": VMDOM.VInsElement;
 }
 declare namespace VMDOM {
-    class VInsElement extends VHtmlElement {
+    class VInsElement extends VHTMLElement {
         nodeName: "INS";
         cite: string;
         dateTime: string;
@@ -1844,7 +1840,7 @@ interface VNodeNames {
     "keygen": VMDOM.VKeygenElement;
 }
 declare namespace VMDOM {
-    class VKeygenElement extends VHtmlElement {
+    class VKeygenElement extends VHTMLElement {
         nodeName: "KEYGEN";
         autofocus: string;
         challenge: string;
@@ -1857,7 +1853,7 @@ interface VNodeNames {
     "legend": VMDOM.VLegendElement;
 }
 declare namespace VMDOM {
-    class VLegendElement extends VHtmlElement {
+    class VLegendElement extends VHTMLElement {
         nodeName: "LEGEND";
         align: string;
     }
@@ -1866,7 +1862,7 @@ interface VNodeNames {
     "li": VMDOM.VLiElement;
 }
 declare namespace VMDOM {
-    class VLiElement extends VHtmlElement {
+    class VLiElement extends VHTMLElement {
         nodeName: "LI";
         value: string;
         type: string;
@@ -1876,7 +1872,7 @@ interface VNodeNames {
     "link": VMDOM.VLinkElement;
 }
 declare namespace VMDOM {
-    class VLinkElement extends VHtmlElement {
+    class VLinkElement extends VHTMLElement {
         nodeName: "LINK";
         disabled: string;
         href: string;
@@ -1896,7 +1892,7 @@ interface VNodeNames {
     "map": VMDOM.VMapElement;
 }
 declare namespace VMDOM {
-    class VMapElement extends VHtmlElement {
+    class VMapElement extends VHTMLElement {
         nodeName: "MAP";
         name: string;
         constructor();
@@ -1906,7 +1902,7 @@ interface VNodeNames {
     "menu": VMDOM.VMenuElement;
 }
 declare namespace VMDOM {
-    class VMenuElement extends VHtmlElement {
+    class VMenuElement extends VHTMLElement {
         nodeName: "MENU";
         compact: string;
     }
@@ -1915,7 +1911,7 @@ interface VNodeNames {
     "meta": VMDOM.VMetaElement;
 }
 declare namespace VMDOM {
-    class VMetaElement extends VHtmlElement {
+    class VMetaElement extends VHTMLElement {
         nodeName: "META";
         name: string;
         content: string;
@@ -1927,7 +1923,7 @@ interface VNodeNames {
     "meter": VMDOM.VMeterElement;
 }
 declare namespace VMDOM {
-    class VMeterElement extends VHtmlElement {
+    class VMeterElement extends VHTMLElement {
         nodeName: "METER";
         value: string;
         min: string;
@@ -1941,7 +1937,7 @@ interface VNodeNames {
     "ol": VMDOM.VOlElement;
 }
 declare namespace VMDOM {
-    class VOlElement extends VHtmlElement {
+    class VOlElement extends VHTMLElement {
         nodeName: "OL";
         reversed: string;
         start: string;
@@ -1953,7 +1949,7 @@ interface VNodeNames {
     "optgroup": VMDOM.VOptgroupElement;
 }
 declare namespace VMDOM {
-    class VOptgroupElement extends VHtmlElement {
+    class VOptgroupElement extends VHTMLElement {
         nodeName: "OPTGROUP";
         disabled: string;
         label: string;
@@ -1963,7 +1959,7 @@ interface VNodeNames {
     "option": VMDOM.VOptionElement;
 }
 declare namespace VMDOM {
-    class VOptionElement extends VHtmlElement {
+    class VOptionElement extends VHTMLElement {
         nodeName: "OPTION";
         disabled: string;
         label: string;
@@ -1975,7 +1971,7 @@ interface VNodeNames {
     "output": VMDOM.VOutputElement;
 }
 declare namespace VMDOM {
-    class VOutputElement extends VHtmlElement {
+    class VOutputElement extends VHTMLElement {
         nodeName: "OUTPUT";
         name: string;
     }
@@ -1984,7 +1980,7 @@ interface VNodeNames {
     "param": VMDOM.VParamElement;
 }
 declare namespace VMDOM {
-    class VParamElement extends VHtmlElement {
+    class VParamElement extends VHTMLElement {
         nodeName: "PARAM";
         name: string;
         value: string;
@@ -1997,7 +1993,7 @@ interface VNodeNames {
     "p": VMDOM.VPElement;
 }
 declare namespace VMDOM {
-    class VPElement extends VHtmlElement {
+    class VPElement extends VHTMLElement {
         nodeName: "P";
         align: string;
     }
@@ -2006,7 +2002,7 @@ interface VNodeNames {
     "pre": VMDOM.VPreElement;
 }
 declare namespace VMDOM {
-    class VPreElement extends VHtmlElement {
+    class VPreElement extends VHTMLElement {
         nodeName: "PRE";
         width: string;
     }
@@ -2015,7 +2011,7 @@ interface VNodeNames {
     "progress": VMDOM.VProgressElement;
 }
 declare namespace VMDOM {
-    class VProgressElement extends VHtmlElement {
+    class VProgressElement extends VHTMLElement {
         nodeName: "PROGRESS";
         value: string;
         max: string;
@@ -2025,7 +2021,7 @@ interface VNodeNames {
     "q": VMDOM.VQElement;
 }
 declare namespace VMDOM {
-    class VQElement extends VHtmlElement {
+    class VQElement extends VHTMLElement {
         nodeName: "Q";
         cite: string;
     }
@@ -2034,7 +2030,7 @@ interface VNodeNames {
     "script": VMDOM.VScriptElement;
 }
 declare namespace VMDOM {
-    class VScriptElement extends VHtmlElement {
+    class VScriptElement extends VHTMLElement {
         nodeName: "SCRIPT";
         src: string;
         type: string;
@@ -2053,7 +2049,7 @@ interface VNodeNames {
     "select": VMDOM.VSelectElement;
 }
 declare namespace VMDOM {
-    class VSelectElement extends VHtmlElement {
+    class VSelectElement extends VHTMLElement {
         nodeName: "SELECT";
         autofocus: string;
         disabled: string;
@@ -2069,7 +2065,7 @@ interface VNodeNames {
     "source": VMDOM.VSourceElement;
 }
 declare namespace VMDOM {
-    class VSourceElement extends VHtmlElement {
+    class VSourceElement extends VHTMLElement {
         nodeName: "SOURCE";
         src: string;
         type: string;
@@ -2082,7 +2078,7 @@ interface VNodeNames {
     "style": VMDOM.VStyleElement;
 }
 declare namespace VMDOM {
-    class VStyleElement extends VHtmlElement {
+    class VStyleElement extends VHTMLElement {
         nodeName: "STYLE";
         media: string;
         type: string;
@@ -2092,7 +2088,7 @@ interface VNodeNames {
     "table": VMDOM.VTableElement;
 }
 declare namespace VMDOM {
-    class VTableElement extends VHtmlElement {
+    class VTableElement extends VHTMLElement {
         nodeName: "TABLE";
         align: string;
         border: string;
@@ -2109,7 +2105,7 @@ interface VNodeNames {
     "tbody": VMDOM.VTbodyElement;
 }
 declare namespace VMDOM {
-    class VTbodyElement extends VHtmlElement {
+    class VTbodyElement extends VHTMLElement {
         nodeName: "TBODY";
         align: string;
         vAlign: string;
@@ -2119,7 +2115,7 @@ interface VNodeNames {
     "td": VMDOM.VTdElement;
 }
 declare namespace VMDOM {
-    class VTdElement extends VHtmlElement {
+    class VTdElement extends VHTMLElement {
         nodeName: "TD";
         colSpan: string;
         rowSpan: string;
@@ -2136,10 +2132,10 @@ declare namespace VMDOM {
     }
 }
 interface VNodeNames {
-    "textarea": VMDOM.VTextareaElement;
+    textarea: VMDOM.VTextareaElement;
 }
 declare namespace VMDOM {
-    class VTextareaElement extends VHtmlElement {
+    class VTextareaElement extends VHTMLElement {
         nodeName: "TEXTAREA";
         autofocus: string;
         cols: string;
@@ -2154,6 +2150,7 @@ declare namespace VMDOM {
         rows: string;
         wrap: string;
         autocapitalize: string;
+        defaultValue: string;
         value: string;
         /**转换为真实dom节点后对虚拟dom的操作转接到真实dom */
         protected emulation(): void;
@@ -2163,7 +2160,7 @@ interface VNodeNames {
     "tfoot": VMDOM.VTfootElement;
 }
 declare namespace VMDOM {
-    class VTfootElement extends VHtmlElement {
+    class VTfootElement extends VHTMLElement {
         nodeName: "TFOOT";
         align: string;
         vAlign: string;
@@ -2173,7 +2170,7 @@ interface VNodeNames {
     "thead": VMDOM.VTheadElement;
 }
 declare namespace VMDOM {
-    class VTheadElement extends VHtmlElement {
+    class VTheadElement extends VHTMLElement {
         nodeName: "THREAD";
         align: string;
         vAlign: string;
@@ -2183,7 +2180,7 @@ interface VNodeNames {
     "th": VMDOM.VThElement;
 }
 declare namespace VMDOM {
-    class VThElement extends VHtmlElement {
+    class VThElement extends VHTMLElement {
         nodeName: "TH";
         colSpan: string;
         rowSpan: string;
@@ -2203,7 +2200,7 @@ interface VNodeNames {
     "track": VMDOM.VTrackElement;
 }
 declare namespace VMDOM {
-    class VTrackElement extends VHtmlElement {
+    class VTrackElement extends VHTMLElement {
         nodeName: "TRACK";
         kind: string;
         src: string;
@@ -2216,7 +2213,7 @@ interface VNodeNames {
     "tr": VMDOM.VTrElement;
 }
 declare namespace VMDOM {
-    class VTrElement extends VHtmlElement {
+    class VTrElement extends VHTMLElement {
         nodeName: "TR";
         align: string;
         vAlign: string;
@@ -2227,7 +2224,7 @@ interface VNodeNames {
     "ul": VMDOM.VUlElement;
 }
 declare namespace VMDOM {
-    class VUlElement extends VHtmlElement {
+    class VUlElement extends VHTMLElement {
         nodeName: "UL";
         compact: string;
         type: string;
@@ -2237,7 +2234,7 @@ interface VNodeNames {
     "video": VMDOM.VVideoElement;
 }
 declare namespace VMDOM {
-    class VVideoElement extends VHtmlElement {
+    class VVideoElement extends VHTMLElement {
         nodeName: "VIDEO";
         width: string;
         height: string;
@@ -2248,7 +2245,7 @@ interface VNodeNames {
     "xmp": VMDOM.VXmpElement;
 }
 declare namespace VMDOM {
-    class VXmpElement extends VHtmlElement {
+    class VXmpElement extends VHTMLElement {
         nodeName: "XMP";
         width: string;
     }
@@ -2257,7 +2254,7 @@ interface VNodeNames {
     "title": VMDOM.VTitleElement;
 }
 declare namespace VMDOM {
-    class VTitleElement extends VHtmlElement {
+    class VTitleElement extends VHTMLElement {
         nodeName: "TITLE";
         title: string;
         lang: string;
@@ -2270,7 +2267,7 @@ interface VNodeNames {
     "span": VMDOM.VSpanElement;
 }
 declare namespace VMDOM {
-    class VSpanElement extends VHtmlElement {
+    class VSpanElement extends VHTMLElement {
         nodeName: "SPAN";
         title: string;
         lang: string;
@@ -2283,7 +2280,7 @@ interface VNodeNames {
     "em": VMDOM.VEmElement;
 }
 declare namespace VMDOM {
-    class VEmElement extends VHtmlElement {
+    class VEmElement extends VHTMLElement {
         nodeName: "EM";
         title: string;
         lang: string;
@@ -2296,7 +2293,7 @@ interface VNodeNames {
     "i": VMDOM.VIElement;
 }
 declare namespace VMDOM {
-    class VIElement extends VHtmlElement {
+    class VIElement extends VHTMLElement {
         nodeName: "I";
         title: string;
         lang: string;
@@ -2309,7 +2306,7 @@ interface VNodeNames {
     "b": VMDOM.VBElement;
 }
 declare namespace VMDOM {
-    class VBElement extends VHtmlElement {
+    class VBElement extends VHTMLElement {
         nodeName: "B";
         title: string;
         lang: string;
@@ -2322,7 +2319,7 @@ interface VNodeNames {
     "form": VMDOM.VFormElement;
 }
 declare namespace VMDOM {
-    class VFormElement extends VHtmlElement {
+    class VFormElement extends VHTMLElement {
         nodeName: "FORM";
         name: string;
         target: string;
@@ -2337,7 +2334,7 @@ interface VNodeNames {
     "label": VMDOM.VLabelElement;
 }
 declare namespace VMDOM {
-    class VLabelElement extends VHtmlElement {
+    class VLabelElement extends VHTMLElement {
         nodeName: "LABEL";
         title: string;
         lang: string;
@@ -2350,7 +2347,7 @@ interface VNodeNames {
     "dt": VMDOM.VDtElement;
 }
 declare namespace VMDOM {
-    class VDtElement extends VHtmlElement {
+    class VDtElement extends VHTMLElement {
         nodeName: "DT";
         title: string;
         lang: string;
@@ -2363,7 +2360,7 @@ interface VNodeNames {
     "dd": VMDOM.VDdElement;
 }
 declare namespace VMDOM {
-    class VDdElement extends VHtmlElement {
+    class VDdElement extends VHTMLElement {
         nodeName: "DD";
         title: string;
         lang: string;
@@ -2376,7 +2373,7 @@ interface VNodeNames {
     "embed": VMDOM.VEmbedElement;
 }
 declare namespace VMDOM {
-    class VEmbedElement extends VHtmlElement {
+    class VEmbedElement extends VHTMLElement {
         nodeName: "EMBED";
         type: string;
         width: string;
@@ -2394,7 +2391,7 @@ interface VNodeNames {
     "strong": VMDOM.VStrongElement;
 }
 declare namespace VMDOM {
-    class VStrongElement extends VHtmlElement {
+    class VStrongElement extends VHTMLElement {
         nodeName: "STRONG";
         title: string;
         lang: string;
@@ -2407,7 +2404,7 @@ interface VNodeNames {
     "button": VMDOM.VButtonElement;
 }
 declare namespace VMDOM {
-    class VButtonElement extends VHtmlElement {
+    class VButtonElement extends VHTMLElement {
         nodeName: "BUTTON";
         formTarget: string;
         name: string;
@@ -2423,7 +2420,7 @@ interface VNodeNames {
     "object": VMDOM.VObjectElement;
 }
 declare namespace VMDOM {
-    class VObjectElement extends VHtmlElement {
+    class VObjectElement extends VHTMLElement {
         nodeName: "OBJECT";
         type: string;
         name: string;
@@ -2447,7 +2444,7 @@ interface VNodeNames {
     "svg": VMDOM.VSvgElement;
 }
 declare namespace VMDOM {
-    class VSvgElement extends VHtmlElement {
+    class VSvgElement extends VHTMLElement {
         nodeName: "SVG";
         title: string;
         lang: string;
@@ -2460,7 +2457,7 @@ interface VNodeNames {
     "circle": VMDOM.VCircleElement;
 }
 declare namespace VMDOM {
-    class VCircleElement extends VHtmlElement {
+    class VCircleElement extends VHTMLElement {
         nodeName: "CIRCLE";
         title: string;
         lang: string;
@@ -2473,7 +2470,7 @@ interface VNodeNames {
     "header": VMDOM.VHeaderElement;
 }
 declare namespace VMDOM {
-    class VHeaderElement extends VHtmlElement {
+    class VHeaderElement extends VHTMLElement {
         nodeName: "HEADER";
         title: string;
         lang: string;
@@ -2486,7 +2483,7 @@ interface VNodeNames {
     "footer": VMDOM.VFooterElement;
 }
 declare namespace VMDOM {
-    class VFooterElement extends VHtmlElement {
+    class VFooterElement extends VHTMLElement {
         nodeName: "FOOTER";
         title: string;
         lang: string;
@@ -2496,14 +2493,33 @@ declare namespace VMDOM {
     }
 }
 interface VNodeNames {
-    domhelper: VMDOM.VDomhelperElement;
+    html: VMDOM.VHtmlElement;
 }
 declare namespace VMDOM {
-    class VDomhelperElement extends VHtmlElement {
+    class VHtmlElement extends VHTMLElement {
+        nodeType: ENodeType.Element;
+        nodeName: string;
+        title: string;
+        lang: string;
+        accessKey: string;
+        webkitdropzone: string;
+        id: string;
+        constructor();
+    }
+}
+interface VNodeNames {
+    domhelper: VMDOM.VDomhelperElement;
+}
+declare const enum ENodeType {
+    DOMHELPER = 104,
+}
+declare namespace VMDOM {
+    class VDomhelperElement extends VHTMLElement {
         nodeName: string;
     }
 }
 interface IMember {
+    do: boolean;
     index: number;
     node: VMDOM.VNode & IVNodeMethod;
     action: string;
@@ -2521,14 +2537,27 @@ interface IMember {
     stringNodeRegExp: RegExp | null;
     stringNodeKeyLength: number;
     commentStart: number;
+    endChar: string;
 }
 interface IVDOMBuilder {
     (html: string, vNode?: undefined): VMDOM.VNode & IVNodeMethod | (VMDOM.VNode & IVNodeMethod)[];
     (html: string, vNode: VMDOM.VNode & IVNodeMethod): VMDOM.VNode & IVNodeMethod;
 }
 declare abstract class VDOM {
+    static treeEach: typeof treeEach;
     protected static htmlwordRE: RegExp;
-    protected static ''(html: string, m: IMember): void;
+    /**
+     * 主循环函数
+     *
+     * @protected
+     * @static
+     * @param {string} html
+     * @param {IMember} m
+     * @returns
+     *
+     * @memberOf VDOM
+     */
+    protected static ''(this: VDOM, html: string, m: IMember): void;
     protected static textNode(html: string, m: IMember): void;
     protected static createHTMLNode(html: string, m: IMember): void;
     protected static setHTMLNodeClose(html: string, m: IMember): void;
@@ -2546,7 +2575,7 @@ declare abstract class VDOM {
     protected static stringNode(html: string, m: IMember): void;
     protected static stringNode2(html: string, m: IMember): void;
     protected static checkEnd(html: string, m: IMember): void;
-    protected static getInitData(vNode: VMDOM.VNode & IVNodeMethod | undefined, length: number): IMember;
+    protected static getInitData(vNode: VMDOM.VNode & IVNodeMethod | undefined, length: number, endChar: string): IMember;
     static readonly parseStructor: IVDOMBuilder;
 }
 declare let $$$: IVNodeMethod;
@@ -2618,7 +2647,7 @@ declare namespace JS {
      * @param {JavaScriptBlock} block 语句块
      * @param {boolean=false} deep 递归
      */
-    function mergeSpace(block: JavaScriptBlock, deep?: boolean): void;
+    function mergeSpace(block: JavaScriptBlock<keyof IBreakes>, deep?: boolean): void;
     /**合并连续空格
      * @param {JavaScriptStatement} statement 语句
      * @param {boolean=false} deep 递归
@@ -2628,7 +2657,7 @@ declare namespace JS {
      * @param {JavaScriptBlock} block 语句块
      * @param {boolean=false} deep 递归
      */
-    function deleteSpace(block: JavaScriptBlock, deep?: boolean): void;
+    function deleteSpace(block: JavaScriptBlock<keyof IBreakes>, deep?: boolean): void;
     /**删除所有空格
      * @param {JavaScriptStatement} statement 语句
      * @param {boolean=false} deep 递归
@@ -2641,11 +2670,18 @@ declare namespace JS {
     }
 }
 declare namespace JS {
+    interface IJavaScriptStatementChild {
+        "JavaScriptBlock": JavaScriptBlock<keyof IBreakes>;
+        "string": string;
+        "JavaScriptComment": JavaScriptComment;
+        "JavaScriptString": JavaScriptString;
+    }
+    type TJavaScriptStatementChild = IJavaScriptStatementChild[keyof IJavaScriptStatementChild];
     class JavaScriptStatement {
-        parent: JavaScriptBlock;
-        children: (JavaScriptBlock | string | JavaScriptComment | JavaScriptString)[];
+        parent: JavaScriptBlock<keyof IBreakes>;
+        children: TJavaScriptStatementChild[];
         isEnd: boolean;
-        push(child: JavaScriptBlock | string | JavaScriptComment | JavaScriptString): void;
+        push(child: TJavaScriptStatementChild): void;
         split(separator: string): string[];
         splitKeyWord(separator: string): JavaScriptStatement[];
         toString(): string;
@@ -2653,24 +2689,30 @@ declare namespace JS {
     }
 }
 declare namespace JS {
-    class JavaScriptBlock {
-        begin: string;
-        end: string;
+    interface IBreakes {
+        '(': ')';
+        '{': '}';
+        '[': ']';
+        '': '';
+    }
+    class JavaScriptBlock<T extends keyof IBreakes> {
+        begin: T;
+        end: IBreakes[T];
         parent: JavaScriptStatement;
         children: JavaScriptStatement[];
         isEnd: boolean;
-        constructor(begin: string, end: string);
+        constructor(begin: T, end: IBreakes[T]);
         push(child: JavaScriptStatement): void;
         toString(): string;
         readonly innerText: string;
-        clone(): JavaScriptBlock;
+        clone(): JavaScriptBlock<T>;
     }
 }
 declare namespace VMDOM {
     class VOrderData {
         name: string;
-        condition: JS.JavaScriptBlock | null | undefined;
-        constructor(name: string, condition: JS.JavaScriptBlock | null | undefined);
+        setup: Order.IOrderSetup | null | undefined;
+        constructor(name: string, setup: Order.IOrderSetup | null | undefined);
         clone(): VOrderData;
     }
 }
@@ -2686,23 +2728,8 @@ declare namespace VMDOM {
         nodeName: "#order";
         nodeType: ENodeType;
         constructor(orderData: VOrderData);
-        cloneNode(deep: boolean): VOrder & IVNodeMethod;
-        toJS(space?: number): string;
-    }
-}
-declare const enum ENodeType {
-    Script = 103,
-}
-interface IVNodeMethod {
-    (data: string, nodeType: ENodeType.Script): VMDOM.VScript & IVNodeMethod;
-}
-declare namespace VMDOM {
-    class VScript extends VPlaceHolder {
-        nodeName: "#script";
-        nodeType: ENodeType;
+        cloneNode(): VOrder & IVNodeMethod;
         toJS(): string;
-        propertyName: string;
-        toFunction(): string;
     }
 }
 interface Object {
@@ -2724,6 +2751,10 @@ interface IBindInfo {
     event: IBindFunction;
 }
 declare namespace Order {
+    interface VNodeVMData {
+        /**命令 */
+        order: VOrder;
+    }
     function addSubOrderName(name: string): void;
     /**从注释中读取命令 */
     function getOrderInfoByString(s: string): IOrderInfo | null;
@@ -2732,10 +2763,10 @@ declare namespace Order {
     interface IOrderInfo {
         order?: string;
         subOrder?: string;
-        condition: string;
+        setup: IOrderSetup;
     }
     interface IOrderConstructor {
-        new (node: IComment, condition: string, ...args: any[]): VOrder;
+        new (node: IComment, setup: IOrderSetup, ...args: any[]): VOrder;
         orderName: string;
         subOrder?: string[];
         run(data: IOrderData): void;
@@ -2766,15 +2797,19 @@ declare namespace Order {
     function bindProperty(obj: Object, name: string, obj2: Object, name2: string, type?: number): void;
 }
 declare namespace Order {
+    interface IOrderSetup {
+        params?: JS.JavaScriptBlock<'('>;
+        data?: JS.JavaScriptBlock<'{'>;
+    }
     interface IOrderData {
         placeholder: VMDOM.VComment;
     }
     abstract class VOrder {
-        data: IOrderData;
         node: VMDOM.VComment;
-        condition: string;
+        setup: IOrderSetup;
+        data: IOrderData;
         run(): void;
-        constructor(node: VMDOM.VComment, condition: string);
+        constructor(node: VMDOM.VComment, setup: IOrderSetup);
         static eachOrder(this: void, array: IArray<INode>, fn: (node: VMDOM.VComment, info: IOrderInfo, state: ITreeEachState<INode>) => (eTreeEach | void), beginIndex?: number): ITreeEachReturn<INode> | undefined;
     }
 }
@@ -2833,11 +2868,11 @@ declare var $t: ITurtle;
 declare let operatorRE: RegExp;
 declare function replaceCls(): void;
 declare function getScopeBy(scope: any, node: INode): any;
-declare function setNodeProperty(node: any, proName: any, condition: any, outerChildNodes: any, outerElement: any, props: any, part: any): void;
+declare function setNodeProperty(node: any, proName: any, condition: any): void;
 declare function getTemplate(node: IElement): string;
 declare function defineClasses(node: IHTMLElement): void;
 declare function isTemplate(node: IElement): node is IElement;
-declare function findTemplates(nodes: IArray<IElement>): IArray<IElement>;
+declare function findTemplates(nodes: IArray<IHTMLElement>): IArray<IElement>;
 /**
  * 加载UI
  */
@@ -2858,34 +2893,24 @@ declare function getUIInfo(node: IHTMLElement): string | {
 };
 declare function parseGet(node: IHTMLElement, outerChildNodes: any, outerElement: any, props: any, part: any): eTreeEach;
 declare let exec: typeof eval;
-declare function execOnScript(node: IHTMLElement, outerChildNodes: any, outerElement: any, props: any, part: any): void;
 declare function execScript(node: IHTMLElement, outerChildNodes?: any, outerElement?: any, props?: any, part?: any): void;
-declare function execTurtleScript(node: IHTMLElement, outerChildNodes: any, outerElement: any, props: any, part: any): void;
 interface INode {
     type?: string;
 }
-declare function parseScript(node: IHTMLElement, outerChildNodes: any, outerElement: any, props: any, part: any): void;
-declare function execNodeQuestion(node: IHTMLElement, outerChildNodes: any, outerElement: any, props: any, part: any): void;
-declare class ElementParser {
-    GET: typeof parseGet;
-    SCRIPT: typeof parseScript;
-}
-declare function render(this: void, uiNode: IHTMLElement | null, outerChildNodes: INode[], outerElement: IHTMLCollection, props: Object | null, uiInfo: string | {
-    sortPath: string;
-    name: string;
-}): void;
-declare let elementParser: ElementParser;
+declare function execNodeQuestion(node: IHTMLElement): void;
 declare function initHTML(arr: INode[] | INodeList, outerChildNodes?: any, outerElement?: any, props?: any, part?: any): void;
 declare function getParts(childNodes: IArray<INode>): Component.Part[];
-interface VNodeVMData {
-    sign?: 0 | 1;
-    part: Component.Part;
+declare namespace VMDOM {
+    interface VNodeVMData {
+        sign?: 0 | 1;
+        part: Component.Part;
+    }
 }
 interface IComment {
-    vmData?: VNodeVMData;
+    vmData?: VMDOM.VNodeVMData;
 }
 interface Comment {
-    vmData?: VNodeVMData;
+    vmData?: VMDOM.VNodeVMData;
 }
 declare namespace Component {
     interface IPartRefs {
@@ -2988,6 +3013,26 @@ interface Node {
 }
 declare let isIE: boolean;
 declare namespace Order {
+    /**仅作其他命令的辅助标记 */
+    class Break extends VOrder {
+        static orderName: string;
+        static run(): void;
+    }
+}
+declare const enum ENodeType {
+    Script = 103,
+}
+interface IVNodeMethod {
+    (data: string, nodeType: ENodeType.Script): VMDOM.VScript & IVNodeMethod;
+}
+declare namespace VMDOM {
+    class VScript extends VPlaceHolder {
+        nodeName: "#script";
+        nodeType: ENodeType;
+        toJS(): string;
+        propertyName: string;
+        toFunction(): string;
+    }
 }
 declare namespace OrderEx {
     const tryRun = "tryRun";
@@ -3021,30 +3066,118 @@ declare namespace Order {
         nodes: VMDOM.VNode[];
     }
     abstract class BlockOrder extends VOrder {
+        /**
+         * 数据块
+         *
+         * @type {IOrderDataBlock}
+         * @memberOf BlockOrder
+         */
         data: IOrderDataBlock;
+        /**
+         *
+         *
+         * @type {VMDOM.VComment}
+         * @memberOf BlockOrder
+         */
         endNode: VMDOM.VComment;
-        constructor(node: VMDOM.VComment, condition: string, orderName: string, isBlockStart: (subOrder: string) => boolean);
+        /**
+         * Creates an instance of BlockOrder.
+         *
+         * @param {VMDOM.VComment} node
+         * @param {IOrderSetup} setup
+         * @param {string} orderName
+         * @param {(subOrder: string) => boolean} isBlockStart
+         *
+         * @memberOf BlockOrder
+         */
+        constructor(node: VMDOM.VComment, setup: IOrderSetup, orderName: string, isBlockStart: (subOrder: string) => boolean);
     }
-    function parseBreakOrder(this: void, data: IOrderDataBlockRun, isBlockStart: (subOrder: string) => boolean, blocks: INode[], p: INode): void;
+    function parseBreakOrder(this: void, data: IOrderDataBlockRun, isBlockStart: (subOrder: string) => boolean, blocks: INode[]): void;
 }
 declare namespace Order {
     interface IOrderDataIf extends IOrderDataBlock {
+        /**
+         * 用于判断的表达式字符串
+         *
+         * @type {string}
+         * @memberOf IOrderDataIf
+         */
         condition: string;
     }
     class If extends BlockOrder {
         static orderName: string;
         static subOrder: string[];
         data: IOrderDataIf;
-        constructor(node: VMDOM.VComment, condition: string);
+        constructor(node: VMDOM.VComment, setup: IOrderSetup);
         static isBlockStart(subOrder: string): boolean;
         static run(this: void, data: IOrderDataIf): void;
     }
 }
 declare namespace Order {
     abstract class RepeatBlockOrder extends BlockOrder {
-        constructor(node: VMDOM.VComment, condition: string, orderName: string);
+        constructor(node: VMDOM.VComment, setup: IOrderSetup, orderName: string);
         static run(data: IOrderDataBlock, canRepeat: (data: IOrderDataBlock) => boolean): void;
         static isBlockStart(subOrder: string): boolean;
+    }
+}
+declare namespace JS {
+    interface IJavaScriptParseState {
+        condition: string;
+        index: number;
+        action: keyof typeof Parser;
+        length: number;
+        block: JavaScriptBlock<keyof IBreakes>;
+        root: JavaScriptBlock<keyof IBreakes>;
+        keyWordStart: number;
+        commentStart: number;
+        stringStart: number;
+        stringStartBy: string;
+    }
+    abstract class Parser {
+        protected static getInitData(condition: string, start?: number): IJavaScriptParseState;
+        static ''(this: typeof Parser, m: IJavaScriptParseState): void;
+        /**是否跟随回车换行 */
+        static isFollowCarriageReturnOrLineFeed(this: typeof Parser, m: IJavaScriptParseState): boolean;
+        static parseKeyWord(this: typeof Parser, m: IJavaScriptParseState): boolean;
+        static pushComment(this: typeof Parser, m: IJavaScriptParseState, comment: JavaScriptComment): void;
+        static pushKeyWord(this: typeof Parser, m: IJavaScriptParseState, keyWord: string): void;
+        static pushString(this: typeof Parser, m: IJavaScriptParseState, string: JavaScriptString): void;
+        static pushBlock(this: typeof Parser, m: IJavaScriptParseState, block: JavaScriptBlock<keyof IBreakes>): void;
+        static pushKeyWordOrBlock(this: typeof Parser, m: IJavaScriptParseState, keyWordOrBlockOrComment: TJavaScriptStatementChild): void;
+        static getLastStatement(this: typeof Parser, m: IJavaScriptParseState): JavaScriptStatement;
+        static '*/<>'(this: typeof Parser, m: IJavaScriptParseState, keyWord: string): void;
+        static '<>'(this: typeof Parser, m: IJavaScriptParseState, keyWord: string): void;
+        static '<<>>'(this: typeof Parser, m: IJavaScriptParseState, keyWord: string): boolean;
+        static '<<<>>>'(this: typeof Parser, m: IJavaScriptParseState, keyWord: string): boolean;
+        static comment(this: typeof Parser, m: IJavaScriptParseState): void;
+        static comment2(this: typeof Parser, m: IJavaScriptParseState): void;
+        static '/'(this: typeof Parser, m: IJavaScriptParseState): void;
+        static '+-%'(this: typeof Parser, m: IJavaScriptParseState, keyWord: string): void;
+        static '?='(this: typeof Parser, m: IJavaScriptParseState, keyWord: string): boolean;
+        static '=>'(this: typeof Parser, m: IJavaScriptParseState): boolean;
+        static '?=='(this: typeof Parser, m: IJavaScriptParseState, keyWord: string): boolean;
+        static ';'(this: typeof Parser, m: IJavaScriptParseState): void;
+        static '.'(this: typeof Parser, m: IJavaScriptParseState): void;
+        static '!~'(this: typeof Parser, m: IJavaScriptParseState, keyWord: string): void;
+        static isStatementBegin(m: IJavaScriptParseState): boolean;
+        static space(this: typeof Parser, m: IJavaScriptParseState): void;
+        static '({['<T extends keyof IBreakes>(this: typeof Parser, m: IJavaScriptParseState, keyWord: string, keyWordEnd: IBreakes[T]): void;
+        static ')}]'<T extends keyof IBreakes>(this: typeof Parser, m: IJavaScriptParseState, keyWordBegin: T): void;
+        static '"`\''(this: typeof Parser, m: IJavaScriptParseState, keyWord: "'" | '"' | '`'): void;
+        static string(this: typeof Parser, m: IJavaScriptParseState): void;
+        static parseEnd(this: typeof Parser, m: IJavaScriptParseState): void;
+        static keyWord(this: typeof Parser, m: IJavaScriptParseState): void;
+        /**解析结构 */
+        static parseStructor(this: typeof Parser, condition: string, start?: number, checkCallback?: (m: IJavaScriptParseState) => boolean): JavaScriptBlock<keyof IBreakes>;
+        /**仅从文本流里解析出一个代码块 */
+        static parseBlock(condition: string, start: number): {
+            length: number;
+            block: JavaScriptBlock<keyof IBreakes>;
+        };
+        static parseStatement(condition: string, start: number): {
+            length: number;
+            statement: JavaScriptStatement;
+        };
     }
 }
 declare namespace JS {
@@ -3055,6 +3188,24 @@ declare namespace JS {
         protected constructor(varInfos: [string, string | undefined, boolean][]);
         getVars(): string[];
     }
+}
+declare namespace Order {
+    interface IOrderDataVar extends IOrderData {
+        varInfos: [string, string | undefined, boolean][];
+        placeholder: VMDOM.VComment;
+    }
+    class Var extends VOrder {
+        static orderName: string;
+        data: IOrderDataVar;
+        block: JS.JavaScriptBlock<keyof JS.IBreakes>;
+        constructor(node: VMDOM.VComment, setup: IOrderSetup);
+        initStatement(): void;
+        getBlock(condition: string): JS.JavaScriptBlock<keyof JS.IBreakes>;
+        initvarInfos(): void;
+        static run(data: IOrderDataVar): void;
+    }
+    function tryRunVarInfos(this: void, node: INode, varInfos: [string, string | undefined, boolean][]): void;
+    function runVarInfos(this: void, scope: Scope, node: VMDOM.VNode, varInfos: [string, string | undefined, boolean][]): void;
 }
 declare namespace JS {
     const enum EForMode {
@@ -3077,7 +3228,7 @@ declare namespace JS {
     class For extends JavaScriptLogic {
         static logicName: string;
         static new(statement: JavaScriptStatement): For | null;
-        static parseConditions(block: JavaScriptBlock): IInfoForStep | IInfoForIn | null;
+        static parseConditions(block: JavaScriptBlock<keyof IBreakes>): IInfoForStep | IInfoForIn | null;
         private static parseStep(statements);
         private static parseForIn(keyWords);
         mode: EForMode;
@@ -3106,124 +3257,58 @@ declare namespace Order {
     class For extends RepeatBlockOrder {
         static orderName: string;
         data: IOrderDataFor;
-        constructor(node: VMDOM.VComment, condition: string);
+        constructor(node: VMDOM.VComment, setup: IOrderSetup);
         static run(data: IOrderDataFor): void;
     }
 }
 declare namespace Order {
     interface IOrderDataSwitch extends IOrderDataBlock {
+        setup: IOrderSetup;
         condition: string;
     }
     class Switch extends BlockOrder {
         static orderName: string;
         static subOrder: string[];
         data: IOrderDataSwitch;
-        constructor(node: VMDOM.VComment, condition: string);
+        constructor(node: VMDOM.VComment, setup: IOrderSetup);
         static isBlockStart(subOrder: string): boolean;
         static run(data: IOrderDataSwitch): void;
     }
 }
 declare namespace Order {
     interface IOrderDataWhile extends IOrderDataBlock {
+        setup: IOrderSetup;
         condition: string;
     }
     class While extends RepeatBlockOrder {
         static orderName: string;
         data: IOrderDataWhile;
-        constructor(node: VMDOM.VComment, condition: string);
+        constructor(node: VMDOM.VComment, setup: IOrderSetup);
         static run(data: IOrderDataWhile): void;
     }
 }
 declare namespace Order {
     interface IOrderDataDo extends IOrderDataWhile {
         isFirst: boolean;
+        setup: IOrderSetup;
     }
     class Do extends RepeatBlockOrder {
         static orderName: string;
         data: IOrderDataDo;
-        constructor(node: VMDOM.VComment, condition: string);
+        constructor(node: VMDOM.VComment, setup: IOrderSetup);
         static run(data: IOrderDataDo): void;
     }
 }
-declare namespace JS {
-    interface IJavaScriptParseState {
-        condition: string;
-        index: number;
-        action: string;
-        length: number;
-        block: JavaScriptBlock;
-        root: JavaScriptBlock;
-        keyWordStart: number;
-        commentStart: number;
-        stringStart: number;
-        stringStartBy: string;
-    }
-    class Parser {
-        private static getInitData(condition, start?);
-        private static ''(m);
-        /**是否跟随回车换行 */
-        private static isFollowCarriageReturnOrLineFeed(m);
-        private static parseKeyWord(m);
-        private static pushComment(m, comment);
-        private static pushKeyWord(m, keyWord);
-        private static pushString(m, string);
-        private static pushBlock(m, block);
-        private static pushKeyWordOrBlock(m, keyWordOrBlockOrComment);
-        private static getLastStatement(m);
-        private static '*/<>'(m, keyWord);
-        private static '<>'(m, keyWord);
-        private static '<<>>'(m, keyWord);
-        private static '<<<>>>'(m, keyWord);
-        private static comment(m);
-        private static comment2(m);
-        private static '/'(m);
-        private static '+-%'(m, keyWord);
-        private static '?='(m, keyWord);
-        private static '=>'(m);
-        private static '?=='(m, keyWord);
-        private static ';'(m);
-        private static '.'(m);
-        private static '!~'(m, keyWord);
-        private static isStatementBegin(m);
-        private static space(m);
-        private static '({['(m, keyWord, keyWordEnd);
-        private static ')}]'(m, keyWord, keyWordBegin);
-        private static '"`\''(m, keyWord);
-        private static string(m);
-        private static parseEnd(m);
-        private static keyWord(m);
-        /**解析结构 */
-        static parseStructor(condition: string, start?: number, checkCallback?: (m: IJavaScriptParseState) => boolean): JavaScriptBlock;
-        /**仅从文本流里解析出一个代码块 */
-        static parseBlock(condition: string, start: number): {
-            length: number;
-            block: JavaScriptBlock;
-        };
-        static parseStatement(condition: string, start: number): {
-            length: number;
-            statement: JavaScriptStatement;
-        };
-    }
-}
 declare namespace Order {
-    interface IOrderDataVar extends IOrderData {
-        varInfos: [string, string | undefined, boolean][];
-        placeholder: VMDOM.VComment;
+    interface IOrderDataScope extends IOrderDataVar {
+        scopeName: string;
     }
-    class Var extends VOrder {
+    class ScopeOrder extends Var {
         static orderName: string;
-        data: IOrderDataVar;
-        block: JS.JavaScriptBlock;
-        constructor(node: VMDOM.VComment, condition: string);
-        initStatement(): void;
-        getBlock(condition: string): JS.JavaScriptBlock;
-        initvarInfos(): void;
-        static run(data: IOrderDataVar): void;
+        data: IOrderDataScope;
+        initBlock(): void;
+        static run(data: IOrderDataScope): void;
     }
-    function tryRunVarInfos(this: void, node: INode, varInfos: [string, string | undefined, boolean][]): void;
-    function runVarInfos(this: void, scope: Scope, node: VMDOM.VNode, varInfos: [string, string | undefined, boolean][]): void;
-}
-declare namespace Order {
 }
 declare namespace Order {
     /**运行并插入返回的节点 */
@@ -3233,7 +3318,7 @@ declare namespace Order {
     class Equal extends VOrder {
         static orderName: string;
         data: IOrderDataEqual;
-        constructor(node: VMDOM.VComment, condition: string);
+        constructor(node: VMDOM.VComment, setup: IOrderSetup);
         static run(this: void, data: IOrderDataEqual): void;
     }
 }
@@ -3246,7 +3331,7 @@ declare namespace JS {
     /**获得分级代码数组
      * @param {JavaScriptBlock} block 语句块
      */
-    function getExps(block: JS.JavaScriptBlock): JavaScriptExpressions;
+    function getExps(block: JS.JavaScriptBlock<keyof IBreakes>): JavaScriptExpressions;
     /**获得分级代码数组
      * @param {JavaScriptStatement} statement 语句
      */
@@ -3269,30 +3354,13 @@ declare namespace JS {
     class Function extends JavaScriptLogic {
         params: string[];
         isLambda: boolean;
-        content: JavaScriptBlock | string;
+        content: JavaScriptBlock<keyof IBreakes> | string;
         static logicName: string;
         static new(statement: JavaScriptStatement): Function | null;
-        static setParams(params: string[], block: JavaScriptBlock): boolean;
-        protected constructor(params: string[], isLambda: boolean, content: JavaScriptBlock | string);
+        static setParams(params: string[], block: JavaScriptBlock<keyof IBreakes>): boolean;
+        protected constructor(params: string[], isLambda: boolean, content: JavaScriptBlock<keyof IBreakes> | string);
         toString(): string;
     }
-}
-declare namespace Order {
-    interface IOrderDataBindExpressions extends IOrderData {
-        function: {
-            params: string[];
-            content: string;
-        } | null;
-        object: [string, string];
-    }
-    class BindExpressions extends VOrder {
-        static orderName: string;
-        data: IOrderDataBindExpressions;
-        constructor(node: VMDOM.VComment, condition: string);
-        /** 计算*/
-        static run(data: IOrderDataBindExpressions): void;
-    }
-    function makeExpressFunction(this: void, content: string, params: string[]): (node: INode, args: any[]) => any;
 }
 declare namespace Order {
 }
@@ -3345,7 +3413,6 @@ declare class Turtle extends EventEmitterEx implements ITurtle {
     emitResize(): void;
     renderTemplate(tp: IElement): void;
     renderDocument: IRenderDocument;
-    private r1(scriptNode, compileuilist, compileName, compileInfo, compile);
     private r2();
     ready(fn: () => void): this;
 }

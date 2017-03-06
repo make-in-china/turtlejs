@@ -1,5 +1,6 @@
 
 /// <reference path='RepeatBlockOrder.ts'/>
+/// <reference path='Var.ts'/>
 /// <reference path='../../virtual/javascript/logic/For.ts'/>
 namespace Order {
     export interface IOrderDataForIn extends IOrderDataBlock{

@@ -1,5 +1,9 @@
 ﻿
 var gulp = require('gulp');
+gulp.task('default',function(){
+    console.log(`任务列表：
+    turtle    构建turtle.js`);
+});
 gulp.task('ui:w', function () {
     var fork=require('child_process').fork;
     var task=fork('gulp.uiWatch.ts');
@@ -49,23 +53,9 @@ function init(){
     }
 }
 
-gulp.task('vm',function(){
-    init();
-
-    del(['dist/virtual/*']);
-    doTSC('src/ts/virtual/UIHelper/UIHelper.ts','virtual/turtle.0.1.js')
-});
 gulp.task('turtle',function(){
     init();
-    doTSC('src/ts/index.ts','virtual/UIHelper.0.1.js')
-});
-gulp.task('default',function(){
-    console.log(`任务列表：
-    project   创建工程
-        name  工程名
-    ui:w      监视ui工程
-    turtle    构建turtle.js
-    vm        构建 uihealper.js`);
+    doTSC('src/index.ts','turtle.0.1.js')
 });
 gulp.task('project',function(){
     var args=process.argv.slice(3);
