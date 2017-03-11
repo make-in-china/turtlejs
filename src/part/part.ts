@@ -1,14 +1,14 @@
 
 /// <reference path='../core/EventEmitterEx.ts'/>
 /// <reference path='../lib/ArrayEx.ts'/>
-/// <reference path='../virtual/lib/TreeEach.ts'/>
+/// <reference path='../virtual/src/lib/TreeEach.ts'/>
 /// <reference path='../lib/lib.ts'/>
 /// <reference path='../lib/is.ts'/>
 // / <reference path="Server.ts"/>
 /// <reference path="View.ts"/>
 /// <reference path="partCore.ts"/>
 /// <reference path='../scope/DOMScope.ts'/>
-/// <reference path='../virtual/node/VNodeVMData.ts'/>
+/// <reference path='../virtual/src/node/VNodeVMData.ts'/>
 namespace VMDOM{
     export interface VNodeVMData{
         sign?:0|1

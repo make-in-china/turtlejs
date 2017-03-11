@@ -1,4 +1,4 @@
-/// <reference path="src/virtual/node/.d.ts" />
+/// <reference path="src/virtual/src/node/.d.ts" />
 declare class ArrayEx<T> extends Array<T> {
     last(): T | undefined;
     clear(): void;

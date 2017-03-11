@@ -1,5 +1,5 @@
 /// <reference path="RootScope.ts"/>
-/// <reference path='../virtual/vdom/VDOM.ts'/>
+/// <reference path='../virtual/src/vdom/VDOM.ts'/>
 
 
 typeof document==="undefined"&&(document=<any>$$$('#document'));

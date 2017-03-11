@@ -9,5 +9,8 @@
         "skipLibCheck":true
         // "noUnusedParameters":true,
         // "noUnusedLocals":true
-    }
+    },
+    "exclude": [
+        "dist/*"
+    ]
 }

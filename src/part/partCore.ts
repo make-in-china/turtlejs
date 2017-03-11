@@ -3,7 +3,7 @@
 /// <reference path='../view/order/VOrder.ts'/>
 /// <reference path='../core/XHR.ts'/>
 /// <reference path='../view/Include.ts'/>
-/// <reference path='../virtual/lib/TreeEach.ts'/>
+/// <reference path='../virtual/src/lib/TreeEach.ts'/>
 /// <reference path='Part.ts'/>
 /// <reference path='Store.ts'/>
 /// <reference path='../main/Config.ts'/>

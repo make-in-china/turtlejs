@@ -1,4 +1,4 @@
-/// <reference path='../virtual/javascript/JavaScriptBlock.ts'/>
+/// <reference path='../virtual/src/javascript/JavaScriptBlock.ts'/>
 
 
 namespace VMDOM{

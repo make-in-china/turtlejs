@@ -2,7 +2,7 @@
 /// <reference path='VOrder.ts'/>
 /// <reference path='Break.ts'/>
 /// <reference path='orderEx/Vorder.ts'/>
-/// <reference path='../../virtual/node/VPlaceHolder.ts'/>
+/// <reference path='../../virtual/src/node/VPlaceHolder.ts'/>
 namespace Order {
     export interface IOrderDataBlock extends IOrderData {
         placeholder: VMDOM.VPlaceHolder

@@ -4,13 +4,6 @@ gulp.task('default',function(){
     console.log(`任务列表：
     turtle    构建turtle.js`);
 });
-gulp.task('ui:w', function () {
-    var fork=require('child_process').fork;
-    var task=fork('gulp.uiWatch.ts');
-    task.on("message",function(e){
-        console.log(e);
-    });
-});
 var tsconfig={
     // outFile:,
     // "noImplicitAny": true,

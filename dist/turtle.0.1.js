@@ -945,8 +945,8 @@ var RootScope = (function () {
     return RootScope;
 }());
 "use strict";
-/// <reference path="../../lib/is.ts"/>
-/// <reference path="../../lib/IAttr.ts"/>
+/// <reference path="../../../lib/is.ts"/>
+/// <reference path="../../../lib/IAttr.ts"/>
 var VNamedNodeMap = (function () {
     function VNamedNodeMap() {
         this._length = 0;
@@ -1375,7 +1375,7 @@ var VMDOM;
     VMDOM.VHTMLCollection = VHTMLCollection;
 })(VMDOM || (VMDOM = {}));
 "use strict";
-/// <reference path="../../core/EventEmitterEx.ts"/>
+/// <reference path="../../../core/EventEmitterEx.ts"/>
 var VMDOM;
 (function (VMDOM) {
     var VNodeVMData = (function () {
@@ -1491,10 +1491,10 @@ var VMDOM;
 /// <reference path='.d.ts'/>
 /// <reference path='VNamedNodeMap.ts'/>
 /// <reference path='VStyle.ts'/>
-/// <reference path='../../lib/HashObject.ts'/>
-/// <reference path='../../lib/ClassList.ts'/>
-/// <reference path='../../lib/Lib.ts'/>
-/// <reference path='../../lib/TypeHelper.ts'/>
+/// <reference path='../../../lib/HashObject.ts'/>
+/// <reference path='../../../lib/ClassList.ts'/>
+/// <reference path='../../../lib/Lib.ts'/>
+/// <reference path='../../../lib/TypeHelper.ts'/>
 /// <reference path='VNodeList.ts'/>
 /// <reference path='VHTMLCollection.ts'/>
 /// <reference path='VNodeVMData.ts'/>
@@ -2098,8 +2098,8 @@ var decodeHTML = (function () {
 "use strict";
 /// <reference path='VNode.ts'/>
 /// <reference path='VElement.ts'/>
-/// <reference path='../../lib/Encode.ts'/>
-/// <reference path='../../core/Node.ts'/>
+/// <reference path='../../../lib/Encode.ts'/>
+/// <reference path='../../../core/Node.ts'/>
 /// <reference path='Lib.ts'/>
 function isVHTMLElement(node) {
     return node.nodeType === 1 /* Element */;
@@ -3513,7 +3513,7 @@ var VMDOM;
     VMDOM.VQElement = VQElement;
 })(VMDOM || (VMDOM = {}));
 "use strict";
-/// <reference path="../../core/node.ts"/>
+/// <reference path="../../../core/node.ts"/>
 var VMDOM;
 (function (VMDOM) {
     var VScriptElement = (function (_super) {
@@ -4700,7 +4700,7 @@ VDOM.parseStructor = function (html, vNode, endChar) {
 };
 var $$$ = VNodeHelp;
 /// <reference path="RootScope.ts"/>
-/// <reference path='../virtual/vdom/VDOM.ts'/>
+/// <reference path='../virtual/src/vdom/VDOM.ts'/>
 "use strict";
 typeof document === "undefined" && (document = $$$('#document'));
 var $rootScope = new RootScope(document);
@@ -5164,7 +5164,7 @@ var JS;
     }());
     JS.JavaScriptBlock = JavaScriptBlock;
 })(JS || (JS = {}));
-/// <reference path='../virtual/javascript/JavaScriptBlock.ts'/>
+/// <reference path='../virtual/src/javascript/JavaScriptBlock.ts'/>
 "use strict";
 var VMDOM;
 (function (VMDOM) {
@@ -5195,8 +5195,8 @@ var VMDOM;
     }());
     VMDOM.VOrderData = VOrderData;
 })(VMDOM || (VMDOM = {}));
-/// <reference path='../virtual/node/VPlaceHolder.ts'/>
-/// <reference path='../virtual/javascript/JavaScriptBlock.ts'/>
+/// <reference path='../virtual/src/node/VPlaceHolder.ts'/>
+/// <reference path='../virtual/src/javascript/JavaScriptBlock.ts'/>
 /// <reference path='VOrderData.ts'/>
 "use strict";
 var VMDOM;
@@ -5610,7 +5610,7 @@ var Order;
     }
 })(Order || (Order = {}));
 /// <reference path='Lib.ts'/>
-/// <reference path='../../virtual/javascript/JavaScriptStatement.ts'/>
+/// <reference path='../../virtual/src/javascript/JavaScriptStatement.ts'/>
 "use strict";
 var Order;
 (function (Order) {
@@ -5676,7 +5676,7 @@ var XHR = (function () {
     return XHR;
 }());
 "use strict";
-/// <reference path="../virtual/vdom/BaseVNode.ts"/>
+/// <reference path="../virtual/src/vdom/BaseVNode.ts"/>
 var includeJSFiles = (function () {
     var IncludeTask = (function () {
         function IncludeTask(parent, files, callback) {
@@ -5886,7 +5886,7 @@ var loadJS = (function () {
 /// <reference path='../view/order/VOrder.ts'/>
 /// <reference path='../core/XHR.ts'/>
 /// <reference path='../view/Include.ts'/>
-/// <reference path='../virtual/lib/TreeEach.ts'/>
+/// <reference path='../virtual/src/lib/TreeEach.ts'/>
 /// <reference path='Part.ts'/>
 /// <reference path='Store.ts'/>
 /// <reference path='../main/Config.ts'/>
@@ -6488,13 +6488,13 @@ function getParts(childNodes) {
 "use strict";
 /// <reference path='../core/EventEmitterEx.ts'/>
 /// <reference path='../lib/ArrayEx.ts'/>
-/// <reference path='../virtual/lib/TreeEach.ts'/>
+/// <reference path='../virtual/src/lib/TreeEach.ts'/>
 /// <reference path='../lib/lib.ts'/>
 /// <reference path='../lib/is.ts'/>
 /// <reference path="View.ts"/>
 /// <reference path="partCore.ts"/>
 /// <reference path='../scope/DOMScope.ts'/>
-/// <reference path='../virtual/node/VNodeVMData.ts'/>
+/// <reference path='../virtual/src/node/VNodeVMData.ts'/>
 var Component;
 (function (Component) {
     var Part = (function (_super) {
@@ -7113,7 +7113,7 @@ var Order;
     ], Break);
     Order.Break = Break;
 })(Order || (Order = {}));
-/// <reference path='../virtual/node/VPlaceHolder.ts'/>
+/// <reference path='../virtual/src/node/VPlaceHolder.ts'/>
 "use strict";
 var VMDOM;
 (function (VMDOM) {
@@ -7181,7 +7181,7 @@ var OrderEx;
 /// <reference path='VOrder.ts'/>
 /// <reference path='Break.ts'/>
 /// <reference path='orderEx/Vorder.ts'/>
-/// <reference path='../../virtual/node/VPlaceHolder.ts'/>
+/// <reference path='../../virtual/src/node/VPlaceHolder.ts'/>
 var Order;
 (function (Order) {
     var BlockOrder = (function (_super) {
@@ -8034,8 +8034,8 @@ var JS;
 "use strict";
 /// <reference path='../../scope/Scope.ts'/>
 /// <reference path='VOrder.ts'/>
-/// <reference path='../../virtual/javascript/Parser.ts'/>
-/// <reference path='../../virtual/javascript/logic/Var.ts'/>
+/// <reference path='../../virtual/src/javascript/Parser.ts'/>
+/// <reference path='../../virtual/src/javascript/logic/Var.ts'/>
 var Order;
 (function (Order) {
     var Var = (function (_super) {
@@ -8262,7 +8262,7 @@ var JS;
 "use strict";
 /// <reference path='RepeatBlockOrder.ts'/>
 /// <reference path='Var.ts'/>
-/// <reference path='../../virtual/javascript/logic/For.ts'/>
+/// <reference path='../../virtual/src/javascript/logic/For.ts'/>
 var Order;
 (function (Order) {
     var For = (function (_super) {
@@ -8863,8 +8863,8 @@ var JS;
     JS.registerLogic(Function);
 })(JS || (JS = {}));
 "use strict";
-/// <reference path='../../virtual/javascript/JavaScriptExpressions.ts'/>
-/// <reference path='../../virtual/javascript/logic/Function.ts'/>
+/// <reference path='../../virtual/src/javascript/JavaScriptExpressions.ts'/>
+/// <reference path='../../virtual/src/javascript/logic/Function.ts'/>
 /// <reference path='VOrder.ts'/>
 /// <reference path='VOrder.ts'/>
 "use strict";

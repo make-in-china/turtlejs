@@ -1,4 +1,4 @@
-/// <reference path='../virtual/node/VPlaceHolder.ts'/>
+/// <reference path='../virtual/src/node/VPlaceHolder.ts'/>
 
 const enum ENodeType {
     Script = 103
