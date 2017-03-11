@@ -5164,7 +5164,7 @@ var JS;
     }());
     JS.JavaScriptBlock = JavaScriptBlock;
 })(JS || (JS = {}));
-/// <reference path='../virtual/src/javascript/JavaScriptBlock.ts'/>
+/// <reference path='../javascript/JavaScriptBlock.ts'/>
 "use strict";
 var VMDOM;
 (function (VMDOM) {
@@ -5196,7 +5196,7 @@ var VMDOM;
     VMDOM.VOrderData = VOrderData;
 })(VMDOM || (VMDOM = {}));
 /// <reference path='../virtual/src/node/VPlaceHolder.ts'/>
-/// <reference path='../virtual/src/javascript/JavaScriptBlock.ts'/>
+/// <reference path='../javascript/JavaScriptBlock.ts'/>
 /// <reference path='VOrderData.ts'/>
 "use strict";
 var VMDOM;
@@ -5638,7 +5638,7 @@ var Order;
     }
 })(Order || (Order = {}));
 /// <reference path='Lib.ts'/>
-/// <reference path='../../virtual/src/javascript/JavaScriptStatement.ts'/>
+/// <reference path='../../javascript/JavaScriptStatement.ts'/>
 "use strict";
 var Order;
 (function (Order) {
@@ -7997,8 +7997,8 @@ var JS;
 "use strict";
 /// <reference path='../../scope/Scope.ts'/>
 /// <reference path='VOrder.ts'/>
-/// <reference path='../../virtual/src/javascript/Parser.ts'/>
-/// <reference path='../../virtual/src/javascript/logic/Var.ts'/>
+/// <reference path='../../javascript/Parser.ts'/>
+/// <reference path='../../javascript/logic/Var.ts'/>
 var Order;
 (function (Order) {
     var Var = (function (_super) {
@@ -8225,7 +8225,7 @@ var JS;
 "use strict";
 /// <reference path='RepeatBlockOrder.ts'/>
 /// <reference path='Var.ts'/>
-/// <reference path='../../virtual/src/javascript/logic/For.ts'/>
+/// <reference path='../../javascript/logic/For.ts'/>
 var Order;
 (function (Order) {
     var For = (function (_super) {
@@ -8826,8 +8826,8 @@ var JS;
     JS.registerLogic(Function);
 })(JS || (JS = {}));
 "use strict";
-/// <reference path='../../virtual/src/javascript/JavaScriptExpressions.ts'/>
-/// <reference path='../../virtual/src/javascript/logic/Function.ts'/>
+/// <reference path='../../javascript/JavaScriptExpressions.ts'/>
+/// <reference path='../../javascript/logic/Function.ts'/>
 /// <reference path='VOrder.ts'/>
 /// <reference path='VOrder.ts'/>
 "use strict";

@@ -1,7 +1,7 @@
 
 
-/// <reference path='../../virtual/src/javascript/JavaScriptExpressions.ts'/>
-/// <reference path='../../virtual/src/javascript/logic/Function.ts'/>
+/// <reference path='../../javascript/JavaScriptExpressions.ts'/>
+/// <reference path='../../javascript/logic/Function.ts'/>
 /// <reference path='VOrder.ts'/>
 namespace Order {
     interface IBindExpressionsFunction{

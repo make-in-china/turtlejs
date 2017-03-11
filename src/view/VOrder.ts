@@ -1,5 +1,5 @@
 /// <reference path='../virtual/src/node/VPlaceHolder.ts'/>
-/// <reference path='../virtual/src/javascript/JavaScriptBlock.ts'/>
+/// <reference path='../javascript/JavaScriptBlock.ts'/>
 /// <reference path='VOrderData.ts'/>
 
 const enum ENodeType{
