@@ -1,7 +1,6 @@
 
 /// <reference path='VOrder.ts'/>
 /// <reference path='Break.ts'/>
-/// <reference path='orderEx/Vorder.ts'/>
 /// <reference path='../../virtual/src/node/VPlaceHolder.ts'/>
 namespace Order {
     export interface IOrderDataBlock extends IOrderData {
@@ -125,7 +124,11 @@ namespace Order {
                     return fn(node,'break',state);
                 }else{
                     if(run){
-                        runOrder(info,node);
+                        let orderName: string = info.order;
+                        if (orderName in orders) {
+                            let order=new orders[orderName](node,info.setup);
+                            VOrder.runOrder(order);
+                        }
                     }else{
                         let innerBlock=parseBlock(info, node);
                         if (innerBlock) {
@@ -145,15 +148,7 @@ namespace Order {
         }, beginIndex);
     }
     
-    function runOrder(this:void,info: IOrderInfo, node: VMDOM.VComment){
-        let orderName: string = <string>info.order;
-        if (orderName in orders) {
-            let order=new orders[orderName](node,info.setup);
-            if(order.run&&OrderEx.canRunAtService(order)){
-                order.run();
-            }
-        }
-    }
+    
     function parseBlock(this:void,info: IOrderInfo, node: VMDOM.VComment): BlockOrder|null {
         let orderName: string = <string>info.order;
 

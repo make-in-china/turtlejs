@@ -5223,9 +5223,37 @@ var VMDOM;
     ], VOrder);
     VMDOM.VOrder = VOrder;
 })(VMDOM || (VMDOM = {}));
+/// <reference path='../virtual/src/node/VPlaceHolder.ts'/>
+"use strict";
+var VMDOM;
+(function (VMDOM) {
+    var VScript = (function (_super) {
+        __extends(VScript, _super);
+        function VScript() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.nodeName = "#script";
+            _this.nodeType = 103 /* Script */;
+            return _this;
+        }
+        VScript.prototype.toJS = function () {
+            return ".$$__(" + this.propertyName + ")";
+            //需要UIHelper配合
+        };
+        VScript.prototype.toFunction = function () {
+            return "function " + this.propertyName + "(this:VMDOM.VPlaceHolder){" + this.data + "\n    }";
+        };
+        return VScript;
+    }(VMDOM.VPlaceHolder));
+    VScript = __decorate([
+        VMDOM.register('#script', 103 /* Script */)
+        /** 预编译脚本 */
+    ], VScript);
+    VMDOM.VScript = VScript;
+})(VMDOM || (VMDOM = {}));
 "use strict";
 /// <reference path='../../scope/DOMScope.ts'/>
 /// <reference path='../../view/VOrder.ts'/>
+/// <reference path='../VScript.ts'/>
 var Order;
 (function (Order) {
     var subOrderNames = [], subOrderRE, orderNames = [], orderRE;
@@ -5623,6 +5651,11 @@ var Order;
         }
         VOrder.prototype.run = function () {
             this.constructor.run(this.data);
+        };
+        VOrder.runOrder = function (order) {
+            if (order.run) {
+                order.run();
+            }
         };
         VOrder.eachOrder = function (array, fn, beginIndex) {
             if (beginIndex === void 0) { beginIndex = 0; }
@@ -7113,74 +7146,9 @@ var Order;
     ], Break);
     Order.Break = Break;
 })(Order || (Order = {}));
-/// <reference path='../virtual/src/node/VPlaceHolder.ts'/>
-"use strict";
-var VMDOM;
-(function (VMDOM) {
-    var VScript = (function (_super) {
-        __extends(VScript, _super);
-        function VScript() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.nodeName = "#script";
-            _this.nodeType = 103 /* Script */;
-            return _this;
-        }
-        VScript.prototype.toJS = function () {
-            return ".$$__(" + this.propertyName + ")";
-            //需要UIHelper配合
-        };
-        VScript.prototype.toFunction = function () {
-            return "function " + this.propertyName + "(this:VMDOM.VPlaceHolder){" + this.data + "\n    }";
-        };
-        return VScript;
-    }(VMDOM.VPlaceHolder));
-    VScript = __decorate([
-        VMDOM.register('#script', 103 /* Script */)
-        /** 预编译脚本 */
-    ], VScript);
-    VMDOM.VScript = VScript;
-})(VMDOM || (VMDOM = {}));
-/// <reference path='../VOrder.ts'/>
-/// <reference path='../../VScript.ts'/>
-"use strict";
-var OrderEx;
-(function (OrderEx) {
-    OrderEx.tryRun = 'tryRun';
-    OrderEx.replaceToScriptNode = 'replaceToScriptNode';
-    function extendsOrderGet(clazz, name, fn) {
-        Object.defineProperty(clazz.prototype, name, { get: fn });
-    }
-    OrderEx.extendsOrderGet = extendsOrderGet;
-    OrderEx.extendsOrderFunction = function (clazz, name, fn) {
-        Object.defineProperty(clazz.prototype, name, { value: fn });
-    };
-    function canRunAtService(order) {
-        try {
-            if (OrderEx.tryRun in order) {
-                order[OrderEx.tryRun]();
-            }
-            Order.resetTest();
-            return true;
-        }
-        catch (e) {
-            debugger;
-            Order.resetTest();
-            return false;
-        }
-    }
-    OrderEx.canRunAtService = canRunAtService;
-    function toScriptNode(order) {
-        if (OrderEx.replaceToScriptNode in order) {
-            var str = order[OrderEx.replaceToScriptNode]();
-            replaceNodeByNode(order.data.placeholder, $$$(str, 103 /* Script */));
-        }
-    }
-    OrderEx.toScriptNode = toScriptNode;
-})(OrderEx || (OrderEx = {}));
 "use strict";
 /// <reference path='VOrder.ts'/>
 /// <reference path='Break.ts'/>
-/// <reference path='orderEx/Vorder.ts'/>
 /// <reference path='../../virtual/src/node/VPlaceHolder.ts'/>
 var Order;
 (function (Order) {
@@ -7267,7 +7235,11 @@ var Order;
                 }
                 else {
                     if (run) {
-                        runOrder(info, node);
+                        var orderName = info.order;
+                        if (orderName in Order.orders) {
+                            var order = new Order.orders[orderName](node, info.setup);
+                            Order.VOrder.runOrder(order);
+                        }
                     }
                     else {
                         var innerBlock = parseBlock(info, node);
@@ -7286,15 +7258,6 @@ var Order;
             }
             return 4 /* c_noIn */;
         }, beginIndex);
-    }
-    function runOrder(info, node) {
-        var orderName = info.order;
-        if (orderName in Order.orders) {
-            var order = new Order.orders[orderName](node, info.setup);
-            if (order.run && OrderEx.canRunAtService(order)) {
-                order.run();
-            }
-        }
     }
     function parseBlock(info, node) {
         var orderName = info.order;

@@ -1,6 +1,7 @@
 
 /// <reference path='../../scope/DOMScope.ts'/>
 /// <reference path='../../view/VOrder.ts'/>
+/// <reference path='../VScript.ts'/>
 // interface VComment {
 //     __order__?: Order.VOrder
 // }

@@ -15,6 +15,12 @@ namespace Order {
         run(){
             (<IOrderConstructor>this.constructor).run(this.data);
         }
+        
+        static runOrder(this:void,order:VOrder){
+            if(order.run){
+                order.run();
+            }
+        }
         constructor(public node: VMDOM.VComment,public setup: IOrderSetup) {
             this.data.placeholder=node;
         }

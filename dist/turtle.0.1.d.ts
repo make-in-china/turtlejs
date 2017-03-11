@@ -2732,6 +2732,21 @@ declare namespace VMDOM {
         toJS(): string;
     }
 }
+declare const enum ENodeType {
+    Script = 103,
+}
+interface IVNodeMethod {
+    (data: string, nodeType: ENodeType.Script): VMDOM.VScript & IVNodeMethod;
+}
+declare namespace VMDOM {
+    class VScript extends VPlaceHolder {
+        nodeName: "#script";
+        nodeType: ENodeType;
+        toJS(): string;
+        propertyName: string;
+        toFunction(): string;
+    }
+}
 interface Object {
     __bind__: IBindInfo[];
 }
@@ -2809,6 +2824,7 @@ declare namespace Order {
         setup: IOrderSetup;
         data: IOrderData;
         run(): void;
+        static runOrder(this: void, order: VOrder): void;
         constructor(node: VMDOM.VComment, setup: IOrderSetup);
         static eachOrder(this: void, array: IArray<INode>, fn: (node: VMDOM.VComment, info: IOrderInfo, state: ITreeEachState<INode>) => (eTreeEach | void), beginIndex?: number): ITreeEachReturn<INode> | undefined;
     }
@@ -3018,39 +3034,6 @@ declare namespace Order {
         static orderName: string;
         static run(): void;
     }
-}
-declare const enum ENodeType {
-    Script = 103,
-}
-interface IVNodeMethod {
-    (data: string, nodeType: ENodeType.Script): VMDOM.VScript & IVNodeMethod;
-}
-declare namespace VMDOM {
-    class VScript extends VPlaceHolder {
-        nodeName: "#script";
-        nodeType: ENodeType;
-        toJS(): string;
-        propertyName: string;
-        toFunction(): string;
-    }
-}
-declare namespace OrderEx {
-    const tryRun = "tryRun";
-    const replaceToScriptNode = "replaceToScriptNode";
-    interface IExtendsOrderFunction {
-        <U>(clazz: {
-            prototype: U;
-        }, name: 'tryRun', fn: (this: U) => void): void;
-        <U>(clazz: {
-            prototype: U;
-        }, name: 'replaceToScriptNode', fn: (this: U) => string): void;
-    }
-    function extendsOrderGet<U extends Order.VOrder>(clazz: {
-        prototype: U;
-    }, name: string, fn: (this: U) => void): void;
-    const extendsOrderFunction: IExtendsOrderFunction;
-    function canRunAtService(order: Order.VOrder): boolean;
-    function toScriptNode(order: Order.VOrder): void;
 }
 declare namespace Order {
     interface IOrderDataBlock extends IOrderData {
