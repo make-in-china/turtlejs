@@ -520,6 +520,7 @@ namespace JS{
             }
             return {length:m.index-start,block:<any>block};
         }
+        /**仅从文本流里解析出一句代码 */
         static parseStatement(condition:string,start:number):{
             length:number,
             statement:JavaScriptStatement
