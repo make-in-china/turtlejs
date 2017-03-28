@@ -11,6 +11,7 @@
         // "noUnusedLocals":true
     },
     "exclude": [
-        "dist/*"
+        "./dist/*",
+        "./src/virtual/dist/*"
     ]
 }
