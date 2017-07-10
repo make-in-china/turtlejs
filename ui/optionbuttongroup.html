@@ -6,7 +6,7 @@
     var index=parseInt("{index!-1}");
     var noCheckClasses="{nocheckclass!}";
     if(outerElement.length!==0){
-        $t.ui.optionbuttongroup.service.require("setCheck")(outerElement,team,noclick,index,checkClasses,noCheckClasses);
+        $t.ui.list.optionbuttongroup.service.require("setCheck")(outerElement,team,noclick,index,checkClasses,noCheckClasses);
     }
 </script></xmp>
 <script xmp ui="optionbuttongroup" service="setCheck">
@@ -19,9 +19,9 @@
           for(var i=0;i<group.length;i++){
               if(group[i].isCheck==1){
                   group[i].isCheck=0;
-                  if(checkClasses)removeClasses(group[i],checkClass);
-                  if(noCheckClasses)addClasses(group[i],noCheckClass);
-                  if(isFunction(group[i].onUnCheck))group[i].onUnCheck();
+                  if(checkClasses)$t.removeClasses(group[i],checkClass);
+                  if(noCheckClasses)$t.addClasses(group[i],noCheckClass);
+                  if($t.isFunction(group[i].onUnCheck))group[i].onUnCheck();
               }
           }
       }
@@ -29,9 +29,9 @@
           if(this.isCheck==1)return;
           unCheck();
           this.isCheck=1;
-          if(checkClasses)addClasses(this,checkClass);
-          if(noCheckClasses)removeClasses(this,noCheckClass);
-          if(isFunction(this.onCheck))this.onCheck();
+          if(checkClasses)$t.addClasses(this,checkClass);
+          if(noCheckClasses)$t.removeClasses(this,noCheckClass);
+          if($t.isFunction(this.onCheck))this.onCheck();
           turtle.uiLink.on(this);
       }
       if(team){

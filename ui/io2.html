@@ -19,7 +19,7 @@
                     $t.removeNode(btnTry);
                     $t.removeNode(runbox);
                     cpn.begin.parentNode.insertBefore(runbox,cpn.begin);
-                    removeClass(runbox,'uhide');
+                    $t.removeClass(runbox,'uhide');
                     script.value=s;
                 }
             }
@@ -32,7 +32,7 @@
             cpn.ready.on(function(){
                 for(var i=0;i<outerElement.length;i++){
                     var str=outerElement[i].innerText;
-                    var dfn=$t.templates.findByString(str);
+                    var dfn=$t.Templates.findByString($t.templates,str);
                     if(dfn){
                         s+=dfn.join("\n");
                     }else{
