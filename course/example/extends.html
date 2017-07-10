@@ -1,0 +1,30 @@
+<title xmp ui="a">
+    (这里是a组件的内容：{text})
+    <script>
+        part.toString=function(){
+            return 'a';
+        }
+    </script>
+</title>
+<!-- 继承a组件 -->
+<title xmp ui="b" extends='a'>
+    <script>
+        /*覆盖父组件函数*/
+        part.toString=function(){
+            return part.super.toString()+'b (修改了toString)';
+        }
+    </script>
+    b.toString()='<!= part>'
+</title>
+<!-- 继承a组件 -->
+<title xmp ui="c" extends='a'>
+    <script>
+        part.super.store[0].data='(修改了界面：'+props.text+')';
+    </script>
+    c.toString()='<!= part>'
+</title>
+<xmp>
+<ui:a text='功夫茶猫'></ui:a><br>
+<ui:b text='功夫茶猫'></ui:b><br>
+<ui:c text='功夫茶猫'></ui:c>
+</xmp>

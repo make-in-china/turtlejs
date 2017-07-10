@@ -1,0 +1,15 @@
+<!-- 定义一个组件 组件在后续教程里会讲解 -->
+<title xmp ui="testset">
+    <div><div><!content></div></div>
+</title>
+
+<!-- 组件服务  HTML片断，当前页面和UI文件支持该方式 -->
+<script xmp service="test" ui="testset">
+    function(s){
+        /*匿名函数*/
+        return s+s;
+    }
+</script>
+<xmp>
+<!= $t.ui.list.testset.service.test("买一送一")>
+</xmp>

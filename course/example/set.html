@@ -1,0 +1,26 @@
+<!-- 定义一个组件 组件在后续教程里会讲解 -->
+<title xmp ui="testset">
+    <div><div><!content></div></div>
+</title>
+
+<xmp>
+<set append style="border:1px #00f solid;">
+    <set lazy style="display:block;">
+        <ui:testset>1</ui:testset>
+        可获得颜色，display:block;没被替换
+    </set>
+</set>
+<set style="border:1px #00f solid;">
+    <set lazy style="display:block;">
+        <ui:testset>1</ui:testset>
+        可获得颜色，display:block;被替换
+    </set>
+    <set>
+        <ui:testset>2</ui:testset>
+        <ui:testset>3</ui:testset>
+        2,3无法获得颜色，组件获得了style，但组件没有传递style到内部容器
+    </set>
+    <div>4</div>
+    <div>5</div>
+</set>
+</xmp>

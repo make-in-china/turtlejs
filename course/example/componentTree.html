@@ -1,0 +1,21 @@
+
+<!-- 定义3个组件 -->
+<xmp ui="a"><div>text={text} , content=<!content></div></xmp>
+<xmp ui="b" extends='a'></xmp>
+<xmp ui="c" extends='a'></xmp>
+<xmp>
+    <h4>创建嵌套组件</h4>
+    <div class="hem10">
+        <ui:a text='a'>
+            <ui:b text='b'>
+                <ui:c text='c'>功夫茶猫</ui:c>
+            </ui:b>
+        </ui:a>
+
+        <!-- 渲染过程中dom不存在任何组件，所以这里异步读取组件树 -->
+        <!async>
+            <h4>组件树结构如下</h4>
+            <textarea style='width:400px;' class="hem5" :="node.innerHTML=$t.rootParts.treeDiagram"></textarea>
+        <!end>
+    </div>
+</xmp>

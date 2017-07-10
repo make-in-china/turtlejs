@@ -1,0 +1,15 @@
+<xmp>
+<script>
+    $t.ui.define("组件1","","",{datas:[
+        '<div>组件1：从对象解析的组件模板</div>']});
+        
+    $t.ui.define('组件2','','',$t.ui.list.组件1).datas=[
+        '<div>组件2：从组件1拷贝的组件模板，但修改了datas</div>'];
+    
+    $t.ui.define('组件3','','',
+        '组件3：<b>HTML字符串生成的组件</b>');
+</script>
+<ui:组件1></ui:组件1>
+<ui:组件2></ui:组件2>
+<ui:组件3></ui:组件3>
+</xmp>

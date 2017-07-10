@@ -1,0 +1,66 @@
+<title xmp ui="tl">
+    <div>
+    <div class='wem16 right'>
+        {name}<! if {way!1}!=2><span class="fblue15">单向</span><! end><! if {way!1}==3>+<! end><! if {way!1}!=1><span class="fred15">双向</span><! end>绑定：
+    </div>
+    <div class='left pdip5'>
+        <!content>
+    </div>
+    </div>
+</title>
+<xmp>
+<!var vvvv:"turtle绑定测试",vv:0,vvv:0>
+<div>
+    <div class="iub">
+        <ui:tl name="checkbox属性 “checked” " way=1>
+        <set lazy bind="vvvv"><!--多次执行bind的写法-->
+            <input type="checkbox" bind="vv" : :checked="vvv">双向A+双向B
+        </set>
+        </ui:tl>
+        <ui:tl name="checkbox内置" way=2>
+        <input type="checkbox" bind="vvvv" : :checked="vvv">双向A
+        </ui:tl>
+        <ui:tl name="checkbox属性 “checked” " way=1>
+        <input type="checkbox" : :checked="vvvv">单向A
+        </ui:tl>
+        <ui:tl name="checkbox属性 “checked” " way=2>
+        <input type="checkbox" bind="vv" : :checked="vvv">双向B
+        </ui:tl>
+        <ui:tl name="按钮属性 “disabled” " way=1>
+        <button : :disabled="vvvv">
+            disabled="<!- vvvv>"
+        </button>
+        </ui:tl>
+        <ui:tl name="div内置" way=1>
+        <div bind="vvvv"></div>
+        </ui:tl>
+        <ui:tl name="div属性 “style.display” " way=1>
+        <div show='vvvv!=""'>
+            className!="uhide"
+        </div>
+        </ui:tl>
+        <ui:tl name="input内置" way=2>
+        <input bind="vvvv">
+        <!- vvvv|v.length==0?'不能为空':''>
+        </ui:tl>
+        <ui:tl name="textArea内置" way=2>
+        <textArea bind="vvvv"></textarea>
+        </ui:tl>
+        <ui:tl name="a属性 “href” " way=1>
+        <a : :href="vvvv"><!- vvvv></a>
+        </ui:tl>
+        <ui:tl name="下拉内置" way=2>
+        <select bind="vvvv" class="wem5">
+            <option ></option>
+            <option >-1</option>
+            <option >0</option>
+            <option >1</option>
+            <option >2</option>
+            <option >3</option>
+            <option value="true">真</option>
+            <option value="false">假</option>
+        </select>
+        </ui:tl>
+    </div>
+</div>
+</xmp>

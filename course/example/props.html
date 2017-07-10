@@ -1,0 +1,18 @@
+<xmp ui="people">
+    <div style="padding:5px;">
+        <div class="fred15"><!= JSON.stringify(props)></div>
+        <div>姓名：{name}</div>
+        <div>性别：{sex!男}.only(男,女;男)</div>
+        <div>婚否：{merry!否}.only(是,否;是)</div>
+        <div>生日：{birth!}.date(yyyy年MM月dd日)</div>
+        <div class="fgray8">
+        填表时间：{birth!}.date(yyyy年MM月dd日hh小时mm分ss秒)</div>
+    </div>
+</xmp>
+<xmp>
+    <ui:people name="功夫茶猫"></ui:people>
+    <ui:people name="功夫茶猫" sex="男"></ui:people>
+    <ui:people name="功夫茶猫" sex="男" merry="否"></ui:people>
+    <ui:people name="功夫茶猫" sex="男" merry></ui:people>
+    <ui:people name="功夫茶猫" sex="男" merry="乱写数据"></ui:people>
+</xmp>

@@ -1,0 +1,12 @@
+<xmp>
+<get name="something">
+    <div>1</div>
+    <div>2</div>
+</get>  
+<!= var nodes=$t.store.something.children; 
+    var str=nodes.length+','+$t.nodesToString(nodes);
+    $t.store.something.innerHTML="";
+    delete $t.store.something;
+    str;>
+</xmp>
+<!-- 注：$t为turtle缩写 -->

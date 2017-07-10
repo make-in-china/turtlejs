@@ -1,0 +1,15 @@
+<xmp>
+<!scope A|x:1,y:1>
+<div>
+    <!scope B|x:2><!--创建一个作用域-->
+    <div>
+        <!scope C>
+        <!var y:3><!--定义一个变量在scope3上-->
+        C域可访问(x=<!= x>,y=<!= y>)<br>
+        A域可访问(x=<!= A.x>)<br>
+        A域可访问(y=<!= A.y>)
+    </div><br>
+    B域可访问(x=<!= x>,y=<!= y>   ) 
+</div><br>
+A域可访问(x=<!= x>,y=<!= y>)
+</xmp>

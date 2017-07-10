@@ -1,0 +1,17 @@
+<xmp>
+<!var data:"他们从我这取的数据">
+<a href="javascript:;" :=
+"node.onclick=function(){alert('值：'+data)}">
+<br>点我</a>冒号自身，一次性运行<br><br>
+
+<input : value:="data">
+<br>运算xxx并返回值到属性名<br><br>
+
+<input : :value="data">编辑我
+<br>运算xxx并返回值到属性名，数据发生变化时，
+此属性同时更新（单向绑定）<br><br>
+
+<input : bind="data">编辑我
+<br>绑定input的value为变量值，
+并在input的oninput事件通知变量更新 
+</xmp>
