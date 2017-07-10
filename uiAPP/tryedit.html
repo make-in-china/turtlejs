@@ -1,0 +1,76 @@
+<xmp>
+    <div>
+        <div p-ref='tools' style='font-size:13px;padding:2px;border:1px solid #555;background-color:#444;box-sizing: border-box;'>
+            <span p-ref="reset" style="background-color:#fff;cursor: pointer;display:inline-block;padding:4px 8px;border:1px solid #555;margin:2px;border-radius:8px;">还原</span>
+            <span p-ref="run" style="background-color:#fff;cursor: pointer;display:inline-block;padding:4px 8px;border:1px solid #555;margin:3px;border-radius:8px;">运行</span>
+            <!if {watch!false}.toBool>
+            <ui:checkbox p-name="watch" color='fff'>监视</ui:checkbox>
+            <!end>
+        </div>
+        <div>
+            <div p-ref="monacoedit" style="background-color:#1e1e1e;display:inline-block;"></div>
+            <div p-ref="turtlesanbox"></div>
+        </div>
+    </div>
+    <script>
+        part.onInit=function(){
+            var reset=part.$reset;
+            var run=part.$run;
+            var istry={try!true};
+            var isWatch={watch!false};
+            var src="{src!}";
+            var turtlesanbox=part.$turtlesanbox;
+            var monacoedit=part.$monacoedit;
+            var len=outerElement.length;
+            var texts=[];
+            part.$tools.style.width=props.width;
+            props.style='width:'+props.width+';height:'+props.height+';';
+            delete props.width;
+            delete props.height;
+            var cpn;
+            if(istry){
+                cpn=$t.renderIn("turtlesanbox","app",turtlesanbox,null,null,
+                    {
+                        src:"../blank.html",
+                        turtlejspath:"js/turtle.js"
+                    }
+                );
+            }else{
+                run.remove();
+                turtlesanbox.remove();
+            }
+            if(isWatch){
+                var watch=part.child[0].partMain;
+                watch.onchange=function(){
+
+                }
+            }
+            if(src===""){
+                for(var i=0;i<len;i++){
+                    texts.push($t.$$$($t.getTemplate(outerElement[i]),3));
+                }
+                loadEditor();
+            }else{
+                $t.xhr.get(src,false,function(text){
+                    texts.push($t.$$$(text,3));
+                    loadEditor();
+                })
+            }
+
+            function loadEditor(){
+                var edit=$t.renderIn("monacoedit",'ui',monacoedit,texts,null,props);
+                reset.onclick=function(){
+                    edit.editor.setValue($t.nodesToString(texts));
+                }
+                if(istry){
+                    cpn.ready.on(function(){
+                        cpn.runHTML($t.nodesToString(texts));
+                    });
+                    run.onclick=function(){
+                        cpn.runHTML(edit.editor.getValue());
+                    }
+                }
+            }
+        }
+    </script>
+</xmp>
