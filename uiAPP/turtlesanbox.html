@@ -1,25 +1,21 @@
 <xmp>
-    <iframe p-ref="ret" src="{src}" class="w100 shadowless bdw2 bdssolid pdip10" style="box-sizing:border-box;">
-        window.pushUI=$t.getClosure(function(callee,window,$t,uiHTML){
-            document.body.innerHTML=uiHTML;
-            $t.renderDocument();
-        },window,$t);
-    </iframe>
+    <iframe p-ref="ret" src="{src}" class="w100 shadowless bdw2 bdssolid pdip10" style="box-sizing:border-box;"></iframe>
     <script>
         var ret=part.$ret;
         part.ready=new $t.ReadyObject();
         ret.onload=function(){
-            ret=ret.valueOf();
+            // ret=ret.valueOf();
             var dom=ret.contentDocument;
             var win=ret.contentWindow;
             var scriptInject=dom.createElement("script");
             scriptInject.setAttribute("src","{turtlejspath}");
             scriptInject.setAttribute("baseuipath",$t.config.baseUIPath);
-            scriptInject.innerHTML=ret.childNodes[0].data;
+            scriptInject.innerHTML="window.pushUI=$t.getClosure(function(callee,window,$t,uiHTML){\n    document.body.innerHTML=uiHTML;\n    $t.renderDocument();\n},window,$t);";;
             dom.body.appendChild(scriptInject);
             part.runHTML=function(html){
+                ret.style.height="0px";
                 win.pushUI(html);
-                ret.style.height=dom.documentElement.scrollHeight+30+"px";
+                ret.style.height=dom.documentElement.scrollHeight+60+"px";
             }
             var tid=setInterval(function(){
                 if(win.hasOwnProperty("$t")){

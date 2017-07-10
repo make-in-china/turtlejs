@@ -7,7 +7,7 @@
     </ui:movepanel>
     <div p-ref="rectmask" class="abs zidx10 noevent" style="background-color:rgba(0,128,192,0.5);"></div>
     <div id="header_wrap" class="outer">
-        <div class="zidx3 fixed right0">
+        <div class="zidx3 right0" style="position:fixed;">
             <ui:growpanel p-name="control" title="JS控制台" extend="0" class="bgray15" style="font-family: 微软雅黑;">
                 <div class="mdip2">
                     <textarea p-ref="script" class="fz18 bgray4 wem20 hem10 fgray15 bdw0 rdip5 pdip5" style="outline-width: 0; resize:none;"></textarea>
@@ -50,21 +50,21 @@
                     var elem;
                     function append(cpns,space){
                         for(var i=0;i<cpns.length;i++){
-                            var elem=$node("div");
+                            var elem=$t.$$$("div");
                             elem.innerHTML='&lt;<span style="color:#c00;">'+cpns[i].template.sortPath+'</span>:<span style="color:#00f;">'+cpns[i].template.partName+'</span>&gt;<span style="color:#aaa;">props='+JSON.stringify(cpns[i].props)+'</span>';
                             elem.style.paddingLeft=space+"em";
                             
                             elems.push(elem);
                             
-                            var elem2=$node("a");
+                            var elem2=$t.$$$("a");
                             elem2.href="javascript:;";
                             elem2.innerHTML=" (删除) ";
                             
-                            var elem3=$node("a");
+                            var elem3=$t.$$$("a");
                             elem3.href="javascript:;";
                             elem3.innerHTML=" (元素) ";
                             
-                            var elem4=$node("a");
+                            var elem4=$t.$$$("a");
                             elem4.href="javascript:;";
                             elem4.innerHTML=" (定义) ";
                             var hideMask=$t.getReTimeout(function(){
@@ -77,13 +77,13 @@
                                     refresh();
                                 }
                                 elem3.onclick=function(){
-                                    var highlight=$t.renderBefore("highlightcode",'ui',part.end,[$node(cpn.innerHTML,3)]);
+                                    var highlight=$t.renderBefore("highlightcode",'ui',part.end,[$t.$$$(cpn.innerHTML,3)]);
                                     pSource.setContent(highlight.elements);
                                     pSource.setTitle(cpn.template.name);
                                     pSource.show();
                                 }
                                 elem4.onclick=function(){
-                                    var highlight=$t.renderBefore("highlightcode",'ui',part.end,[$node('<script>'+cpn.template.toDefineString()+'</sc'+'ript>',3)]);
+                                    var highlight=$t.renderBefore("highlightcode",'ui',part.end,[$t.$$$('<script>'+cpn.template.toDefineString()+'</sc'+'ript>',3)]);
                                     pSource.setContent(highlight.elements);
                                     pSource.setTitle(cpn.template.name);
                                     pSource.show();
@@ -130,7 +130,7 @@
                 var html;
                 $t.xhr.get(location.href,true,function(v){html=v});
                 source.onclick=function(){
-                    var htmltext=$node(html,3);
+                    var htmltext=$t.$$$(html,3);
                     var highlight=$t.renderBefore("highlightcode",'ui',part.end,[htmltext]);
                     pSource.setContent(highlight.elements);
                     pSource.setTitle('本页源码');
