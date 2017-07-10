@@ -2,11 +2,11 @@
 <script>
     var url='{url}';//getAttr(this,'url','');
     var action='{action!GET}'.toUpperCase();//getAttr(this,'action','get').toLowerCase();
-    var autoRun=parseBool('{autoRun!}');//parseBool(getAttr(this,'autoRun',true));
+    var autoRun=$t.parseBool('{autoRun!}');//$t.parseBool(getAttr(this,'autoRun',true));
     var name='{name!''}'//getAttr(this,'name','');
     var xhr=new XMLHttpRequest;
     var postData;
-    var async=parseBool('{async!}');
+    var async=$t.parseBool('{async!}');
     var onData;
     var t8=this.children[0];
     if(outer.length==0){

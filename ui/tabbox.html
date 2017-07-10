@@ -11,7 +11,7 @@
         <span tabitemcount class="valignt fz12 inlineBlock mwem1 hem1 pdip3 rem1 bred15 fgray15 lhem1 ct2" style="margin-right: -15px;margin-top:-10px;margin-left:-5px;"></span>
     </get>
     <script>
-        var tabsItem=$t.store.takeElem('tabsItem');
+        var tabsItem=$t.Store.takeElem($t.store,"tabsItem");
         part.$.init(part,outer,part.$content,part.$tabs,part.$panel,tabsItem[0],tabsItem[1],tabsItem[2]);
     </script>
 </xmp>
@@ -36,7 +36,7 @@
                 key=name;
             }
             if(!elem){
-                elem=$node('div');
+                elem=$t.$$$('div');
                 elem.setAttribute('tabname',name);
             }
             elemTabItem=tabsItem.cloneNode();
@@ -59,7 +59,7 @@
             if(canCount){
                 elemCount=tabsItemCount.cloneNode();
                 elemTabItem.appendChild(elemCount);
-                elemCount.appendChild($node("0",3));
+                elemCount.appendChild($t.$$$("0",3));
                 $t.bindNode(elemCount.childNodes[0],tabItem,'count');
             }
             tabItems.push(tabItem);
