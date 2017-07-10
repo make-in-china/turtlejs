@@ -1,22 +1,2 @@
 <!-- 提供继承 -->
-<xmp>
-    <script>
-        part.onInit=function(finalPart){
-            var partMain=finalPart.partMain;
-            if(partMain){
-                var style='{style!}';
-                if(style){
-                    $t.addStyle(partMain,style);
-                }
-                var className='{class!}';
-                if(className){
-                    $t.addClassName(partMain,className);   
-                }
-                var ref='{ref!}';
-                if(ref){
-                    partMain.setAttribute('ref',ref);
-                }
-            }
-        }
-    </script>
-</xmp>
+<xmp><script>part.runScript('{style!}','{class!}','{d-class!}','{ref!}','{click!}','{id!}','{show!}','{hide!}','{box.class!}');</script></xmp>
