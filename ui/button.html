@@ -10,18 +10,21 @@
 <xmp ui="skin.btn.add" extends='base'>
     <div p-main class="pointer fa ct wem1 hem1">&#xf067;</div></xmp>
     
+<xmp ui="skin.btn.default" extends='base'><div p-main><!content></div></xmp>
+
 <xmp ui="skinbutton"></xmp>
 
 <xmp>
     <script>
-        var skin='{skin!}';
+        var skin='{skin!default}';
         var that=this!==window?this:null;
-        if(skin){
+        // if(skin){
             $t.renderIn('skinbutton',part.template.sortPath,that,outer,outerElement,part.props,part,'','skin.btn.'+skin);
-        }else{
-            var elem=$node('div');
-            $t.appendNodes(elem,outer);
-            this.appendChild(elem);
-        }
+        // }else{
+            // debugger;
+            // var elem=$t.$$$('div');
+            // $t.appendNodes(elem,outer);
+            // this.appendChild(elem);
+        // }
     </script>
 </xmp>

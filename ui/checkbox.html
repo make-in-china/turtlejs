@@ -1,0 +1,12 @@
+<xmp extends='ui:base'>
+    <div p-ref='box' style='cursor: pointer;display:inline-block;color:#{color!555};'>
+        <input p-main type="checkbox" style="padding:4px 8px;border:1px solid #555;margin:3px;border-radius:8px;"/><!content>
+    </div>
+    <script>
+        part.$box.onclick=function(e){
+            if(e.target!==part.partMain){
+                part.partMain.click();
+            }
+        }
+    </script>
+<xmp>

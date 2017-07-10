@@ -16,17 +16,17 @@
                 panel.style.display='inline-block';
             }
             part.max=add.onclick=function(){
-                removeClass(sub,"uhide");
-                addClass(add,"uhide");
-                removeClass(content,"uhide");
+                $t.removeClass(sub,"uhide");
+                $t.addClass(add,"uhide");
+                $t.removeClass(content,"uhide");
                 part.emitResize();
             }
             part.min=sub.onclick=function(){
-                removeClass(add,"uhide");
-                addClass(sub,"uhide");
-                addClass(content,"uhide");
+                $t.removeClass(add,"uhide");
+                $t.addClass(sub,"uhide");
+                $t.addClass(content,"uhide");
             }
-            if(!parseBool({extend!0})){
+            if(!$t.parseBool({extend!0})){
                 sub.onclick();
             }
             part.onSetSize=function(rect){
