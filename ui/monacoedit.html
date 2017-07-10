@@ -1,0 +1,20 @@
+<xmp extends="ui:base">
+    <div p-main></div>
+    <script>
+        var path=part.template.path+'/'+part.template.name+'.res/vs';
+        $t.require(path+"/loader.js","",window);
+	    require.config({ paths: { 'vs': path }});
+        require(['vs/editor/editor.main'], function() {
+            var editor=monaco.editor;
+            part.editor = editor.create(part.partMain,{
+                minimap:{
+                    enabled:false
+                },
+                theme:"vs-dark",
+                value: $t.nodesToString(outer),
+                language: 'html'
+            });
+        });
+        
+    </script>
+</xmp>
